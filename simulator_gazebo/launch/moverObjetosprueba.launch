@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<launch>
+	
+	<!--node name="Waypoints" pkg="mbzirc" type="pruebamover" output="screen"/-->
+	<include file="$(find gazebo_ros)/launch/empty_world.launch"/>
+	<node name="Waypoints" pkg="mbzirc" type="pruebamover" output="screen"/>
+	  
+	<!--arg name="model" default="$(find rotors_description)/urdf/firefly.xacro" /-->
+    
+    <group ns="uav1">
+     <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
+       <arg name="name" value="uav1" />
+       <arg name="tf_prefix" value="uav1" />
+       <arg name="model" default="$(find rotors_description)/urdf/firefly.xacro" />
+       <!--arg name="model" value="$(arg model)" /-->
+       <arg name="x" value="0" />
+       <arg name="y" value="0" />
+       <arg name="z" value="0.1" />
+     </include>
+   </group>
+   
+   
+	
+</launch>
