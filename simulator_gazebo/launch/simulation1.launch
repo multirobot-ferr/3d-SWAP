@@ -2,6 +2,8 @@
 
 <launch>
     <node name="CreateFile" pkg="mbzirc_stage" type="createfileworld" output="screen" args="$(find mbzirc_stage)"/>
+
+    <node name="CameraView" pkg="mbzirc_stage" type="cameraview" output="screen"/>
 	
     <!--node name="Waypoints_File" pkg="mbzirc" type="waypoint_publisher" output="screen"/-->
 	

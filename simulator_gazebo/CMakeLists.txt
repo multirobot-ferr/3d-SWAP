@@ -49,7 +49,9 @@ if(GRVCQUAD_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
 	
 	find_package(catkin REQUIRED COMPONENTS 
-		grvc_quadrotor_com)
+        grvc_quadrotor_com roscpp sensor_msgs image_transport std_msgs cv_bridge)
+
+    find_package(OpenCV REQUIRED COMPONENTS)
 
 	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com)
 
@@ -66,3 +68,6 @@ set_target_properties(demo PROPERTIES FOLDER "samples")
 
 add_executable(createfileworld src/createfileworld.cpp)
 target_link_libraries(createfileworld LINK_PUBLIC grvc_com)
+
+add_executable(cameraview src/cameraview.cpp)
+target_link_libraries(cameraview ${catkin_LIBRARIES})
