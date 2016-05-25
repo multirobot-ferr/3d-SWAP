@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 
 <launch>
-    <node name="CreateFile" pkg="mbzirc" type="createfileworld" output="screen" args="$(find mbzirc)"/>
+    <node name="CreateFile" pkg="mbzirc_stage" type="createfileworld" output="screen" args="$(find mbzirc_stage)"/>
 	
     <!--node name="Waypoints_File" pkg="mbzirc" type="waypoint_publisher" output="screen"/-->
 	
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find mbzirc)/world/generate_world.world"/>
+        <arg name="world_name" value="$(find mbzirc_stage)/world/generate_world.world"/>
     	<arg name="paused" value="true"/>
   	</include>
   	
