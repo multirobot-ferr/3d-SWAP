@@ -64,5 +64,5 @@ add_executable(demo src/main.cpp)
 target_link_libraries(demo LINK_PUBLIC hal_server)
 set_target_properties(demo PROPERTIES FOLDER "samples")
 
-add_executable(createworld src/createfileworld.cpp)
-target_link_libraries(createworld LINK_PUBLIC grvc_com)
+add_executable(createfileworld src/createfileworld.cpp)
+target_link_libraries(createfileworld LINK_PUBLIC grvc_com)
