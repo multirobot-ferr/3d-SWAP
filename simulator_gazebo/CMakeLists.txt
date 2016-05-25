@@ -24,7 +24,7 @@
 # SOFTWARE.
 ################################################################################
 cmake_minimum_required (VERSION 2.6)
-project(mbzirc_demo)
+project(mbzirc_stage)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -49,9 +49,9 @@ if(GRVCQUAD_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
 	
 	find_package(catkin REQUIRED COMPONENTS 
-		grvc_quadrotor_hal)
+		grvc_quadrotor_com)
 
-	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_hal)
+	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com)
 
 	include_directories(${catkin_INCLUDE_DIRS})
 endif(GRVCQUAD_USE_ROS)
