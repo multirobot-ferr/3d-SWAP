@@ -4,9 +4,7 @@
     <node name="CreateFile" pkg="mbzirc_stage" type="createfileworld" output="screen" args="$(find mbzirc_stage)"/>
 
     <node name="CameraView" pkg="mbzirc_stage" type="cameraview" output="screen"/>
-	
-    <!--node name="Waypoints_File" pkg="mbzirc" type="waypoint_publisher" output="screen"/-->
-	
+		
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(find mbzirc_stage)/world/generate_world.world"/>
     	<arg name="paused" value="true"/>
@@ -36,8 +34,8 @@
         <arg name="pos_y" value="-25"/>
     </include>
 
+    <node name="spawn_object_blue_cylinder" pkg="gazebo_ros" type="spawn_model"
+        args="-file $(find mbzirc_stage)/urdf/object_blue_cylinder.sdf -sdf -x 0 -y 0 -z 0.05 -model object_blue_cylinder_mov" />
 
-  	<!--node name="Waypoints" pkg="mbzirc" type="pruebamover" output="screen"/-->
 
-	
 </launch>

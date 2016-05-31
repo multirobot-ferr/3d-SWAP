@@ -9,9 +9,17 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 -->
 <launch>
-	
-	<include file="$(find mbzirc_stage)/launch/simulation1.launch"/>
-	
-	<node name="demo_simulation" pkg="mbzirc_stage" type="demo" respawn="false"/>
+	<!-- Configurable options -->
+	<arg name="robot_name"/> <!-- Robot name defines the namespace for all topics regarding the robot -->
+	<arg name="pos_x" default="0.0"/>
+	<arg name="pos_y" default="0.0"/>
+	<arg name="pos_z" default="1.0"/>
 
+	<!-- Spawn a quad: send the robot XML to param server, push robot_description to factory and spawn robot in gazebo-->
+    <arg name="model" default="$(find mbzirc_stage)/urdf/object_blue_cylinder.urdf.xacro"/>
+    <param command="$(find xacro)/xacro.py '$(arg model)' model_name:=$(arg robot_name) name="robot_description_$(arg robot_name)"/>
+	<node name="spawn_$(arg robot_name)" pkg="gazebo_ros" type="spawn_model" 
+		args="-param robot_description_$(arg robot_name) -urdf -x $(arg pos_x) -y $(arg pos_y) -z $(arg pos_z) -model $(arg robot_name)"
+		respawn="false">
+	</node>
 </launch>
