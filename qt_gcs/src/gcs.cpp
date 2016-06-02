@@ -1,4 +1,4 @@
-#include "gcs/gcs.h"
+#include "qt_gcs/gcs.h"
 #include "ui_gcs.h"
 
 GCS::GCS(QWidget *parent) :

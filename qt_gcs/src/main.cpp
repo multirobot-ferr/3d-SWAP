@@ -1,4 +1,4 @@
-#include "gcs/gcs.h"
+#include <qt_gcs/gcs.h>
 #include <QApplication>
 
 int main(int argc, char *argv[])
