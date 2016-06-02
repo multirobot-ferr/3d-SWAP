@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>mbzirc_stage</name>
+  <name>mbzirc_gcs_view</name>
   <version>0.0.0</version>
   <description>The mbzirc package</description>
   <maintainer email="luisgrvc@todo.todo">luisgrvc</maintainer>
