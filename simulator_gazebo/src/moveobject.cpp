@@ -2,79 +2,50 @@
  * Node for move object
  * Author: Luis Manuel Ramirez de la Cova
  * Date: 30-05-2016
- * Modificate: 30-05-2016
+ * Modificate: 31-05-2016
  * Organization: University of Seville, GRVC
  * Description:
  */
 
-#include <iostream>
-#include <ros/ros.h>
-#include <geometry_msgs/Twist.h>
+#include <grvc_com/publisher.h>
+#include <grvc_quadrotor_hal/server.h>
+#include <cstdint>
+#include <thread>
+#include <vector>
+#include <string>
+#include <thread>
 
-class MoveObject
+using namespace grvc::com;
+using namespace grvc::hal;
+
+void updateObject(const std::string & object_blue_cylinder_mov, const std::vector<Vec3>&wplist, int _argc, char **_argv)
 {
-    private:
-        ros::NodeHandle nh_;
-        ros::Publisher cmd_vel_pub_;
+    Publisher* wpPub = new Publisher("hal_sample", (object_blue_cylinder_mov + "/hal/go_to_wp").c_str(), _argc, _argv);
+    std::string curState;
+    new Subscriber<std::string>("hal_sample", (object_blue_cylinder_mov + "/hal/state").c_str(), _argc, _argv, [&](const std::string& _str) {
+        curState = _str;
+    });
 
-    public:
-        MoveObject(ros::NodeHandle &nh)
-        {
-            nh_ = nh;
-            cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("/", 1);
-        }
+    while(curState != "finished")
+    {}
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    for (size_t i= 0; i < wplist.size(); i++)
+    {
+        wpPub->publish(wplist[i]);
+        std::this_thread::sleep_for(std::chrono::seconds(4));
+    }
+}
 
-        bool driveKeyboard()
-        {
-             std::cout << "Type a command and then press enter. " <<
-                   "Use '+' to move forward, 'l' to turn left, " << "'r' to turn right, '.' to exit.\n";
-             //we will be sending commands of type "twist"
-             geometry_msgs::Twist base_cmd;
-             char cmd[50];
-             while(nh_.ok())
-             {
-                 std::cin.getline(cmd, 50);
-                 if(cmd[0]!='+' && cmd[0]!='l' && cmd[0]!='r' && cmd[0]!='.')
-                 {
-                     std::cout << "unknown command:" << cmd << "\n";
-                     continue;
-                 }
-                 base_cmd.linear.x = base_cmd.linear.y = base_cmd.angular.z = 0;
-                 //move forward
-                 if(cmd[0]=='+')
-                 {
-                     base_cmd.linear.x = 0.25;
-                 }
-                 //turn left (yaw) and drive forward at the same time
-                 else if(cmd[0]=='l')
-                 {
-                     base_cmd.angular.z = 0.75;
-                     base_cmd.linear.x = 0.25;
-                 }
-                 //turn right (yaw) and drive forward at the same time
-                 else if(cmd[0]=='r')
-                 {
-                     base_cmd.angular.z = -0.75;
-                     base_cmd.linear.x = 0.25;
-                 }
-                 //quit
-                 else if(cmd[0]=='.')
-                 {
-                     break;
-                 }
-                 //publish the assembled command
-                 cmd_vel_pub_.publish(base_cmd);
-            }
-            return true;
-        }
-};
 
-int main(int argc, char** argv)
+int main(int _argc, char** _argv)
 {
-    //init the ROS node
-    ros::init(argc, argv, "robot_driver");
-    ros::NodeHandle nh;
-    MoveObject driver(nh);
-    driver.driveKeyboard();
+    std::vector<Vec3>wplist_1 = {{0.0, 1.0, 0.05},{0.0, 3.0, 0.05},{0.0, 5.0, 0.05}};
+    //updateObject("/object_blue_cylinder_mov", wplist_1, _argc, _argv);
+
+    std::thread object_blue_cylinder_mov(updateObject, "/object_blue_cylinder_mov", wplist_1, _argc, _argv);
+
+    object_blue_cylinder_mov.join();
+
+    return 0;
 
 }

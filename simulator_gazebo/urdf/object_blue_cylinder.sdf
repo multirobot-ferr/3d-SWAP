@@ -2,7 +2,7 @@
 <sdf version="1.4">
 <model name="Blue cylinder object">
   <pose>0 0 0.08 0 0 0</pose>
-  <static>true</static>
+  <static>false</static>
     <link name="link">
       <inertial>
         <mass>0.5</mass>
@@ -38,5 +38,6 @@
         </material>
       </visual>
     </link>
+    <!--plugin name="differential_controller" filename="libhector_quadrotor_controller.so"/-->
   </model>
 </sdf>
