@@ -6,3 +6,5 @@ cmake_install.cmake
 install_manifest.txt
 ./gcs/world/generate_world.world
 *~
+/gcs/build
+
