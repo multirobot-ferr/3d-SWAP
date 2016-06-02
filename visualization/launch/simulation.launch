@@ -13,7 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <launch>
     <node name="CreateFile" pkg="mbzirc_gcs_view" type="createfileworld" output="screen" args="$(find mbzirc_gcs_view)" />
 
-    <!--node name="CameraView" pkg="mbzirc_stage" type="cameraview" output="screen" /-->
+    <node name="CameraView" pkg="mbzirc_gcs_view" type="cameraview" output="screen" />
 
 
 		

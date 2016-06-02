@@ -62,15 +62,11 @@ endif(GRVCQUAD_USE_ROS)
 #FIND_PACKAGE(Eigen3 REQUIRED)
 #INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
 
-#add_executable(demo src/main.cpp)
-#target_link_libraries(demo LINK_PUBLIC hal_server)
-#set_target_properties(demo PROPERTIES FOLDER "samples")
-
 add_executable(createfileworld src/createfileworld.cpp)
 target_link_libraries(createfileworld LINK_PUBLIC grvc_com)
 
-#add_executable(cameraview src/cameraview.cpp)
-#target_link_libraries(cameraview ${catkin_LIBRARIES})
+add_executable(cameraview src/cameraview.cpp)
+target_link_libraries(cameraview ${catkin_LIBRARIES})
 
 #add_executable(moveobject src/moveobject.cpp)
 #target_link_libraries(moveobject LINK_PUBLIC hal_server)
