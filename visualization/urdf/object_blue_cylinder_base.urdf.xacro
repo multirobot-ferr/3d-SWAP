@@ -14,7 +14,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <xacro:include filename="$(find grvc_quadrotor_gazebo)/urdf/quadrotor_plugins.urdf.xacro" />
 
 <!--#####################################################################################-->  
-  <!-- Main quadrotor link -->
+  <!-- Main object link -->
   <xacro:macro name="quadrotor_base_macro" params="id model_name">
     <link name="base_link_${id}">
       <inertial>
@@ -26,7 +26,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-          <box size="0.3 0.3 0.20"/>
+          <cylinder length="0.2" radius="0.15"/>
       </geometry>
       <material name="blue">
           <color rgba="0 0 .8 0"/>
@@ -35,12 +35,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-          <box size="0.3 0.3 0.20"/>
+          <cylinder length="0.2" radius="0.15"/>
       </geometry>
     </collision>
   </link>
 
     <gazebo reference="base_link_${id}">
+      <material>Gazebo/Blue</material>
       <turnGravityOff>false</turnGravityOff>
     </gazebo>
 

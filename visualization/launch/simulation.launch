@@ -46,10 +46,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_y" value="-25"/>
     </include>
 
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_blue_cylinder.launch"/>
 
-    <!--node name="spawn_object_blue_cylinder" pkg="gazebo_ros" type="spawn_model"
-        args="-file $(find mbzirc_gcs_view)/urdf/object_blue_cylinder.sdf -sdf -x 0 -y 0 -z 1 -model object_blue_cylinder_mov" /-->
 
-    <!--node name="MoveObject" pkg="mbzirc_gcs_view" type="moveobject" output="screen" /-->
+    <node name="moveObject" pkg="mbzirc_gcs_view" type="moveobject" output="screen" />
 
 </launch>
