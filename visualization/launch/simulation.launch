@@ -46,8 +46,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_y" value="-25"/>
     </include>
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_blue_cylinder.launch"/>
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="urdf_file" value="object_blue_cylinder.urdf.xacro"/>
+        <arg name="robot_name" value="object_blue_cylinder_mov"/>
+        <arg name="pos_z" value="0.06"/>
+        <arg name="pos_x" value="-50"/>
+        <arg name="pos_y" value="20"/>
+    </include>
 
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="urdf_file" value="object_blue_box.urdf.xacro"/>
+        <arg name="robot_name" value="object_blue_box_mov"/>
+        <arg name="pos_z" value="0.06"/>
+        <arg name="pos_x" value="-30"/>
+        <arg name="pos_y" value="20"/>
+    </include-->
 
     <node name="moveObject" pkg="mbzirc_gcs_view" type="moveobject" output="screen" />
 

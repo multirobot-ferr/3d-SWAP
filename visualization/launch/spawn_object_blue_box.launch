@@ -4,23 +4,23 @@
   <!-- We resume the logic in empty_world.launch, changing only the name of
     the world to be launched -->
 
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  <!--include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="worlds/empty.world" />
     <arg name="paused" value="true"/>
-  </include>
+  </include-->
 
-  <arg name="robot_name" value="object_blue_cylinder_mov"/>
+  <arg name="robot_name" value="object_blue_box_mov"/>
 
   <!-- urdf xml robot description loaded on the Parameter Server-->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find mbzirc_gcs_view)/urdf/object_blue_cylinder.urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find mbzirc_gcs_view)/urdf/object_blue_box.urdf.xacro'" />
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
-  <node name="object_blue_cylinder_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+  <node name="object_blue_box_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
     args="-urdf -param robot_description -model $(arg robot_name)" />
 
     <node name="grvc_hal_$(arg robot_name)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
         args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/>
 
-  <node name="move_object" pkg="mbzirc_gcs_view" type="moveobject" output="screen" />
+  <!--node name="move_object" pkg="mbzirc_gcs_view" type="moveobject" output="screen" /-->
 
 </launch>

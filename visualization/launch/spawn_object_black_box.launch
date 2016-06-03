@@ -4,17 +4,10 @@
   <!-- We resume the logic in empty_world.launch, changing only the name of
     the world to be launched -->
 
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+  <!--include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="worlds/empty.world" />
     <arg name="paused" value="true"/>
-  </include>
-
-  <arg name="robot_name" value="object_black_box_mov"/>
-  <arg name="id" default="1"/>
-  <arg name="pos_x" default="0.0"/>
-  <arg name="pos_y" default="0.0"/>
-  <arg name="pos_z" default="0.05"/>
-  <arg name="gazebo_ns" default="$(arg robot_name)"/>
+  </include-->
 
   <!-- urdf xml robot description loaded on the Parameter Server-->
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find mbzirc_gcs_view)/urdf/object_black_box.urdf.xacro'" />
@@ -26,6 +19,6 @@
     <node name="grvc_hal_$(arg robot_name)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
         args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/>
 
-  <node name="move_object" pkg="mbzirc_gcs_view" type="moveobject" output="screen" />
+  <!--node name="move_object" pkg="mbzirc_gcs_view" type="moveobject" output="screen" /-->
 
 </launch>

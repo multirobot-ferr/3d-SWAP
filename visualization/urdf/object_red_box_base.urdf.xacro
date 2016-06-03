@@ -41,7 +41,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   </link>
 
     <gazebo reference="base_link_${id}">
-      <material>Red/Blue</material>
+      <material>Gazebo/Red</material>
       <turnGravityOff>false</turnGravityOff>
     </gazebo>
 
