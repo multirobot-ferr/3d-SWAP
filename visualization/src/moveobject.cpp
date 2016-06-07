@@ -39,12 +39,18 @@ void updateObject(const std::string & object_name, const std::vector<Vec3>&wplis
 
 int main(int _argc, char** _argv)
 {
-    std::vector<Vec3>wplist_1 = {{-50.0, -20.0, 0.07},{50.0, -20.0, 0.07},{50.0, 20.0, 0.07},{-50.0, 20.0, 0.07}, {-50.0, -20.0, 0.07},{50.0, -20.0, 0.07},{50.0, 20.0, 0.07},{-50.0, 20.0, 0.07}, {-50.0, -20.0, 0.07},{50.0, -20.0, 0.07},{50.0, 20.0, 0.07},{-50.0, 20.0, 0.07}};
+    //std::vector<Vec3>wplist_1 = {{-40.0, 10.0, 0.07},{-40.0, 0.0, 0.07}, {-40.0, -10.0, 0.07}, {-40.0, -20.0, 0.07}, {0.0, -20.0, 0.07}, {40, -20, 0.07}};
     //updateObject("/object_blue_cylinder_mov", wplist_1, _argc, _argv);
 
-    std::thread object_blue_cylinder_mov(updateObject, "/object_blue_cylinder_mov", wplist_1, _argc, _argv);
+    //std::thread object_black_cylinder_mov_1(updateObject, "/object_black_cylinder_mov_1", wplist_1, _argc, _argv);
 
-    object_blue_cylinder_mov.join();
+    std::vector<Vec3>wplist_2 = {{5.0, 2.0, 0.07},{5.0, -2.0, 0.07}, {2.0, -2.0, 0.07}, {-2.0, -2.0, 0.07}};
+    //updateObject("/object_black_box_mov", wplist_2, _argc, _argv);
+
+    std::thread object_red_cylinder_mov_1(updateObject, "/object_red_cylinder_mov_1", wplist_2, _argc, _argv);
+
+    //object_black_cylinder_mov_1.join();
+    object_red_cylinder_mov_1.join();
 
     return 0;
 

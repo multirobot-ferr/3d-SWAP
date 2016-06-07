@@ -1,24 +1,30 @@
 <?xml version="1.0"?>
 <launch>
 
-  <!-- We resume the logic in empty_world.launch, changing only the name of
-    the world to be launched -->
+    <!-- Configurable options -->
+    <arg name="robot_name"/> <!-- Robot name defines the namespace for all topics regarding the robot -->
+    <arg name="urdf_file"/>
+    <arg name="pos_x" default="0.0"/>
+    <arg name="pos_y" default="0.0"/>
+    <arg name="pos_z" default="1.0"/>
 
-  <!-- Configurable options -->
-  <arg name="robot_name"/>              <!-- Robot name defines the namespace for all topics regarding the robot -->
-  <arg name="pos_x" default="0.0"/>
-  <arg name="pos_y" default="0.0"/>
-  <arg name="pos_z" default="1.0"/>
-  <arg name="urdf_file"/>
+    <!-- Spawn a quad: send the robot XML to param server, push robot_description to factory and spawn robot in gazebo-->
+    <arg name="model" default="$(find mbzirc_gcs_view)/urdf/$(arg urdf_file)"/>
+    <param command="$(find xacro)/xacro.py '$(arg model)' model_name:=$(arg robot_name)" name="robot_description_$(arg robot_name)"/>
 
-  <!-- urdf xml robot description loaded on the Parameter Server-->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find mbzirc_gcs_view)/urdf/$(arg urdf_file)'" />
-
-  <!-- push robot_description to factory and spawn robot in gazebo -->
-  <node name="$(arg robot_name)" pkg="gazebo_ros" type="spawn_model" output="screen"
-    args="-urdf -x $(arg pos_x) -y $(arg pos_y) -z $(arg pos_z) -param robot_description -model $(arg robot_name)" />
+    <node name="spawn_$(arg robot_name)" pkg="gazebo_ros" type="spawn_model"
+        args="-param robot_description_$(arg robot_name) -urdf -x $(arg pos_x) -y $(arg pos_y) -z $(arg pos_z) -model $(arg robot_name)"
+        respawn="false">
+    </node>
 
     <node name="grvc_hal_$(arg robot_name)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
         args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/>
 
+    <!--node name="move_object" pkg="mbzirc_gcs_view" type="moveobject" output="screen" /-->
+
 </launch>
+
+
+
+
+

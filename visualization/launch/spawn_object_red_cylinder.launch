@@ -10,13 +10,16 @@
   </include-->
 
   <arg name="robot_name" value="object_red_cylinder_mov"/>
+  <arg name="pos_x" default="0.0"/>
+  <arg name="pos_y" default="0.0"/>
+  <arg name="pos_z" default="1.0"/>
 
   <!-- urdf xml robot description loaded on the Parameter Server-->
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find mbzirc_gcs_view)/urdf/object_red_cylinder.urdf.xacro'" />
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
   <node name="object_red_cylinder_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
-    args="-urdf -param robot_description -model $(arg robot_name)" />
+    args="-urdf -x $(arg pos_x) -y $(arg pos_y) -z $(arg pos_z) -param robot_description -model $(arg robot_name)" />
 
     <node name="grvc_hal_$(arg robot_name)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
         args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/>

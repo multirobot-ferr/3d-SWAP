@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- 
+<!--
 The MIT License (MIT)
 Copyright (c) 2016 GRVC University of Seville
 
@@ -7,37 +7,43 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
 
 <launch>
+
+<!--******************************NODE GENERATE WORLD****************************************-->
     <node name="CreateFile" pkg="mbzirc_gcs_view" type="createfileworld" output="screen" args="$(find mbzirc_gcs_view)" />
 
+<!--******************************NODE GENERATE OPENCV WINDOWS****************************************-->
     <node name="CameraView" pkg="mbzirc_gcs_view" type="cameraview" output="screen" />
 
 
-		
-	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+<!--******************************WORLD****************************************-->
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(find mbzirc_gcs_view)/world/generate_world.world"/>
-    	<arg name="paused" value="true"/>
-  	</include>
-  	
-    <include file="$(find grvc_quadrotor_hal)/launch/spawn_quad_gazebo.launch">
+        <arg name="paused" value="true"/>
+    </include>
+
+<!--******************************UAVs****************************************-->
+
+    <!--include file="$(find grvc_quadrotor_hal)/launch/spawn_quad_gazebo.launch">
         <arg name="robot_name" value="quad1"/>
         <arg name="id" value="1"/>
         <arg name="pos_x" value="65"/>
         <arg name="pos_y" value="-26.5"/>
         <arg name="pos_z" value="0.3"/>
-    </include>
+    </include-->
 
-    <include file="$(find grvc_quadrotor_hal)/launch/spawn_quad_gazebo.launch">
+    <!--include file="$(find grvc_quadrotor_hal)/launch/spawn_quad_gazebo.launch">
         <arg name="robot_name" value="quad2"/>
         <arg name="id" value="2"/>
         <arg name="pos_x" value="65"/>
         <arg name="pos_y" value="-23.5"/>
         <arg name="pos_z" value="0.3"/>
-    </include>
-  	
+    </include-->
+
     <include file="$(find grvc_quadrotor_hal)/launch/spawn_quad_gazebo.launch">
         <arg name="robot_name" value="quad3"/>
         <arg name="id" value="3"/>
@@ -46,22 +52,89 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_y" value="-25"/>
     </include>
 
+<!--******************************DINAMIC_OBJECTS****************************************-->
+
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
-        <arg name="urdf_file" value="object_blue_cylinder.urdf.xacro"/>
-        <arg name="robot_name" value="object_blue_cylinder_mov"/>
-        <arg name="pos_z" value="0.06"/>
-        <arg name="pos_x" value="-50"/>
+        <arg name="robot_name" value="object_black_cylinder_mov_1"/>
+        <arg name="urdf_file" value="object_black_cylinder.urdf.xacro"/>
+        <arg name="pos_x" value="-40"/>
         <arg name="pos_y" value="20"/>
+        <arg name="pos_z" value="0.07"/>
     </include>
 
-    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
-        <arg name="urdf_file" value="object_blue_box.urdf.xacro"/>
-        <arg name="robot_name" value="object_blue_box_mov"/>
-        <arg name="pos_z" value="0.06"/>
-        <arg name="pos_x" value="-30"/>
-        <arg name="pos_y" value="20"/>
-    </include-->
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="robot_name" value="object_black_cylinder_mov_2"/>
+        <arg name="urdf_file" value="object_black_cylinder.urdf.xacro"/>
+        <arg name="pos_x" value="17"/>
+        <arg name="pos_y" value="-2"/>
+        <arg name="pos_z" value="0.07"/>
+    </include>
 
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="robot_name" value="object_black_box_mov_1"/>
+        <arg name="urdf_file" value="object_black_box.urdf.xacro"/>
+        <arg name="pos_x" value="-6"/>
+        <arg name="pos_y" value="13"/>
+        <arg name="pos_z" value="0.07"/>
+    </include>
+
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="robot_name" value="object_black_box_mov_2"/>
+        <arg name="urdf_file" value="object_black_box.urdf.xacro"/>
+        <arg name="pos_x" value="32"/>
+        <arg name="pos_y" value="12"/>
+        <arg name="pos_z" value="0.07"/>
+    </include>
+
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="robot_name" value="object_blue_box_mov_1"/>
+        <arg name="urdf_file" value="object_blue_box.urdf.xacro"/>
+        <arg name="pos_x" value="-38"/>
+        <arg name="pos_y" value="-7"/>
+        <arg name="pos_z" value="0.07"/>
+    </include>
+
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="robot_name" value="object_blue_cylinder_mov_1"/>
+        <arg name="urdf_file" value="object_blue_cylinder.urdf.xacro"/>
+        <arg name="pos_x" value="10"/>
+        <arg name="pos_y" value="8"/>
+        <arg name="pos_z" value="0.07"/>
+    </include>
+
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="robot_name" value="object_red_box_mov_1"/>
+        <arg name="urdf_file" value="object_red_box.urdf.xacro"/>
+        <arg name="pos_x" value="-18"/>
+        <arg name="pos_y" value="27"/>
+        <arg name="pos_z" value="0.07"/>
+    </include>
+
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="robot_name" value="object_red_box_mov_2"/>
+        <arg name="urdf_file" value="object_red_box.urdf.xacro"/>
+        <arg name="pos_x" value="22"/>
+        <arg name="pos_y" value="-28"/>
+        <arg name="pos_z" value="0.07"/>
+    </include>
+
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="robot_name" value="object_red_cylinder_mov_1"/>
+        <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
+        <arg name="pos_x" value="-3"/>
+        <arg name="pos_y" value="-28"/>
+        <arg name="pos_z" value="0.07"/>
+    </include>
+
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+        <arg name="robot_name" value="object_red_cylinder_mov_2"/>
+        <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
+        <arg name="pos_x" value="17"/>
+        <arg name="pos_y" value="13"/>
+        <arg name="pos_z" value="0.07"/>
+    </include>
+
+<!--******************************NODE MOVE DINAMICS OBJECTS****************************************-->
     <node name="moveObject" pkg="mbzirc_gcs_view" type="moveobject" output="screen" />
 
 </launch>
