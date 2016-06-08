@@ -30,6 +30,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
   <property name="wirst_mu" value="0.0" />
 
   <!-- ######################################################################## -->
+
   <!-- A single propeller -->
   <xacro:macro name="quadrotor_single_propeller" params="propid id xyz">
     <link name="prop_${propid}_${id}">
@@ -61,8 +62,9 @@ xmlns:xacro="http://ros.org/wiki/xacro">
     </joint>
   </xacro:macro>
   
-<!--#####################################################################################-->  
-    <!-- Camera -->
+<!--##############################CAMERA#######################################################-->
+
+  <!-- Camera -->
   <xacro:macro name="generic_camera" params="id"> 	
   	<link name="camera_link_${id}">
     	<inertial>
@@ -128,7 +130,73 @@ xmlns:xacro="http://ros.org/wiki/xacro">
       	</sensor>
     </gazebo>
   </xacro:macro>
-  
+
+  <!-- #########################SONAR############################################### -->
+
+  <xacro:macro name="sonar_sensor" params="id">
+    <link name="sonar_link_${id}">
+      <inertial>
+        <mass value="0.000" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <inertia ixx="0.00000000" ixy="0" ixz="0" iyy="0.00000000" iyz="0" izz="0.00000000" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://hector_sensors_description/meshes/sonar_sensor/max_sonar_ez4.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.01 0.01 0.01" />
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="sonar_${id}_joint" type="fixed">
+      <origin xyz="0 0.25 0.032" rpy="0 1.57 0"/>
+      <parent link="base_link_${id}"/>
+      <child link="sonar_link_${id}"/>
+    </joint>
+
+    <gazebo reference="sonar_link_${id}">
+      <sensor type="ray" name="sonar_link_${id}_sensor">
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>3</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.35</min_angle>
+              <max_angle> 0.35</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>3</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.35</min_angle>
+              <max_angle>0.35</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.03</min>
+            <max>100</max>
+            <resolution>0.01</resolution>
+          </range>
+        </ray>
+
+        <plugin name="gazebo_ros_sonar_link_${id}_controller" filename="libhector_gazebo_ros_sonar.so">
+          <gaussianNoise>0.005</gaussianNoise>
+          <topicName>sonar_${id}</topicName>
+          <frameId>sonar_link_${id}</frameId>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
   <!-- ######################################################################## -->
   <!-- Main quadrotor link -->
   <xacro:macro name="quadrotor_base_macro" params="id model_name">
@@ -159,6 +227,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
     <xacro:quadrotor_single_propeller propid="2" id="${id}" xyz="-0.40 0.00 0.03" />
     <xacro:quadrotor_single_propeller propid="3" id="${id}" xyz="0.00 -0.40 0.03" />
     <xacro:generic_camera  id="${id}" />
+    <xacro:sonar_sensor id="${id}" />
 
     <gazebo reference="base_link_${id}">
       <turnGravityOff>false</turnGravityOff>
@@ -167,11 +236,6 @@ xmlns:xacro="http://ros.org/wiki/xacro">
     <!-- Gazebo Plugins -->
     <xacro:quadrotor_plugins model_name="${model_name}" base_link="base_link_${id}"/>
 	
-  </xacro:macro>
-  
-
-   
-
-
+  </xacro:macro>  
 
 </robot>
