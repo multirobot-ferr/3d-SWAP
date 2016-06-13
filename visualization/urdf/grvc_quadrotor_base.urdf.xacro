@@ -116,7 +116,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
           		<imageTopicName>image_raw_${id}</imageTopicName>
           		<cameraInfoTopicName>camera_info_${id}</cameraInfoTopicName>
           		<frameName>camera_link_${id}</frameName>
-          		<CxPrime>320.5</CxPrime>
+                <!--CxPrime>320.5</CxPrime>
           		<Cx>320.5</Cx>
           		<Cy>240.5</Cy>
           		<hackBaseline>0</hackBaseline>
@@ -125,7 +125,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
           		<distortionK2>0.0</distortionK2>
           		<distortionK3>0.0</distortionK3>
           		<distortionT1>0.0</distortionT1>
-          		<distortionT2>0.0</distortionT2>
+                <distortionT2>0.0</distortionT2-->
         	</plugin>
       	</sensor>
     </gazebo>
