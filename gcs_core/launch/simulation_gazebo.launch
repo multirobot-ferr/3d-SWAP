@@ -14,6 +14,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	
 	<include file="$(find mbzirc_gcs_view)/launch/simulation.launch" />
 	
-	<node name="gcs_core" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" />
+	<node name="gcs_core_quad1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=quad1" />
+	<node name="gcs_core_quad2" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=quad2" />
+	<node name="gcs_core_quad3" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=quad3" />
 
 </launch>

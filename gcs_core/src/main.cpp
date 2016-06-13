@@ -21,6 +21,7 @@
 #include <grvc_com/publisher.h>
 #include <grvc_quadrotor_hal/server.h>
 #include <grvc_quadrotor_hal/types.h>
+#include <grvc_utils/argument_parser.h>
 #include <cstdint>
 #include <thread>
 #include <vector>
@@ -64,7 +65,7 @@ struct Quadrotor {
 		double fly_z = path_[0].pos.z();
 		take_off_pub_->publish(fly_z, true);
 		// This is a hack: ROS misses the first few state messages, so we have to check manually.
-		while (cur_z_ < fly_z) {
+		while (cur_z_ < fly_z*0.8) {
 			this_thread::sleep_for(chrono::milliseconds(100));
 		}
 
@@ -103,72 +104,66 @@ void quad_thread(const string& _quad_name, const WaypointList& _list, int _argc,
 }
 
 int main(int _argc, char** _argv) {
+	grvc::utils::ArgumentParser parser(_argc, _argv);
+	string quad = parser.getArgument("quad_name", string("quad1"));
 
-	WaypointList wplist_1 = {
-		{{60.0, -25.0, 20}, 0.0},
-		{{30.0, -20.0, 20}, 0.0},
-		{{0.0, -20.0, 20}, 0.0},
-		{{-30.0, -20.0, 20}, 0.0},
-		{{-50.0, -20.0, 20}, 0.0},
-		{{-50.0, 0.0, 20}, 0.0},
-		{{-50.0, 20.0, 20}, 0.0},
-		{{-30.0, 20.0, 20}, 0.0},
-		{{0.0, 20.0, 20}, 0.0},
-		{{30.0, 20.0, 20}, 0.0},
-		{{-30.0, 20.0, 20}, 0.0},
-		{{50.0, 20.0, 20}, 0.0}
-	};
-	//updateQuadrotor("/quad1", wplist_1, _argc, _argv);
+	if(quad == "quad1") {
+		WaypointList wplist_1 = {
+			{{60.0, -25.0, 20}, 0.0},
+			{{30.0, -20.0, 20}, 0.0},
+			{{0.0, -20.0, 20}, 0.0},
+			{{-30.0, -20.0, 20}, 0.0},
+			{{-50.0, -20.0, 20}, 0.0},
+			{{-50.0, 0.0, 20}, 0.0},
+			{{-50.0, 20.0, 20}, 0.0},
+			{{-30.0, 20.0, 20}, 0.0},
+			{{0.0, 20.0, 20}, 0.0},
+			{{30.0, 20.0, 20}, 0.0},
+			{{-30.0, 20.0, 20}, 0.0},
+			{{50.0, 20.0, 20}, 0.0}
+		};
 
-	std::thread quad1([&](){
 		quad_thread("/quad1", wplist_1, _argc, _argv);
-	});
-
-	WaypointList wplist_2 = {
-		{{60, -15.0, 16}, 0.0},
-		{{30, -5.0, 16}, 0.0},
-		{{0.0, 0.0, 16}, 0.0},
-		{{-30, 10.0, 16}, 0.0},
-		{{-50, 20.0, 16}, 0.0},
-		{{0, 20.0, 16}, 0.0},
-		{{10, 0.0, 16}, 0.0},
-		{{30, -5.0, 16}, 0.0},
-		{{0.0, 0.0, 16}, 0.0},
-		{{-30, 10.0, 16}, 0.0},
-		{{-50, 20.0, 16}, 0.0},
-		{{0, 20.0, 16}, 0.0},
-		{{10, 0.0, 16}, 0.0}
-	};
-	//updateQuadrotor("/quad2", wplist_2, _argc, _argv);
-
-	std::thread quad2([&](){
+	}
+	else if (quad == "quad2") {
+		WaypointList wplist_2 = {
+			{{60, -15.0, 16}, 0.0},
+			{{30, -5.0, 16}, 0.0},
+			{{0.0, 0.0, 16}, 0.0},
+			{{-30, 10.0, 16}, 0.0},
+			{{-50, 20.0, 16}, 0.0},
+			{{0, 20.0, 16}, 0.0},
+			{{10, 0.0, 16}, 0.0},
+			{{30, -5.0, 16}, 0.0},
+			{{0.0, 0.0, 16}, 0.0},
+			{{-30, 10.0, 16}, 0.0},
+			{{-50, 20.0, 16}, 0.0},
+			{{0, 20.0, 16}, 0.0},
+			{{10, 0.0, 16}, 0.0}
+		};
+		
 		quad_thread("/quad2", wplist_2, _argc, _argv);
-	});
+	}
 
-	WaypointList wplist_3 = {
-		{{60.0, -10.0, 18}, 0.0},
-		{{55.0, -10.0, 18}, 0.0},
-		{{45.0, -5.0, 18}, 0.0},
-		{{35.0, -10.0, 18}, 0.0},
-		{{25.0, -5, 18}, 0.0},
-		{{20.0, 0.0, 18}, 0.0},
-		{{20.0, 5.0, 18}, 0.0},
-		{{10.0, -5.0, 18}, 0.0},
-		{{0.0, 5.0, 18}, 0.0},
-		{{-10.0, 10.0, 18}, 0.0},
-		{{-15.0, 10.0, 18}, 0.0},
-		{{-25.0, 0.0, 18}, 0.0},
-		{{-10.0, -10.0, 18.0}, 0.0}
-	};
-	//updateQuadrotor("/quad2", wplist_2, _argc, _argv);
-
-	std::thread quad3([&](){
+	else {
+		WaypointList wplist_3 = {
+			{{60.0, -10.0, 18}, 0.0},
+			{{55.0, -10.0, 18}, 0.0},
+			{{45.0, -5.0, 18}, 0.0},
+			{{35.0, -10.0, 18}, 0.0},
+			{{25.0, -5, 18}, 0.0},
+			{{20.0, 0.0, 18}, 0.0},
+			{{20.0, 5.0, 18}, 0.0},
+			{{10.0, -5.0, 18}, 0.0},
+			{{0.0, 5.0, 18}, 0.0},
+			{{-10.0, 10.0, 18}, 0.0},
+			{{-15.0, 10.0, 18}, 0.0},
+			{{-25.0, 0.0, 18}, 0.0},
+			{{-10.0, -10.0, 18.0}, 0.0}
+		};
+	
 		quad_thread("/quad3", wplist_3, _argc, _argv);
-	});
-
-	quad1.join();
-	quad2.join();
-	quad3.join();
+	}
 
 	return 0;
 }

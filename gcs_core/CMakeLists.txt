@@ -65,4 +65,3 @@ endif(GRVCQUAD_USE_ROS)
 add_executable(gcs_core src/main.cpp)
 target_link_libraries(gcs_core LINK_PUBLIC hal_server)
 set_target_properties(gcs_core PROPERTIES FOLDER "samples")
-
