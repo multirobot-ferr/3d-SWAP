@@ -28,7 +28,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <!--******************************UAVs****************************************-->
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_quad.launch">
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_prueba.launch">
         <arg name="robot_name" value="quad1"/>
         <!--arg name="urdf_file" value="grvc_quadrotor.urdf.xacro"/-->
         <arg name="id" value="1"/>
@@ -37,7 +37,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_z" value="0.3"/>
     </include>
 
-    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_quad_gazebo.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_quad_prueba.launch">
         <arg name="robot_name" value="quad2"/>
         <arg name="urdf_file" value="grvc_quadrotor.urdf.xacro"/>
         <arg name="id" value="2"/>
@@ -46,7 +46,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_z" value="0.3"/>
     </include>
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_gazebo.launch">
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_prueba.launch">
         <arg name="robot_name" value="quad3"/>
         <arg name="urdf_file" value="grcv_quadrotor.urdf.xacro"/>
         <arg name="id" value="3"/>
