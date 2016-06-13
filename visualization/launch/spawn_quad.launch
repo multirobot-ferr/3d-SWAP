@@ -18,7 +18,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	<arg name="pos_y" default="0.0"/>
 	<arg name="pos_z" default="1.0"/>
     <arg name="gazebo_ns" default="$(arg robot_name)"/>
-    <arg name="use_ground_truth_for_tf" default="true"/>
+
 
 	<!-- Spawn a quad: send the robot XML to param server, push robot_description to factory and spawn robot in gazebo-->
     <arg name="model" default="$(find mbzirc_gcs_view)/urdf/grvc_quadrotor.urdf.xacro"/>
@@ -31,19 +31,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         respawn="false" output="screen">
 	</node>
 
-    <!-- Spawn launch hal controller -->
-    <node name="grvc_hal_$(arg robot_name)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
-        args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/>
 
-
-    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"  />
-
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" >
-        <param name="publish_frequency" type="double" value="50.0" />
-    </node>
-
-
-    <!-- RVIZ -->
-    <node name="rviz" pkg="rviz" type="rviz" />
 
 </launch>

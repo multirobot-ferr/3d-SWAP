@@ -10,57 +10,31 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 -->
 <launch>
-   <arg name="robot_name"/>
-   <arg name="model" default="$(find mbzirc_gcs_view)/urdf/grvc_quadrotor.urdf.xacro"/>
-   <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
-   <arg name="pos_x" default="0.0"/>
-   <arg name="pos_y" default="0.0"/>
-   <arg name="pos_z" default="0.3"/>
-   <arg name="id" default="1"/>
+    <!-- Configurable options -->
+    <arg name="robot_name"/> <!-- Robot name defines the namespace for all topics regarding the robot -->
+    <arg name="id" default="1"/>
+    <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
+    <arg name="pos_x" default="0.0"/>
+    <arg name="pos_y" default="0.0"/>
+    <arg name="pos_z" default="1.0"/>
+    <arg name="gazebo_ns" default="$(arg robot_name)"/>
 
-   <arg name="use_ground_truth_for_tf" default="true" />
-   <arg name="use_ground_truth_for_control" default="true" />
-   <arg name="use_pose_estimation" if="$(arg use_ground_truth_for_control)" default="false"/>
-   <arg name="use_pose_estimation" unless="$(arg use_ground_truth_for_control)" default="true"/>
 
-   <!-- send the robot XML to param server -->
-   <param name="robot_description" command="$(find xacro)/xacro.py '$(arg model)'" />
-   <param name="tf_prefix" type="string" value="$(arg tf_prefix)" />
+    <!-- Spawn a quad: send the robot XML to param server, push robot_description to factory and spawn robot in gazebo-->
+    <arg name="model" default="$(find mbzirc_gcs_view)/urdf/grvc_quadrotor.urdf.xacro"/>
+    <param name="robot_description_$(arg robot_name)" command="$(find xacro)/xacro.py '$(arg model)' model_name:=$(arg robot_name) id:=$(arg id)" />
+    <param name="tf_prefix" type="string" value="$(arg tf_prefix)"/>
 
-   <!-- push robot_description to factory and spawn robot in gazebo -->
-   <node name="spawn_$(arg robot_name)" pkg="gazebo_ros" type="spawn_model"
-     args="-param robot_description
-           -urdf
-           -x $(arg pos_x)
-           -y $(arg pos_y)
-           -z $(arg pos_z)
-           -model $(arg robot_name)"
-     respawn="false" output="screen"/>
 
-   <!-- start robot state publisher -->
-   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher_$(arg robot_name)" output="screen" >
-     <param name="publish_frequency" type="double" value="50.0" />
-   </node>
+    <node name="spawn_$(arg robot_name)" pkg="gazebo_ros" type="spawn_model"
+        args="-param robot_description_$(arg robot_name) -urdf -x $(arg pos_x) -y $(arg pos_y) -z $(arg pos_z) -model $(arg robot_name)"
+        respawn="false" output="screen">
+    </node>
 
-   <!-- publish state and tf -->
-   <node name="ground_truth_to_tf_$(arg robot_name)" pkg="message_to_tf" type="message_to_tf" output="screen">
-     <param name="odometry_topic" value="ground_truth/state" />
-     <param name="frame_id" value="/world" />
-     <param name="tf_prefix" value="$(arg tf_prefix)" if="$(arg use_ground_truth_for_tf)" />
-     <param name="tf_prefix" value="$(arg tf_prefix)/ground_truth" unless="$(arg use_ground_truth_for_tf)" />
-   </node>
-   <!--group if="$(arg use_pose_estimation)">
-     <node name="pose_estimation" pkg="hector_quadrotor_pose_estimation" type="hector_quadrotor_pose_estimation" output="screen">
-       <rosparam file="$(find hector_quadrotor_pose_estimation)/params/simulation.yaml" />
-       <param name="nav_frame" value="$(arg tf_prefix)/nav" />
-       <param name="publish_world_nav_transform" value="true" />
-       <param name="tf_prefix" value="$(arg tf_prefix)" unless="$(arg use_ground_truth_for_tf)" />
-       <param name="tf_prefix" value="$(arg tf_prefix)/pose_estimation" if="$(arg use_ground_truth_for_tf)" />
-     </node>
-   </group-->
-
+    <!-- Spawn launch hal controller -->
     <node name="grvc_hal_$(arg robot_name)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
         args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/>
+
 
     <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find mbzirc_gcs_view)/rviz/prueba1.rviz" /-->
 
