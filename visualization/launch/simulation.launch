@@ -28,7 +28,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <!--******************************UAVs****************************************-->
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_gazebo.launch">
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_quad.launch">
         <arg name="robot_name" value="quad1"/>
         <!--arg name="urdf_file" value="grvc_quadrotor.urdf.xacro"/-->
         <arg name="id" value="1"/>
@@ -37,9 +37,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_z" value="0.3"/>
     </include>
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_gazebo.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_quad_gazebo.launch">
         <arg name="robot_name" value="quad2"/>
-        <!--arg name="urdf_file" value="grvc_quadrotor.urdf.xacro"/-->
+        <arg name="urdf_file" value="grvc_quadrotor.urdf.xacro"/>
         <arg name="id" value="2"/>
         <arg name="pos_x" value="65"/>
         <arg name="pos_y" value="-23.5"/>
@@ -48,16 +48,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_gazebo.launch">
         <arg name="robot_name" value="quad3"/>
-        <!--arg name="urdf_file" value="grcv_quadrotor.urdf.xacro"/-->
+        <arg name="urdf_file" value="grcv_quadrotor.urdf.xacro"/>
         <arg name="id" value="3"/>
         <arg name="pos_z" value="0.3"/>
         <arg name="pos_x" value="65"/>
         <arg name="pos_y" value="-25"/>
-    </include>
+    </include-->
 
 <!--******************************DINAMIC_OBJECTS****************************************-->
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object.launch">
         <arg name="robot_name" value="object_black_cylinder_mov_1"/>
         <arg name="urdf_file" value="object_black_cylinder.urdf.xacro"/>
         <arg name="pos_x" value="-40"/>
@@ -135,9 +135,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_x" value="17"/>
         <arg name="pos_y" value="13"/>
         <arg name="pos_z" value="0.07"/>
-    </include>
+    </include-->
 
 <!--******************************NODE MOVE DINAMICS OBJECTS****************************************-->
     <!--node name="moveObject" pkg="mbzirc_gcs_view" type="moveobject" output="screen" /-->
+
+
 
 </launch>

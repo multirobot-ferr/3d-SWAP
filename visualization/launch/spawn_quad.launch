@@ -11,16 +11,34 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <launch>
 	<!-- Configurable options -->
 	<arg name="robot_name"/> <!-- Robot name defines the namespace for all topics regarding the robot -->
-	<arg name="id" default="1"/>
+    <arg name="id" default="1"/>
+    <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
 	<arg name="pos_x" default="0.0"/>
 	<arg name="pos_y" default="0.0"/>
 	<arg name="pos_z" default="1.0"/>
+    <arg name="gazebo_ns" default="$(arg robot_name)"/>
 
 	<!-- Spawn a quad: send the robot XML to param server, push robot_description to factory and spawn robot in gazebo-->
     <arg name="model" default="$(find mbzirc_gcs_view)/urdf/grvc_quadrotor.urdf.xacro"/>
-	<param command="$(find xacro)/xacro.py '$(arg model)' model_name:=$(arg robot_name) id:=$(arg id)" name="robot_description_$(arg robot_name)"/>
-	<node name="spawn_$(arg robot_name)" pkg="gazebo_ros" type="spawn_model" 
+    <param command="$(find xacro)/xacro.py '$(arg model)' model_name:=$(arg robot_name) id:=$(arg id)" name="robot_description_$(arg robot_name)"/>
+    <param name="tf_prefix" type="string" value="$(arg tf_prefix)"/>
+    <param name="use_gui" value="false" />
+
+    <node name="spawn_$(arg robot_name)" pkg="gazebo_ros" type="spawn_model"
 		args="-param robot_description_$(arg robot_name) -urdf -x $(arg pos_x) -y $(arg pos_y) -z $(arg pos_z) -model $(arg robot_name)"
 		respawn="false">
 	</node>
+
+    <!-- Spawn launch hal controller -->
+    <node name="grvc_hal_$(arg robot_name)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
+        args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" />
+
+    <!--node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"  />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" >
+        <param name="publish_frequency" type="double" value="50.0" />
+    </node-->
+
 </launch>

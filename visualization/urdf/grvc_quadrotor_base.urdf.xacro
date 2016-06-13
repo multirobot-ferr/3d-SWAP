@@ -102,8 +102,8 @@ xmlns:xacro="http://ros.org/wiki/xacro">
         		<horizontal_fov>1.07079633</horizontal_fov>
           		<image>
             		<format>R8G8B8</format>
-            		<width>800</width>
-            		<height>800</height>
+                    <width>1280</width>
+                    <height>960</height>
           		</image>
           		<clip>
             		<near>0.01</near>
@@ -120,7 +120,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
           		<Cx>320.5</Cx>
           		<Cy>240.5</Cy>
           		<hackBaseline>0</hackBaseline>
-          		<focalLength>674.315744</focalLength>
+                <focalLength>1078.905191</focalLength>
           		<distortionK1>0.0</distortionK1>
           		<distortionK2>0.0</distortionK2>
           		<distortionK3>0.0</distortionK3>
