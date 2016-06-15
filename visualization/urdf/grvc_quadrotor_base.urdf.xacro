@@ -210,22 +210,24 @@ xmlns:xacro="http://ros.org/wiki/xacro">
       <visual>
         <origin xyz="0 0 -0.25" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://grvc_quadrotor_gazebo/model/grvc_quad.dae"/>
+          <mesh filename="package://mbzirc_gcs_view/model/firefly_scale.dae"/>
         </geometry>
       </visual>
 
       <collision>
         <origin xyz="0 0 -0.25" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://grvc_quadrotor_gazebo/model/grvc_quad_simplified.stl"/>
+          <mesh filename="package://mbzirc_gcs_view/model/firefly_scale.dae"/>
         </geometry>
       </collision>
     </link>
 
-    <xacro:quadrotor_single_propeller propid="0" id="${id}" xyz="0.40 0.00 0.03" />
-    <xacro:quadrotor_single_propeller propid="1" id="${id}" xyz="0.00 0.41 0.03" />
-    <xacro:quadrotor_single_propeller propid="2" id="${id}" xyz="-0.40 0.00 0.03" />
-    <xacro:quadrotor_single_propeller propid="3" id="${id}" xyz="0.00 -0.40 0.03" />
+    <xacro:quadrotor_single_propeller propid="0" id="${id}" xyz="0.40 0.23 -0.05" />
+    <xacro:quadrotor_single_propeller propid="1" id="${id}" xyz="0.00 0.46 -0.05" />
+    <xacro:quadrotor_single_propeller propid="2" id="${id}" xyz="-0.40 0.23 -0.05" />
+    <xacro:quadrotor_single_propeller propid="3" id="${id}" xyz="0.00 -0.46 -0.05" />
+    <xacro:quadrotor_single_propeller propid="4" id="${id}" xyz="-0.40 -0.23 -0.05" />
+    <xacro:quadrotor_single_propeller propid="5" id="${id}" xyz="0.40 -0.23 -0.05" />
     <xacro:generic_camera  id="${id}" />
     <xacro:sonar_sensor id="${id}" />
 
