@@ -155,7 +155,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
     </link>
 
     <joint name="sonar_${id}_joint" type="fixed">
-      <origin xyz="0 0.25 0.032" rpy="0 1.57 0"/>
+      <origin xyz="0 0.35 -0.065" rpy="0 1.57 0"/>
       <parent link="base_link_${id}"/>
       <child link="sonar_link_${id}"/>
     </joint>
