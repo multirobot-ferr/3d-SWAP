@@ -21,15 +21,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <!--******************************WORLD****************************************-->
     <!-- Actually start gazebo server -->
-    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="$(find mbzirc_gcs_view)/world/generate_world.world">
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find mbzirc_gcs_view)/world/generate_world.world"/>
+        <arg name="paused" value="true"/>
+    </include>
+
+    <!--node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="$(find mbzirc_gcs_view)/world/generate_world.world">
         <env name="LC_NUMERIC" value="C"/>
         <env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/>
-    </node>
+    </node-->
 
     <!-- launch gazebo client -->
-    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
+    <!--node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
         <env name="LC_NUMERIC" value="C"/>
-    </node>
+    </node-->
 
 <!--******************************UAVs****************************************-->
 

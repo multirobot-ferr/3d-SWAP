@@ -57,7 +57,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
 
     <joint name="base_prop_${propid}_joint_${id}" type="fixed">
       <origin xyz="${xyz}" rpy="0.0 0.0 0.0" />
-      <parent link="base_link_${id}"/>
+      <parent link="base_link"/>
       <child link="prop_${propid}_${id}"/>
     </joint>
   </xacro:macro>
@@ -89,7 +89,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
     
     <joint name="camera_${id}_joint" type="fixed">
   		<origin xyz="0.0 0.0 -0.12" rpy="0 1.4 0"/>
-    	<parent link="base_link_${id}"/>
+        <parent link="base_link"/>
     	<child link="camera_link_${id}"/>
     </joint>
 
@@ -156,7 +156,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
 
     <joint name="sonar_${id}_joint" type="fixed">
       <origin xyz="0 0.35 -0.065" rpy="0 1.57 0"/>
-      <parent link="base_link_${id}"/>
+      <parent link="base_link"/>
       <child link="sonar_link_${id}"/>
     </joint>
 
@@ -200,7 +200,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- ######################################################################## -->
   <!-- Main quadrotor link -->
   <xacro:macro name="quadrotor_base_macro" params="id model_name">
-    <link name="base_link_${id}">
+    <link name="base_link">
       <inertial>
         <mass value="1.487" />
         <origin xyz="0 0 0.0" />
@@ -231,12 +231,12 @@ xmlns:xacro="http://ros.org/wiki/xacro">
     <xacro:generic_camera  id="${id}" />
     <xacro:sonar_sensor id="${id}" />
 
-    <gazebo reference="base_link_${id}">
+    <gazebo reference="base_link">
       <turnGravityOff>false</turnGravityOff>
     </gazebo>
 
     <!-- Gazebo Plugins -->
-    <xacro:quadrotor_plugins model_name="${model_name}" base_link="base_link_${id}"/>
+    <xacro:quadrotor_plugins model_name="${model_name}" base_link="base_link"/>
 	
   </xacro:macro>  
 
