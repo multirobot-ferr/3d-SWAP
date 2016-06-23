@@ -27,10 +27,10 @@ CAMERA_PIXEL_SIZE="1"
 CAMERA_TYPE="ros"
 
 # In case of using video
-VIDEO_PATH="/path/to/video.mp4"
+VIDEO_PATH="b2.mp4"
 
 # In case of ros topic
-CAMERA_TOPIC="/camera_1/image_raw_1"
+CAMERA_TOPIC="/camera_2/image_raw_2"
 
 # In case of usb device
 CAMERA_INDEX="0"
@@ -46,7 +46,7 @@ CANDIDATES_TOPIC="/candidateList"
 ##	Drone data		##
 ##################################
 # Topic where to read the data from the drone
-DRONE_POSE_TOPIC="/quad1/hal/position"
+DRONE_POSE_TOPIC="/quad2/hal/position"
 
 ##################################
 ##	Debugging Flags		##
@@ -59,7 +59,7 @@ VISUALIZE_RESULTS=true
 ##	Object clues		##
 ##################################
 MIN_OBJ_SIZE=0.15
-MAX_OBJ_SIZE=1.0
+MAX_OBJ_SIZE=2.0
 
 #------------------------------------------DONT TOUCH BELOW THIS LINE!!---------------------------------------------
 ##################   
