@@ -31,91 +31,91 @@
 		<!--*********************************-->
 
 			<model name="Object_Black_Cylinder1">
-				<pose>14 28 0.05 0 0 0				</pose>
+				<pose>19 7 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_black_cylinder_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Black_Cylinder2">
-				<pose>-34 -7 0.05 0 0 0				</pose>
+				<pose>28 -23 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_black_cylinder_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Black_Box1">
-				<pose>46 -2 0.05 0 0 0				</pose>
+				<pose>10 -2 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_black_box_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Blue_Cylinder1">
-				<pose>-33 6 0.05 0 0 0				</pose>
+				<pose>-40 -1 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_blue_cylinder_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Blue_Cylinder2">
-				<pose>-24 -18 0.05 0 0 0				</pose>
+				<pose>3 -7 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_blue_cylinder_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Blue_Box1">
-				<pose>-45 -24 0.05 0 0 0				</pose>
+				<pose>45 -15 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_blue_box_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Blue_Box2">
-				<pose>45 25 0.05 0 0 0				</pose>
+				<pose>-16 -27 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_blue_box_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Red_Box1">
-				<pose>-48 -26 0.05 0 0 0				</pose>
+				<pose>-49 -26 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_red_box_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Red_Cylinder1">
-				<pose>-42 -16 0.05 0 0 0				</pose>
+				<pose>-22 -13 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_red_cylinder_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Red_Cylinder2">
-				<pose>-8 -11 0.05 0 0 0				</pose>
+				<pose>-5 26 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_red_cylinder_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Large_Red">
-				<pose>-29 26 0.05 0 0 0				</pose>
+				<pose>35 -17 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_large_red_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Large_Blue">
-				<pose>-49 18 0.05 0 0 0</pose>
+				<pose>-31 -20 0.05 0 0 0</pose>
 				<include>
 					<uri>model://object_large_blue_mbzirc</uri>
 				</include>
 			</model>
 
 			<model name="Object_Large_Black">
-				<pose>-11 9 0.05 0 0 0				</pose>
+				<pose>-41 -11 0.05 0 0 0				</pose>
 				<include>
 					<uri>model://object_large_black_mbzirc</uri>
 				</include>

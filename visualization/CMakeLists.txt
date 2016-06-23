@@ -71,3 +71,6 @@ target_link_libraries(cameraview ${catkin_LIBRARIES})
 add_executable(moveobject src/moveobject.cpp)
 target_link_libraries(moveobject LINK_PUBLIC hal_server)
 set_target_properties(moveobject PROPERTIES FOLDER "samples")
+
+add_executable(moveall src/moveall.cpp)
+target_link_libraries(moveall ${catkin_LIBRARIES})
