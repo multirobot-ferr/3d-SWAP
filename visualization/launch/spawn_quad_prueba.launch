@@ -43,8 +43,6 @@
      <param name="frame_id" value="map" />
      <param name="footprint_frame_id" value="base_footprint_$(arg id)" />
      <param name="stabilized_frame_id" value="base_stabilized_$(arg id)" />
-     <!--remap from="base_footprint" to="base_footprint_$(arg id)" />
-     <remap from="base_stabilized" to="base_stabilized_$(arg id)" /-->
      <param name="child_frame_id" value="base_link_$(arg id)" />
      <param name="tf_prefix" value="$(arg tf_prefix)" if="$(arg use_ground_truth_for_tf)" />
      <param name="tf_prefix" value="$(arg tf_prefix)/ground_truth" unless="$(arg use_ground_truth_for_tf)" />
