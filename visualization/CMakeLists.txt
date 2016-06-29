@@ -49,7 +49,7 @@ if(GRVCQUAD_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
 	
 	find_package(catkin REQUIRED COMPONENTS 
-        grvc_quadrotor_com roscpp sensor_msgs image_transport std_msgs cv_bridge)
+        grvc_quadrotor_com roscpp sensor_msgs image_transport std_msgs cv_bridge visualization_msgs tf geometry_msgs)
 
     find_package(OpenCV REQUIRED COMPONENTS)
 
@@ -74,3 +74,6 @@ set_target_properties(moveobject PROPERTIES FOLDER "samples")
 
 add_executable(moveall src/moveall.cpp)
 target_link_libraries(moveall ${catkin_LIBRARIES})
+
+add_executable(marker_stage src/marker_stage.cpp)
+target_link_libraries(marker_stage ${catkin_LIBRARIES})
