@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.77.0 commit date:2016-03-18, commit time:12:34, hash:22a2853</authoring_tool>
     </contributor>
-    <created>2016-06-30T10:48:18</created>
-    <modified>2016-06-30T10:48:18</modified>
+    <created>2016-06-30T11:41:44</created>
+    <modified>2016-06-30T11:41:44</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -124,7 +124,7 @@
         <technique sid="common">
           <phong>
             <emission>
-              <color sid="emission">0.3390739 0.64 0.1425665 1</color>
+              <color sid="emission">0.1 0.1 0.1 1</color>
             </emission>
             <ambient>
               <color sid="ambient">0.3390739 0.64 0.1425665 1</color>
@@ -150,13 +150,13 @@
         <technique sid="common">
           <phong>
             <emission>
-              <color sid="emission">1 1 1 1</color>
+              <color sid="emission">0.1 0.1 0.1 1</color>
             </emission>
             <ambient>
-              <color sid="ambient">1 1 1 1</color>
+              <color sid="ambient">0.8 0.8 0.8 1</color>
             </ambient>
             <diffuse>
-              <color sid="diffuse">1 1 1 1</color>
+              <color sid="diffuse">0.8 0.8 0.8 1</color>
             </diffuse>
             <specular>
               <color sid="specular">0.25 0.25 0.25 1</color>
@@ -176,7 +176,7 @@
         <technique sid="common">
           <phong>
             <emission>
-              <color sid="emission">0.3024 0.64 0.2344 1</color>
+              <color sid="emission">0.1 0.1 0.1 1</color>
             </emission>
             <ambient>
               <color sid="ambient">0.3024 0.64 0.2344 1</color>
@@ -202,7 +202,7 @@
         <technique sid="common">
           <phong>
             <emission>
-              <color sid="emission">0.3022496 0.64 0.2344196 1</color>
+              <color sid="emission">0.1 0.1 0.1 1</color>
             </emission>
             <ambient>
               <color sid="ambient">0.3022496 0.64 0.2344196 1</color>

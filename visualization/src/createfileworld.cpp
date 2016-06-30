@@ -63,7 +63,7 @@ int main (int argc, char **argv)
 	
     string package = argv[1];
     string worldfile = package + "/world/generate_world.world";
-    string meshfile = package + "/model/stage_01.dae";
+    string meshfile = package + "/model/stage_01_gazebo.dae";
 	ofstream myfile;
 
     myfile.open (worldfile);
