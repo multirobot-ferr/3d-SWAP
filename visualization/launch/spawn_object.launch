@@ -20,7 +20,6 @@
     <node name="grvc_hal_$(arg robot_name)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
         args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/>
 
-    <!--node name="move_object" pkg="mbzirc_gcs_view" type="moveobject" output="screen" /-->
 
 </launch>
 

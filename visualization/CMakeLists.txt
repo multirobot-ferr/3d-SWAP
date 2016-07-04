@@ -77,3 +77,7 @@ target_link_libraries(moveall ${catkin_LIBRARIES})
 
 add_executable(marker_stage src/marker_stage.cpp)
 target_link_libraries(marker_stage ${catkin_LIBRARIES})
+
+add_executable(take_object src/take_object.cpp)
+target_link_libraries(take_object ${catkin_LIBRARIES})
+

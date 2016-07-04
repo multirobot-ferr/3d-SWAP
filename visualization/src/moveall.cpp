@@ -10,9 +10,9 @@
 int main(int argc, char** argv)
 {
     //UAVs
-    system("rostopic pub /quad1/hal/go_to_wp std_msgs/String \"data: '{-50,-20,10},0'\" & ");
-    system("rostopic pub /quad2/hal/go_to_wp std_msgs/String \"data: '{-50,0,10},0'\" & ");
-    system("rostopic pub /quad3/hal/go_to_wp std_msgs/String \"data: '{-50,20,10},0'\" & ");
+    system("rostopic pub /quad1/hal/go_to_wp std_msgs/String \"data: '{-45,-20,5},0'\" & ");
+    system("rostopic pub /quad2/hal/go_to_wp std_msgs/String \"data: '{-45,0,5},0'\" & ");
+    system("rostopic pub /quad3/hal/go_to_wp std_msgs/String \"data: '{-45,20,5},0'\" & ");
 
     //Black Cylinder
     system("rostopic pub /object_black_cylinder_mov_1/hal/go_to_wp std_msgs/String \"data: '{0,0,0.07},0'\" & ");
