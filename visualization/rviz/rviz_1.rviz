@@ -10,6 +10,7 @@ Panels:
         - /RobotModel2
         - /RobotModel3
         - /Marker1
+        - /RobotModel4
       Splitter Ratio: 0.5
     Tree Height: 775
   - Class: rviz/Selection
@@ -123,51 +124,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        camera_link_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_0_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_1_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_2_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_3_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_4_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_5_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        sonar_link_2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_quad2
       TF Prefix: ""
@@ -184,51 +140,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        camera_link_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_0_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_1_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_2_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_3_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_4_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        prop_5_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        sonar_link_3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_quad3
       TF Prefix: ""
@@ -243,6 +154,27 @@ Visualization Manager:
         marker_stage: true
       Queue Size: 100
       Value: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_link_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: robot_description_object_black_cylinder_mov_1
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -267,7 +199,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 32.3881
+      Distance: 17.0313
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -279,10 +211,10 @@ Visualization Manager:
         Z: 0
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.730398
-      Target Frame: map
+      Pitch: 0.365398
+      Target Frame: base_link_4
       Value: Orbit (rviz)
-      Yaw: 5.99858
+      Yaw: 0.630398
     Saved: ~
 Window Geometry:
   Displays:

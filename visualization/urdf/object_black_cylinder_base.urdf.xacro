@@ -14,40 +14,40 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <xacro:include filename="$(find grvc_quadrotor_gazebo)/urdf/quadrotor_plugins.urdf.xacro" />
 
 <!--#####################################################################################-->  
-  <!-- Main object link -->
-  <xacro:macro name="quadrotor_base_macro" params="id model_name">
-    <link name="base_link_${id}">
-      <inertial>
-        <mass value="0.5" />
-        <origin xyz="0 0 0.0" />
-        <inertia ixx="0.01152" ixy="0.0" ixz="0.0" iyy="0.01152" iyz="0.0" izz="0.0218" />
-      </inertial>
+<!-- Main object link -->
+<xacro:macro name="quadrotor_base_macro" params="id model_name">
+  <link name="base_link_${id}">
+    <inertial>
+      <mass value="0.5" />
+      <origin xyz="0 0 0.0" />
+      <inertia ixx="0.01152" ixy="0.0" ixz="0.0" iyy="0.01152" iyz="0.0" izz="0.0218" />
+    </inertial>
 
-      <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-          <cylinder length="0.2" radius="0.15"/>
-      </geometry>
-      <material name="blue">
-          <color rgba="0 0 .8 0"/>
-      </material>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-          <cylinder length="0.2" radius="0.15"/>
-      </geometry>
-    </collision>
-  </link>
+    <visual>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <geometry>
+        <cylinder length="0.2" radius="0.15"/>
+    </geometry>
+    <material name="blue">
+        <color rgba="0 0 .8 0"/>
+    </material>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <geometry>
+        <cylinder length="0.2" radius="0.15"/>
+    </geometry>
+  </collision>
+</link>
 
-    <gazebo reference="base_link_${id}">
-      <material>Gazebo/Black</material>
-      <turnGravityOff>false</turnGravityOff>
-    </gazebo>
+  <gazebo reference="base_link_${id}">
+    <material>Gazebo/Black</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
 
-    <!-- Gazebo Plugins -->
-    <xacro:quadrotor_plugins model_name="${model_name}" base_link="base_link_${id}"/>
+  <!-- Gazebo Plugins -->
+  <xacro:quadrotor_plugins model_name="${model_name}" base_link="base_link_${id}"/>
 
-  </xacro:macro>
+</xacro:macro>
 
 </robot>

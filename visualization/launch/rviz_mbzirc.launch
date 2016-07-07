@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <node name="marker_stage" pkg="mbzirc_gcs_view" type="marker_stage" />
+
+    <node name="rviz_mbzirc" pkg="rviz" type="rviz" args="-d $(find mbzirc_gcs_view)/rviz/rviz_1.rviz" />
+
+</launch>
