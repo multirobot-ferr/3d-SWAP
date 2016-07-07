@@ -73,6 +73,44 @@ void quad_thread(const string& _quad_name, const WaypointList& _list, int _argc,
 	quad.run();
 }
 
+struct MovingObject {
+public:
+    MovingObject(const std::string& _object_name, const WaypointList& _wp_list, int _argc, char** _argv)
+        : name_(_object_name)
+        , path_(_wp_list)
+    {
+        path_srv_ = new grvc::hal::Server::PathService::Client(name_ + "/hal/path", utils::ArgumentParser(_argc, _argv));
+        new Subscriber<Vec3>(g_node_name, name_ + "/hal/position", _argc, _argv, [&](const Vec3& _v) {
+            ready_ = true; // Once we receive telemetry, hal is ready
+        });
+    }
+
+    void run() {
+        assert(path_.size() > 0);
+
+        // Wait for quad to be ready to fly
+        while (!ready_) {
+            this_thread::sleep_for(chrono::milliseconds(100));
+        }
+
+        grvc::hal::TaskState ts;
+        path_srv_->send(path_, ts);
+
+    }
+
+protected:
+    hal::Server::PathService::Client* path_srv_ = nullptr;
+    string name_;
+    WaypointList path_;
+    bool ready_ = false;
+};
+
+void object_thread(const string& _object_name, const WaypointList& _list, int _argc, char** _argv) {
+    MovingObject object(_object_name, _list, _argc, _argv);
+    object.run();
+}
+
+
 int main(int _argc, char** _argv) {
 	utils::ArgumentParser parser(_argc, _argv);
 	string quad = parser.getArgument("quad_name", string("quad1"));
@@ -115,7 +153,7 @@ int main(int _argc, char** _argv) {
 		quad_thread("/quad2", wplist_2, _argc, _argv);
 	}
 
-	else {
+    else if (quad == "quad3") {
 		WaypointList wplist_3 = {
 			{{60.0, -10.0, 18}, 0.0},
 			{{55.0, -10.0, 18}, 0.0},
@@ -133,7 +171,107 @@ int main(int _argc, char** _argv) {
 		};
 
 		quad_thread("/quad3", wplist_3, _argc, _argv);
-	}
+
+    }
+    else if (quad == "object_black_cylinder_mov_1") {
+        WaypointList wplist_4 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_black_cylinder_mov_1", wplist_4, _argc, _argv);
+    }
+
+    else if (quad == "object_black_cylinder_mov_2") {
+        WaypointList wplist_5 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_black_cylinder_mov_2", wplist_5, _argc, _argv);
+    }
+
+    else if (quad == "object_black_box_mov_1") {
+        WaypointList wplist_6 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_black_box_mov_1", wplist_6, _argc, _argv);
+    }
+
+    else if (quad == "object_black_box_mov_2") {
+        WaypointList wplist_7 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_black_box_mov_2", wplist_7, _argc, _argv);
+    }
+
+    else if (quad == "object_blue_cylinder_mov_1") {
+        WaypointList wplist_8 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_blue_cylinder_mov_1", wplist_8, _argc, _argv);
+    }
+
+    else if (quad == "object_blue_box_mov_1") {
+        WaypointList wplist_9 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_black_cylinder_mov_1", wplist_9, _argc, _argv);
+    }
+
+    else if (quad == "object_red_cylinder_mov_1") {
+        WaypointList wplist_10 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_red_cylinder_mov_1", wplist_10, _argc, _argv);
+    }
+
+    else if (quad == "object_red_cylinder_mov_2") {
+        WaypointList wplist_11 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_red_cylinder_mov_2", wplist_11, _argc, _argv);
+    }
+
+    else if (quad == "object_red_box_mov_1") {
+        WaypointList wplist_12 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_red_box_mov_1", wplist_12, _argc, _argv);
+    }
+
+    else if (quad == "object_red_box_mov_2") {
+        WaypointList wplist_13 = {
+            {{50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, 20.0, 0.06}, 0.0},
+            {{-50.0, -20.0, 0.06}, 0.0},
+            {{50.0, -20.0, 0.06}, 0.0}
+        };
+        object_thread("/object_red_box_mov_2", wplist_13, _argc, _argv);
+    }
 
 	return 0;
 }
