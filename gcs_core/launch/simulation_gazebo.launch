@@ -19,14 +19,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	<node name="gcs_core_quad3" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=quad3" />
 
     <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_cylinder_mov_1" />
-    <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_cylinder_mov_2" />
-    <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_box_mov_1" />
-    <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_box_mov_2" />
-    <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_blue_cylinder_mov_1" />
-    <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_blue_box_mov_1" />
-    <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_red_cylinder_mov_1" />
-    <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_red_cylinder_mov_2" />
-    <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_red_box_mov_1" />
-    <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_red_box_mov_2" />
+    <node name="gcs_core_obj2" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_cylinder_mov_2" />
+    <node name="gcs_core_obj3" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_box_mov_1" />
+    <node name="gcs_core_obj4" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_box_mov_2" />
+    <node name="gcs_core_obj5" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_blue_cylinder_mov_1" />
+    <node name="gcs_core_obj6" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_blue_box_mov_1" />
+    <node name="gcs_core_obj7" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_red_cylinder_mov_1" />
+    <node name="gcs_core_obj8" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_red_cylinder_mov_2" />
+    <node name="gcs_core_obj9" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_red_box_mov_1" />
+    <node name="gcs_core_obj10" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_red_box_mov_2" />
 
 </launch>
