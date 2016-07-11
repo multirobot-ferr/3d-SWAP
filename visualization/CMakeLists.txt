@@ -62,7 +62,10 @@ endif(GRVCQUAD_USE_ROS)
 #FIND_PACKAGE(Eigen3 REQUIRED)
 #INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
 
-add_executable(createfileworld src/createfileworld.cpp)
+#add_executable(createfileworld src/createfileworld.cpp)
+#target_link_libraries(createfileworld LINK_PUBLIC grvc_com)
+
+add_executable(createfileworld src/createfileworld_urdf.cpp)
 target_link_libraries(createfileworld LINK_PUBLIC grvc_com)
 
 add_executable(cameraview src/cameraview.cpp)
@@ -77,6 +80,9 @@ target_link_libraries(moveall ${catkin_LIBRARIES})
 
 add_executable(marker_stage src/marker_stage.cpp)
 target_link_libraries(marker_stage ${catkin_LIBRARIES})
+
+add_executable(marker_waypoints src/marker_waypoints.cpp)
+target_link_libraries(marker_waypoints ${catkin_LIBRARIES})
 
 add_executable(take_object src/take_object.cpp)
 target_link_libraries(take_object ${catkin_LIBRARIES})

@@ -12,12 +12,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <launch>
 
+    <!--*****************VISUALIZATION ENVIROMENT*****************************-->
     <include file="$(find mbzirc_gcs_view)/launch/simulation.launch" />
 
+    <!--*****************MOVING UAV*******************************************-->
     <node name="gcs_core_quad1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=quad1" />
     <node name="gcs_core_quad2" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=quad2" />
     <node name="gcs_core_quad3" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=quad3" />
 
+    <!--*****************MOVING OBJECTS***************************************-->
     <node name="gcs_core_obj1" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_cylinder_mov_1" />
     <node name="gcs_core_obj2" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_cylinder_mov_2" />
     <node name="gcs_core_obj3" pkg="mbzirc_gcs_core" type="gcs_core" output="screen" args="-quad_name=object_black_box_mov_1" />

@@ -55,6 +55,4 @@
     <node name="grvc_uav_$(arg robot_name)" pkg="grvc_quadrotor_uav" type="uav_node" respawn="false" output="screen"
         args="-hal_ns=/$(arg robot_name)/hal -uav_ns=/$(arg robot_name)/uav -gazebo_ns=/$(arg robot_name)"/>
 
-    <!--node name="rviz" pkg="rviz" type="rviz" /-->
-
 </launch>
