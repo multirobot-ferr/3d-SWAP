@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     {
         transform.setOrigin(tf::Vector3(0.0, 0.1, 0.0));
         transform.setRotation(tf::Quaternion(0, 0, 0, 1));
-        br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "base_link_1", "base_link_2"));
+        br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "base_link_1", "base_link_4"));
 
         rate.sleep();
     }

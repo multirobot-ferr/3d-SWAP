@@ -28,8 +28,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <geometry>
           <box size="0.3 0.3 0.20"/>
       </geometry>
-      <material name="blue">
-          <color rgba="0 0 .8 0"/>
+      <material name="red">
+          <color rgba="0.8 0 0 1"/>
       </material>
     </visual>
     <collision>

@@ -28,8 +28,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <geometry>
           <cylinder length="0.2" radius="0.15"/>
       </geometry>
-      <material name="blue">
-          <color rgba="0 0 .8 0"/>
+      <material name="red">
+          <color rgba="0.8 0 0 1"/>
       </material>
     </visual>
     <collision>
