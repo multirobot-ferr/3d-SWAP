@@ -25,7 +25,6 @@
 
    <!-- START robot state publisher -->
    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher_$(arg robot_name)" output="screen" >
-
         <remap from="robot_description" to="robot_description_$(arg robot_name)" />
         <remap from="joint_states" to="joint_states_$(arg robot_name)" />
         <param name="publish_frequency" type="double" value="50.0" />
