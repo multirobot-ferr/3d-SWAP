@@ -49,11 +49,12 @@ if(GRVCQUAD_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
 	
 	find_package(catkin REQUIRED COMPONENTS 
-        grvc_quadrotor_com roscpp sensor_msgs image_transport std_msgs cv_bridge visualization_msgs tf geometry_msgs)
+        grvc_quadrotor_com roscpp sensor_msgs grvc_quadrotor_hal
+        image_transport std_msgs cv_bridge visualization_msgs tf geometry_msgs)
 
     find_package(OpenCV REQUIRED COMPONENTS)
 
-	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com)
+    catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com grvc_quadrotor_hal)
 
 	include_directories(${catkin_INCLUDE_DIRS})
 endif(GRVCQUAD_USE_ROS)

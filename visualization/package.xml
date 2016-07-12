@@ -17,9 +17,11 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>cv_bridge</build_depend>
   <build_depend>opencv2</build_depend>
+  <build_depend>grvc_quadrotor_hal</build_depend>
 
 
   <run_depend>grvc_quadrotor_com</run_depend>
+  <run_depend>grvc_quadrotor_hal</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>image_transport</run_depend>
