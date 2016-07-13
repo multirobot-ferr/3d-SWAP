@@ -41,10 +41,4 @@
      <param name="tf_prefix" value="$(arg tf_prefix)/ground_truth" unless="$(arg use_ground_truth_for_tf)" />
    </node>
 
-    <!--node name="grvc_hal_$(arg robot_name)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
-        args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/-->
-
-    <node name="take_object_$(arg robot_name)" pkg="mbzirc_gcs_view" type="take_object" respawn="false" output="screen"
-        args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name) -start_pos=$(arg pos_x),$(arg pos_y),$(arg pos_z)"/>
-
 </launch>

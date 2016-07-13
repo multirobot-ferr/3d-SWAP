@@ -47,7 +47,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_z" value="0.3"/>
     </include>
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_correct.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_quad_correct.launch">
         <arg name="robot_name" value="quad2"/>
         <arg name="id" value="2"/>
         <arg name="pos_x" value="65"/>
@@ -61,7 +61,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_x" value="65"/>
         <arg name="pos_y" value="-23.5"/>
         <arg name="pos_z" value="0.3"/>
-    </include>
+    </include-->
 
 <!--******************************STATIC_OBJECTS****************************************-->
 
@@ -74,7 +74,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_z" value="0.15"/>
     </include>
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="object_black_cylinder_2"/>
         <arg name="urdf_file" value="object_black_cylinder.urdf.xacro"/>
         <arg name="id" value="5"/>
@@ -181,7 +181,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_x" value="-2"/>
         <arg name="pos_y" value="5"/>
         <arg name="pos_z" value="0.07"/>
-    </include>
+    </include-->
 
 
 <!--******************************DINAMIC_OBJECTS****************************************-->
@@ -264,6 +264,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_x" value="17"/>
         <arg name="pos_y" value="13"/>
         <arg name="pos_z" value="0.07"/>
+    </include-->
+
+<!--******************************DROP BOX****************************************-->
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_dropping_box.launch">
+        <arg name="robot_name" value="dropping_box"/>
+        <arg name="urdf_file" value="dropping_box.urdf.xacro"/>
+        <arg name="id" value="27"/>
+        <arg name="pos_x" value="-66"/>
+        <arg name="pos_y" value="25"/>
+        <arg name="pos_z" value="0.01"/>
     </include-->
 
 </launch>

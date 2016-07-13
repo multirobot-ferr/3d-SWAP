@@ -18,9 +18,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <xacro:macro name="quadrotor_base_macro" params="id model_name">
   <link name="base_link_${id}">
     <inertial>
-      <mass value="0.1" />
+      <mass value="0.01" />
       <origin xyz="0 0 0.0" />
-      <inertia ixx="0.01152" ixy="0.0" ixz="0.0" iyy="0.01152" iyz="0.0" izz="0.0218" />
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01" />
     </inertial>
 
     <visual>

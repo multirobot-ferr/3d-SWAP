@@ -22,26 +22,25 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <origin xyz="0 0 0.0" />
         <inertia ixx="0.01152" ixy="0.0" ixz="0.0" iyy="0.01152" iyz="0.0" izz="0.0218" />
       </inertial>
-
       <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-          <box size="0.3 0.3 0.20"/>
-      </geometry>
-      <material name="blue">
-          <color rgba="0 0 .8 1"/>
-      </material>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-          <box size="0.3 0.3 0.20"/>
-      </geometry>
-    </collision>
-  </link>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="0.5 1 0.05"/>
+        </geometry>
+        <material name="gold">
+            <color rgba="0 1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+            <box size="0.5 1 0.05"/>
+        </geometry>
+        </collision>
+    </link>
 
     <gazebo reference="base_link_${id}">
-      <material>Gazebo/Blue</material>
+      <material>Gazebo/Gold</material>
       <turnGravityOff>false</turnGravityOff>
     </gazebo>
 
