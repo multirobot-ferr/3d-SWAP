@@ -11,6 +11,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
+<xacro:include filename="$(find grvc_quadrotor_gazebo)/urdf/quadrotor_plugins.urdf.xacro" />
+
 <!--#####################################################################################-->  
   <!-- Main object link -->
   <xacro:macro name="quadrotor_base_macro" params="id model_name">
@@ -27,7 +29,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <box size="2 0.2 0.2"/>
       </geometry>
       <material name="black">
-          <color rgba="1 1 1 1"/>
+          <color rgba="0 0 0 1"/>
       </material>
     </visual>
     <collision>
@@ -42,6 +44,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
       <material>Gazebo/Black</material>
       <turnGravityOff>false</turnGravityOff>
     </gazebo>
+
+    <!-- Gazebo Plugins -->
+    <xacro:quadrotor_plugins model_name="${model_name}" base_link="base_link_${id}"/>
 
   </xacro:macro>
 
