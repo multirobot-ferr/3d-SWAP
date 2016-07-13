@@ -15,7 +15,7 @@ using namespace std;
 using namespace grvc::hal;
 
 Vec3 g_piecePos;
-const double cCatchThreshold = 0.5f;
+const double cCatchThreshold = 0.7f;
 bool caught = false;
 Server::WaypointService::Client* waypoint_srv;
 int i = 0;

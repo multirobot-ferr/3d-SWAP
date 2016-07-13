@@ -9,40 +9,16 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 -->
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="grvc_quadrotor" xmlns:xacro="http://ros.org/wiki/xacro">
 
-<!--#####################################################################################-->  
-  <!-- Main object link -->
-  <xacro:macro name="quadrotor_base_macro" params="id model_name">
-    <link name="base_link_${id}">
-      <inertial>
-        <mass value="0.5" />
-        <origin xyz="0 0 0.0" />
-        <inertia ixx="0.01152" ixy="0.0" ixz="0.0" iyy="0.01152" iyz="0.0" izz="0.0218" />
-      </inertial>
+  <xacro:arg name="model_name" default="object_blue_box_mov"/>
+  <xacro:arg name="id" default="1"/>
 
-      <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-          <box size="2 0.2 0.20"/>
-      </geometry>
-      <material name="blue">
-          <color rgba="0 0 .8 0"/>
-      </material>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-          <box size="2 0.2 0.20"/>
-      </geometry>
-    </collision>
-  </link>
-
-    <gazebo reference="base_link_${id}">
-      <material>Gazebo/Blue</material>
-      <turnGravityOff>false</turnGravityOff>
-    </gazebo>
-
-  </xacro:macro>
+  <!-- Included URDF Files -->
+  <xacro:include filename="$(find mbzirc_gcs_view)/urdf/object_blue_box_base.urdf.xacro" />
+  
+  <!-- Instantiate quadrotor_base_macro once (has no parameters atm) -->
+  <!-- model_name must be ual_${id} for ual node to find the uav -->
+  <xacro:quadrotor_base_macro id="$(arg id)" model_name="$(arg model_name)"/>
 
 </robot>
