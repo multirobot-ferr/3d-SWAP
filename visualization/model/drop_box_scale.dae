@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.77.0 commit date:2016-03-18, commit time:12:34, hash:22a2853</authoring_tool>
     </contributor>
-    <created>2016-07-14T08:55:04</created>
-    <modified>2016-07-14T08:55:04</modified>
+    <created>2016-07-14T09:08:13</created>
+    <modified>2016-07-14T09:08:13</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -463,11 +463,11 @@
         <instance_camera url="#Camera-camera"/>
       </node>
       <node id="Lamp" name="Lamp" type="NODE">
-        <matrix sid="transform">-0.1454323 -0.3855505 0.2831966 2.878009 0.4775856 -0.09994169 0.1091956 0.5490085 -0.02759453 0.3022624 0.3973361 3.627151 0 0 0 1</matrix>
+        <matrix sid="transform">-0.4775855 0.09994181 -0.1091957 -0.4583356 -0.1454325 -0.3855504 0.2831966 1.514074 -0.02759453 0.3022624 0.3973361 2.972032 0 0 0 1</matrix>
         <instance_light url="#Lamp-light"/>
       </node>
       <node id="Cube" name="Cube" type="NODE">
-        <matrix sid="transform">0.5 0 0 1.371278 0 0.25 0 0.02766652 0 0 0.02000001 0.7018679 0 0 0 1</matrix>
+        <matrix sid="transform">-2.18557e-8 -0.25 0 0.06300643 0.5 -1.09278e-8 0 0.007342279 0 0 0.02000001 0.04674888 0 0 0 1</matrix>
         <instance_geometry url="#Cube-mesh" name="Cube">
           <bind_material>
             <technique_common>
@@ -477,7 +477,7 @@
         </instance_geometry>
       </node>
       <node id="Cube_001" name="Cube_001" type="NODE">
-        <matrix sid="transform">0.5 0 0 1.373632 0 0.02500001 0 -0.1937841 0 0 0.4 1.08055 0 0 0 1</matrix>
+        <matrix sid="transform">-2.18557e-8 -0.02500001 0 0.284457 0.5 -1.09278e-9 0 0.009696662 0 0 0.4 0.425431 0 0 0 1</matrix>
         <instance_geometry url="#Cube_001-mesh" name="Cube_001">
           <bind_material>
             <technique_common>
@@ -487,7 +487,7 @@
         </instance_geometry>
       </node>
       <node id="Cube_002" name="Cube_002" type="NODE">
-        <matrix sid="transform">0.5 0 0 1.376921 0 0.02500001 0 0.2502695 0 0 0.4 1.08055 0 0 0 1</matrix>
+        <matrix sid="transform">-2.18557e-8 -0.02500001 0 -0.1595965 0.5 -1.09278e-9 0 0.01298589 0 0 0.4 0.425431 0 0 0 1</matrix>
         <instance_geometry url="#Cube_002-mesh" name="Cube_002">
           <bind_material>
             <technique_common>
@@ -497,7 +497,7 @@
         </instance_geometry>
       </node>
       <node id="Cube_004" name="Cube_004" type="NODE">
-        <matrix sid="transform">0.0244738 0 0 1.845441 0 0.244738 0 0.02604968 0 0 0.3915808 1.078351 0 0 0 1</matrix>
+        <matrix sid="transform">-1.06978e-9 -0.244738 0 0.06462324 0.0244738 -1.06978e-8 0 0.4815056 0 0 0.3915808 0.4232315 0 0 0 1</matrix>
         <instance_geometry url="#Cube_004-mesh" name="Cube_004">
           <bind_material>
             <technique_common>
@@ -507,7 +507,7 @@
         </instance_geometry>
       </node>
       <node id="Cube_003" name="Cube_003" type="NODE">
-        <matrix sid="transform">0.0244738 0 0 1.845441 0 0.244738 0 0.02604968 0 0 0.3915808 1.078351 0 0 0 1</matrix>
+        <matrix sid="transform">-1.06978e-9 -0.244738 0 0.06462324 0.0244738 -1.06978e-8 0 0.4815056 0 0 0.3915808 0.4232315 0 0 0 1</matrix>
         <instance_geometry url="#Cube_005-mesh" name="Cube_003">
           <bind_material>
             <technique_common>
@@ -517,7 +517,7 @@
         </instance_geometry>
       </node>
       <node id="Cube_005" name="Cube_005" type="NODE">
-        <matrix sid="transform">0.0244738 0 0 1.845441 0 0.244738 0 0.02604968 0 0 0.3915808 1.078351 0 0 0 1</matrix>
+        <matrix sid="transform">-1.06978e-9 -0.244738 0 0.06462324 0.0244738 -1.06978e-8 0 0.4815056 0 0 0.3915808 0.4232315 0 0 0 1</matrix>
         <instance_geometry url="#Cube_006-mesh" name="Cube_005">
           <bind_material>
             <technique_common>
@@ -527,7 +527,7 @@
         </instance_geometry>
       </node>
       <node id="Cube_006" name="Cube_006" type="NODE">
-        <matrix sid="transform">0.0244738 0 0 0.9020194 0 0.244738 0 0.02919442 0 0 0.3915808 1.078351 0 0 0 1</matrix>
+        <matrix sid="transform">-1.06978e-9 -0.244738 0 0.06147853 0.0244738 -1.06978e-8 0 -0.4619161 0 0 0.3915808 0.4232315 0 0 0 1</matrix>
         <instance_geometry url="#Cube_007-mesh" name="Cube_006">
           <bind_material>
             <technique_common>
