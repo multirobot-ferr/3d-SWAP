@@ -33,7 +33,7 @@ public:
         ros::init(_argc, _argv, "haunter");
         n = new ros::NodeHandle();
         modelStatePub_ = n->advertise<gazebo_msgs::ModelState>("/gazebo/set_model_state", 100);
-        robotPosSub_ = new grvc::com::Subscriber<Vec3>(node_name.c_str(), "/quad1/hal/position", _argc, _argv, [this](const Vec3& _pos) {
+        robotPosSub_ = new grvc::com::Subscriber<Vec3>(node_name.c_str(), "/quad2/hal/position", _argc, _argv, [this](const Vec3& _pos) {
             catchCallback(_pos);
         });
     }

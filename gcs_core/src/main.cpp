@@ -176,10 +176,15 @@ int main(int _argc, char** _argv) {
     std::thread quad2_thread ([&](){
         quad2.run();
         quad2.setPath({
-            {{3, -2.0, flight_z}, 0.0},
-            {{3, -2.0, 5}, 0.0},
-            {{3, -2.0, 1}, 0.0},
-            {{3, -2.0, flight_z}, 0.0},
+            {{0, 0, flight_z}, 0.0},
+            {{0, 0, 5}, 0.0},
+            {{0, 0, 1}, 0.0}
+          });
+        quad2.run();
+        this_thread::sleep_for(chrono::seconds(20));
+        quad2.setPath({
+            {{0, 0, 0.9}, 0.0},
+            {{0, 0.0, flight_z}, 0.0},
             {{-50.0, 25, flight_z}, 0.0}});
         quad2.run();
     });
