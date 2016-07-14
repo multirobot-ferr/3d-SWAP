@@ -47,7 +47,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_z" value="0.3"/>
     </include>
 
-    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_quad_correct.launch">
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_correct.launch">
         <arg name="robot_name" value="quad2"/>
         <arg name="id" value="2"/>
         <arg name="pos_x" value="65"/>
@@ -61,7 +61,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_x" value="65"/>
         <arg name="pos_y" value="-23.5"/>
         <arg name="pos_z" value="0.3"/>
-    </include-->
+    </include>
 
 <!--******************************STATIC_OBJECTS****************************************-->
 
@@ -134,7 +134,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="urdf_file" value="object_red_box.urdf.xacro"/>
         <arg name="id" value="11"/>
         <arg name="pos_x" value="25"/>
-        <arg name="pos_y" value="-17"/>
+        <arg name="pos_y" value="22"/>
         <arg name="pos_z" value="0.07"/>
     </include>
 

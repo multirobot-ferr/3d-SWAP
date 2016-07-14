@@ -47,6 +47,10 @@ struct Quadrotor {
         });
     }
 
+    void setPath(const WaypointList& _wp_list) {
+        path_ = _wp_list;
+    }
+
     void run() {
         assert(path_.size() > 0);
 
@@ -57,7 +61,7 @@ struct Quadrotor {
 
         grvc::uav::ActionState as;
         path_srv_->send(path_, as);
-
+        cout << name_ << as <<"*************\n";
     }
 
 private:
@@ -119,80 +123,88 @@ int main(int _argc, char** _argv) {
 
     WaypointList wplist_1 = {
         {{60.0, -25.0, flight_z}, 0.0},
-        //{{50.0, -28.5, flight_z}, 0.0},
         {{-50.0, -28.5, flight_z}, 0.0},
         {{-50.0, -22.5, flight_z}, 0.0},
-        {{50.0, -22.5, flight_z}, 0.0},
-        {{7.0, -25, flight_z}, 0.0},
-        {{7.0, -25, 0.7}, 0.0},
-        {{7.0, -25, flight_z}, 0.0},
-        {{-50.0, 22.5, flight_z}, 0.0}
-       /* {{65.0, -28.5, flight_z}, 0.0},
-        {{-66.0, 25, flight_z}, 0.0},
-        {{-66.0, 25, flight_z}, 0.0},
-        {{-66.0, 25, flight_z}, 0.0},
-        {{-66.0, 25, flight_z}, 0.0},
-        {{-60.0, 18, flight_z}, 0.0},*/
+        {{50.0, -22.5, flight_z}, 0.0}
     };
 
     Quadrotor quad1("/quad1", wplist_1, _argc, _argv);
-    std::thread quad1_thread ([&](){quad1.run();});
-
-    WaypointList wplist_2 = {
-            {{60, -15.0, 16}, 0.0},
-            {{30, -5.0, 16}, 0.0},
-            {{0.0, 0.0, 16}, 0.0},
-            {{-30, 10.0, 16}, 0.0},
-            {{-50, 20.0, 16}, 0.0},
-            {{0, 20.0, 16}, 0.0},
-            {{10, 0.0, 16}, 0.0},
-            {{30, -5.0, 16}, 0.0},
-            {{0.0, 0.0, 16}, 0.0},
-            {{-30, 10.0, 16}, 0.0},
-            {{-50, 20.0, 16}, 0.0},
-            {{0, 20.0, 16}, 0.0},
-            {{10, 0.0, 16}, 0.0}
-    };
-
-    Quadrotor quad2("/quad2", wplist_2, _argc, _argv);
-    std::thread quad2_thread ([&](){quad2.run();});
+    std::thread quad1_thread ([&](){
+        quad1.run();
+        quad1.setPath({
+            {{7.0, -25, flight_z}, 0.0},
+            {{7.0, -25, 1}, 0.0},
+            {{7.0, -25, flight_z}, 0.0},
+            {{-66.0, 25, flight_z}, 0.0},
+            {{-66, 25.0, 5}, 0.0},
+            {{-66, 25.0, 2}, 0.0},
+            {{-66, 25.0, flight_z}, 0.0},
+            {{-50.0, 20, flight_z}, 0.0}});
+        quad1.run();
+    });
 
     WaypointList wplist_3 = {
-        {{60.0, -10.0, 18}, 0.0},
-        {{55.0, -10.0, 18}, 0.0},
-        {{45.0, -5.0, 18}, 0.0},
-        {{35.0, -10.0, 18}, 0.0},
-        {{25.0, -5, 18}, 0.0},
-        {{20.0, 0.0, 18}, 0.0},
-        {{20.0, 5.0, 18}, 0.0},
-        {{10.0, -5.0, 18}, 0.0},
-        {{0.0, 5.0, 18}, 0.0},
-        {{-10.0, 10.0, 18}, 0.0},
-        {{-15.0, 10.0, 18}, 0.0},
-        {{-25.0, 0.0, 18}, 0.0},
-        {{-10.0, -10.0, 18.0}, 0.0}
+        {{60.0, 17.0, flight_z}, 0.0},
+        {{-50.0, 17.0, flight_z}, 0.0},
+        {{-50.0, 27.0, flight_z}, 0.0},
+        {{50.0, 27.0, flight_z}, 0.0}
+
     };
 
     Quadrotor quad3("/quad3", wplist_3, _argc, _argv);
-    std::thread quad3_thread ([&](){quad3.run();});
+    std::thread quad3_thread ([&](){
+        quad3.run();
+        quad3.setPath({
+            {{25.0, 22.0, flight_z}, 0.0},
+            {{25.0, 22.0, 5}, 0.0},
+            {{25.0, 22.0, 1}, 0.0},
+            {{25.0, 22.0, flight_z}, 0.0},
+            {{-50.0, 30.0, flight_z}, 0.0}});
+        quad3.run();
+    });
+
+    this_thread::sleep_for(chrono::seconds(20));
+
+    WaypointList wplist_2 = {
+            {{60, -5.0, flight_z}, 0.0},
+            {{-50, -5.0, flight_z}, 0.0},
+            {{-50.0, 5.0, flight_z}, 0.0},
+            {{50, 5.0, flight_z}, 0.0},
+    };
+
+    Quadrotor quad2("/quad2", wplist_2, _argc, _argv);
+    std::thread quad2_thread ([&](){
+        quad2.run();
+        quad2.setPath({
+            {{3, -2.0, flight_z}, 0.0},
+            {{3, -2.0, 5}, 0.0},
+            {{3, -2.0, 1}, 0.0},
+            {{3, -2.0, flight_z}, 0.0},
+            {{-50.0, 25, flight_z}, 0.0}});
+        quad2.run();
+    });
 
     quad1_thread.join();
     quad2_thread.join();
     quad3_thread.join();
 
+    quad2.setPath({
+                      {{-66, 25.0, flight_z}, 0.0},
+                      {{-66, 25.0, 5}, 0.0},
+                      {{-66, 25.0, 2}, 0.0},
+                      {{-66, 25.0, flight_z}, 0.0},
+                      {{-50.0, 25, flight_z}, 0.0}
+                  });
+    quad2.run();
 
-
-
-
-
-
-
-
-
-
-
-
-
+    quad3.setPath({
+                      {{-66, 25.0, flight_z}, 0.0},
+                      {{-66, 25.0, 5}, 0.0},
+                      {{-66, 25.0, 2}, 0.0},
+                      {{-66, 25.0, flight_z}, 0.0},
+                      {{-50.0, 30, flight_z}, 0.0}
+                  });
+    quad3.run();
 
 
 
