@@ -52,6 +52,8 @@ namespace mbzirc{
             _os << _candidate.color << std::endl;
         // Serialize shape
             _os << _candidate.shape << std::endl;
+        // Serialize Size and angle
+            _os << _candidate.width << ", " << _candidate.height << ", " << _candidate.rotation << std::endl;
 
         return _os;
     }
@@ -91,6 +93,12 @@ namespace mbzirc{
         // Deserialize shape
         numbers = parseNextLine(_is);
         _candidate.shape = int(numbers[0]);
+
+        // Deseriaize size and orientation
+        numbers = parseNextLine(_is);
+        _candidate.width = numbers[0];
+        _candidate.height = numbers[1];
+        _candidate.rotation = numbers[2];
 
         return _is;
     }

@@ -37,11 +37,16 @@ namespace mbzirc{
         Eigen::Matrix3d locationCovariance;
         Eigen::Matrix3d speedCovariance;
 
-        /// Candidate's color. -1:unknown, 0: Black, 1: Red and 2:Blue. 666
+        /// Candidate's color. -1:unknown, 0: Black, 1: Red and 2:Blue.
         int color;
 
-        /// Candidate's shape.
+        /// Candidate's shape.  -1:unknown, 0: Long Rectangle, 1: Square and 2:Circle.
         int shape;
+
+        /// Cadidate's size
+        double width;
+        double height;
+        double rotation;
 
     };
     // Serialize candidate.
