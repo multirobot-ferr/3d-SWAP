@@ -197,53 +197,6 @@ xmlns:xacro="http://ros.org/wiki/xacro">
     </gazebo>
   </xacro:macro>
 
-<!-- ###########################GRIPPER########################################### -->
-
-  <xacro:macro name="gripper" params="id">
-    <link name="gripper_pole_${id}">
-      <inertial>
-        <mass value="0.000" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <inertia ixx="0.00000000" ixy="0" ixz="0" iyy="0.00000000" iyz="0" izz="0.00000000" />
-      </inertial>
-      <visual>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <geometry>
-          <cylinder length="0.2" radius=".01"/>
-        </geometry>
-      </visual>
-      <collision>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <geometry>
-          <cylinder length="0.2" radius=".01"/>
-        </geometry>
-      </collision>
-    </link>
-
-    <link name="left_gripper_${id}">
-        <visual>
-          <origin rpy="0.0 0 0" xyz="0 0 0"/>
-          <geometry>
-            <mesh filename="package://pr2_description/meshes/gripper_v0/l_finger.dae"/>
-          </geometry>
-        </visual>
-    </link>
-
-    <joint name="left_gripper_joint_${id}" type="fixed">
-        <!--axis xyz="0 0 1"/>
-        <limit effort="1000.0" lower="0.0" upper="0.548" velocity="0.5"/-->
-        <origin rpy="0 0 0" xyz="0.2 0.01 0"/>
-        <parent link="gripper_pole_${id}"/>
-        <child link="left_gripper_${id}"/>
-    </joint>
-
-    <joint name="gripper_${id}_joint" type="fixed">
-      <origin xyz="0 0 -0.065" rpy="0 0 0"/>
-      <parent link="base_link_${id}"/>
-      <child link="gripper_pole_${id}"/>
-    </joint>
-  </xacro:macro>
-
   <!-- ########################UAV################################################ -->
   <!-- Main quadrotor link -->
   <xacro:macro name="quadrotor_base_macro" params="id model_name">
@@ -277,7 +230,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
     <xacro:quadrotor_single_propeller propid="5" id="${id}" xyz="0.33 -0.35 -0.18" />
     <xacro:generic_camera  id="${id}" />
     <xacro:sonar_sensor id="${id}" />
-    <xacro:gripper id="${id}" />
+
 
     <gazebo reference="base_link_${id}">
       <turnGravityOff>false</turnGravityOff>

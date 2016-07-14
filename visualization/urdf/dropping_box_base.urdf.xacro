@@ -14,35 +14,29 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <xacro:include filename="$(find grvc_quadrotor_gazebo)/urdf/quadrotor_plugins.urdf.xacro" />
 
 <!--#####################################################################################-->  
-  <!-- Main object link -->
-  <xacro:macro name="quadrotor_base_macro" params="id model_name">
-    <link name="base_link_${id}">
-      <inertial>
-        <mass value="0.5" />
-        <origin xyz="0 0 0.0" />
-        <inertia ixx="0.01152" ixy="0.0" ixz="0.0" iyy="0.01152" iyz="0.0" izz="0.0218" />
-      </inertial>
-      <visual>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <geometry>
-            <box size="0.5 1 0.05"/>
-        </geometry>
-        <material name="gold">
-            <color rgba="0 1 1 1"/>
-        </material>
-      </visual>
-      <collision>
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <geometry>
-            <box size="0.5 1 0.05"/>
-        </geometry>
-        </collision>
-    </link>
+<!-- Main quadrotor link -->
+<xacro:macro name="quadrotor_base_macro" params="id model_name">
+  <link name="base_link_${id}">
+    <inertial>
+      <mass value="1.487" />
+      <origin xyz="0 0 0.0" />
+      <inertia ixx="0.01152" ixy="0.0" ixz="0.0" iyy="0.01152" iyz="0.0" izz="0.0218" />
+    </inertial>
 
-    <gazebo reference="base_link_${id}">
-      <material>Gazebo/Gold</material>
-      <turnGravityOff>false</turnGravityOff>
-    </gazebo>
+    <visual>
+      <origin xyz="0 0 -0.25" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://mbzirc_gcs_view/model/drop_box_scale.dae"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 -0.25" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://mbzirc_gcs_view/model/drop_box_scale.dae"/>
+      </geometry>
+    </collision>
+  </link>
 
     <!-- Gazebo Plugins -->
     <xacro:quadrotor_plugins model_name="${model_name}" base_link="base_link_${id}"/>
