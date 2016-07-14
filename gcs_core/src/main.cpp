@@ -115,23 +115,30 @@ int main(int _argc, char** _argv) {
     utils::ArgumentParser parser(_argc, _argv);
     string quad = parser.getArgument("quad_name", string("quad1"));
 
-    if(quad == "quad1") {
-        WaypointList wplist_1 = {
-            {{60.0, -25.0, 10}, 0.0},
-            {{65.0, -28.5, 5}, 0.0},
-            {{65.0, -28.5, 3}, 0.0},
-            {{65.0, -28.5, 1.5}, 0.0},
-            {{65.0, -28.5, 1}, 0.0},
-            {{65.0, -28.5, 1.5}, 0.0},
-            {{65.0, -28.5, 2.0}, 0.0},
-            {{65.0, -28.5, 5.0}, 0.0},
-            {{-65.0, 28.5, 5}, 0.0},
-        };
+    double flight_z = 10.0;
 
-        quad_thread("/quad1", wplist_1, _argc, _argv);
-    }
-    else if (quad == "quad2") {
-        WaypointList wplist_2 = {
+    WaypointList wplist_1 = {
+        {{60.0, -25.0, flight_z}, 0.0},
+        //{{50.0, -28.5, flight_z}, 0.0},
+        {{-50.0, -28.5, flight_z}, 0.0},
+        {{-50.0, -22.5, flight_z}, 0.0},
+        {{50.0, -22.5, flight_z}, 0.0},
+        {{7.0, -25, flight_z}, 0.0},
+        {{7.0, -25, 0.7}, 0.0},
+        {{7.0, -25, flight_z}, 0.0},
+        {{-50.0, 22.5, flight_z}, 0.0}
+       /* {{65.0, -28.5, flight_z}, 0.0},
+        {{-66.0, 25, flight_z}, 0.0},
+        {{-66.0, 25, flight_z}, 0.0},
+        {{-66.0, 25, flight_z}, 0.0},
+        {{-66.0, 25, flight_z}, 0.0},
+        {{-60.0, 18, flight_z}, 0.0},*/
+    };
+
+    Quadrotor quad1("/quad1", wplist_1, _argc, _argv);
+    std::thread quad1_thread ([&](){quad1.run();});
+
+    WaypointList wplist_2 = {
             {{60, -15.0, 16}, 0.0},
             {{30, -5.0, 16}, 0.0},
             {{0.0, 0.0, 16}, 0.0},
@@ -145,32 +152,51 @@ int main(int _argc, char** _argv) {
             {{-50, 20.0, 16}, 0.0},
             {{0, 20.0, 16}, 0.0},
             {{10, 0.0, 16}, 0.0}
-        };
+    };
 
-        quad_thread("/quad2", wplist_2, _argc, _argv);
-    }
+    Quadrotor quad2("/quad2", wplist_2, _argc, _argv);
+    std::thread quad2_thread ([&](){quad2.run();});
 
-    else if (quad == "quad3") {
-        WaypointList wplist_3 = {
-            {{60.0, -10.0, 18}, 0.0},
-            {{55.0, -10.0, 18}, 0.0},
-            {{45.0, -5.0, 18}, 0.0},
-            {{35.0, -10.0, 18}, 0.0},
-            {{25.0, -5, 18}, 0.0},
-            {{20.0, 0.0, 18}, 0.0},
-            {{20.0, 5.0, 18}, 0.0},
-            {{10.0, -5.0, 18}, 0.0},
-            {{0.0, 5.0, 18}, 0.0},
-            {{-10.0, 10.0, 18}, 0.0},
-            {{-15.0, 10.0, 18}, 0.0},
-            {{-25.0, 0.0, 18}, 0.0},
-            {{-10.0, -10.0, 18.0}, 0.0}
-        };
+    WaypointList wplist_3 = {
+        {{60.0, -10.0, 18}, 0.0},
+        {{55.0, -10.0, 18}, 0.0},
+        {{45.0, -5.0, 18}, 0.0},
+        {{35.0, -10.0, 18}, 0.0},
+        {{25.0, -5, 18}, 0.0},
+        {{20.0, 0.0, 18}, 0.0},
+        {{20.0, 5.0, 18}, 0.0},
+        {{10.0, -5.0, 18}, 0.0},
+        {{0.0, 5.0, 18}, 0.0},
+        {{-10.0, 10.0, 18}, 0.0},
+        {{-15.0, 10.0, 18}, 0.0},
+        {{-25.0, 0.0, 18}, 0.0},
+        {{-10.0, -10.0, 18.0}, 0.0}
+    };
 
-        quad_thread("/quad3", wplist_3, _argc, _argv);
+    Quadrotor quad3("/quad3", wplist_3, _argc, _argv);
+    std::thread quad3_thread ([&](){quad3.run();});
 
-    }
-    else if (quad == "object_black_cylinder_1") {
+    quad1_thread.join();
+    quad2_thread.join();
+    quad3_thread.join();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*else if (quad == "object_black_cylinder_1") {
         WaypointList wplist_4 = {
             {{-40.0, -20.0, 0.06}, 0.0},
             {{40.0, -20.0, 0.06}, 0.0},
@@ -268,7 +294,7 @@ int main(int _argc, char** _argv) {
             {{22.0, -28.0, 0.06}, 0.0}
         };
         object_thread("/object_red_box_mov_2", wplist_13, _argc, _argv);
-    }
+    }*/
 
     return 0;
 }

@@ -25,6 +25,10 @@ public:
         string node_name = "take_object";
         grvc::utils::ArgumentParser args(_argc, _argv);
         piecePos_ = args.getArgument("start_pos", piecePos_);
+        targetPos.model_name = "object_black_cylinder_1";
+        targetPos.pose.position.x = piecePos_[0];
+        targetPos.pose.position.y  = piecePos_[1];
+        targetPos.pose.position.z  = piecePos_[2];
         //cout << piecePos_ << endl;
         ros::init(_argc, _argv, "haunter");
         n = new ros::NodeHandle();
@@ -38,22 +42,47 @@ protected:
     void catchCallback(const Vec3& _pos) {
 
         if((_pos - piecePos_).norm() < cCatchThreshold_ ) {
-            if(!caught_) cout << "Caught! -----------------\n";
-            caught_ = true;
+            if(!caught_ && !release)
+            {
+                cout << "Caught! -----------------\n";
+                caught_ = true;
+            }
         }
         if(caught_) {
             piecePos_ = _pos + Vec3(0.0, 0.0, -0.2);
-            gazebo_msgs::ModelState targetPos;
-            targetPos.model_name = "object_black_cylinder_1";
+
+
             targetPos.pose.position.x = piecePos_[0];
             targetPos.pose.position.y = piecePos_[1];
             targetPos.pose.position.z = piecePos_[2];
-            modelStatePub_.publish(targetPos);
+
+
+            distanceBox_ = _pos - Vec3(-66, 25, 2);
+            if(abs(distanceBox_[0]) < releaseThreshold_[0] && abs(distanceBox_[1]) < releaseThreshold_[1] && abs(distanceBox_[2]) < releaseThreshold_[2] )
+            {
+                caught_ = false;
+                release = true;
+                cout << "Object release-----------\n";
+                //targetPos.twist.linear.z = -20;
+
+            }
+            cout << "Distance to box:" << distanceBox_[0] << " " << distanceBox_[1] << " " << distanceBox_[2] << endl;
         }
+        if(release && targetPos.pose.position.z > 0.2)
+        {
+            targetPos.pose.position.z -= 0.1;
+
+
+        }
+        modelStatePub_.publish(targetPos);
     }
 
+    gazebo_msgs::ModelState targetPos;
     Vec3 piecePos_;
+    Vec3 releaseThreshold_ = Vec3(0.1, 0.1, 0.1);
+    Vec3 distanceBox_;
     const double cCatchThreshold_ = 0.7f;
+    bool release = false;
     bool caught_ = false;
     ros::NodeHandle* n;
     ros::Publisher modelStatePub_;

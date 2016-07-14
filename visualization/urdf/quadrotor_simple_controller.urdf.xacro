@@ -25,7 +25,7 @@ xmlns:xacro="http://ros.org/wiki/xacro"
         <yawLimit>1.5</yawLimit>
         <velocityXYProportionalGain>5.0</velocityXYProportionalGain>
         <velocityXYDifferentialGain>1.0</velocityXYDifferentialGain>
-        <velocityXYLimit>5</velocityXYLimit>
+        <velocityXYLimit>50</velocityXYLimit>
         <velocityZProportionalGain>5.0</velocityZProportionalGain>
         <velocityZDifferentialGain>1.0</velocityZDifferentialGain>
         <velocityZLimit>2</velocityZLimit>

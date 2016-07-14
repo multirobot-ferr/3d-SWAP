@@ -34,6 +34,7 @@ Panels:
         - /RobotModel25
         - /RobotModel26
         - /RobotModel27
+        - /Marker2
       Splitter Ratio: 0.5
     Tree Height: 775
   - Class: rviz/Selection
@@ -421,11 +422,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_17:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_black_cylinder_mov_1
       TF Prefix: ""
@@ -442,11 +438,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_18:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_black_cylinder_mov_2
       TF Prefix: ""
@@ -463,11 +454,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_19:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_black_box_mov_1
       TF Prefix: ""
@@ -484,11 +470,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_20:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_black_box_mov_2
       TF Prefix: ""
@@ -505,11 +486,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_22:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_blue_cylinder_mov_1
       TF Prefix: ""
@@ -526,11 +502,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_21:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_blue_box_mov_1
       TF Prefix: ""
@@ -547,11 +518,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_25:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_red_cylinder_mov_1
       TF Prefix: ""
@@ -568,11 +534,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_26:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_red_cylinder_mov_2
       TF Prefix: ""
@@ -589,11 +550,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_23:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_red_box_mov_1
       TF Prefix: ""
@@ -610,17 +566,20 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_24:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description_object_red_box_mov_2
       TF Prefix: ""
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /quad1/markers
+      Name: Marker
+      Namespaces:
+        path: true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -645,22 +604,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 104.301
+      Distance: 10
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 4.4954
-        Y: -3.97883
-        Z: -0.365268
+        X: 0.608982
+        Y: -0.437521
+        Z: -0.121241
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.355398
-      Target Frame: map
+      Pitch: 0.215398
+      Target Frame: base_link_1
       Value: Orbit (rviz)
-      Yaw: 5.55858
+      Yaw: 5.85358
     Saved: ~
 Window Geometry:
   Displays:
