@@ -88,3 +88,6 @@ target_link_libraries(marker_waypoints ${catkin_LIBRARIES})
 add_executable(take_object src/take_object.cpp)
 target_link_libraries(take_object ${catkin_LIBRARIES})
 
+add_executable(moving_object src/moving_object.cpp)
+target_link_libraries(moving_object ${catkin_LIBRARIES})
+
