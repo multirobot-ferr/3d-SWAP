@@ -102,8 +102,8 @@ xmlns:xacro="http://ros.org/wiki/xacro">
         		<horizontal_fov>1.07079633</horizontal_fov>
           		<image>
             		<format>R8G8B8</format>
-                    <width>1280</width>
-                    <height>960</height>
+                    <width>460</width>
+                    <height>380</height>
           		</image>
           		<clip>
             		<near>0.01</near>
