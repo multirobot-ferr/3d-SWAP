@@ -32,7 +32,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- ######################################################################## -->
 
   <!-- A single propeller -->
-  <xacro:macro name="quadrotor_single_propeller" params="propid id xyz">
+  <!--xacro:macro name="quadrotor_single_propeller" params="propid id xyz">
     <link name="prop_${propid}_${id}">
       <inertial>
         <mass value="0.0000" />
@@ -60,7 +60,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
       <parent link="base_link_${id}"/>
       <child link="prop_${propid}_${id}"/>
     </joint>
-  </xacro:macro>
+  </xacro:macro-->
   
 <!--##############################CAMERA#######################################################-->
 
@@ -222,12 +222,12 @@ xmlns:xacro="http://ros.org/wiki/xacro">
       </collision>
     </link>
 
-    <xacro:quadrotor_single_propeller propid="0" id="${id}" xyz="0.33 0.11 -0.18" />
+    <!--xacro:quadrotor_single_propeller propid="0" id="${id}" xyz="0.33 0.11 -0.18" />
     <xacro:quadrotor_single_propeller propid="1" id="${id}" xyz="-0.07 0.34 -0.18" />
     <xacro:quadrotor_single_propeller propid="2" id="${id}" xyz="-0.47 0.11 -0.18" />
     <xacro:quadrotor_single_propeller propid="3" id="${id}" xyz="-0.07 -0.58 -0.18" />
     <xacro:quadrotor_single_propeller propid="4" id="${id}" xyz="-0.47 -0.35 -0.18" />
-    <xacro:quadrotor_single_propeller propid="5" id="${id}" xyz="0.33 -0.35 -0.18" />
+    <xacro:quadrotor_single_propeller propid="5" id="${id}" xyz="0.33 -0.35 -0.18" /-->
     <xacro:generic_camera  id="${id}" />
     <xacro:sonar_sensor id="${id}" />
 

@@ -21,19 +21,20 @@ int i = 0;
 
 class ObjectHaunter {
 public:
-    ObjectHaunter(int _argc, char** _argv) {
+    ObjectHaunter(const grvc::utils::ArgumentParser& _args,int _argc, char** _argv) {
         string node_name = "take_object";
-        grvc::utils::ArgumentParser args(_argc, _argv);
-        piecePos_ = args.getArgument("start_pos", piecePos_);
-        targetPos.model_name = "object_black_cylinder_1";
+        piecePos_ = _args.getArgument("start_pos", piecePos_);
+        piece_name_ = _args.getArgument("piece_name", string(""));
+        targetPos.model_name = piece_name_;
         targetPos.pose.position.x = piecePos_[0];
         targetPos.pose.position.y  = piecePos_[1];
         targetPos.pose.position.z  = piecePos_[2];
-        //cout << piecePos_ << endl;
+        string quad_name = _args.getArgument("quad_name", string(""));
+
         ros::init(_argc, _argv, "haunter");
         n = new ros::NodeHandle();
         modelStatePub_ = n->advertise<gazebo_msgs::ModelState>("/gazebo/set_model_state", 100);
-        robotPosSub_ = new grvc::com::Subscriber<Vec3>(node_name.c_str(), "/quad2/hal/position", _argc, _argv, [this](const Vec3& _pos) {
+        robotPosSub_ = new grvc::com::Subscriber<Vec3>(node_name, string("/") + quad_name+ "/hal/position", _argc, _argv, [this](const Vec3& _pos) {
             catchCallback(_pos);
         });
     }
@@ -77,6 +78,7 @@ protected:
         modelStatePub_.publish(targetPos);
     }
 
+    string piece_name_;
     gazebo_msgs::ModelState targetPos;
     Vec3 piecePos_;
     Vec3 releaseThreshold_ = Vec3(0.1, 0.1, 0.1);
@@ -96,7 +98,8 @@ protected:
 int main(int _argc, char** _argv)
 {
 
-    ObjectHaunter haunter(_argc, _argv);
+    grvc::utils::ArgumentParser args(_argc, _argv);
+    ObjectHaunter haunter(args, _argc, _argv);
 
     for(;;) {
          this_thread::sleep_for(chrono::milliseconds(500));

@@ -68,6 +68,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="object_black_cylinder_1"/>
         <arg name="urdf_file" value="object_black_cylinder.urdf.xacro"/>
+        <arg name="quad_name" value="quad1"/>
         <arg name="id" value="4"/>
         <arg name="pos_x" value="7"/>
         <arg name="pos_y" value="-25"/>
@@ -136,19 +137,20 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_x" value="3"/>
         <arg name="pos_y" value="-2"/>
         <arg name="pos_z" value="0.07"/>
-    </include>
+    </include-->
 
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="object_red_box_1"/>
         <arg name="urdf_file" value="object_red_box.urdf.xacro"/>
+        <arg name="quad_name" value="quad3"/>
         <arg name="id" value="11"/>
         <arg name="pos_x" value="25"/>
         <arg name="pos_y" value="22"/>
         <arg name="pos_z" value="0.07"/>
     </include>
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="object_red_cylinder_1"/>
         <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
         <arg name="id" value="12"/>

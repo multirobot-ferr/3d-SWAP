@@ -4,6 +4,7 @@
     <!-- Configurable options -->
     <arg name="robot_name"/> <!-- Robot name defines the namespace for all topics regarding the robot -->
     <arg name="urdf_file"/>
+    <arg name="quad_name"/>
     <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
     <arg name="pos_x" default="0.0"/>
     <arg name="pos_y" default="0.0"/>
@@ -45,6 +46,6 @@
         args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name)"/-->
 
     <node name="take_object_$(arg robot_name)" pkg="mbzirc_gcs_view" type="take_object" respawn="false" output="screen"
-        args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name) -start_pos=$(arg pos_x),$(arg pos_y),$(arg pos_z)"/>
+        args="-hal_ns=/$(arg robot_name)/hal -wp_topic=go_to_wp -gazebo_ns=/$(arg robot_name) -start_pos=$(arg pos_x),$(arg pos_y),$(arg pos_z) -piece_name=$(arg robot_name) -quad_name=$(arg quad_name)"/>
 
 </launch>

@@ -163,7 +163,7 @@ int main(int _argc, char** _argv) {
         quad3.run();
     });
 
-    this_thread::sleep_for(chrono::seconds(20));
+    this_thread::sleep_for(chrono::seconds(10));
 
     WaypointList wplist_2 = {
             {{60, -5.0, flight_z}, 0.0},
