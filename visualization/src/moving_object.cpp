@@ -37,7 +37,7 @@ public:
 
 protected:
     void catchCallback(const Vec3& _pos) {
-        const double cCatchThreshold = 0.7f;
+        const double cCatchThreshold = 1.0f;
 
         if((_pos - piece_pos_).norm() < cCatchThreshold ) {
             if(!caught_ && !released_)

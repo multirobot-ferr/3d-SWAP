@@ -111,15 +111,157 @@ protected:
 
 void object_thread(const string& _object_name, const WaypointList& _list, int _argc, char** _argv) {
     MovingObject object(_object_name, _list, _argc, _argv);
-    object.run();
+    std::thread _thread1 ([&](){
+        object.run();
+    });
+    _thread1.detach();
 }
-
 
 int main(int _argc, char** _argv) {
     utils::ArgumentParser parser(_argc, _argv);
     string quad = parser.getArgument("quad_name", string("quad1"));
 
     double flight_z = 10.0;
+
+    WaypointList wplist_4 = {
+        {{-40.0, -20.0, 0.06}, 0.0},
+        {{40.0, -20.0, 0.06}, 0.0},
+        {{40.0, 20.0, 0.06}, 0.0},
+        {{-40.0, 20.0, 0.06}, 0.0},
+        {{-40.0, -20.0, 0.06}, 0.0},
+        {{40.0, -20.0, 0.06}, 0.0},
+        {{40.0, 20.0, 0.06}, 0.0},
+        {{-40.0, 20.0, 0.06}, 0.0}
+    };
+    MovingObject object1("/object_black_cylinder_mov_1", wplist_4, _argc, _argv);
+    std::thread _thread1 ([&](){
+        object1.run();
+    });
+
+    WaypointList wplist_5 = {
+        {{17.0, 19.0, 0.06}, 0.0},
+        {{17.0, -19.0, 0.06}, 0.0},
+        {{17.0, 19.0, 0.06}, 0.0},
+        {{17.0, -19.0, 0.06}, 0.0},
+        {{17.0, 19.0, 0.06}, 0.0},
+        {{17.0, -19.0, 0.06}, 0.0},
+        {{17.0, 19.0, 0.06}, 0.0},
+        {{17.0, -19.0, 0.06}, 0.0}
+    };
+    MovingObject object2("/object_black_cylinder_mov_2", wplist_5, _argc, _argv);
+    std::thread _thread2 ([&](){
+        object2.run();
+    });
+
+    WaypointList wplist_6 = {
+        {{-6.0, -13.0, 0.06}, 0.0},
+        {{-18.0, -13.0, 0.06}, 0.0},
+        {{-18.0, 13.0, 0.06}, 0.0},
+        {{-6.0, 13.0, 0.06}, 0.0},
+        {{-6.0, -13.0, 0.06}, 0.0},
+        {{-18.0, -13.0, 0.06}, 0.0},
+        {{-18.0, 13.0, 0.06}, 0.0},
+        {{-6.0, 13.0, 0.06}, 0.0}
+    };
+    MovingObject object3("/object_black_box_mov_1", wplist_6, _argc, _argv);
+    std::thread _thread3 ([&](){
+        object3.run();
+    });
+
+
+    WaypointList wplist_7 = {
+        {{32.0, -12.0, 0.06}, 0.0},
+        {{-32.0, -12.0, 0.06}, 0.0},
+        {{-32.0, 12.0, 0.06}, 0.0},
+        {{32.0, 12.0, 0.06}, 0.0},
+        {{32.0, -12.0, 0.06}, 0.0},
+        {{-32.0, -12.0, 0.06}, 0.0},
+        {{-32.0, 12.0, 0.06}, 0.0},
+        {{32.0, 12.0, 0.06}, 0.0}
+    };
+    MovingObject object4("/object_black_box_mov_2", wplist_7, _argc, _argv);
+    std::thread _thread4 ([&](){
+        object4.run();
+    });
+
+    WaypointList wplist_9 = {
+        {{-38.0, 17.0, 0.06}, 0.0},
+        {{38.0, 17.0, 0.06}, 0.0},
+        {{38.0, -17.0, 0.06}, 0.0},
+        {{-38.0, -17.0, 0.06}, 0.0},{{-38.0, 17.0, 0.06}, 0.0},
+        {{38.0, 17.0, 0.06}, 0.0},
+        {{38.0, -17.0, 0.06}, 0.0},
+        {{-38.0, -17.0, 0.06}, 0.0}
+
+    };
+    MovingObject object6("/object_black_cylinder_mov_1", wplist_9, _argc, _argv);
+    std::thread _thread6 ([&](){
+        object6.run();
+    });
+
+
+    WaypointList wplist_10 = {
+        {{-28.0, 3.0, 0.06}, 0.0},
+        {{3.0, 28.0, 0.06}, 0.0},
+        {{28.0, -3.0, 0.06}, 0.0},
+        {{-3.0, -28.0, 0.06}, 0.0},
+        {{-28.0, 3.0, 0.06}, 0.0},
+        {{3.0, 28.0, 0.06}, 0.0},
+        {{28.0, -3.0, 0.06}, 0.0},
+        {{-3.0, -28.0, 0.06}, 0.0}
+    };
+    MovingObject object7("/object_red_cylinder_mov_1", wplist_10, _argc, _argv);
+    std::thread _thread7 ([&](){
+        object7.run();
+    });
+
+
+    WaypointList wplist_11 = {
+        {{13.0, -17.0, 0.06}, 0.0},
+        {{-17.0, -13.0, 0.06}, 0.0},
+        {{-13.0, 17.0, 0.06}, 0.0},
+        {{17.0, 13.0, 0.06}, 0.0},
+        {{13.0, -17.0, 0.06}, 0.0},
+        {{-17.0, -13.0, 0.06}, 0.0},
+        {{-13.0, 17.0, 0.06}, 0.0},
+        {{17.0, 13.0, 0.06}, 0.0}
+    };
+    MovingObject object8("/object_red_cylinder_mov_2", wplist_11, _argc, _argv);
+    std::thread _thread8 ([&](){
+        object8.run();
+    });
+
+
+    WaypointList wplist_12 = {
+        {{18.0, -27.0, 0.06}, 0.0},
+        {{-18.0, -27.0, 0.06}, 0.0},
+        {{18.0, 27.0, 0.06}, 0.0},
+        {{-18.0, 27.0, 0.06}, 0.0},
+        {{18.0, -27.0, 0.06}, 0.0},
+        {{-18.0, -27.0, 0.06}, 0.0},
+        {{18.0, 27.0, 0.06}, 0.0},
+        {{-18.0, 27.0, 0.06}, 0.0}
+    };
+    MovingObject object9("/object_red_box_mov_1", wplist_12, _argc, _argv);
+    std::thread _thread9 ([&](){
+        object9.run();
+    });
+
+
+    WaypointList wplist_13 = {
+        {{-22.0, -28.0, 0.06}, 0.0},
+        {{-22.0, 28.0, 0.06}, 0.0},
+        {{22.0, 28.0, 0.06}, 0.0},
+        {{22.0, -28.0, 0.06}, 0.0},
+        {{-22.0, -28.0, 0.06}, 0.0},
+        {{-22.0, 28.0, 0.06}, 0.0},
+        {{22.0, 28.0, 0.06}, 0.0},
+        {{22.0, -28.0, 0.06}, 0.0}
+    };
+        MovingObject object0("/object_red_box_mov_2", wplist_13, _argc, _argv);
+        std::thread _thread0 ([&](){
+        object0.run();
+    });
 
     WaypointList wplist_1 = {
         {{60.0, -25.0, flight_z}, 0.0},
@@ -141,6 +283,8 @@ int main(int _argc, char** _argv) {
             {{-66, 25.0, flight_z}, 0.0},
             {{-50.0, 20, flight_z}, 0.0}});
         quad1.run();
+
+
     });
 
     WaypointList wplist_3 = {
@@ -163,7 +307,7 @@ int main(int _argc, char** _argv) {
         quad3.run();
     });
 
-    this_thread::sleep_for(chrono::seconds(10));
+    this_thread::sleep_for(chrono::seconds(20));
 
     WaypointList wplist_2 = {
             {{60, -5.0, flight_z}, 0.0},
@@ -193,6 +337,36 @@ int main(int _argc, char** _argv) {
     quad2_thread.join();
     quad3_thread.join();
 
+    std::thread quad1_1_thread ([&] (){
+        quad1.setPath({
+            {{65.0, -26.5, flight_z}, 0.0},
+            {{65.0, -26.5, 5}, 0.0},
+            {{65.0, -26.5, 1}, 0.0},
+            {{65.0, -26.5, 0.3}, 0.0}});
+        quad1.run();
+    });
+
+    quad3.setPath({
+                      {{-66, 25.0, flight_z}, 0.0},
+                      {{-66, 25.0, 5}, 0.0},
+                      {{-66, 25.0, 2}, 0.0},
+                      {{-66, 25.0, flight_z}, 0.0},
+                      {{-50.0, 30, flight_z}, 0.0},
+                      {{-50.0, 30, flight_z}, 0.0}
+                  });
+    quad3.run();
+
+    std::thread quad3_1_thread ([&](){
+        quad3.setPath({
+            {{65, -23.5, flight_z}, 0.0},
+            {{65, -23.5, 5}, 0.0},
+            {{65, -23.5, 1}, 0.0},
+            {{65, -23.5, 0.3}, 0.0}
+          });
+        quad3.run();
+
+    });
+
     quad2.setPath({
                       {{-66, 25.0, flight_z}, 0.0},
                       {{-66, 25.0, 5}, 0.0},
@@ -202,115 +376,27 @@ int main(int _argc, char** _argv) {
                   });
     quad2.run();
 
-    quad3.setPath({
-                      {{-66, 25.0, flight_z}, 0.0},
-                      {{-66, 25.0, 5}, 0.0},
-                      {{-66, 25.0, 2}, 0.0},
-                      {{-66, 25.0, flight_z}, 0.0},
-                      {{-50.0, 30, flight_z}, 0.0}
+    quad2.setPath({
+                      {{65, -25, flight_z}, 0.0},
+                      {{65, -25, 5}, 0.0},
+                      {{65, -25.0, 1}, 0.0},
+                      {{65, -25.0, 0.3}, 0.0}
                   });
-    quad3.run();
+    quad2.run();
 
 
 
-    /*else if (quad == "object_black_cylinder_1") {
-        WaypointList wplist_4 = {
-            {{-40.0, -20.0, 0.06}, 0.0},
-            {{40.0, -20.0, 0.06}, 0.0},
-            {{40.0, 20.0, 0.06}, 0.0},
-            {{-40.0, 20.0, 0.06}, 0.0}
-        };
-        object_thread("/object_black_cylinder_mov_1", wplist_4, _argc, _argv);
-    }
+    /*
 
-    else if (quad == "object_black_cylinder_mov_2") {
-        WaypointList wplist_5 = {
-            {{17.0, 19.0, 0.06}, 0.0},
-            {{17.0, -19.0, 0.06}, 0.0},
-            {{17.0, 19.0, 0.06}, 0.0},
-            {{17.0, -19.0, 0.06}, 0.0}
-        };
-        object_thread("/object_black_cylinder_mov_2", wplist_5, _argc, _argv);
-    }
 
-    else if (quad == "object_black_box_mov_1") {
-        WaypointList wplist_6 = {
-            {{-6.0, -13.0, 0.06}, 0.0},
-            {{-18.0, -13.0, 0.06}, 0.0},
-            {{-18.0, 13.0, 0.06}, 0.0},
-            {{-6.0, 13.0, 0.06}, 0.0}
-        };
-        object_thread("/object_black_box_mov_1", wplist_6, _argc, _argv);
-    }
 
-    else if (quad == "object_black_box_mov_2") {
-        WaypointList wplist_7 = {
-            {{32.0, -12.0, 0.06}, 0.0},
-            {{-32.0, -12.0, 0.06}, 0.0},
-            {{-32.0, 12.0, 0.06}, 0.0},
-            {{32.0, 12.0, 0.06}, 0.0}
-        };
-        object_thread("/object_black_box_mov_2", wplist_7, _argc, _argv);
-    }
-
-    else if (quad == "object_blue_cylinder_mov_1") {
-        WaypointList wplist_8 = {
-            {{40.0, 8.0, 0.06}, 0.0},
-            {{40.0, -8.0, 0.06}, 0.0},
-            {{10.0, -8.0, 0.06}, 0.0},
-            {{10.0, 8.0, 0.06}, 0.0}
-        };
-        object_thread("/object_blue_cylinder_mov_1", wplist_8, _argc, _argv);
-    }
-
-    else if (quad == "object_blue_box_mov_1") {
-        WaypointList wplist_9 = {
-            {{-38.0, 17.0, 0.06}, 0.0},
-            {{38.0, 17.0, 0.06}, 0.0},
-            {{38.0, -17.0, 0.06}, 0.0},
-            {{-38.0, -17.0, 0.06}, 0.0}
-        };
-        object_thread("/object_black_cylinder_mov_1", wplist_9, _argc, _argv);
-    }
-
-    else if (quad == "object_red_cylinder_mov_1") {
-        WaypointList wplist_10 = {
-            {{-28.0, 3.0, 0.06}, 0.0},
-            {{3.0, 28.0, 0.06}, 0.0},
-            {{28.0, -3.0, 0.06}, 0.0},
-            {{-3.0, -28.0, 0.06}, 0.0}
-        };
-        object_thread("/object_red_cylinder_mov_1", wplist_10, _argc, _argv);
-    }
-
-    else if (quad == "object_red_cylinder_mov_2") {
-        WaypointList wplist_11 = {
-            {{13.0, -17.0, 0.06}, 0.0},
-            {{-17.0, -13.0, 0.06}, 0.0},
-            {{-13.0, 17.0, 0.06}, 0.0},
-            {{17.0, 13.0, 0.06}, 0.0}
-        };
-        object_thread("/object_red_cylinder_mov_2", wplist_11, _argc, _argv);
-    }
 
     else if (quad == "object_red_box_mov_1") {
-        WaypointList wplist_12 = {
-            {{18.0, -27.0, 0.06}, 0.0},
-            {{-18.0, -27.0, 0.06}, 0.0},
-            {{18.0, 27.0, 0.06}, 0.0},
-            {{-18.0, 27.0, 0.06}, 0.0}
-        };
-        object_thread("/object_red_box_mov_1", wplist_12, _argc, _argv);
+
     }
 
     else if (quad == "object_red_box_mov_2") {
-        WaypointList wplist_13 = {
-            {{-22.0, -28.0, 0.06}, 0.0},
-            {{-22.0, 28.0, 0.06}, 0.0},
-            {{22.0, 28.0, 0.06}, 0.0},
-            {{22.0, -28.0, 0.06}, 0.0}
-        };
-        object_thread("/object_red_box_mov_2", wplist_13, _argc, _argv);
+
     }*/
 
     return 0;

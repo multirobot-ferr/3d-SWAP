@@ -32,12 +32,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
           <color rgba="0.8 0 0 1"/>
       </material>
     </visual>
-    <collision>
+    <!--collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
           <box size="0.3 0.3 0.20"/>
       </geometry>
-    </collision>
+    </collision-->
   </link>
 
     <gazebo reference="base_link_${id}">
