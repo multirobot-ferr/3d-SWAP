@@ -41,6 +41,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_correct.launch">
         <arg name="robot_name" value="quad1"/>
+        <arg name="mesh_name" value="uav1"/>
         <arg name="id" value="1"/>
         <arg name="pos_x" value="65"/>
         <arg name="pos_y" value="-27.5"/>
@@ -49,6 +50,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_correct.launch">
         <arg name="robot_name" value="quad2"/>
+        <arg name="mesh_name" value="uav2"/>
         <arg name="id" value="2"/>
         <arg name="pos_x" value="65"/>
         <arg name="pos_y" value="-25"/>
@@ -57,6 +59,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_quad_correct.launch">
         <arg name="robot_name" value="quad3"/>
+        <arg name="mesh_name" value="uav3"/>
         <arg name="id" value="3"/>
         <arg name="pos_x" value="65"/>
         <arg name="pos_y" value="-22.5"/>
