@@ -22,6 +22,9 @@
 #include <grvc_quadrotor_uav/server.h>
 #include <grvc_quadrotor_hal/types.h>
 #include <grvc_utils/argument_parser.h>
+#include <ros/ros.h>
+#include <visualization_msgs/Marker.h>
+#include <grvc_com/ros/ros_singleton.h>
 #include <cstdint>
 #include <thread>
 #include <vector>
@@ -42,9 +45,48 @@ struct Quadrotor {
         , path_(_wp_list)
     {
         path_srv_ = new grvc::uav::Server::PathService::Client(name_ + "/uav/path", utils::ArgumentParser(_argc, _argv));
+
+        ros_handle_ = com::RosSingleton::get()->handle();
+        auto text_full_topic = name_ + "/" + "text";
+        text_pub_ = ros_handle_->advertise<visualization_msgs::Marker>(text_full_topic.c_str(), 0);
+
+        text_.header.frame_id = "/map";
+        text_.ns = "text";
+        text_.action = visualization_msgs::Marker::ADD;
+        text_.pose.orientation.w = 1.0;
+        text_.id = 0;
+        text_.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+
+        text_.text = name_;
+        text_.scale.z = 0.5;
+        if(name_ == "/quad1"){
+            text_.color.r = 0.800f;
+            text_.color.g = 0.242f;
+            text_.color.b = 0.031f;
+            text_.color.a = 1.0;
+        }
+        else if (name_ == "/quad2"){
+            text_.color.r = 0.705f;
+            text_.color.g = 0.135f;
+            text_.color.b = 0.800f;
+            text_.color.a = 1.0;
+        }
+        else if (name_ == "/quad3"){
+            text_.color.r = 0.800f;
+            text_.color.g = 0.715f;
+            text_.color.b = 0.017f;
+            text_.color.a =1.0;
+        }
+
         new Subscriber<Vec3>(g_node_name, name_ + "/hal/position", _argc, _argv, [&](const Vec3& _v) {
-            ready_ = true; // Once we receive telemetry, hal is ready
+          ready_ = true; // Once we receive telemetry, hal is ready
+          text_.pose.position.x = _v[0];
+          text_.pose.position.y = _v[1];
+          text_.pose.position.z = _v[2] + 0.3;
+          text_.header.stamp = ros::Time::now();
+          text_pub_.publish(text_);  // TODO: decimate?
         });
+
     }
 
     void setPath(const WaypointList& _wp_list) {
@@ -66,9 +108,12 @@ struct Quadrotor {
 
 private:
     grvc::uav::Server::PathService::Client* path_srv_;
+    ros::NodeHandle* ros_handle_;
+    ros::Publisher text_pub_;
 
     string name_;
     WaypointList path_;
+    visualization_msgs::Marker text_;
     bool ready_ = false;
 };
 
