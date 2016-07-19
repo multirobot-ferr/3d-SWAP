@@ -82,7 +82,7 @@ struct Quadrotor {
           ready_ = true; // Once we receive telemetry, hal is ready
           text_.pose.position.x = _v[0];
           text_.pose.position.y = _v[1];
-          text_.pose.position.z = _v[2] + 0.3;
+          text_.pose.position.z = _v[2] + 0.4;
           text_.header.stamp = ros::Time::now();
           text_pub_.publish(text_);  // TODO: decimate?
         });
@@ -313,75 +313,124 @@ int main(int _argc, char** _argv) {
     });
 
     WaypointList wplist_1 = {
-        {{60.0, -25.0, flight_z}, 0.0},
-        {{-50.0, -28.5, flight_z}, 0.0},
-        {{-50.0, -22.5, flight_z}, 0.0},
-        {{50.0, -22.5, flight_z}, 0.0}
+        {{65.0, -27.5, flight_z}, 0.0}
     };
 
     Quadrotor quad1("/quad1", wplist_1, _argc, _argv);
-    quad1.setText("TakingOff");
     std::thread quad1_thread ([&](){
+        // Take off
+        quad1.setText("taking-off");
         quad1.run();
-        quad1.setText("Catch!");
+        // Covering
+        quad1.setPath({
+          {{60.0, -25.0, flight_z}, 0.0},
+          {{-50.0, -28.5, flight_z}, 0.0},
+          {{-50.0, -22.5, flight_z}, 0.0},
+          {{50.0, -22.5, flight_z}, 0.0}
+        });
+        quad1.setText("covering");
+        quad1.run();
+        // Catch
         quad1.setPath({
             {{7.0, -25, flight_z}, 0.0},
-            {{7.0, -25, 1}, 0.0},
-            {{7.0, -25, flight_z}, 0.0},
+            {{7.0, -25, 1}, 0.0}});
+        quad1.setText("catch!");
+        quad1.run();
+        //Success
+        quad1.setPath({
+            {{7.0, -25, flight_z}, 0.0}});
+        quad1.setText("success!");
+        quad1.run();
+        // Release
+        quad1.setPath({
+            {{-50.0, 20, flight_z}, 0.0},
             {{-66.0, 25, flight_z}, 0.0},
             {{-66, 25.0, 5}, 0.0},
             {{-66, 25.0, 2}, 0.0},
             {{-66, 25.0, flight_z}, 0.0},
             {{-50.0, 20, flight_z}, 0.0}});
+        quad1.setText("release");
         quad1.run();
-
-
     });
 
     WaypointList wplist_3 = {
-        {{60.0, 17.0, flight_z}, 0.0},
-        {{-50.0, 17.0, flight_z}, 0.0},
-        {{-50.0, 27.0, flight_z}, 0.0},
-        {{50.0, 27.0, flight_z}, 0.0}
-
+        {{65.0, -22.5, flight_z}, 0.0}
     };
 
     Quadrotor quad3("/quad3", wplist_3, _argc, _argv);
     std::thread quad3_thread ([&](){
+        // Take off
+        quad3.setText("taking-off");
         quad3.run();
+        // Covering
+        quad3.setPath({
+          {{60.0, 17.0, flight_z}, 0.0},
+          {{-50.0, 17.0, flight_z}, 0.0},
+          {{-50.0, 27.0, flight_z}, 0.0},
+          {{50.0, 27.0, flight_z}, 0.0}});
+        quad3.setText("covering");
+        quad3.run();
+        // Catch!
         quad3.setPath({
             {{25.0, 22.0, flight_z}, 0.0},
             {{25.0, 22.0, 5}, 0.0},
-            {{25.0, 22.0, 1}, 0.0},
-            {{25.0, 22.0, flight_z}, 0.0},
-            {{-50.0, 30.0, flight_z}, 0.0}});
+            {{25.0, 22.0, 1}, 0.0}});
+        quad3.setText("catch!");
         quad3.run();
+        //Success
+        quad3.setPath({
+            {{25.0, 22.0, flight_z}, 0.0}});
+        quad3.setText("success!");
+        quad3.run();
+        //Release
+        quad3.setPath({
+            {{-50.0, 30.0, flight_z}, 0.0}});
+        quad3.setText("release");
+        quad3.run();
+        quad3.setText("waiting");
     });
 
     this_thread::sleep_for(chrono::seconds(35));
 
     WaypointList wplist_2 = {
-            {{60, -5.0, flight_z}, 0.0},
-            {{-50, -5.0, flight_z}, 0.0},
-            {{-50.0, 5.0, flight_z}, 0.0},
-            {{50, 5.0, flight_z}, 0.0},
+            {{65, -25.0, flight_z}, 0.0}
     };
 
     Quadrotor quad2("/quad2", wplist_2, _argc, _argv);
     std::thread quad2_thread ([&](){
+        //Taking Off
+        quad2.setText("taking-off");
         quad2.run();
+        //Covering
+        quad2.setPath({
+            {{60, -5.0, flight_z}, 0.0},
+            {{-50, -5.0, flight_z}, 0.0},
+            {{-50.0, 5.0, flight_z}, 0.0},
+            {{50, 5.0, flight_z}, 0.0}
+          });
+        quad2.setText("covering");
+        quad2.run();
+        //Catch
         quad2.setPath({
             {{0, 0, flight_z}, 0.0},
             {{0, 0, 5}, 0.0},
             {{0, 0, 1}, 0.0}
           });
+        quad2.setText("catch!");
         quad2.run();
-        this_thread::sleep_for(chrono::seconds(30));
+        //Success
         quad2.setPath({
             {{0, 0, 0.9}, 0.0},
-            {{0, 0.0, flight_z}, 0.0},
-            {{-50.0, 25, flight_z}, 0.0}});
+            {{0, 0.0, flight_z}, 0.0}});
+        this_thread::sleep_for(chrono::seconds(30));
+        quad2.setText("success!");
         quad2.run();
+        //Release
+        quad2.setPath({
+            {{-50.0, 25, flight_z}, 0.0}});
+        quad2.setText("release");
+        quad2.run();
+        quad2.setText("waiting");
     });
 
     quad1_thread.join();
@@ -389,13 +438,14 @@ int main(int _argc, char** _argv) {
     quad3_thread.join();
 
     std::thread quad1_1_thread ([&] (){
-        quad1.setText("Land");
+        quad1.setText("land");
         quad1.setPath({
             {{65.0, -26.5, flight_z}, 0.0},
             {{65.0, -26.5, 5}, 0.0},
             {{65.0, -26.5, 1}, 0.0},
             {{65.0, -26.5, 0.3}, 0.0}});
         quad1.run();
+        quad1.setText("finished!");
     });
 
     quad3.setPath({
@@ -406,9 +456,11 @@ int main(int _argc, char** _argv) {
                       {{-50.0, 30, flight_z}, 0.0},
                       {{-50.0, 30, flight_z}, 0.0}
                   });
+    quad3.setText("release");
     quad3.run();
 
     std::thread quad3_1_thread ([&](){
+        quad3.setText("land");
         quad3.setPath({
             {{65, -23.5, flight_z}, 0.0},
             {{65, -23.5, 5}, 0.0},
@@ -416,6 +468,7 @@ int main(int _argc, char** _argv) {
             {{65, -23.5, 0.3}, 0.0}
           });
         quad3.run();
+        quad3.setText("finished!");
 
     });
 
@@ -426,6 +479,7 @@ int main(int _argc, char** _argv) {
                       {{-66, 25.0, flight_z}, 0.0},
                       {{-50.0, 25, flight_z}, 0.0}
                   });
+    quad2.setText("release");
     quad2.run();
 
     quad2.setPath({
@@ -434,7 +488,9 @@ int main(int _argc, char** _argv) {
                       {{65, -25.0, 1}, 0.0},
                       {{65, -25.0, 0.3}, 0.0}
                   });
+    quad2.setText("land");
     quad2.run();
+    quad2.setText("finished!");
 
 
 
