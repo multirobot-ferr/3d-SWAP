@@ -4,6 +4,7 @@
 
    <arg name="robot_name"/> <!-- Robot name defines the namespace for all topics regarding the robot -->
    <arg name="model" default="$(find mbzirc_gcs_view)/urdf/grvc_quadrotor.urdf.xacro"/>
+   <arg name="mesh_name" default="uav"/>
    <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
    <arg name="pos_x" default="0.0"/>
    <arg name="pos_y" default="0.0"/>
@@ -14,7 +15,7 @@
    <arg name="use_ground_truth_for_control" default="true" />
 
    <!-- SEND the robot XML to param server -->
-   <param name="robot_description_$(arg robot_name)" command="$(find xacro)/xacro.py  '$(arg model)' model_name:=$(arg robot_name) id:=$(arg id)" />
+   <param name="robot_description_$(arg robot_name)" command="$(find xacro)/xacro.py  '$(arg model)' model_name:=$(arg robot_name) id:=$(arg id) mesh_name:=$(arg mesh_name)" />
    <param name="tf_prefix" type="string" value="$(arg tf_prefix)" />
 
    <!-- PUSH robot_description to factory and spawn robot in gazebo -->

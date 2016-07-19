@@ -12,13 +12,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <robot name="grvc_quadrotor" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:property name="M_PI" value="3.1415926535897931" />
   <xacro:arg name="model_name" default="grvc_gazebo"/>
+  <xacro:arg name="mesh_name" default="1"/>
   <xacro:arg name="id" default="1"/>
 
   <!-- Included URDF Files -->
   <xacro:include filename="$(find mbzirc_gcs_view)/urdf/grvc_quadrotor_base.urdf.xacro" />
   
   <!-- Instantiate quadrotor_base_macro once (has no parameters atm) -->
-  <!-- model_name must be ual_${id} for ual node to find the uav -->
-  <xacro:quadrotor_base_macro id="$(arg id)" model_name="$(arg model_name)"/>
+  <xacro:quadrotor_base_macro id="$(arg id)" model_name="$(arg model_name)" mesh_name="$(arg mesh_name)"/>
   
 </robot>

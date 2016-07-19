@@ -199,7 +199,7 @@ xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- ########################UAV################################################ -->
   <!-- Main quadrotor link -->
-  <xacro:macro name="quadrotor_base_macro" params="id model_name">
+  <xacro:macro name="quadrotor_base_macro" params="id model_name mesh_name">
     <link name="base_link_${id}">
       <inertial>
         <mass value="1.487" />
@@ -210,14 +210,14 @@ xmlns:xacro="http://ros.org/wiki/xacro">
       <visual>
         <origin xyz="0 0 -0.25" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://mbzirc_gcs_view/model/firefly_scale.dae"/>
+          <mesh filename="package://mbzirc_gcs_view/model/firefly_scale_${mesh_name}.dae"/>
         </geometry>
       </visual>
 
       <collision>
         <origin xyz="0 0 -0.25" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://mbzirc_gcs_view/model/firefly_scale.dae"/>
+          <mesh filename="package://mbzirc_gcs_view/model/firefly_scale_${mesh_name}.dae"/>
         </geometry>
       </collision>
     </link>
