@@ -147,7 +147,9 @@ public:
         }
 
         grvc::hal::TaskState ts;
-        path_srv_->send(path_, ts);
+        for(;;) {
+            path_srv_->send(path_, ts);
+        }
 
     }
 
@@ -262,6 +264,7 @@ int main(int _argc, char** _argv) {
     MovingObject object7("/object_red_cylinder_mov_1", wplist_10, _argc, _argv);
     std::thread _thread7 ([&](){
         object7.run();
+
     });
 
 
@@ -323,8 +326,8 @@ int main(int _argc, char** _argv) {
         quad1.run();
         // Covering
         quad1.setPath({
-          {{60.0, -25.0, flight_z}, 0.0},
-          {{-50.0, -28.5, flight_z}, 0.0},
+          {{60.0, -27.5, flight_z}, 0.0},
+          {{-50.0, -27.5, flight_z}, 0.0},
           {{-50.0, -22.5, flight_z}, 0.0},
           {{50.0, -22.5, flight_z}, 0.0}
         });
@@ -333,7 +336,7 @@ int main(int _argc, char** _argv) {
         // Catch
         quad1.setPath({
             {{7.0, -25, flight_z}, 0.0},
-            {{7.0, -25, 1}, 0.0}});
+            {{7.0, -25, 0.9}, 0.0}});
         quad1.setText("catch!");
         quad1.run();
         //Success
