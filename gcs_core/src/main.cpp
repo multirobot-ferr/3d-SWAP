@@ -93,6 +93,10 @@ struct Quadrotor {
         path_ = _wp_list;
     }
 
+    void setText(const string& _in) {
+      text_.text = _in;
+    }
+
     void run() {
         assert(path_.size() > 0);
 
@@ -316,8 +320,10 @@ int main(int _argc, char** _argv) {
     };
 
     Quadrotor quad1("/quad1", wplist_1, _argc, _argv);
+    quad1.setText("TakingOff");
     std::thread quad1_thread ([&](){
         quad1.run();
+        quad1.setText("Catch!");
         quad1.setPath({
             {{7.0, -25, flight_z}, 0.0},
             {{7.0, -25, 1}, 0.0},
@@ -383,6 +389,7 @@ int main(int _argc, char** _argv) {
     quad3_thread.join();
 
     std::thread quad1_1_thread ([&] (){
+        quad1.setText("Land");
         quad1.setPath({
             {{65.0, -26.5, flight_z}, 0.0},
             {{65.0, -26.5, 5}, 0.0},
