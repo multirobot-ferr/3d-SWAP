@@ -30,7 +30,7 @@ CAMERA_TYPE="ros"
 VIDEO_PATH="b2.mp4"
 
 # In case of ros topic
-CAMERA_TOPIC="/camera_1/image_raw_1"
+CAMERA_TOPIC="/camera_3/image_raw_3"
 
 # In case of usb device
 CAMERA_INDEX="0"
@@ -46,7 +46,7 @@ CANDIDATES_TOPIC="/candidateList"
 ##	Drone data		##
 ##################################
 # Topic where to read the data from the drone
-DRONE_POSE_TOPIC="/quad1/hal/position"
+DRONE_POSE_TOPIC="/quad3/hal/position"
 
 ##################################
 ##	Debugging Flags		##

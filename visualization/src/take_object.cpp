@@ -45,7 +45,7 @@ protected:
         if((_pos - piecePos_).norm() < cCatchThreshold_ ) {
             if(!caught_ && !release)
             {
-                cout << "Caught! -----------------\n";
+                //cout << "Caught! -----------------\n";
                 caught_ = true;
             }
         }
@@ -63,11 +63,11 @@ protected:
             {
                 caught_ = false;
                 release = true;
-                cout << "Object release-----------\n";
+                //cout << "Object release-----------\n";
                 //targetPos.twist.linear.z = -20;
 
             }
-            cout << "Distance to box:" << distanceBox_[0] << " " << distanceBox_[1] << " " << distanceBox_[2] << endl;
+            //cout << "Distance to box:" << distanceBox_[0] << " " << distanceBox_[1] << " " << distanceBox_[2] << endl;
         }
         if(release && targetPos.pose.position.z > 0.2)
         {

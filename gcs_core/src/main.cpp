@@ -377,7 +377,7 @@ int main(int _argc, char** _argv) {
         quad3.setPath({
             {{25.0, 22.0, flight_z}, 0.0},
             {{25.0, 22.0, 5}, 0.0},
-            {{25.0, 22.0, 1}, 0.0}});
+            {{25.0, 22.0, 0.9}, 0.0}});
         quad3.setText("catch!");
         quad3.run();
         //Success
