@@ -175,62 +175,43 @@ int main(int _argc, char** _argv) {
     double flight_z = 10.0;
 
     WaypointList wplist_4 = {
-        {{-40.0, -20.0, 0.06}, 0.0},
-        {{40.0, -20.0, 0.06}, 0.0},
-        {{40.0, 20.0, 0.06}, 0.0},
-        {{-40.0, 20.0, 0.06}, 0.0},
-        {{-40.0, -20.0, 0.06}, 0.0},
-        {{40.0, -20.0, 0.06}, 0.0},
-        {{40.0, 20.0, 0.06}, 0.0},
-        {{-40.0, 20.0, 0.06}, 0.0}
+        {{42.0, -24.0, 0.1}, 0.0},
+        {{42.0, 24.0, 0.1}, 0.0},
+        {{-42.0, 24.0, 0.1}, 0.0},
+        {{-42.0, -24.0, 0.1}, 0.0}
     };
-    MovingObject object1("/object_black_cylinder_mov_1", wplist_4, _argc, _argv);
+    MovingObject object1("/moving_object_2", wplist_4, _argc, _argv);
     std::thread _thread1 ([&](){
         object1.run();
     });
 
     WaypointList wplist_5 = {
-        {{17.0, 19.0, 0.06}, 0.0},
-        {{17.0, -19.0, 0.06}, 0.0},
-        {{17.0, 19.0, 0.06}, 0.0},
-        {{17.0, -19.0, 0.06}, 0.0},
-        {{17.0, 19.0, 0.06}, 0.0},
-        {{17.0, -19.0, 0.06}, 0.0},
-        {{17.0, 19.0, 0.06}, 0.0},
-        {{17.0, -19.0, 0.06}, 0.0}
+        {{-15.0, 19.0, 0.1}, 0.0},
+        {{-15.0, -19.0, 0.1}, 0.0}
     };
-    MovingObject object2("/object_black_cylinder_mov_2", wplist_5, _argc, _argv);
+    MovingObject object2("/moving_object_3", wplist_5, _argc, _argv);
     std::thread _thread2 ([&](){
         object2.run();
     });
 
     WaypointList wplist_6 = {
-        {{-6.0, -13.0, 0.06}, 0.0},
-        {{-18.0, -13.0, 0.06}, 0.0},
-        {{-18.0, 13.0, 0.06}, 0.0},
-        {{-6.0, 13.0, 0.06}, 0.0},
-        {{-6.0, -13.0, 0.06}, 0.0},
-        {{-18.0, -13.0, 0.06}, 0.0},
-        {{-18.0, 13.0, 0.06}, 0.0},
-        {{-6.0, 13.0, 0.06}, 0.0}
+        {{-6.0, -13.0, 0.1}, 0.0},
+        {{-18.0, -13.0, 0.1}, 0.0},
+        {{-18.0, 13.0, 0.1}, 0.0},
+        {{-6.0, 13.0, 0.1}, 0.0}
     };
-    MovingObject object3("/object_black_box_mov_1", wplist_6, _argc, _argv);
+    MovingObject object3("/moving_object_4", wplist_6, _argc, _argv);
     std::thread _thread3 ([&](){
         object3.run();
     });
-
-
+/*
     WaypointList wplist_7 = {
-        {{32.0, -12.0, 0.06}, 0.0},
-        {{-32.0, -12.0, 0.06}, 0.0},
-        {{-32.0, 12.0, 0.06}, 0.0},
-        {{32.0, 12.0, 0.06}, 0.0},
         {{32.0, -12.0, 0.06}, 0.0},
         {{-32.0, -12.0, 0.06}, 0.0},
         {{-32.0, 12.0, 0.06}, 0.0},
         {{32.0, 12.0, 0.06}, 0.0}
     };
-    MovingObject object4("/object_black_box_mov_2", wplist_7, _argc, _argv);
+    MovingObject object4("/moving_object_5", wplist_7, _argc, _argv);
     std::thread _thread4 ([&](){
         object4.run();
     });
@@ -313,7 +294,7 @@ int main(int _argc, char** _argv) {
         MovingObject object0("/object_red_box_mov_2", wplist_13, _argc, _argv);
         std::thread _thread0 ([&](){
         object0.run();
-    });
+    });*/
 
     WaypointList wplist_1 = {
         {{65.0, -27.5, flight_z}, 0.0}
