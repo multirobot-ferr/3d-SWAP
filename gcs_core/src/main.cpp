@@ -204,12 +204,12 @@ int main(int _argc, char** _argv) {
     std::thread _thread3 ([&](){
         object3.run();
     });
-/*
+
     WaypointList wplist_7 = {
-        {{32.0, -12.0, 0.06}, 0.0},
-        {{-32.0, -12.0, 0.06}, 0.0},
-        {{-32.0, 12.0, 0.06}, 0.0},
-        {{32.0, 12.0, 0.06}, 0.0}
+        {{32.0, -12.0, 0.1}, 0.0},
+        {{-32.0, -12.0, 0.1}, 0.0},
+        {{-32.0, 12.0, 0.1}, 0.0},
+        {{32.0, 12.0, 0.1}, 0.0}
     };
     MovingObject object4("/moving_object_5", wplist_7, _argc, _argv);
     std::thread _thread4 ([&](){
@@ -217,85 +217,60 @@ int main(int _argc, char** _argv) {
     });
 
     WaypointList wplist_9 = {
-        {{-38.0, 17.0, 0.06}, 0.0},
-        {{38.0, 17.0, 0.06}, 0.0},
-        {{38.0, -17.0, 0.06}, 0.0},
-        {{-38.0, -17.0, 0.06}, 0.0},{{-38.0, 17.0, 0.06}, 0.0},
-        {{38.0, 17.0, 0.06}, 0.0},
-        {{38.0, -17.0, 0.06}, 0.0},
-        {{-38.0, -17.0, 0.06}, 0.0}
+        {{-38.0, 19.0, 0.1}, 0.0},
+        {{38.0, 19.0, 0.1}, 0.0},
+        {{38.0, -19.0, 0.1}, 0.0},
+        {{-38.0, -19.0, 0.1}, 0.0}
 
     };
-    MovingObject object6("/object_black_cylinder_mov_1", wplist_9, _argc, _argv);
+    MovingObject object6("/moving_object_6", wplist_9, _argc, _argv);
     std::thread _thread6 ([&](){
         object6.run();
     });
 
-
     WaypointList wplist_10 = {
-        {{-28.0, 3.0, 0.06}, 0.0},
-        {{3.0, 28.0, 0.06}, 0.0},
-        {{28.0, -3.0, 0.06}, 0.0},
-        {{-3.0, -28.0, 0.06}, 0.0},
-        {{-28.0, 3.0, 0.06}, 0.0},
-        {{3.0, 28.0, 0.06}, 0.0},
-        {{28.0, -3.0, 0.06}, 0.0},
-        {{-3.0, -28.0, 0.06}, 0.0}
+        {{-12.0, 11.0, 0.1}, 0.0},
+        {{-12.0, -11.0, 0.1}, 0.0},
+        {{12.0, -11.0, 0.1}, 0.0},
+        {{12.0, 11.0, 0.1}, 0.0}
     };
-    MovingObject object7("/object_red_cylinder_mov_1", wplist_10, _argc, _argv);
+    MovingObject object7("/moving_object_7", wplist_10, _argc, _argv);
     std::thread _thread7 ([&](){
         object7.run();
-
     });
 
-
     WaypointList wplist_11 = {
-        {{13.0, -17.0, 0.06}, 0.0},
-        {{-17.0, -13.0, 0.06}, 0.0},
-        {{-13.0, 17.0, 0.06}, 0.0},
-        {{17.0, 13.0, 0.06}, 0.0},
-        {{13.0, -17.0, 0.06}, 0.0},
-        {{-17.0, -13.0, 0.06}, 0.0},
-        {{-13.0, 17.0, 0.06}, 0.0},
-        {{17.0, 13.0, 0.06}, 0.0}
+        {{18.0, -27.0, 0.1}, 0.0},
+        {{18.0, 27.0, 0.1}, 0.0}
     };
-    MovingObject object8("/object_red_cylinder_mov_2", wplist_11, _argc, _argv);
+    MovingObject object8("/moving_object_8", wplist_11, _argc, _argv);
     std::thread _thread8 ([&](){
         object8.run();
     });
 
-
     WaypointList wplist_12 = {
-        {{18.0, -27.0, 0.06}, 0.0},
-        {{-18.0, -27.0, 0.06}, 0.0},
-        {{18.0, 27.0, 0.06}, 0.0},
-        {{-18.0, 27.0, 0.06}, 0.0},
-        {{18.0, -27.0, 0.06}, 0.0},
-        {{-18.0, -27.0, 0.06}, 0.0},
-        {{18.0, 27.0, 0.06}, 0.0},
-        {{-18.0, 27.0, 0.06}, 0.0}
+        {{26.0, 0.0, 0.1}, 0.0},
+        {{0.0, 26.0, 0.1}, 0.0},
+        {{-26.0, 0.0, 0.1}, 0.0},
+        {{0.0, -26.0, 0.1}, 0.0}
     };
-    MovingObject object9("/object_red_box_mov_1", wplist_12, _argc, _argv);
+    MovingObject object9("/moving_object_9", wplist_12, _argc, _argv);
     std::thread _thread9 ([&](){
         object9.run();
     });
 
-
     WaypointList wplist_13 = {
-        {{-22.0, -28.0, 0.06}, 0.0},
-        {{-22.0, 28.0, 0.06}, 0.0},
-        {{22.0, 28.0, 0.06}, 0.0},
-        {{22.0, -28.0, 0.06}, 0.0},
-        {{-22.0, -28.0, 0.06}, 0.0},
-        {{-22.0, 28.0, 0.06}, 0.0},
-        {{22.0, 28.0, 0.06}, 0.0},
-        {{22.0, -28.0, 0.06}, 0.0}
+        {{0.0, 16.0, 0.1}, 0.0},
+        {{16.0, 0.0, 0.1}, 0.0},
+        {{0.0, -16.0, 0.1}, 0.0},
+        {{-16.0, 0.0, 0.1}, 0.0}
     };
-        MovingObject object0("/object_red_box_mov_2", wplist_13, _argc, _argv);
+        MovingObject object0("/moving_object_10", wplist_13, _argc, _argv);
         std::thread _thread0 ([&](){
         object0.run();
-    });*/
+    });
 
+        //UAVs
     WaypointList wplist_1 = {
         {{65.0, -27.5, flight_z}, 0.0}
     };
@@ -475,21 +450,6 @@ int main(int _argc, char** _argv) {
     quad2.setText("land");
     quad2.run();
     quad2.setText("finished!");
-
-
-
-    /*
-
-
-
-
-    else if (quad == "object_red_box_mov_1") {
-
-    }
-
-    else if (quad == "object_red_box_mov_2") {
-
-    }*/
 
     return 0;
 }

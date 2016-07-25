@@ -241,68 +241,59 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_z" value="0.1"/>
     </include>
 
-    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_mobile.launch">
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_mobile.launch">
         <arg name="robot_name" value="moving_object_5"/>
         <arg name="urdf_file" value="object_black_box.urdf.xacro"/>
         <arg name="id" value="20"/>
         <arg name="pos_x" value="32"/>
         <arg name="pos_y" value="12"/>
-        <arg name="pos_z" value="0.07"/>
+        <arg name="pos_z" value="0.1"/>
     </include>
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_mobile.launch">
-        <arg name="robot_name" value="object_blue_box_mov_1"/>
-        <arg name="urdf_file" value="object_blue_box.urdf.xacro"/>
+        <arg name="robot_name" value="moving_object_6"/>
+        <arg name="urdf_file" value="object_black_box.urdf.xacro"/>
         <arg name="id" value="21"/>
         <arg name="pos_x" value="-38"/>
         <arg name="pos_y" value="-19"/>
-        <arg name="pos_z" value="0.07"/>
+        <arg name="pos_z" value="0.1"/>
     </include>
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_mobile.launch">
-        <arg name="robot_name" value="object_blue_cylinder_mov_1"/>
-        <arg name="urdf_file" value="object_blue_cylinder.urdf.xacro"/>
+        <arg name="robot_name" value="moving_object_7"/>
+        <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
         <arg name="id" value="22"/>
-        <arg name="pos_x" value="10"/>
-        <arg name="pos_y" value="8"/>
-        <arg name="pos_z" value="0.07"/>
+        <arg name="pos_x" value="12"/>
+        <arg name="pos_y" value="11"/>
+        <arg name="pos_z" value="0.1"/>
     </include>
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_mobile.launch">
-        <arg name="robot_name" value="object_red_box_mov_1"/>
-        <arg name="urdf_file" value="object_red_box.urdf.xacro"/>
+        <arg name="robot_name" value="moving_object_8"/>
+        <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
         <arg name="id" value="23"/>
-        <arg name="pos_x" value="-18"/>
+        <arg name="pos_x" value="18"/>
         <arg name="pos_y" value="27"/>
-        <arg name="pos_z" value="0.07"/>
+        <arg name="pos_z" value="0.1"/>
     </include>
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_mobile.launch">
-        <arg name="robot_name" value="object_red_box_mov_2"/>
-        <arg name="urdf_file" value="object_blue_box.urdf.xacro"/>
+        <arg name="robot_name" value="moving_object_9"/>
+        <arg name="urdf_file" value="object_red_box.urdf.xacro"/>
         <arg name="id" value="24"/>
-        <arg name="pos_x" value="22"/>
-        <arg name="pos_y" value="-28"/>
-        <arg name="pos_z" value="0.07"/>
+        <arg name="pos_x" value="0"/>
+        <arg name="pos_y" value="-26"/>
+        <arg name="pos_z" value="0.1"/>
     </include>
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_mobile.launch">
-        <arg name="robot_name" value="object_red_cylinder_mov_1"/>
-        <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
+        <arg name="robot_name" value="moving_object_10"/>
+        <arg name="urdf_file" value="object_red_box.urdf.xacro"/>
         <arg name="id" value="25"/>
-        <arg name="pos_x" value="-3"/>
-        <arg name="pos_y" value="-28"/>
-        <arg name="pos_z" value="0.07"/>
+        <arg name="pos_x" value="-16"/>
+        <arg name="pos_y" value="0"/>
+        <arg name="pos_z" value="0.1"/>
     </include>
-
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_mobile.launch">
-        <arg name="robot_name" value="object_red_cylinder_mov_2"/>
-        <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
-        <arg name="id" value="26"/>
-        <arg name="pos_x" value="17"/>
-        <arg name="pos_y" value="13"/>
-        <arg name="pos_z" value="0.07"/>
-    </include-->
 
 <!--******************************DROP BOX****************************************-->
     <include file="$(find mbzirc_gcs_view)/launch/spawn_dropping_box.launch">
