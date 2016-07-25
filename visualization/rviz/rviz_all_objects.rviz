@@ -33,11 +33,10 @@ Panels:
         - /RobotModel24
         - /RobotModel25
         - /RobotModel26
-        - /RobotModel27
         - /Marker2
         - /Marker3
         - /Marker4
-        - /RobotModel28
+        - /RobotModel27
         - /Marker5
         - /Marker6
         - /Marker7
@@ -488,34 +487,13 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_17:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-      Name: RobotModel
-      Robot Description: robot_description_object_black_cylinder_mov_1
-      TF Prefix: ""
-      Update Interval: 0
-      Value: true
-      Visual Enabled: true
-    - Alpha: 1
-      Class: rviz/RobotModel
-      Collision Enabled: false
-      Enabled: true
-      Links:
-        All Links Enabled: true
-        Expand Joint Details: false
-        Expand Link Details: false
-        Expand Tree: false
-        Link Tree Style: Links in Alphabetic Order
         base_link_18:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: robot_description_object_black_cylinder_mov_2
+      Robot Description: robot_description_moving_object_2
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -536,7 +514,7 @@ Visualization Manager:
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: robot_description_object_black_box_mov_1
+      Robot Description: robot_description_moving_object_3
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -557,23 +535,7 @@ Visualization Manager:
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: robot_description_object_black_box_mov_2
-      TF Prefix: ""
-      Update Interval: 0
-      Value: true
-      Visual Enabled: true
-    - Alpha: 1
-      Class: rviz/RobotModel
-      Collision Enabled: false
-      Enabled: true
-      Links:
-        All Links Enabled: true
-        Expand Joint Details: false
-        Expand Link Details: false
-        Expand Tree: false
-        Link Tree Style: Links in Alphabetic Order
-      Name: RobotModel
-      Robot Description: robot_description_object_blue_cylinder_mov_1
+      Robot Description: robot_description_moving_object_4
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -594,7 +556,7 @@ Visualization Manager:
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: robot_description_object_blue_box_mov_1
+      Robot Description: robot_description_moving_object_5
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -609,34 +571,13 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_25:
+        base_link_22:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: robot_description_object_red_cylinder_mov_1
-      TF Prefix: ""
-      Update Interval: 0
-      Value: true
-      Visual Enabled: true
-    - Alpha: 1
-      Class: rviz/RobotModel
-      Collision Enabled: false
-      Enabled: true
-      Links:
-        All Links Enabled: true
-        Expand Joint Details: false
-        Expand Link Details: false
-        Expand Tree: false
-        Link Tree Style: Links in Alphabetic Order
-        base_link_26:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-      Name: RobotModel
-      Robot Description: robot_description_object_red_cylinder_mov_2
+      Robot Description: robot_description_moving_object_6
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -657,7 +598,7 @@ Visualization Manager:
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: robot_description_object_red_box_mov_1
+      Robot Description: robot_description_moving_object_7
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -678,7 +619,49 @@ Visualization Manager:
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: robot_description_object_red_box_mov_2
+      Robot Description: robot_description_moving_object_8
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_link_25:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: robot_description_moving_object_9
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_link_26:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotModel
+      Robot Description: robot_description_moving_object_10
       TF Prefix: ""
       Update Interval: 0
       Value: true
@@ -717,7 +700,7 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link_35:
+        base_link_17:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -776,7 +759,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 81.7524
+      Distance: 20.6372
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -788,10 +771,10 @@ Visualization Manager:
         Z: 17.882
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.599797
+      Pitch: 0.489798
       Target Frame: map
       Value: Orbit (rviz)
-      Yaw: 4.91859
+      Yaw: 5.19358
     Saved: ~
 Window Geometry:
   Displays:
