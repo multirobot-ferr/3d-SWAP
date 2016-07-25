@@ -23,13 +23,6 @@
         respawn="false">
     </node>
 
-   <!-- START robot state publisher -->
-   <!--node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher_$(arg robot_name)" output="screen" >
-        <remap from="robot_description" to="robot_description_$(arg robot_name)" />
-        <remap from="joint_states" to="joint_states_$(arg robot_name)" />
-        <param name="publish_frequency" type="double" value="50.0" />
-   </node-->
-
    <!-- PUBLISH state and tf -->
    <node name="ground_truth_to_tf_$(arg robot_name)" pkg="message_to_tf" type="message_to_tf" output="screen">
      <param name="odometry_topic" value="/$(arg robot_name)/ground_truth/state" />
