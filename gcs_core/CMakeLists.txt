@@ -49,19 +49,16 @@ if(GRVCQUAD_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
 
 	find_package(catkin REQUIRED COMPONENTS
-        grvc_quadrotor_com roscpp sensor_msgs image_transport std_msgs cv_bridge)
+        grvc_quadrotor_com grvc_quadrotor_hal roscpp std_msgs)
 
-    find_package(OpenCV REQUIRED COMPONENTS)
-
-	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com)
+	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com grvc_quadrotor_hal)
 
 	include_directories(${catkin_INCLUDE_DIRS})
 endif(GRVCQUAD_USE_ROS)
 
-#set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../../cmake/modules")
-#FIND_PACKAGE(Eigen3 REQUIRED)
-#INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../cmake/modules")
+FIND_PACKAGE(Eigen3 REQUIRED)
+INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
 
-add_executable(gcs_core src/main.cpp)
-target_link_libraries(gcs_core LINK_PUBLIC uav_server)
-set_target_properties(gcs_core PROPERTIES FOLDER "samples")
+add_library(gcs_core src/strategy/strategy.cpp)
+#set_target_properties(gcs_core PROPERTIES FOLDER "core")
