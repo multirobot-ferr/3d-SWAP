@@ -29,7 +29,7 @@
 
 #include <Eigen/Core>
 
-namespace mbzircus {
+namespace grvc { namespace mbzirc {
 
 	//------------------------------------------------------------------------------------------------------------------
 	typedef Eigen::Vector2d Vector2;
@@ -37,7 +37,7 @@ namespace mbzircus {
 	//------------------------------------------------------------------------------------------------------------------
 	struct Rectangle {
 		Vector2 mMin, mMax;
-		Vector2 clamp(const Vector&) const;
+		Vector2 clamp(const Vector2&) const;
 		Vector2 center() const { return (mMax + mMin)*0.5f; }
 		Vector2 size() const { return mMax - mMin; }
 		bool contains(const Vector2& _p) const { return clamp(_p) == _p; }
@@ -48,6 +48,6 @@ namespace mbzircus {
 		return{ std::max(mMin.x, std::min(mMax.x, _pos.x)), std::max(mMin.y, std::min(mMax.y, _pos.y)) };
 	}
 
-} // namespace mbzircus
+}} // namespace grvc::mbzirc
 
 #endif // _MBZIRC_UTIL_TYPES_H_
