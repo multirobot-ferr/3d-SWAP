@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strategy testing and simulation environment for mbzirc competition
 //----------------------------------------------------------------------------------------------------------------------
-#include "strategy.h"
+#include <gcs_core/strategy/strategy.h>
 #include "carrierPolicy.h"
 #include "scanPolicy.h"
 #include <arena/arena.h>
