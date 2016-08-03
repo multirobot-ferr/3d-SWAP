@@ -24,19 +24,14 @@
 // Strategy testing and simulation environment for mbzirc competition
 //----------------------------------------------------------------------------------------------------------------------
 #include <gcs_core/strategy/strategy.h>
-#include "carrierPolicy.h"
-#include "scanPolicy.h"
-#include <arena/arena.h>
-#include <robot/robot.h>
-#include "targetEstimator/targetEstimator.h"
 
-namespace mbzircus {
+namespace grvc { namespace mbzirc {
 	//------------------------------------------------------------------------------------------------------------------
 	Strategy::Strategy(const std::vector<Agent>& _r, const std::vector<TargetEstimator*>& _e, ScanPolicy* _s, CarrierPolicy* _c)
 		:mEstimators(_e)
 		,mScanPcy(_s)
 		,mCarrierPcy(_c)
-		,mTaskManager(_r)
+		//,mTaskManager(_r)
 	{
 	}
 
@@ -98,4 +93,4 @@ namespace mbzircus {
 		}
 	}
 	*/
-}
+}} // namespace grvc::mbzirc

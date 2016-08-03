@@ -53,7 +53,7 @@ namespace grvc { namespace mbzirc {
 		ScanPolicy*						mScanPcy;
 		CarrierPolicy*					mCarrierPcy;
 		std::vector<TargetEstimator*>	mEstimators;
-		RobotTaskManager				mTaskManager;
+		//RobotTaskManager				mTaskManager;
 	};
 	
 }} // namespace grvc::mbzirc
