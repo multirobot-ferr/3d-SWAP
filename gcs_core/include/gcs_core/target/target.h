@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // The MIT License (MIT)
 // 
-// Copyright (c) 2016 Carmelo J. FernÃ¡ndez-AgÃ¼era Tortosa
+// Copyright (c) 2016 Carmelo J. Fernández-Agüera Tortosa
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,39 +23,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strategy testing and simulation environment for mbzirc competition
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef _MBZIRCUS_STRATEGY_STRATEGY_H_
-#define _MBZIRCUS_STRATEGY_STRATEGY_H_
+#ifndef _MBZIRC_CORE_TARGET_TARGET_H_
+#define _MBZIRC_CORE_TARGET_TARGET_H_
 
-#include <vector>
-#include <gcs_core/agent/agent.h>
 
-namespace grvc { namespace mbzirc {
-	
-	class ScanPolicy;
-	class CarrierPolicy;
-	class TargetEstimator;
+namespace grvc {
+	namespace mbzirc {
 
-	class Strategy {
-	public:
-		Strategy(const std::vector<Agent>& _r, const std::vector<TargetEstimator*>&, ScanPolicy*, CarrierPolicy*);
-		/// run strategy
-		/// \param _dt time interval in seconds
-		void step(float _dt);
+		class Target {
+		public:
+			
+			struct Desc {};
+		};
+	}
+}	// namespace grvc::mbzirc
 
-	private:
-		/// \return true if any observations have located any target directly
-		/// \param _located vector to receive estimations of located targets
-		/*
-		bool observe(Arena*, std::vector<Target::Desc>& _located, float _dt);
-		void scan(Arena* _a);
-		*/
-		
-		ScanPolicy*						mScanPcy;
-		CarrierPolicy*					mCarrierPcy;
-		std::vector<TargetEstimator*>	mEstimators;
-		RobotTaskManager				mTaskManager;
-	};
-	
-}} // namespace grvc::mbzirc
-
-#endif // _MBZIRCUS_STRATEGY_STRATEGY_H_
+#endif // _MBZIRC_CORE_TARGET_TARGET_H_

@@ -27,10 +27,11 @@
 #define _MBZIRC_AGENT_AGENT_H_
 
 #include <gcs_core/util/types.h>
+#include <gcs_core/target/target.h>
 
 namespace grvc { namespace mbzirc {
 
-	class Robot {
+	class Agent {
 	public:
 		// Chases a target and takes it to the drop zone.
 		void captureStaticTarget	(const Target::Desc&);
