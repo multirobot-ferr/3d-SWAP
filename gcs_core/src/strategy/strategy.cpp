@@ -40,6 +40,7 @@ namespace mbzircus {
 	{
 	}
 
+	/*
 	//------------------------------------------------------------------------------------------------------------------
 	void Strategy::step(Arena* _a, float _dt) {
 		assert(mCarrierPcy);
@@ -96,4 +97,5 @@ namespace mbzircus {
 			d.first->goTo(d.second);
 		}
 	}
+	*/
 }
