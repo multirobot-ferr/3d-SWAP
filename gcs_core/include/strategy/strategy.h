@@ -37,7 +37,7 @@ namespace grvc { namespace mbzirc {
 
 	class Strategy {
 	public:
-		Strategy(const std::vector<Agent>& _r, const std::vector<TargetEstimator*>&, ScanPolicy*, CarrierPolicy*);
+		Strategy(const std::vector<Agent>& _r, const std::vector<TargetEstimator*>&, ScanPolicy&, CarrierPolicy&);
 		/// run strategy
 		/// \param _dt time interval in seconds
 		void step(float _dt);
