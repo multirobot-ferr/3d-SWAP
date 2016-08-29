@@ -40,15 +40,11 @@ namespace grvc { namespace mbzirc {
 		Strategy(const std::vector<Agent>& _r, const std::vector<TargetEstimator*>&, ScanPolicy*, CarrierPolicy*);
 		/// run strategy
 		/// \param _dt time interval in seconds
-		void step(float _dt);
+		void step(double _dt);
 
 	private:
-		/// \return true if any observations have located any target directly
-		/// \param _located vector to receive estimations of located targets
-		/*
-		bool observe(Arena*, std::vector<Target::Desc>& _located, float _dt);
-		void scan(Arena* _a);
-		*/
+		void observe(double _dt);
+		void updatePolicies(double _dt);
 		
 		ScanPolicy*						mScanPcy;
 		CarrierPolicy*					mCarrierPcy;

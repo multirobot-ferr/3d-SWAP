@@ -35,6 +35,26 @@ namespace grvc { namespace mbzirc {
 	{
 	}
 
+	//------------------------------------------------------------------------------------------------------------------
+	void Strategy::step(double _dt) {
+		assert(mCarrierPcy);
+		assert(mScanPcy);
+		observe(_dt);// Observe and update estimations
+		updatePolicies(_dt);// Update policies (policies are responsible for actually sending commands)
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	void Strategy::observe(double _dt) {
+		_dt;
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	void Strategy::updatePolicies(double _dt) {
+		// Update carrier policy given the latest estimates
+		// If something must be carried and there are carriers available, reassign
+		// Scan with whatever you have left
+	}
+
 	/*
 	//------------------------------------------------------------------------------------------------------------------
 	void Strategy::step(Arena* _a, float _dt) {
