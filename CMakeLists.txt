@@ -45,7 +45,7 @@ if(MSVC)
 	add_definitions(/W4 /WX) # Enable high level warnings and treat them like errors
 endif(MSVC)
 if(CMAKE_COMPILER_IS_GNUCXX)
-	add_definitions(-std=c++11 -Wall -Werror)
+	add_definitions(-std=c++11 -Wall -Werror -DNOMINMAX)
 endif()
 
 if(MBZIRC_USE_ROS)

@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // The MIT License (MIT)
 // 
-// Copyright (c) 2016 Carmelo J. FernÃ¡ndez-AgÃ¼era Tortosa
+// Copyright (c) 2016 Carmelo J. Fernández-Agüera Tortosa
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +23,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strategy testing and simulation environment for mbzirc competition
 //----------------------------------------------------------------------------------------------------------------------
-// Common types reused along the project
-#ifndef _MBZIRC_UTIL_TYPES_H_
-#define _MBZIRC_UTIL_TYPES_H_
-
-#include <Eigen/Core>
+#include <gcs_core/strategy/carrierPolicy/carrierPolicy.h>
+#include <gcs_core/agent/agent.h>
 
 namespace grvc { namespace mbzirc {
 
-	//------------------------------------------------------------------------------------------------------------------
-	typedef Eigen::Vector2d Vector2;
+	//----------------------------------------------------------------------------------------------------------------------
+	void CarrierPolicy::update(double _dt) {
+		updateInternalState(_dt);
+		if (areThereFreeCarriers() && this->hasToCarry()) {
+			assignCarriers();
+		}
+	}
 
-	//------------------------------------------------------------------------------------------------------------------
-	struct Rectangle {
-		Vector2 mMin, mMax;
-		Vector2 clamp(const Vector2&) const;
-		Vector2 center() const { return (mMax + mMin)*0.5f; }
-		Vector2 size() const { return mMax - mMin; }
-		bool contains(const Vector2& _p) const { return clamp(_p) == _p; }
-	};
+	//----------------------------------------------------------------------------------------------------------------------
+	CarrierPolicy::CarrierPolicy(const std::vector<Agent*>& _carriers) 
+		:mCarriers(_carriers)
+	{
+		// Intentionally blank
+	}
 
-	//------------------------------------------------------------------------------------------------------------------
-	inline Vector2 Rectangle::clamp(const Vector2& _pos) const {
-		return Vector2(std::max(mMin.x(), std::min(mMax.x(), _pos.x())), 
-						std::max(mMin.y(), std::min(mMax.y(), _pos.y())) );
+	//----------------------------------------------------------------------------------------------------------------------
+	bool CarrierPolicy::areThereFreeCarriers() const {
+		for(auto c : mCarriers)
+			if(!c->isBussy()) // Not bussy, can carry stuff
+				return true;
+		return false;
 	}
 
 }} // namespace grvc::mbzirc
-
-#endif // _MBZIRC_UTIL_TYPES_H_

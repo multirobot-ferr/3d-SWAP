@@ -30,6 +30,8 @@
 
 namespace grvc { namespace mbzirc {
 
+	class Agent;
+
 	class CarrierPolicy {
 	public:
 		/// \param _dt time interval since last call
