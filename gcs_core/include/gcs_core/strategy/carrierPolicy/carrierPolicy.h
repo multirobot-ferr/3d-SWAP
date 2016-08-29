@@ -35,6 +35,11 @@ namespace grvc { namespace mbzirc {
 		/// \param _dt time interval since last call
 		void update(double _dt);
 
+	protected:
+		CarrierPolicy(const std::vector<Agent*>& _carriers);
+		
+		std::vector<Agent*> mCarriers;
+
 	private:
 		/// \param _dt time interval since last call
 		virtual void updateInternalState(double _dt) = 0;
