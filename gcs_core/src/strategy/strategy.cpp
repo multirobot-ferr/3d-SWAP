@@ -25,6 +25,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include <gcs_core/strategy/strategy.h>
 #include <gcs_core/strategy/carrierPolicy/carrierPolicy.h>
+#include <gcs_core/strategy/scanPolicy/scanPolicy.h>
 
 namespace grvc { namespace mbzirc {
 	//------------------------------------------------------------------------------------------------------------------
@@ -53,7 +54,7 @@ namespace grvc { namespace mbzirc {
 	void Strategy::updatePolicies(double _dt) {
 		// Update carrier policy given the latest estimates
 		// If something must be carried and there are carriers available, reassign
-		mCarrierPcy->updatePolicy(_dt);
+		mCarrierPcy->update(_dt);
 		// Scan with whatever you have left
 		mScanPcy->update(_dt);
 	}
