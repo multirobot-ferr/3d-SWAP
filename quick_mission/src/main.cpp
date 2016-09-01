@@ -25,7 +25,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include <gcs_core/strategy/strategy.h>
 
+using namespace grvc::mbzirc;
+
 int main(int, char**)
 {
-    return 0;
+	Strategy gcs({}, nullptr, nullptr);
+	return 0;
 }

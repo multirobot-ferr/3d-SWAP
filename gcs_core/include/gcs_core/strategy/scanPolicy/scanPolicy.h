@@ -31,7 +31,7 @@ namespace grvc { namespace mbzirc {
 	class ScanPolicy {
 	public:
 		/// \param _dt time interval since last call
-		void update(double _dt);
+		virtual void update(double _dt) = 0;
 	};
 
 }} // namespace grvc::mbzirc
