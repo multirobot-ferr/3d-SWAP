@@ -48,9 +48,11 @@ namespace grvc { namespace mbzirc {
 		/// An agent is bussy when it has been assigned to capture a target and hasn't finished that task.
 		/// Both success or failure on the task leave the agent free. Feedback on the success of the task
 		/// Comes through observations
-		bool isBussy				() const;
+		bool isBussy				() const { return mBussy; }
 
 		/// 666 TODO: Observations. Should include feedback on captured targets
+	private:
+		bool mBussy = false;
 	};
 }}	// namespace grvc::mbzirc
 
