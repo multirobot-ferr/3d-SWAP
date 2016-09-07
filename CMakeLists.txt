@@ -60,6 +60,10 @@ endif(MBZIRC_USE_ROS)
 #	COMMENT "Generating API documentation with Doxygen" VERBATIM)
 #endif(DOXYGEN_FOUND)
 
+find_package(grvcQuadrotor REQUIRED)
+#link_directories(${GRVCQUADROTOR_LIBRARY_DIR}})
+link_libraries(${GRVCQUADROTOR_LIBRARIES})
+
 # Included subprojects
 add_subdirectory(gcs_core)
 add_subdirectory(quick_mission)
