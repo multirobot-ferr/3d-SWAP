@@ -5,6 +5,10 @@
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
 
+#include <string>
+#include <stdio.h>
+
+
 
 mavros_msgs::State current_state;
 void state_cb(const mavros_msgs::State::ConstPtr& msg)
@@ -12,6 +16,14 @@ void state_cb(const mavros_msgs::State::ConstPtr& msg)
     current_state = *msg;
 }
 
+
+void pose_cb(const geometry_msgs::PoseStamped::ConstPtr & position)
+{
+
+    geometry_msgs::PoseStamped pose;
+    pose = *position;
+    ROS_INFO("Recieved pose: [%f %f %f]\n", pose.pose.position.x, pose.pose.position.y, pose.pose.position.z);
+}
 
 int main(int argc, char **argv)
 {
@@ -22,6 +34,8 @@ int main(int argc, char **argv)
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             ("mavros/state", 10, state_cb);
+    ros::Subscriber local_pos_sub = nh.subscribe<geometry_msgs::PoseStamped>
+            ("mavros/local_position/pose", 10, pose_cb);
     ros::Publisher vel_pub = nh.advertise<geometry_msgs::TwistStamped>
             ("mavros/setpoint_velocity/cmd_vel", 10);
     ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>

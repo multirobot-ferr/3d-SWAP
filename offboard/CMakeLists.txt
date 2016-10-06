@@ -131,7 +131,6 @@ include_directories(
 ## Declare a C++ executable
  add_executable(offboard_position src/offboard_position.cpp)
  add_executable(pubWP src/publica_waypoints.cpp)
- add_executable(script_prueba src/script_prueba.cpp)
  add_executable(offboard_velocity src/offboard_velocity.cpp)
  add_executable(offboard_node src/offboard_node.cpp)
 
@@ -144,9 +143,6 @@ include_directories(
    ${catkin_LIBRARIES}
  )
  target_link_libraries(pubWP
-   ${catkin_LIBRARIES}
- )
- target_link_libraries(script_prueba
    ${catkin_LIBRARIES}
  )
  target_link_libraries(offboard_node
