@@ -4,6 +4,7 @@
     <!-- Configurable options -->
     <arg name="robot_name"/> <!-- Robot name defines the namespace for all topics regarding the robot -->
     <arg name="urdf_file"/>
+    <arg name="urdf_name"/>
     <arg name="quad_name"/>
     <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
     <arg name="pos_x" default="0.0"/>
@@ -16,7 +17,7 @@
 
     <!-- Spawn a object: send the robot XML to param server, push robot_description to factory and spawn robot in gazebo-->
     <arg name="model" default="$(find mbzirc_gcs_view)/urdf/$(arg urdf_file)"/>
-    <param name="robot_description_$(arg robot_name)" command="$(find xacro)/xacro.py '$(arg model)' model_name:=$(arg robot_name) id:=$(arg id)" />
+    <param name="robot_description_$(arg robot_name)" command="$(find xacro)/xacro.py '$(arg model)' model_name:=$(arg robot_name) id:=$(arg id) urdf_name:=$(arg urdf_name)" />
     <param name="tf_prefix" type="string" value="$(arg tf_prefix)" />
 
     <node name="spawn_$(arg robot_name)" pkg="gazebo_ros" type="spawn_model"

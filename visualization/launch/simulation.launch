@@ -68,17 +68,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <!--******************************STATIC_OBJECTS****************************************-->
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="static_object_1"/>
-        <arg name="urdf_file" value="object_black_cylinder.urdf.xacro"/>
+        <arg name="urdf_file" value="object.urdf.xacro"/>
+        <arg name="urdf_name" value="object_black_cylinder"/>
         <arg name="quad_name" value="quad1"/>
         <arg name="id" value="4"/>
         <arg name="pos_x" value="7"/>
         <arg name="pos_y" value="-25"/>
         <arg name="pos_z" value="0.15"/>
-    </include>
+    </include-->
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="static_object_2"/>
         <arg name="urdf_file" value="object_black_cylinder.urdf.xacro"/>
         <arg name="quad_name" value="quad1"/>
@@ -167,11 +168,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_x" value="-17"/>
         <arg name="pos_y" value="-11"/>
         <arg name="pos_z" value="0.07"/>
-    </include>
+    </include-->
 
 <!--****************************BIG OBJECTS*************************************-->
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="object_big_black"/>
         <arg name="urdf_file" value="object_big_black.urdf.xacro"/>
         <arg name="quad_name" value="quad1"/>
@@ -199,7 +200,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_x" value="-2"/>
         <arg name="pos_y" value="5"/>
         <arg name="pos_z" value="0.07"/>
-    </include>
+    </include-->
 
 
 <!--******************************DINAMIC_OBJECTS****************************************-->
