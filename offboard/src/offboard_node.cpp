@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 
     ros::Rate rate (20.0);
 
-    while(ros::ok() && current_state.connected)
+    while(ros::ok() && !current_state.connected)
     {
         ros::spinOnce();
         rate.sleep();
@@ -41,45 +41,43 @@ int main(int argc, char **argv)
     pose.pose.position.y = 3;
     pose.pose.position.z = 5;
 
-    for(i = 100; ros::ok() && i > 0; --i)
+   /* for(i = 100; ros::ok() && i > 0; --i)
     {
         local_pos_pub.publish(pose);
         ros::spinOnce();
         rate.sleep();
-    }
+    }*/
 
+   // ros::Time last_request = ros::Time::now();
     mavros_msgs::SetMode offb_set_mode;
     offb_set_mode.request.custom_mode = "OFFBOARD";
+    offb_set_mode.response.success = false;
 
     mavros_msgs::CommandBool arm_cmd;
     arm_cmd.request.value = true;
+    arm_cmd.response.success = false;
 
-    ros::Time last_request = ros::Time::now();
-
+    bool initialized = false;
     while(ros::ok())
     {
-        if(current_state.mode != "OFFBOARD" && (ros::Time::now() - last_request > ros::Duration(5.0)))
-        {
-            if(set_mode_client.call(offb_set_mode) && offb_set_mode.response.success)
-            {
-                ROS_INFO("Offboard enabled");
-            }
-            last_request = ros::Time::now();
-        }
-        else
-        {
-            if(!current_state.armed && (ros::Time::now() - last_request > ros::Duration(5.0)))
-            {
-                if(arming_client.call(arm_cmd) && arm_cmd.response.success)
-                {
-                    ROS_INFO("Vehicle armed");
-                }
-                last_request = ros::Time::now();
-            }
-        }
-
         local_pos_pub.publish(pose);
 
+        if(!initialized) {
+
+            if(!offb_set_mode.response.success) {
+                set_mode_client.call(offb_set_mode);
+                sleep(1);
+            }
+            if(!arm_cmd.response.success) {
+                arming_client.call(arm_cmd);
+                sleep(1);
+            }
+
+            if(current_state.mode == "OFFBOARD" && current_state.armed) {
+                initialized = true;
+                ROS_INFO("Initialized");
+            }
+        }
         ros::spinOnce();
         rate.sleep();
     }

@@ -52,6 +52,12 @@ int main(int argc, char **argv)
     }
 
     geometry_msgs::TwistStamped velocity;
+    geometry_msgs::PoseStamped pose;
+
+    if(pose.pose.position.z > 15)
+    {
+
+    }
     velocity.twist.linear.x = 0;
     velocity.twist.linear.y = 0.5;
     velocity.twist.linear.z = 0.5;
