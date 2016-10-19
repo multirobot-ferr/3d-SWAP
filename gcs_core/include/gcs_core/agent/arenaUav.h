@@ -23,32 +23,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strategy testing and simulation environment for mbzirc competition
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef _MBZIRC_AGENT_UAV_H_
-#define _MBZIRC_AGENT_UAV_H_
+#ifndef _MBZIRC_AGENT_ARENAUAV_H_
+#define _MBZIRC_AGENT_ARENAUAV_H_
 
-#include <grvc_quadrotor_hal/types.h>
-#include <gcs_core/util/types.h>
+#include "uav.h"
 
 namespace grvc {
 	namespace mbzirc {
 
-		class Uav {
+		class ArenaUav {
 		public:
 			// Chases a target and takes it to the drop zone.
-			virtual void takeOff(double _height) = 0;
-			virtual void land() = 0;
-			virtual void goTo(const hal::Waypoint& _wp) = 0;
-			virtual void trackPath(const hal::WaypointList&) = 0;
+			void takeOff(double _height) override;
+			void land() override;
+			void goTo(const hal::Waypoint& _wp) override;
+			void trackPath(const hal::WaypointList&) override;
 
-			virtual const hal::Vec3& position() const = 0;
+			virtual const hal::Vec3& position() const override;
 			/// A rectangle that is guaranteed to be scanned by the view frustrum of the camera.
 			/// It should be the bigest rectangle inscribed in the intersection of the frustrum with the floor,
 			/// or the closest (conservative) possible approximation
-			virtual Rectangle viewArea() const = 0;
+			virtual Rectangle viewArea() const override;
 
 			/// 666 TODO: Observations. Should include feedback on captured targets
 		};
 	}
 }	// namespace grvc::mbzirc
 
-#endif // _MBZIRC_AGENT_UAV_H_
+#endif // _MBZIRC_AGENT_ARENAUAV_H_
