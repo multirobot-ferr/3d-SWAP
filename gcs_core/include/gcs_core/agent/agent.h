@@ -31,13 +31,16 @@
 
 namespace grvc { namespace mbzirc {
 
+	class Uav;
+
 	class Agent {
 	public:
+		Agent(const Vector2& startPos);
 		// Chases a target and takes it to the drop zone.
 		void captureStaticTarget	(const Target::Desc&);
 		void goTo					(const Vector2& _wp);
-		void setHeight				(double _h);
-		void setYaw					(double _yaw); // Degrees
+		void setFlightHeight		(double _h) { flyHeight = _h; }
+		void setYaw					(double _yaw) { yaw = _yaw; } // Degrees
 
 		const Vector2& position		() const;
 		/// A rectangle that is guaranteed to be scanned by the view frustrum of the camera.
@@ -48,11 +51,19 @@ namespace grvc { namespace mbzirc {
 		/// An agent is bussy when it has been assigned to capture a target and hasn't finished that task.
 		/// Both success or failure on the task leave the agent free. Feedback on the success of the task
 		/// Comes through observations
-		bool isBussy				() const { return mBussy; }
+		bool isBussy				() const { return mCapturing; }
 
+		void update();
 		/// 666 TODO: Observations. Should include feedback on captured targets
 	private:
-		bool mBussy = false;
+		bool mCapturing = false;
+		Vector2 goalPos;
+		float flyHeight = 5.0f;
+		float yaw = 0.0f;
+
+		float closeEnough = 0.5f;
+
+		Uav* uav;
 	};
 }}	// namespace grvc::mbzirc
 

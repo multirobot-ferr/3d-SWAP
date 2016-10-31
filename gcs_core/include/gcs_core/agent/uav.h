@@ -34,7 +34,6 @@ namespace grvc {
 
 		class Uav {
 		public:
-			// Chases a target and takes it to the drop zone.
 			virtual void takeOff(double _height) = 0;
 			virtual void land() = 0;
 			virtual void goTo(const hal::Waypoint& _wp) = 0;

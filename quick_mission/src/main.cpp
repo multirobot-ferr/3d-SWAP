@@ -24,11 +24,13 @@
 // Strategy testing and simulation environment for mbzirc competition
 //----------------------------------------------------------------------------------------------------------------------
 #include <gcs_core/strategy/strategy.h>
+#include <gcs_core/agent/agent.h>
 
 using namespace grvc::mbzirc;
 
 int main(int, char**)
 {
+	Agent * robot = new Agent();
 	Strategy gcs({}, nullptr, nullptr);
 	return 0;
 }

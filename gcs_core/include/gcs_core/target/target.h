@@ -32,8 +32,9 @@ namespace grvc {
 
 		class Target {
 		public:
-			
-			struct Desc {};
+			struct Desc {
+				Vector2 pos;
+			};
 		};
 	}
 }	// namespace grvc::mbzirc
