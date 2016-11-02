@@ -90,7 +90,6 @@ int main(int argc, char **argv)
         }
         if(home_cmd.response.result > 0)
         {
-
             ROS_INFO("NOT SET HOME");
             ROS_INFO("[%i]", home_cmd.response.result);
         }

@@ -142,10 +142,12 @@ int main(int argc, char **argv)
 
             if(!offb_set_mode.response.success) {
                 set_mode_client.call(offb_set_mode);
+                //sleep(1);
             }
 
             if(!arm_cmd.response.success) {
                 arming_client.call(arm_cmd);
+               // sleep(1);
             }
 
             if(current_state.mode == "OFFBOARD" && current_state.armed) {
