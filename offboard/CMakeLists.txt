@@ -133,6 +133,7 @@ include_directories(
  add_executable(pubWP src/publica_waypoints.cpp)
  add_executable(offboard_velocity src/offboard_velocity.cpp)
  add_executable(offboard_node src/offboard_node.cpp)
+# add_executable(node_telemetry src/node_telemetry.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -152,6 +153,10 @@ include_directories(
  target_link_libraries(offboard_velocity
    ${catkin_LIBRARIES}
  )
+
+ #target_link_libraries(node_telemetry
+  # ${catkin_LIBRARIES}
+ #)
 #############
 ## Install ##
 #############
