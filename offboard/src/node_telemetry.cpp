@@ -4,7 +4,7 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/Float64.h>
-
+#include <nav_msgs/Odometry.h>
 
 
 mavros_msgs::State current_state;
@@ -27,10 +27,11 @@ void local_cb(const geometry_msgs::PoseStamped::ConstPtr & local_position)
     ROS_INFO("Recieved local pose: [%f %f %f]\n", l_position.pose.position.x, l_position.pose.position.y, l_position.pose.position.z);
 }
 
-geometry_msgs::PoseWithCovarianceStamped l_UTM_position;
-void local_UTM_cb(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr & local_UTM_position)
+nav_msgs::Odometry l_UTM_position;
+void local_UTM_cb(const nav_msgs::Odometry::ConstPtr & local_UTM_position)
 {
     l_UTM_position = *local_UTM_position;
+    ROS_INFO("Recieved UTM local pose: [%f %f %f]\n", l_UTM_position.pose.pose.position.x, l_UTM_position.pose.pose.position.y, l_UTM_position.pose.pose.position.z);
 }
 
 std_msgs::Float64 r_altitude;
@@ -47,22 +48,18 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
-            ("mavros/state", 10, state_cb);
+            ("mavros/state", 1000, state_cb);
     ros::Subscriber global_sub = nh.subscribe<sensor_msgs::NavSatFix>
-            ("global_position/global", 10, global_cb);
+            ("mavros/global_position/global", 1000, global_cb);
     ros::Subscriber local_sub = nh.subscribe<geometry_msgs::PoseStamped>
-            ("local_position/pose", 10, local_cb);
-    ros::Subscriber localUTM_sub = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>
-            ("global_position/local", 10, local_UTM_cb);
+            ("mavros/local_position/pose", 1000, local_cb);
+    ros::Subscriber localUTM_sub = nh.subscribe<nav_msgs::Odometry>
+            ("mavros/global_position/local", 1000, local_UTM_cb);
     ros::Subscriber rel_altitude_sub = nh.subscribe<std_msgs::Float64>
-            ("global_position/rel_alt", 10, r_altitude_cb);
+            ("mavros/global_position/rel_alt", 1000, r_altitude_cb);
 
-    ros::spinOnce();
+    ros::spin();
 
     return 0;
 
 }
-
-
-
-
