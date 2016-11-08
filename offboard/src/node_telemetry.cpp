@@ -1,5 +1,4 @@
 #include <ros/ros.h>
-#include <mavros/mavlink_diag.h>
 #include <mavros_msgs/State.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -44,7 +43,7 @@ void r_altitude_cb(const std_msgs::Float64::ConstPtr & relative_altitude)
 int main(int argc, char **argv)
 {
 
-    ros::init(argc, argv, "offb_node");
+    ros::init(argc, argv, "telemetry_node");
     ros::NodeHandle nh;
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
@@ -56,8 +55,7 @@ int main(int argc, char **argv)
     ros::Subscriber localUTM_sub = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>
             ("global_position/local", 10, local_UTM_cb);
     ros::Subscriber rel_altitude_sub = nh.subscribe<std_msgs::Float64>
-            ("global_position/rel_alt", 10, global_cb);
-
+            ("global_position/rel_alt", 10, r_altitude_cb);
 
     ros::spinOnce();
 
