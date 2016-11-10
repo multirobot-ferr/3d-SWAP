@@ -30,9 +30,9 @@
 namespace grvc { namespace mbzirc {
 	//------------------------------------------------------------------------------------------------------------------
 	Strategy::Strategy(const std::vector<TargetEstimator*>& _e, ScanPolicy* _s, CarrierPolicy* _c)
-		:mEstimators(_e)
-		,mScanPcy(_s)
+		:mScanPcy(_s)
 		,mCarrierPcy(_c)
+		,mEstimators(_e)
 	{
 	}
 

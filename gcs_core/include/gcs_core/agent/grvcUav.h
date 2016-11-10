@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // The MIT License (MIT)
 // 
-// Copyright (c) 2016 Carmelo J. Fernández-Agüera Tortosa
+// Copyright (c) 2016 Carmelo J. FernÃ¡ndez-AgÃ¼era Tortosa
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,43 +23,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strategy testing and simulation environment for mbzirc competition
 //----------------------------------------------------------------------------------------------------------------------
-#include <gcs_core/agent/agent.h>
-#include <gcs_core/agent/arenaUav.h>
-#include <gcs_core/agent/grvcUav.h>
-#include <gcs_core/target/target.h>
+#ifndef _MBZIRC_AGENT_GRVCUAV_H_
+#define _MBZIRC_AGENT_GRVCUAV_H_
+
+#include "uav.h"
 
 namespace grvc {
 	namespace mbzirc {
-		//--------------------------------------------------------------------------------------------------------------
-		Agent::Agent(const Vector2& startPos) {
-			uav = new GrvcUav(hal::Vec3(startPos.x(), startPos.y(), flyHeight));
-		}
 
-		//--------------------------------------------------------------------------------------------------------------
-		void Agent::captureStaticTarget(const Target::Desc& _target) {
-			mCapturing = true;
-			goTo(_target.pos);
-		}
+		class GrvcUav : public Uav {
+		public:
+			GrvcUav(const hal::Vec3& startPos);
+			// Chases a target and takes it to the drop zone.
+			void takeOff(double _height) override;
+			void land() override;
+			void goTo(const hal::Waypoint& _wp) override;
+			void trackPath(const hal::WaypointList&) override;
 
-		//--------------------------------------------------------------------------------------------------------------
-		void Agent::goTo(const Vector2& pos) {
-			goalPos = pos;
-			hal::Vector3 pos3 = Vector3(pos.x(), pos.y(), flyHeight);
-			uav->goTo(pos3);
-		}
+			virtual const hal::Vec3& position() const override;
+			/// A rectangle that is guaranteed to be scanned by the view frustrum of the camera.
+			/// It should be the bigest rectangle inscribed in the intersection of the frustrum with the floor,
+			/// or the closest (conservative) possible approximation
+			virtual Rectangle viewArea() const override;
 
-		//--------------------------------------------------------------------------------------------------------------
-		Vector2 Agent::position() const {
-			auto pos3 = uav->position();
-			return Vector2(pos3.x(), pos3.y());
-		}
+			/// 666 TODO: Observations. Should include feedback on captured targets
+		};
+	}
+}	// namespace grvc::mbzirc
 
-		//--------------------------------------------------------------------------------------------------------------
-		void Agent::update() {
-			if (mCapturing) {
-				float distanceToGoal = (position() -  goalPos).norm();
-				if(distanceToGoal <= closeEnough)
-					mCapturing = false;
-			}
-		}
-} }	// namespace grvc::mbzirc
+#endif // _MBZIRC_AGENT_GRVCUAV_H_
