@@ -2,19 +2,19 @@
 # GRVC Quadrotor
 ################################################################################
 # The MIT License (MIT)
-#
+# 
 # Copyright (c) 2016 GRVC University of Seville
-#
+# 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-#
+# 
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-#
+# 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,16 +24,19 @@
 # SOFTWARE.
 ################################################################################
 cmake_minimum_required (VERSION 2.6)
-project(mbzirc_gcs_core)
+project(mbzirc)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # ---- Configurable options ----
 # Pass this options to CMake in command line to select specific functionality for this project
+option(MBZIRC_BUILD_TESTS "Enable testing and generate test projects" ON)
+option(MBZIRC_BUILD_SAMPLES "Build sample projects" ON)
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	option(GRVCQUAD_USE_ROS "Enable ros-specific code and interfaces" ON)
+	option(MBZIRC_USE_ROS "Enable ros-specific code and interfaces" ON)
 else()
-	option(GRVCQUAD_USE_ROS "Enable ros-specific code and interfaces" OFF)
+	option(MBZIRC_USE_ROS "Enable ros-specific code and interfaces" OFF)
 endif()
 
 # --- Compiler specific options ---
@@ -42,47 +45,29 @@ if(MSVC)
 	add_definitions(/W4 /WX) # Enable high level warnings and treat them like errors
 endif(MSVC)
 if(CMAKE_COMPILER_IS_GNUCXX)
-    add_definitions(-std=c++11 -Wall -Werror)
+	add_definitions(-std=c++11 -Wall -Werror -DNOMINMAX)
 endif()
 
-if(GRVCQUAD_USE_ROS)
+if(MBZIRC_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
+endif(MBZIRC_USE_ROS)
 
-	find_package(catkin REQUIRED COMPONENTS
-        grvc_quadrotor_com grvc_quadrotor_hal roscpp std_msgs)
-
-	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com grvc_quadrotor_hal)
-
-	include_directories(${catkin_INCLUDE_DIRS})
-endif(GRVCQUAD_USE_ROS)
-
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../cmake/modules")
-FIND_PACKAGE(Eigen3 REQUIRED)
-INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
-
-# ---- Clasify sources according to folder structure ----
-# This macro is a modified version of http://www.cmake.org/pipermail/cmake/2013-November/056336.html
-macro(GroupSources curdir dirLabel)
-	file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir}
-		${PROJECT_SOURCE_DIR}/${curdir}/*)
-	foreach(child ${children})
-		if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
-			GroupSources(${curdir}/${child} ${dirLabel}/${child})
-		else()
-			string(REPLACE "/" "\\" groupname ${dirLabel})
-			source_group(${groupname} FILES
-				${PROJECT_SOURCE_DIR}/${curdir}/${child})
-		endif()
-	endforeach()
-endmacro()
+#find_package(Doxygen)
+#if(DOXYGEN_FOUND)
+#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+#add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+#	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#	COMMENT "Generating API documentation with Doxygen" VERBATIM)
+#endif(DOXYGEN_FOUND)
 
 find_package(grvcQuadrotor REQUIRED)
-
-file(GLOB_RECURSE CORE_SOURCE_FILES "src/*.cpp" "include/gcs_core/*.h")
-GroupSources(src core)
-GroupSources(include/gcs_core core)
 #link_directories(${GRVCQUADROTOR_LIBRARY_DIR}})
-add_library(gcs_core STATIC ${CORE_SOURCE_FILES})
-target_include_directories(gcs_core PUBLIC "include" ${EIGEN3_INCLUDE_DIR} ${GRVCQUADROTOR_INCLUDE_DIR})
-target_link_libraries(gcs_core LINK_PUBLIC ${GRVCQUADROTOR_LIBRARIES})
-#set_target_properties(gcs_core PROPERTIES FOLDER "core")
+link_libraries(${GRVCQUADROTOR_LIBRARIES})
+
+# Included subprojects
+add_subdirectory(gcs_core)
+add_subdirectory(quick_mission)
+
+if(MBZIRC_BUILD_TESTS)
+	ENABLE_TESTING()
+endif(MBZIRC_BUILD_TESTS)

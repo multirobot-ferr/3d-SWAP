@@ -24,7 +24,7 @@
 # SOFTWARE.
 ################################################################################
 cmake_minimum_required (VERSION 2.6)
-project(mbzirc_gcs_core)
+project(mbzirc_quick_mission)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -49,16 +49,12 @@ if(GRVCQUAD_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
 
 	find_package(catkin REQUIRED COMPONENTS
-        grvc_quadrotor_com grvc_quadrotor_hal roscpp std_msgs)
+        mbzirc_gcs_core)
 
-	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com grvc_quadrotor_hal)
+	catkin_package(	CATKIN_DEPENDS mbzirc_gcs_core)
 
 	include_directories(${catkin_INCLUDE_DIRS})
 endif(GRVCQUAD_USE_ROS)
-
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../cmake/modules")
-FIND_PACKAGE(Eigen3 REQUIRED)
-INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
 
 # ---- Clasify sources according to folder structure ----
 # This macro is a modified version of http://www.cmake.org/pipermail/cmake/2013-November/056336.html
@@ -76,13 +72,8 @@ macro(GroupSources curdir dirLabel)
 	endforeach()
 endmacro()
 
-find_package(grvcQuadrotor REQUIRED)
-
-file(GLOB_RECURSE CORE_SOURCE_FILES "src/*.cpp" "include/gcs_core/*.h")
-GroupSources(src core)
-GroupSources(include/gcs_core core)
-#link_directories(${GRVCQUADROTOR_LIBRARY_DIR}})
-add_library(gcs_core STATIC ${CORE_SOURCE_FILES})
-target_include_directories(gcs_core PUBLIC "include" ${EIGEN3_INCLUDE_DIR} ${GRVCQUADROTOR_INCLUDE_DIR})
-target_link_libraries(gcs_core LINK_PUBLIC ${GRVCQUADROTOR_LIBRARIES})
-#set_target_properties(gcs_core PROPERTIES FOLDER "core")
+file(GLOB_RECURSE QM_SOURCE_FILES "src/*.cpp" "include/quick_mission/*.h")
+GroupSources(src quickMission)
+GroupSources(include/quick_mission quickMission)
+add_executable(quickMission ${QM_SOURCE_FILES})
+target_link_libraries(quickMission gcs_core)
