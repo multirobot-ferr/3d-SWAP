@@ -76,7 +76,7 @@ macro(GroupSources curdir dirLabel)
 	endforeach()
 endmacro()
 
-find_package(grvcQuadrotor REQUIRED)
+#find_package(grvcQuadrotor REQUIRED)
 
 file(GLOB_RECURSE CORE_SOURCE_FILES "src/*.cpp" "include/gcs_core/*.h")
 GroupSources(src core)

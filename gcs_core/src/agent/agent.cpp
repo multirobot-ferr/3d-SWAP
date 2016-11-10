@@ -31,7 +31,7 @@ namespace grvc {
 	namespace mbzirc {
 		//--------------------------------------------------------------------------------------------------------------
 		Agent::Agent(const Vector2& startPos) {
-			uav = new ArenaUav(hal::Vec3(startPos.x, startPos.y, flyHeight));
+			uav = new ArenaUav(hal::Vec3(startPos.x(), startPos.y(), flyHeight));
 		}
 
 		//--------------------------------------------------------------------------------------------------------------
@@ -43,14 +43,14 @@ namespace grvc {
 		//--------------------------------------------------------------------------------------------------------------
 		void Agent::goTo(const Vector2& pos) {
 			goalPos = pos;
-			hal::Vector3 pos3 = Vector3(pos.x, pos.y, flyHeight);
+			hal::Vector3 pos3 = Vector3(pos.x(), pos.y(), flyHeight);
 			uav->goTo(pos3);
 		}
 
 		//--------------------------------------------------------------------------------------------------------------
 		Vector2 Agent::position() const {
 			auto pos3 = uav->position();
-			return Vector2(pos3.x, pos3.y);
+			return Vector2(pos3.x(), pos3.y());
 		}
 
 		//--------------------------------------------------------------------------------------------------------------
