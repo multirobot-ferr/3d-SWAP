@@ -42,7 +42,7 @@ namespace grvc { namespace mbzirc {
 		void setFlightHeight		(double _h) { flyHeight = _h; }
 		void setYaw					(double _yaw) { yaw = _yaw; } // Degrees
 
-		const Vector2& position		() const;
+		Vector2 position		() const;
 		/// A rectangle that is guaranteed to be scanned by the view frustrum of the camera.
 		/// It should be the bigest rectangle inscribed in the intersection of the frustrum with the floor,
 		/// or the closest (conservative) possible approximation

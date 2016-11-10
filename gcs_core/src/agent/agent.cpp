@@ -44,8 +44,9 @@ namespace grvc {
 		//--------------------------------------------------------------------------------------------------------------
 		void Agent::goTo(const Vector2& pos) {
 			goalPos = pos;
-			hal::Vector3 pos3 = Vector3(pos.x(), pos.y(), flyHeight);
-			uav->goTo(pos3);
+			hal::Vec3 pos3 = hal::Vec3(pos.x(), pos.y(), flyHeight);
+			hal::Waypoint wp = { pos3, 0.0f };
+			uav->goTo(wp);
 		}
 
 		//--------------------------------------------------------------------------------------------------------------
