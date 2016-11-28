@@ -61,6 +61,6 @@ namespace grvc {
 
 		//--------------------------------------------------------------------------------------------------------------
 		Rectangle GrvcUav::viewArea() const  {
-			return Rectangle(Vector2(mPos.x()-0.5f, mPos.y()-0.5f), Vector2(mPos.x()+0.5f, mPos.y()+0.5f);
+			return Rectangle{Vector2(mPos.x()-0.5f, mPos.y()-0.5f), Vector2(mPos.x()+0.5f, mPos.y()+0.5f)};
 		}
 } }	// namespace grvc::mbzirc
