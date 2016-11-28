@@ -27,13 +27,15 @@
 #include <gcs_core/agent/agent.h>
 #include <grvc_utils/argument_parser.h>
 #include <string>
-#include <vector>
+#include <map>
+#include <iostream>
 #include <quick_mission/tinyxml2.h>
 
 using namespace grvc::mbzirc;
 using namespace grvc::utils;
 
 using namespace std;
+using namespace tinyxml2;
 
 int main(int _argc, char** _argv)
 {
@@ -42,9 +44,41 @@ int main(int _argc, char** _argv)
 	// Open mission file
 	string missionFile = args.getArgument("mission", string("mission.xml"));
 
+	XMLDocument doc;
+	doc.LoadFile(missionFile.c_str());
+	map<int,Agent*>	robots;
 
-	vector<Agent*>	robots;
-	robots.push_back(new Agent("/quad1", Vector2(0.f, 0.f)));
+	// Parse mission file
+	{
+		XMLNode* root = doc.FirstChild();
+		if(!root) {
+			cout << "Error loading xml mission file " << missionFile << "\n";
+			return -1;
+		}
+
+		XMLElement* uav = root->FirstChildElement("uav");
+		while(uav) {
+			string uri;
+			int id;
+			uav->QueryIntAttribute("id", &id);
+
+			const char* uriRaw = uav->Attribute("uri");
+			if(uriRaw)
+				uri = uriRaw;
+			else {
+				cout << "Error: uav " << id << " requires a valid uri attribute\n";
+			}
+
+			float x, y;
+			uav->QueryFloatAttribute("x", &x);
+			uav->QueryFloatAttribute("x", &y);
+
+			// Create an agent using the specified informational
+			robots.insert(make_pair(id, new Agent(uri, Vector2(x,y))));
+
+			uav = uav->NextSiblingElement("uav");
+		}
+	}
 	
 	return 0;
 }
