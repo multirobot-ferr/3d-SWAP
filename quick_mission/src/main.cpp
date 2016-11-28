@@ -27,26 +27,24 @@
 #include <gcs_core/agent/agent.h>
 #include <grvc_utils/argument_parser.h>
 #include <string>
-#include <tinyxml.h>
+#include <vector>
+#include <quick_mission/tinyxml2.h>
 
 using namespace grvc::mbzirc;
-using namespace grvc::uav;
 using namespace grvc::utils;
 
 using namespace std;
 
 int main(int _argc, char** _argv)
 {
-	Agent * robot = new Agent();
-	Strategy gcs({}, nullptr, nullptr);
 	ArgumentParser args(_argc, _argv);
 
 	// Open mission file
 	string missionFile = args.getArgument("mission", string("mission.xml"));
-	
-	
-	Server::TakeOffService::Client takeOff("/quad1/uav/take_off", args);
 
-	grvc::uav::ActionState as;
+
+	vector<Agent*>	robots;
+	robots.push_back(new Agent("/quad1", Vector2(0.f, 0.f)));
+	
 	return 0;
 }

@@ -31,8 +31,8 @@
 namespace grvc {
 	namespace mbzirc {
 		//--------------------------------------------------------------------------------------------------------------
-		Agent::Agent(const Vector2& startPos) {
-			uav = new GrvcUav(hal::Vec3(startPos.x(), startPos.y(), flyHeight));
+		Agent::Agent(const std::string& _uri, const Vector2& startPos) {
+			uav = new GrvcUav(_uri, hal::Vec3(startPos.x(), startPos.y(), flyHeight));
 		}
 
 		//--------------------------------------------------------------------------------------------------------------

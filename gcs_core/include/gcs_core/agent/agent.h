@@ -28,6 +28,7 @@
 
 #include <gcs_core/util/types.h>
 #include <gcs_core/target/target.h>
+#include <string>
 
 namespace grvc { namespace mbzirc {
 
@@ -35,7 +36,7 @@ namespace grvc { namespace mbzirc {
 
 	class Agent {
 	public:
-		Agent(const Vector2& startPos);
+		Agent(const std::string& uri, const Vector2& startPos);
 		// Chases a target and takes it to the drop zone.
 		void captureStaticTarget	(const Target::Desc&);
 		void goTo					(const Vector2& _wp);

@@ -27,13 +27,14 @@
 #define _MBZIRC_AGENT_GRVCUAV_H_
 
 #include "uav.h"
+#include <string>
 
 namespace grvc {
 	namespace mbzirc {
 
 		class GrvcUav : public Uav {
 		public:
-			GrvcUav(const hal::Vec3& startPos);
+			GrvcUav(const std::string& _uri, const hal::Vec3& startPos);
 			// Chases a target and takes it to the drop zone.
 			void takeOff(double _height) override;
 			void land() override;

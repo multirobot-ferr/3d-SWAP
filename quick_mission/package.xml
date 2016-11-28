@@ -10,13 +10,10 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   
-
-  <build_depend>tinyxml</build_depend>
   <build_depend>grvc_quadrotor_uav</build_depend>
   <build_depend>grvc_quadrotor_utils</build_depend>
   <build_depend>mbzirc_gcs_core</build_depend>
 
-  <run_depend>tinyxml</run_depend>
   <run_depend>grvc_quadrotor_uav</run_depend>
   <run_depend>grvc_quadrotor_utils</run_depend>
   <run_depend>mbzirc_gcs_core</run_depend>
