@@ -12,12 +12,14 @@
   
   <build_depend>grvc_quadrotor_com</build_depend>
   <build_depend>grvc_quadrotor_hal</build_depend>
+  <build_depend>grvc_quadrotor_uav</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
 
 
   <run_depend>grvc_quadrotor_com</run_depend>
   <run_depend>grvc_quadrotor_hal</run_depend>
+  <run_depend>grvc_quadrotor_uav</run_depend>
   <run_depend>roscpp</run_depend>pend>
   <run_depend>std_msgs</run_depend>
 

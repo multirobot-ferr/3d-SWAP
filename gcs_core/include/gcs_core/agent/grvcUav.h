@@ -48,6 +48,8 @@ namespace grvc {
 			Rectangle viewArea() const override;
 
 			/// 666 TODO: Observations. Should include feedback on captured targets
+		private:
+			hal::Vec3 mPos;
 		};
 	}
 }	// namespace grvc::mbzirc

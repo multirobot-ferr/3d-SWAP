@@ -49,9 +49,9 @@ if(GRVCQUAD_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
 
 	find_package(catkin REQUIRED COMPONENTS
-        grvc_quadrotor_com grvc_quadrotor_hal roscpp std_msgs)
+        grvc_quadrotor_com grvc_quadrotor_hal grvc_quadrotor_uav roscpp std_msgs)
 
-	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com grvc_quadrotor_hal)
+	catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com grvc_quadrotor_hal grvc_quadrotor_uav)
 
 	include_directories(${catkin_INCLUDE_DIRS})
 endif(GRVCQUAD_USE_ROS)
