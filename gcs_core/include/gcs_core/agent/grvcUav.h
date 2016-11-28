@@ -27,6 +27,7 @@
 #define _MBZIRC_AGENT_GRVCUAV_H_
 
 #include "uav.h"
+#include <grvc_quadrotor_uav/server.h>
 #include <string>
 
 namespace grvc {
@@ -49,6 +50,11 @@ namespace grvc {
 
 			/// 666 TODO: Observations. Should include feedback on captured targets
 		private:
+			uav::Server::TakeOffService::Client*	take_off_srv;
+			uav::Server::WaypointService::Client*	waypoint_srv;
+			uav::Server::PathService::Client*		path_srv;
+			uav::Server::LandService::Client*		land_srv;
+
 			hal::Vec3 mPos;
 		};
 	}

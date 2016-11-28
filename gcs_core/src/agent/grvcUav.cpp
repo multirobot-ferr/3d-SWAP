@@ -36,6 +36,13 @@ namespace grvc {
 		//--------------------------------------------------------------------------------------------------------------
 		GrvcUav::GrvcUav(const std::string& _uri, const hal::Vec3& startPos) {
 			mPos = startPos;
+
+			utils::ArgumentParser args(0,nullptr);
+
+  			take_off_srv = new Server::TakeOffService::Client(_uri+"/uav/take_off", args);
+  			waypoint_srv = new Server::WaypointService::Client(_uri+"/uav/go_to_wp", args);
+  			path_srv = new Server::PathService::Client(_uri+"/uav/path", args);
+  			land_srv = new Server::LandService::Client(_uri+"/uav/land", args);
 		}
 
 		//--------------------------------------------------------------------------------------------------------------
@@ -61,6 +68,6 @@ namespace grvc {
 
 		//--------------------------------------------------------------------------------------------------------------
 		Rectangle GrvcUav::viewArea() const  {
-			return Rectangle{Vector2(mPos.x()-0.5f, mPos.y()-0.5f), Vector2(mPos.x()+0.5f, mPos.y()+0.5f)};
+			return {Vector2(mPos.x()-0.5f, mPos.y()-0.5f), Vector2(mPos.x()+0.5f, mPos.y()+0.5f)};
 		}
 } }	// namespace grvc::mbzirc
