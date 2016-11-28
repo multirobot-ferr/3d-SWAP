@@ -48,12 +48,14 @@ endif()
 if(GRVCQUAD_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
 
-	find_package(catkin REQUIRED COMPONENTS
+	find_package(catkin REQUIRED cmake_modules
+	COMPONENTS
         mbzirc_gcs_core)
+	find_package(TinyXML REQUIRED)
 
-	catkin_package(	CATKIN_DEPENDS mbzirc_gcs_core)
+	catkin_package(	CATKIN_DEPENDS mbzirc_gcs_core grvc_quadrotor_utils DEPENDS TinyXML)
 
-	include_directories(${catkin_INCLUDE_DIRS})
+	include_directories(${catkin_INCLUDE_DIRS} ${TinyXML_INCLUDE_DIRS})
 endif(GRVCQUAD_USE_ROS)
 
 # ---- Clasify sources according to folder structure ----
@@ -76,4 +78,4 @@ file(GLOB_RECURSE QM_SOURCE_FILES "src/*.cpp" "include/quick_mission/*.h")
 GroupSources(src quickMission)
 GroupSources(include/quick_mission quickMission)
 add_executable(quickMission ${QM_SOURCE_FILES})
-target_link_libraries(quickMission gcs_core)
+target_link_libraries(quickMission gcs_core ${TinyXML_LIBRARIES})
