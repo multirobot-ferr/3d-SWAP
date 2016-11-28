@@ -16,28 +16,28 @@ identify it during the mission, inside this xml -->
 <uav uri="/quad2" id="2"/>
 
 <!-- Parallel actions. Each of the sequences will start at the same time, and group will finish after all sequences have finished -->
-<parallel>
-	<sequence robotId="1">
+<command type="parallel">
+	<command type="sequence" robotId="1">
 		<take_off/>
 		<land/>
 	</sequence>
 	
-	<sequence robotId="2">
+	<command type="sequence" robotId="2">
 		<take_off/>
 		<goto x="2" y="0"/>
 		<land/>
 	</sequence>
-</parallel>
+</command>
 
 <!-- You can add parallel actions after each other to force synch points at the start of each one -->
-<parallel>
-	<sequence robotId="1">
+<command type="parallel">
+	<command type="sequence" robotId="1">
 		<take_off/>
 		<land/>
-	</sequence>
+	</command>
 	
-	<sequence robotId="2">
+	<command type="sequence" robotId="2">
 		<take_off/>
 		<land/>
-	</sequence>
-</parallel>
+	</command>
+</command>

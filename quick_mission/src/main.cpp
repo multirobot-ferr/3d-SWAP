@@ -28,6 +28,7 @@
 #include <grvc_utils/argument_parser.h>
 #include <string>
 #include <map>
+#include <vector>
 #include <iostream>
 #include <quick_mission/tinyxml2.h>
 
@@ -37,48 +38,82 @@ using namespace grvc::utils;
 using namespace std;
 using namespace tinyxml2;
 
+struct Command {
+	virtual void run() = 0;
+	static Command* buildFromXml(XMLElement* node);
+};
+
+struct ParallelCommand {
+	vector<Command*>	children;
+};
+
+struct SequenceCommand : Command {
+	int uavId;
+};
+
+bool parseMissionFile(const char* missionFile, map<int,Agent*>& robots, vector<Command*> commands) {
+	XMLDocument doc;
+	doc.LoadFile(missionFile);
+	
+	XMLNode* root = doc.RootElement();
+	if(!root) {
+		cout << "Error loading xml mission file " << missionFile << "\n";
+		return false;
+	}
+
+	// Get list of robots
+	XMLElement* uav = root->FirstChildElement("uav");
+	while(uav) {
+		int id = uav->IntAttribute("id");
+
+		const char* uriRaw = uav->Attribute("uri");
+		string uri;
+		if(uriRaw)
+			uri = uriRaw;
+		else {
+			cout << "Error: uav " << id << " requires a valid uri attribute\n";
+			return false;
+		}
+
+		float x = uav->FloatAttribute("x");
+		float y = uav->FloatAttribute("y");
+
+		// Create an agent using the specified informational
+		robots.insert(make_pair(id, new Agent(uri, Vector2(x,y))));
+
+		uav = uav->NextSiblingElement("uav");
+	}
+
+	// Iterate over mission commands
+	XMLElement* commandNode = root->FirstChildElement("command");
+	while(commandNode) {
+		Command* cmd = Command::buildFromXml(commandNode);
+		if(!cmd) {
+			cout << "Error parsing command\n";
+			return false;
+		}
+		commands.push_back(cmd);
+		commandNode = commandNode->NextSiblingElement("command");
+	}
+
+	return true;
+}
+
 int main(int _argc, char** _argv)
 {
 	ArgumentParser args(_argc, _argv);
 
-	// Open mission file
+	// Read mission file
 	string missionFile = args.getArgument("mission", string("mission.xml"));
 
-	XMLDocument doc;
-	doc.LoadFile(missionFile.c_str());
 	map<int,Agent*>	robots;
+	vector<Command*>	commands;
 
-	// Parse mission file
-	{
-		XMLNode* root = doc.FirstChild();
-		if(!root) {
-			cout << "Error loading xml mission file " << missionFile << "\n";
-			return -1;
-		}
+	if(!parseMissionFile(missionFile.c_str(), robots, commands))
+		return -1;
 
-		XMLElement* uav = root->FirstChildElement("uav");
-		while(uav) {
-			string uri;
-			int id;
-			uav->QueryIntAttribute("id", &id);
-
-			const char* uriRaw = uav->Attribute("uri");
-			if(uriRaw)
-				uri = uriRaw;
-			else {
-				cout << "Error: uav " << id << " requires a valid uri attribute\n";
-			}
-
-			float x, y;
-			uav->QueryFloatAttribute("x", &x);
-			uav->QueryFloatAttribute("x", &y);
-
-			// Create an agent using the specified informational
-			robots.insert(make_pair(id, new Agent(uri, Vector2(x,y))));
-
-			uav = uav->NextSiblingElement("uav");
-		}
-	}
+	// Run commands.
+	// Agents need to be updated periodically, so we'll run a separate thread for them, and feed them the commands sequentially.
 	
 	return 0;
 }
