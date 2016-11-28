@@ -23,33 +23,41 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strategy testing and simulation environment for mbzirc competition
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef _MBZIRC_AGENT_GRVCUAV_H_
-#define _MBZIRC_AGENT_GRVCUAV_H_
+#include <gcs_core/agent/agent.h>
+#include <gcs_core/agent/arenaUav.h>
+#include <gcs_core/agent/grvcUav.h>
+#include <gcs_core/target/target.h>
+#include <grvc_quadrotor_uav/server.h>
 
-#include "uav.h"
-#include <string>
+using namespace grvc::uav;
 
 namespace grvc {
 	namespace mbzirc {
+		//--------------------------------------------------------------------------------------------------------------
+		GrvcUav::GrvcUav(const std::string& _uri, const hal::Vec3& startPos) {
+		}
 
-		class GrvcUav : public Uav {
-		public:
-			GrvcUav(const std::string& _uri, const hal::Vec3& startPos);
-			// Chases a target and takes it to the drop zone.
-			void takeOff(double _height) override;
-			void land() override;
-			void goTo(const hal::Waypoint& _wp) override;
-			void trackPath(const hal::WaypointList&) override;
+		//--------------------------------------------------------------------------------------------------------------
+		void GrvcUav::takeOff(double _height)  {
+		}
 
-			const hal::Vec3& position() const override;
-			/// A rectangle that is guaranteed to be scanned by the view frustrum of the camera.
-			/// It should be the bigest rectangle inscribed in the intersection of the frustrum with the floor,
-			/// or the closest (conservative) possible approximation
-			Rectangle viewArea() const override;
+		//--------------------------------------------------------------------------------------------------------------
+		void GrvcUav::land()  {
+		}
 
-			/// 666 TODO: Observations. Should include feedback on captured targets
-		};
-	}
-}	// namespace grvc::mbzirc
+		//--------------------------------------------------------------------------------------------------------------
+		void GrvcUav::goTo(const hal::Waypoint& _wp)  {
+		}
 
-#endif // _MBZIRC_AGENT_GRVCUAV_H_
+		//--------------------------------------------------------------------------------------------------------------
+		void GrvcUav::trackPath(const hal::WaypointList&)  {
+		}
+
+		//--------------------------------------------------------------------------------------------------------------
+		const hal::Vec3& GrvcUav::position() const  {
+		}
+
+		//--------------------------------------------------------------------------------------------------------------
+		//Rectangle GrvcUav::viewArea() const  {
+		//}
+} }	// namespace grvc::mbzirc
