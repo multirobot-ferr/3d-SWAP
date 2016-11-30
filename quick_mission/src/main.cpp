@@ -40,7 +40,9 @@ using namespace tinyxml2;
 
 struct Command {
 	virtual void run() = 0;
-	static Command* buildFromXml(XMLElement* node);
+	static Command* buildFromXml(XMLElement* node) {
+		return nullptr;
+	}
 };
 
 struct ParallelCommand {
