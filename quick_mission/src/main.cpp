@@ -46,7 +46,7 @@ struct Command {
 struct Action {
 	static Action* buildFromXml(XMLElement* node);
 	virtual void run(Agent*) = 0;
-}
+};
 
 struct GoToAction : Action {
 	GoToAction(XMLElement* node);
@@ -54,12 +54,12 @@ struct GoToAction : Action {
 
 private:
 	Vector2 pos;
-}
+};
 
 struct LandAction : Action {
-	LandAction(XMLElement* node);
-	void run(Agent*) override;
-}
+	LandAction(XMLElement* node) {}
+	void run(Agent* robot) override { robot->land(); }
+};
 
 struct ParallelCommand : Command {
 	static ParallelCommand* buildFromXml(XMLElement* node);

@@ -42,6 +42,7 @@ namespace grvc { namespace mbzirc {
 		void goTo					(const Vector2& _wp);
 		void setFlightHeight		(double _h) { flyHeight = _h; }
 		void setYaw					(double _yaw) { yaw = _yaw; } // Degrees
+		void land					();
 
 		Vector2 position		() const;
 		/// A rectangle that is guaranteed to be scanned by the view frustrum of the camera.
