@@ -40,19 +40,65 @@ using namespace tinyxml2;
 
 struct Command {
 	virtual void run() = 0;
-	static Command* buildFromXml(XMLElement* node) {
-		return nullptr;
-	}
+	static Command* buildFromXml(XMLElement* node);
 };
 
-struct ParallelCommand {
+struct Action {
+	static Action* buildFromXml(XMLElement* node);
+	virtual void run(int uav) = 0;
+}
+
+struct TakeOffAction : Action {
+	Action(XMLElement* node);
+	void run(int uav) override;
+}
+
+struct ParallelCommand : Command {
+	static ParallelCommand* buildFromXml(XMLElement* node);
 	vector<Command*>	children;
 };
 
 struct SequenceCommand : Command {
+	static SequenceCommand* buildFromXml(XMLElement* node);
+	vector<Action*> actionList;
 	int uavId;
 };
 
+//----------------------------------------------------------------------------------------------------------------------
+Command* Command::buildFromXml(XMLElement* node) {
+	string cmdType = node->Attribute("type");
+	if(cmdType == "sequence")
+		return SequenceCommand::buildFromXml(node);
+	else if(cmdType == "parallel")
+		return ParallelCommand::buildFromXml(node);
+	return nullptr;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+ParallelCommand* ParallelCommand::buildFromXml(XMLElement* node) {
+	XMLElement *child = node->FirstChildElement("command");
+	while(child) {
+		children.push_back(Command::buildFromXml(child));
+		child = child->NextSiblingElement("command");
+	}
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+SequenceCOmmand* SequenceCommand::buildFromXml(XMLElement* node) {
+	uavId = node->IntAttribute("robotId");
+	XMLElement *action = node->FirstChild()->ToElement();
+	while(action) {
+		actionList.push_back(Action::buildFromXml(action));
+		action = action->NextSibling()->ToElement();
+	}
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+Action* Action::buildFromXml(XMLElement* node) {
+	
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 bool parseMissionFile(const char* missionFile, map<int,Agent*>& robots, vector<Command*> commands) {
 	XMLDocument doc;
 	doc.LoadFile(missionFile);
@@ -101,6 +147,7 @@ bool parseMissionFile(const char* missionFile, map<int,Agent*>& robots, vector<C
 	return true;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 int main(int _argc, char** _argv)
 {
 	ArgumentParser args(_argc, _argv);
