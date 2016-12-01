@@ -45,12 +45,20 @@ struct Command {
 
 struct Action {
 	static Action* buildFromXml(XMLElement* node);
-	virtual void run(int uav) = 0;
+	virtual void run(Agent*) = 0;
 }
 
-struct TakeOffAction : Action {
-	Action(XMLElement* node);
-	void run(int uav) override;
+struct GoToAction : Action {
+	GoToAction(XMLElement* node);
+	void run(Agent*) override;
+
+private:
+	Vector2 pos;
+}
+
+struct LandAction : Action {
+	LandAction(XMLElement* node);
+	void run(Agent*) override;
 }
 
 struct ParallelCommand : Command {
@@ -95,7 +103,24 @@ SequenceCOmmand* SequenceCommand::buildFromXml(XMLElement* node) {
 
 //----------------------------------------------------------------------------------------------------------------------
 Action* Action::buildFromXml(XMLElement* node) {
-	
+	string actionType = node->name();
+	if(name == "take_off")
+		return new TakeOffAction(node);
+	else if(name == "land")
+		return new LandAction(node);
+	cout << "Warning: Unknown action type " << actionType << "\n";
+	return nullptr;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+GoToAction::GoToAction(XMLElement* node) {
+	pos.x = node->FloatAttribute("x");
+	pos.y = node->FloatAttribute("y");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void GoToAction::run(Agent* robot) {
+	robot->goTo(pos);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

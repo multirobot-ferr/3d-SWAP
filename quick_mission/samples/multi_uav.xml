@@ -18,12 +18,12 @@ identify it during the mission, inside this xml -->
 <!-- Parallel actions. Each of the sequences will start at the same time, and group will finish after all sequences have finished -->
 <command type="parallel">
 	<command type="sequence" robotId="1">
-		<take_off/>
+		<goto x="0" y="2"/>
 		<land/>
 	</sequence>
 	
 	<command type="sequence" robotId="2">
-		<take_off/>
+		<goto x="0" y="2"/>
 		<goto x="2" y="0"/>
 		<land/>
 	</sequence>
@@ -32,12 +32,12 @@ identify it during the mission, inside this xml -->
 <!-- You can add parallel actions after each other to force synch points at the start of each one -->
 <command type="parallel">
 	<command type="sequence" robotId="1">
-		<take_off/>
+		<goto x="0" y="0"/>
 		<land/>
 	</command>
 	
 	<command type="sequence" robotId="2">
-		<take_off/>
+		<goto x="0" y="0"/>
 		<land/>
 	</command>
 </command>
