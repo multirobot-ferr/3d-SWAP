@@ -50,7 +50,7 @@ struct Action {
 
 struct GoToAction : Action {
 	GoToAction(XMLElement* node);
-	void run(Agent*) override;
+	void run(Agent* robot) override { robot->goTo(pos); }
 
 private:
 	Vector2 pos;
@@ -58,16 +58,18 @@ private:
 
 struct LandAction : Action {
 	LandAction(XMLElement* node) {}
-	void run(Agent* robot) override { robot->land(); }
+	void run(Agent* robot) override { }//robot->land(); }
 };
 
 struct ParallelCommand : Command {
-	static ParallelCommand* buildFromXml(XMLElement* node);
+	ParallelCommand(XMLElement* node);
+	void run() override {}
 	vector<Command*>	children;
 };
 
 struct SequenceCommand : Command {
-	static SequenceCommand* buildFromXml(XMLElement* node);
+	SequenceCommand(XMLElement* node);
+	void run() override {}
 	vector<Action*> actionList;
 	int uavId;
 };
@@ -76,14 +78,14 @@ struct SequenceCommand : Command {
 Command* Command::buildFromXml(XMLElement* node) {
 	string cmdType = node->Attribute("type");
 	if(cmdType == "sequence")
-		return SequenceCommand::buildFromXml(node);
+		return new SequenceCommand(node);
 	else if(cmdType == "parallel")
-		return ParallelCommand::buildFromXml(node);
+		return new ParallelCommand(node);
 	return nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-ParallelCommand* ParallelCommand::buildFromXml(XMLElement* node) {
+ParallelCommand::ParallelCommand(XMLElement* node) {
 	XMLElement *child = node->FirstChildElement("command");
 	while(child) {
 		children.push_back(Command::buildFromXml(child));
@@ -92,7 +94,7 @@ ParallelCommand* ParallelCommand::buildFromXml(XMLElement* node) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-SequenceCOmmand* SequenceCommand::buildFromXml(XMLElement* node) {
+SequenceCommand::SequenceCommand(XMLElement* node) {
 	uavId = node->IntAttribute("robotId");
 	XMLElement *action = node->FirstChild()->ToElement();
 	while(action) {
@@ -103,10 +105,10 @@ SequenceCOmmand* SequenceCommand::buildFromXml(XMLElement* node) {
 
 //----------------------------------------------------------------------------------------------------------------------
 Action* Action::buildFromXml(XMLElement* node) {
-	string actionType = node->name();
-	if(name == "take_off")
-		return new TakeOffAction(node);
-	else if(name == "land")
+	string actionType = node->Name();
+	if(actionType == "goto")
+		return new GoToAction(node);
+	else if(actionType == "land")
 		return new LandAction(node);
 	cout << "Warning: Unknown action type " << actionType << "\n";
 	return nullptr;
@@ -114,13 +116,8 @@ Action* Action::buildFromXml(XMLElement* node) {
 
 //----------------------------------------------------------------------------------------------------------------------
 GoToAction::GoToAction(XMLElement* node) {
-	pos.x = node->FloatAttribute("x");
-	pos.y = node->FloatAttribute("y");
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void GoToAction::run(Agent* robot) {
-	robot->goTo(pos);
+	pos.x() = node->FloatAttribute("x");
+	pos.y() = node->FloatAttribute("y");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
