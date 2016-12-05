@@ -34,7 +34,7 @@
 namespace grvc { namespace mbzirc {
 
 	//------------------------------------------------------------------------------------------------------------------
-	typeded uav::WorldCoord	WorldCoord;
+	typedef uav::WorldCoord	WorldCoord;
 
 	//------------------------------------------------------------------------------------------------------------------
 	typedef Eigen::Vector2d Vector2;
