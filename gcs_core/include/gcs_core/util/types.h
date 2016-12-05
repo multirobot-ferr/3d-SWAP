@@ -29,18 +29,12 @@
 
 #include <Eigen/Core>
 #include <grvc_utils/units.h>
+#include <grvc_quadrotor_uav/types.h>
 
 namespace grvc { namespace mbzirc {
 
 	//------------------------------------------------------------------------------------------------------------------
-	struct WorldCoord : utils::Cartesian3d {
-		WorldCoord(){}
-		WorldCoord(double _x, double _y, double _z) {
-			raw.x() = _x;
-			raw.y() = _y;
-			raw.z() = _z;
-		}
-	};
+	typeded uav::WorldCoord	WorldCoord;
 
 	//------------------------------------------------------------------------------------------------------------------
 	typedef Eigen::Vector2d Vector2;
