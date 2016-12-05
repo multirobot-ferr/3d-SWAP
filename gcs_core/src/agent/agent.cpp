@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // The MIT License (MIT)
 // 
-// Copyright (c) 2016 Carmelo J. Fernández-Agüera Tortosa
+// Copyright (c) 2016 Carmelo J. Fernï¿½ndez-Agï¿½era Tortosa
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ namespace grvc {
 	namespace mbzirc {
 		//--------------------------------------------------------------------------------------------------------------
 		Agent::Agent(const std::string& _uri, const Vector2& startPos) {
-			uav = new GrvcUav(_uri, hal::Vec3(startPos.x(), startPos.y(), flyHeight));
+			uav = new GrvcUav(_uri, WorldCoord(startPos.x(), startPos.y(), flyHeight));
 		}
 
 		//--------------------------------------------------------------------------------------------------------------
@@ -44,9 +44,9 @@ namespace grvc {
 		//--------------------------------------------------------------------------------------------------------------
 		void Agent::goTo(const Vector2& pos) {
 			goalPos = pos;
-			hal::Vec3 pos3 = hal::Vec3(pos.x(), pos.y(), flyHeight);
-			hal::Waypoint wp = { pos3, 0.0f };
-			uav->goTo(wp);
+			auto pos3 = WorldCoord(pos.x(), pos.y(), flyHeight);
+			//hal::Waypoint wp = { hal::Vec3(pos3.x(), pos3.y(), pos3.z()), 0.0f };
+			uav->goTo(pos3);
 		}
 
 		//--------------------------------------------------------------------------------------------------------------

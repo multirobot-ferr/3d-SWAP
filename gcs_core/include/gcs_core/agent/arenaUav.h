@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // The MIT License (MIT)
 // 
-// Copyright (c) 2016 Carmelo J. Fernández-Agüera Tortosa
+// Copyright (c) 2016 Carmelo J. Fernï¿½ndez-Agï¿½era Tortosa
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,10 @@ namespace grvc {
 			// Chases a target and takes it to the drop zone.
 			void takeOff(double _height) override;
 			void land() override;
-			void goTo(const hal::Waypoint& _wp) override;
+			void goTo(const WorldCoord& _wp) override;
 			void trackPath(const hal::WaypointList&) override;
 
-			virtual const hal::Vec3& position() const override;
+			virtual const WorldCoord& position() const override;
 			/// A rectangle that is guaranteed to be scanned by the view frustrum of the camera.
 			/// It should be the bigest rectangle inscribed in the intersection of the frustrum with the floor,
 			/// or the closest (conservative) possible approximation

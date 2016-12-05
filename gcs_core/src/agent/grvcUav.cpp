@@ -34,7 +34,7 @@ using namespace grvc::uav;
 namespace grvc {
 	namespace mbzirc {
 		//--------------------------------------------------------------------------------------------------------------
-		GrvcUav::GrvcUav(const std::string& _uri, const hal::Vec3& startPos) {
+		GrvcUav::GrvcUav(const std::string& _uri, const WorldCoord& startPos) {
 			mPos = startPos;
 
 			utils::ArgumentParser args(0,nullptr);
@@ -54,7 +54,7 @@ namespace grvc {
 		}
 
 		//--------------------------------------------------------------------------------------------------------------
-		void GrvcUav::goTo(const hal::Waypoint& _wp)  {
+		void GrvcUav::goTo(const WorldCoord& _wp)  {
 		}
 
 		//--------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ namespace grvc {
 		}
 
 		//--------------------------------------------------------------------------------------------------------------
-		const hal::Vec3& GrvcUav::position() const  {
+		const WorldCoord& GrvcUav::position() const  {
 			return mPos;
 		}
 

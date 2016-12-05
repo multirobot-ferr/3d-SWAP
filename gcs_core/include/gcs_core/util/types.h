@@ -28,8 +28,19 @@
 #define _MBZIRC_UTIL_TYPES_H_
 
 #include <Eigen/Core>
+#include <grvc_utils/units.h>
 
 namespace grvc { namespace mbzirc {
+
+	//------------------------------------------------------------------------------------------------------------------
+	struct WorldCoord : utils::Cartesian3d {
+		WorldCoord(){}
+		WorldCoord(double _x, double _y, double _z) {
+			raw.x() = _x;
+			raw.y() = _y;
+			raw.z() = _z;
+		}
+	};
 
 	//------------------------------------------------------------------------------------------------------------------
 	typedef Eigen::Vector2d Vector2;

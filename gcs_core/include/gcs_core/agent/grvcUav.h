@@ -28,6 +28,7 @@
 
 #include "uav.h"
 #include <grvc_quadrotor_uav/server.h>
+#include <gcs_core/util/types.h>
 #include <string>
 
 namespace grvc {
@@ -35,14 +36,14 @@ namespace grvc {
 
 		class GrvcUav : public Uav {
 		public:
-			GrvcUav(const std::string& _uri, const hal::Vec3& startPos);
+			GrvcUav(const std::string& _uri, const WorldCoord& startPos);
 			// Chases a target and takes it to the drop zone.
 			void takeOff(double _height) override;
 			void land() override;
-			void goTo(const hal::Waypoint& _wp) override;
+			void goTo(const WorldCoord& _wp) override;
 			void trackPath(const hal::WaypointList&) override;
 
-			const hal::Vec3& position() const override;
+			const WorldCoord& position() const override;
 			/// A rectangle that is guaranteed to be scanned by the view frustrum of the camera.
 			/// It should be the bigest rectangle inscribed in the intersection of the frustrum with the floor,
 			/// or the closest (conservative) possible approximation
@@ -55,7 +56,7 @@ namespace grvc {
 			uav::Server::PathService::Client*		path_srv;
 			uav::Server::LandService::Client*		land_srv;
 
-			hal::Vec3 mPos;
+			WorldCoord mPos;
 		};
 	}
 }	// namespace grvc::mbzirc
