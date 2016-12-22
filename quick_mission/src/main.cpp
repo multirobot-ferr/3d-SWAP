@@ -131,9 +131,12 @@ bool parseMissionFile(const char* missionFile, map<int,Agent*>& robots, vector<C
 		return false;
 	}
 
+	cout << "Parsing uavs\n";
+
 	// Get list of robots
-	XMLElement* uav = root->FirstChildElement("uav");
+	XMLElement* uav = doc.FirstChildElement("uav");
 	while(uav) {
+		cout << "Found one uav\n";
 		int id = uav->IntAttribute("id");
 
 		const char* uriRaw = uav->Attribute("uri");
@@ -149,7 +152,9 @@ bool parseMissionFile(const char* missionFile, map<int,Agent*>& robots, vector<C
 		float y = uav->FloatAttribute("y");
 
 		// Create an agent using the specified informational
-		robots.insert(make_pair(id, new Agent(uri, Vector2(x,y))));
+		auto robotEntry = make_pair(id, new Agent(uri, Vector2(x,y)));
+		cout << "Loaded robot with uri: " << uri << " at " << x << ", " << y << "\n";
+		robots.insert(robotEntry);
 
 		uav = uav->NextSiblingElement("uav");
 	}

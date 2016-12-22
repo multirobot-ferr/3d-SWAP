@@ -12,7 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <!-- First of all, define your uavs. Each uav requires a uri (usually, the root namespace of its ros topics), and an id to
 identify it during the mission, inside this xml -->
-<uav uri="/quad1" id="1"/ x="0" y="0">
+<uav uri="/quad1" id="1" x="0" y="0"/>
 
 <!-- now define the mission itself -->
 <command type="sequence" robotId="1">
