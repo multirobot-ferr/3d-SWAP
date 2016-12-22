@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.6">
 	<world name="default">
 
 		<!-- A global light source -->
@@ -17,11 +17,11 @@
 
 		<model name="testbed_scene">
 			<static>true</static>
-			<pose>4.262532 7.173285 0 0 0 0</pose>
+			<pose>23.158678 75.310852 0 0 0 1.57</pose>
 			<link name="test_scene">
 				<visual name="visual">
 					<geometry>
-						<mesh><uri>/home/luisgrvc/catkin_ws/src/mbzirc/visualization/model/stage_01_gazebo.dae</uri></mesh>
+						<mesh><uri>/home/luisgrvc/catkin_make/src/mbzirc/visualization/model/stage_01_gazebo.dae</uri></mesh>
 					</geometry>
 				</visual>
 			</link>

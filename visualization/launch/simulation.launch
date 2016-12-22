@@ -16,7 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <node name="CreateFile" pkg="mbzirc_gcs_view" type="createfileworld" output="screen" args="$(find mbzirc_gcs_view)" />
 
 <!--******************************NODE GENERATE OPENCV WINDOWS****************************************-->
-    <node name="CameraView" pkg="mbzirc_gcs_view" type="cameraview" output="screen" />
+    <!--node name="CameraView" pkg="mbzirc_gcs_view" type="cameraview" output="screen" /-->
 
 
 <!--******************************WORLD****************************************-->
@@ -172,7 +172,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <!--****************************BIG OBJECTS*************************************-->
 
-    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="object_big_black"/>
         <arg name="urdf_file" value="object_big_black.urdf.xacro"/>
         <arg name="quad_name" value="quad1"/>
@@ -200,7 +200,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="pos_x" value="-2"/>
         <arg name="pos_y" value="5"/>
         <arg name="pos_z" value="0.07"/>
-    </include-->
+    </include>
 
 
 <!--******************************DINAMIC_OBJECTS****************************************-->
