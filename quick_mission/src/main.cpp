@@ -159,9 +159,14 @@ bool parseMissionFile(const char* missionFile, map<int,Agent*>& robots, vector<C
 		uav = uav->NextSiblingElement("uav");
 	}
 
+	cout << robots.size() << " robots found\n";
+
+	cout << "parsing commands\n";
+
 	// Iterate over mission commands
-	XMLElement* commandNode = root->FirstChildElement("command");
+	XMLElement* commandNode = doc.FirstChildElement("command");
 	while(commandNode) {
+		cout << "found command\n";
 		Command* cmd = Command::buildFromXml(commandNode);
 		if(!cmd) {
 			cout << "Error parsing command\n";
