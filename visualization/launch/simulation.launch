@@ -51,8 +51,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <!-- Launch robot id=2 -->
     <include file="$(find px4_bringup)/launch/spawn_robot.launch">
         <arg name="id" value="2"/>
-        <arg name="pos_x" value="2.0"/>
-        <arg name="pos_y" value="2.0"/>
+        <arg name="pos_x" value="5"/>
+        <arg name="pos_y" value="5"/>
         <arg name="pos_z" value="1.0"/>
         <arg name="yaw" value="0.0"/>
         <arg name="material" value="Indigo"/>
@@ -60,8 +60,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <!-- Launch robot id=3 -->
     <include file="$(find px4_bringup)/launch/spawn_robot.launch">
         <arg name="id" value="3"/>
-        <arg name="pos_x" value="2.0"/>
-        <arg name="pos_y" value="-2.0"/>
+        <arg name="pos_x" value="8.5"/>
+        <arg name="pos_y" value="5"/>
         <arg name="pos_z" value="1.0"/>
         <arg name="yaw" value="0.0"/>
         <arg name="material" value="ZincYellow"/>
