@@ -62,9 +62,9 @@ int main(int argc, char **argv)
     cv::startWindowThread();
 
     image_transport::ImageTransport it(nh);
-    image_transport::Subscriber sub1 = it.subscribe("/camera_1/image_raw_1", 1, imageCallback1);
-    image_transport::Subscriber sub2 = it.subscribe("/camera_2/image_raw_2", 1, imageCallback2);
-    image_transport::Subscriber sub3 = it.subscribe("/camera_3/image_raw_3", 1, imageCallback3);
+    image_transport::Subscriber sub1 = it.subscribe("/mbzirc_1/camera_0/image_raw", 1, imageCallback1);
+    image_transport::Subscriber sub2 = it.subscribe("/mbzirc_2/camera_0/image_raw", 1, imageCallback2);
+    image_transport::Subscriber sub3 = it.subscribe("/mbzirc_3/camera_0/image_raw", 1, imageCallback3);
 
     ros::Rate rate(10.0);
 
