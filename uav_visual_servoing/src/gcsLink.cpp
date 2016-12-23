@@ -24,37 +24,21 @@
 // SOFTWARE.
 //------------------------------------------------------------------------------
 
-#ifndef MBZIRC_CANDIDATELIST_H_
-#define MBZIRC_CANDIDATELIST_H_
+#include <gcsLink.h>
 
-#include "Candidate.h"
-#include <vector>
-
-namespace mbzirc{
-    struct CandidateList{
-        std::vector<Candidate> candidates;
-    };
-    // Serialize candidate.
-    std::ostream& operator<<(std::ostream& _os, const CandidateList& _candidates){
-        for(auto candidate: _candidates.candidates){
-            _os << candidate;
-        }
-        return _os;
-    }
-
-    // Deserialize candidate.
-    std::istream& operator>>(std::istream& _is, CandidateList &_candidates){
-        _candidates.candidates.clear();
-        do{
-            Candidate candidate;
-            _is >> candidate;
-            if(candidate.isInitialized){
-                _candidates.candidates.push_back(candidate);
-            }
-        }while(_is);
-        return _is;
-    }
-
+//------------------------------------------------------------------------------
+bool GcsLink::init() {
+    // Check that the GCS is ready and start watchdog
+    mConnected = true;
 }
 
-#endif
+//------------------------------------------------------------------------------
+bool GcsLink::isConnected() {
+    return mConnected;
+}
+
+//------------------------------------------------------------------------------
+void GcsLink::getCurrentMission(GcsLink::actions &_action, std::string &_data) {
+    _action = mLastAction;
+    _data = mLastData;
+}

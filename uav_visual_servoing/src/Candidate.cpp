@@ -72,34 +72,49 @@ namespace mbzirc{
 
         // Deserialize location
         auto numbers = parseNextLine(_is);
+        if(numbers.size() < 3)
+            return _is;
         _candidate.location << numbers[0], numbers[1], numbers[2];
 
         // Deserialize speed
         numbers = parseNextLine(_is);
+        if(numbers.size() < 3)
+            return _is;
         _candidate.speed << numbers[0], numbers[1], numbers[2];
 
         // Deserialize covariance of location
         numbers = parseNextLine(_is);
+        if(numbers.size() < 9)
+            return _is;
         _candidate.locationCovariance << numbers[0], numbers[1], numbers[2], numbers[3], numbers[4], numbers[5], numbers[6],  numbers[7], numbers[8];
 
         // Deserialize covariance of speed
         numbers = parseNextLine(_is);
+        if(numbers.size() < 9)
+            return _is;
         _candidate.speedCovariance << numbers[0], numbers[1], numbers[2], numbers[3], numbers[4], numbers[5], numbers[6],  numbers[7], numbers[8];
 
         // Deserialize color
         numbers = parseNextLine(_is);
+        if(numbers.size() < 1)
+            return _is;
         _candidate.color = int(numbers[0]);
 
         // Deserialize shape
         numbers = parseNextLine(_is);
+        if(numbers.size() < 1)
+            return _is;
         _candidate.shape = int(numbers[0]);
 
         // Deseriaize size and orientation
         numbers = parseNextLine(_is);
+        if(numbers.size() < 3)
+            return _is;
         _candidate.width = numbers[0];
         _candidate.height = numbers[1];
         _candidate.rotation = numbers[2];
 
+        _candidate.isInitialized = true;
         return _is;
     }
 

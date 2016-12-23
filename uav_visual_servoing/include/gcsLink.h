@@ -24,37 +24,25 @@
 // SOFTWARE.
 //------------------------------------------------------------------------------
 
-#ifndef MBZIRC_CANDIDATELIST_H_
-#define MBZIRC_CANDIDATELIST_H_
+#include <string>
 
-#include "Candidate.h"
-#include <vector>
+class GcsLink{
+public:
+    /// Available actions for the module.
+    enum class actions {error, hovering, visualServoing};
 
-namespace mbzirc{
-    struct CandidateList{
-        std::vector<Candidate> candidates;
-    };
-    // Serialize candidate.
-    std::ostream& operator<<(std::ostream& _os, const CandidateList& _candidates){
-        for(auto candidate: _candidates.candidates){
-            _os << candidate;
-        }
-        return _os;
-    }
+    /// Make sure that the GCS is enabled and it is ready to send messages to the module.
+    bool init();
 
-    // Deserialize candidate.
-    std::istream& operator>>(std::istream& _is, CandidateList &_candidates){
-        _candidates.candidates.clear();
-        do{
-            Candidate candidate;
-            _is >> candidate;
-            if(candidate.isInitialized){
-                _candidates.candidates.push_back(candidate);
-            }
-        }while(_is);
-        return _is;
-    }
+    /// Check the connection still available.
+    bool isConnected();
 
-}
+    /// get last mission sent by the GCS.
+    void getCurrentMission(actions &_action, std::string &_data);
 
-#endif
+private:
+    bool mConnected = false;
+
+    actions mLastAction     = actions::error;
+    std::string mLastData   = "";
+};

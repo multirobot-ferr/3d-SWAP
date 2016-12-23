@@ -53,6 +53,9 @@ struct Candidate{
     double height;
     double rotation;
 
+
+    bool isInitialized = false;
+
 };
 
 // Serialize candidate.
