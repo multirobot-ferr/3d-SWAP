@@ -21,7 +21,7 @@
 			<link name="test_scene">
 				<visual name="visual">
 					<geometry>
-						<mesh><uri>/home/grvc/code/ros/src/mbzirc/visualization/model/stage_01_gazebo.dae</uri></mesh>
+						<mesh><uri>/home/luisgrvc/catkin_make/src/mbzirc/visualization/model/stage_01_gazebo.dae</uri></mesh>
 					</geometry>
 				</visual>
 			</link>
