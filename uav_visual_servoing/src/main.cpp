@@ -57,6 +57,15 @@ int main(int _argc, char** _argv){
     grvc::utils::ArgumentParser args(_argc, _argv);
     pos_error_srv = new hal::Server::PositionErrorService::Client("/mbzirc_1/hal/pos_error", args);
 
+    hal::Server::TakeOffService::Client takeOff_srv("/mbzirc_1/hal/take_off", args);
+    hal::TaskState ts;
+    while(!takeOff_srv.isConnected()) {
+        this_thread::sleep_for(chrono::milliseconds(100));
+    }
+
+    double flyZ = 15.0;
+    takeOff_srv.send(flyZ, ts);
+
     std::this_thread::sleep_for(std::chrono::seconds(5));
     std::cout << "Connected to hal" << std::endl;
 
