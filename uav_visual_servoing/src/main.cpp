@@ -58,6 +58,7 @@ int main(int _argc, char** _argv){
     pos_error_srv = new hal::Server::PositionErrorService::Client("/mbzirc_1/hal/pos_error", args);
 
     std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::cout << "Connected to hal" << std::endl;
 
 
     ros::NodeHandle nh;
@@ -67,6 +68,8 @@ int main(int _argc, char** _argv){
     if(!candidateSubscriber){
         std::cout << ("Can't start candidate subscriber.") << std::endl;
         return -1;
+    }else{
+        std::cout << "Subscribed to candidate topic" << std::endl;
     }
 
     std::cout << "Initialized" << std::endl;
@@ -93,7 +96,8 @@ void candidateCallback(const std_msgs::String::ConstPtr _msg){
         pos_error_srv->send(target.location, ts);
 
     }else{
-        std::cout << "0 candidates availables" << std::endl;
+        hal::Vec3 zeroError = {0,0,0};
+        pos_error_srv->send(zeroError, ts);
     }
     this_thread::sleep_for(chrono::milliseconds(100));
 }
