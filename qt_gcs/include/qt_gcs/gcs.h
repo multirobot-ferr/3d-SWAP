@@ -7,12 +7,9 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
-namespace Ui {
-class GCSInterface;
-}
+#include "qt_gcs/uavInterface.h"
 
-class GCS : public QMainWindow
-{
+class GCS : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -31,7 +28,7 @@ private:
     QGroupBox *mUavListGroup;
     QVBoxLayout *mUavListLayout;
 
-    QGroupBox *mUavInterface1, *mUavInterface2, *mUavInterface3;
+    UavInterface *mUavInterface1, *mUavInterface2, *mUavInterface3;
 
 };
 
