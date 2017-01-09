@@ -13,14 +13,24 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QRadioButton>
+
+#include <grvc_quadrotor_hal/types.h>
+#include <grvc_quadrotor_hal/server.h>
 
 class UavInterface : public QGroupBox {
     Q_OBJECT
 
 public:
-    UavInterface(int _index);
+    UavInterface(int _argc, char **_argv, int _index);
     ~UavInterface();
+
+private slots:
+    void takeOffCallback();
+    void targetCallback();
+
 private:
+    int mUavId;
     QHBoxLayout *mMainLayoutUav;
 
     QVBoxLayout *mOdometryLayoutUav;
@@ -28,12 +38,14 @@ private:
     QVBoxLayout *mActionsLayoutUav;
     QHBoxLayout *mTakeOffLayout;
     QPushButton *mTakeOffButton;
-    QSpinBox *mTakeOffAltitude;
+    QDoubleSpinBox *mTakeOffAltitude;
 
     QHBoxLayout *mTargetLayout;
     QPushButton *mTargetButton;
+    QRadioButton *mTargetEnable;
     QSpinBox *mColorSpin;
     QSpinBox *mShapeSpin;
+
 };
 
 #endif

@@ -13,7 +13,7 @@ class GCS : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit GCS(QWidget *parent = 0);
+    explicit GCS(int _argc, char **_argv, QWidget *parent = 0);
     ~GCS();
 
 private:

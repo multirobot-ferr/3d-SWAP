@@ -12,7 +12,7 @@
 #include <QSpinBox>
 
 //---------------------------------------------------------------------------------------------------------------------
-GCS::GCS(QWidget *parent) : QMainWindow(parent) {
+GCS::GCS(int _argc, char **_argv, QWidget *parent) : QMainWindow(parent) {
     this->setWindowTitle("Ground Control Station");
     // Set up central widget and layout
     mCentralWidget = new QWidget();
@@ -22,7 +22,7 @@ GCS::GCS(QWidget *parent) : QMainWindow(parent) {
 
     // Set up dummy map
     mDummyMap = new QImage();
-    mDummyMap->load("/home/bardo91/Desktop/dummyMap.png");
+    mDummyMap->load("./dummyMap.png");
     mMapLayout = new QLabel();
     mMapLayout->setPixmap(QPixmap::fromImage(*mDummyMap));
     mMainLayout->addWidget(mMapLayout);
@@ -34,11 +34,11 @@ GCS::GCS(QWidget *parent) : QMainWindow(parent) {
     mUavListGroup->setLayout(mUavListLayout);
     mMainLayout->addWidget(mUavListGroup);
 
-    mUavInterface1 = new UavInterface(1);
+    mUavInterface1 = new UavInterface(_argc, _argv, 1);
     mUavListLayout->addWidget(mUavInterface1);
-    mUavInterface2 = new UavInterface(2);
+    mUavInterface2 = new UavInterface(_argc, _argv, 2);
     mUavListLayout->addWidget(mUavInterface2);
-    mUavInterface3 = new UavInterface(3);
+    mUavInterface3 = new UavInterface(_argc, _argv, 3);
     mUavListLayout->addWidget(mUavInterface3);
 }
 

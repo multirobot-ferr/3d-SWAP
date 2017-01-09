@@ -8,12 +8,17 @@
 
 #include <qt_gcs/gcs.h>
 #include <QApplication>
+#include <ros/ros.h>
 
 int main(int argc, char *argv[])
 {
+    if(!ros::isInitialized()){
+        ros::init(argc, argv, "qt_gcs");
+    }
+
     QApplication app (argc, argv);
 
-    GCS gcs;
+    GCS gcs(argc, argv);
     gcs.show();
 
     return app.exec();
