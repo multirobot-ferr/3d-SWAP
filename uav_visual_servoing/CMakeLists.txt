@@ -24,8 +24,20 @@ if(GRVCQUAD_USE_ROS)
 			geometry_msgs
 			mavros
 			mavros_msgs
-		        roscpp
-			grvc_quadrotor_uav)
+		    roscpp
+			grvc_quadrotor_uav
+			message_generation)
+## Generate services in the 'srv' folder
+ add_service_files(
+   FILES
+   target_service.srv
+ )
+
+## Generate added messages and services with any dependencies listed here
+ generate_messages(
+   DEPENDENCIES
+   std_msgs
+ )
 
 	catkin_package(CATKIN_DEPENDS
 			grvc_quadrotor_uav)

@@ -41,15 +41,34 @@
 #include <CandidateList.h>
 #include <Candidate.h>
 #include <std_msgs/Float64.h>
+#include <uav_visual_servoing/target_service.h>
 
 
 using namespace grvc;
 using namespace std;
 
+mbzirc::Candidate specs;
+bool target_state = false;
+
 void candidateCallback(const std_msgs::String::ConstPtr _msg);
+
 float gAltitude = 15;
+
 void altitudeCallback(const std_msgs::Float64::ConstPtr _msg){
     gAltitude = _msg->data;
+}
+
+bool targetCallback(uav_visual_servoing::target_service::Request  &req,
+         uav_visual_servoing::target_service::Response &res)
+{
+    target_state = req.enabled;
+    specs.color = req.color;
+    specs.shape = req.shape;
+    specs.location[0] = req.position[0];
+    specs.location[1] = req.position[1];
+    res.success = true;
+
+    return true;
 }
 mbzirc::Candidate bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs);
 
@@ -65,6 +84,9 @@ int main(int _argc, char** _argv){
 
     ros::Subscriber altitudeSubs;
     ros::NodeHandle nh;
+
+    ros::ServiceServer target_service = nh.advertiseService("/mbzirc_1/target_service/enabled", targetCallback);
+
     if(ros::isInitialized()){
         altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_1/global_position/rel_alt", 10, altitudeCallback);
     }
@@ -100,8 +122,8 @@ int main(int _argc, char** _argv){
 }
 
 void candidateCallback(const std_msgs::String::ConstPtr _msg){
-    mbzirc::Candidate specs;
-    specs.color = 1;
+    //mbzirc::Candidate specs;
+    //specs.color = 1;
     hal::TaskState ts;
 
     std::stringstream msg;
@@ -109,8 +131,17 @@ void candidateCallback(const std_msgs::String::ConstPtr _msg){
     mbzirc::CandidateList candidateList;
     msg >> candidateList;
 
+    if(target_state){
+        if(candidateList.candidates.size() > 0){
+        
+        mbzirc::Candidate target = bestCandidateMatch(candidateList, specs);
+        std::cout << "tracking candidate with error " << target.location.transpose() << std::endl;
+        target.location[2] = 15-gAltitude;
+        pos_error_srv->send(target.location, ts);
 
-    if(candidateList.candidates.size() > 0){
+        }
+    }
+   /* if(candidateList.candidates.size() > 0){
         mbzirc::Candidate target = bestCandidateMatch(candidateList, specs);
         std::cout << "tracking candidate with error " << target.location.transpose() << std::endl;
         target.location[2] = 15-gAltitude;
@@ -119,7 +150,7 @@ void candidateCallback(const std_msgs::String::ConstPtr _msg){
     }else{
         hal::Vec3 zeroError = {0,0,0};
         pos_error_srv->send(zeroError, ts);
-    }
+    }*/
     this_thread::sleep_for(chrono::milliseconds(100));
 }
 
