@@ -2,6 +2,10 @@
 #define MYCLASS_H
 
 #include <QMainWindow>
+#include <QGroupBox>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 namespace Ui {
 class GCSInterface;
@@ -16,7 +20,19 @@ public:
     ~GCS();
 
 private:
-    Ui::GCSInterface*ui;
+    QMenuBar *mMenuBar;
+
+    QHBoxLayout *mMainLayout;
+    QWidget *mCentralWidget;
+
+    QImage *mDummyMap;
+    QLabel *mMapLayout;
+
+    QGroupBox *mUavListGroup;
+    QVBoxLayout *mUavListLayout;
+
+    QGroupBox *mUavInterface1, *mUavInterface2, *mUavInterface3;
+
 };
 
 #endif // MYCLASS_H
