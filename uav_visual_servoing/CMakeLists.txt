@@ -31,6 +31,7 @@ if(GRVCQUAD_USE_ROS)
  add_service_files(
    FILES
    target_service.srv
+   takeoff_service.srv
  )
 
 ## Generate added messages and services with any dependencies listed here

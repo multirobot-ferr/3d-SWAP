@@ -42,17 +42,19 @@
 #include <Candidate.h>
 #include <std_msgs/Float64.h>
 #include <uav_visual_servoing/target_service.h>
-
+#include <uav_visual_servoing/takeoff_service.h>
 
 using namespace grvc;
 using namespace std;
 
 mbzirc::Candidate specs;
 bool target_state = false;
+hal::Server::TakeOffService::Client* takeOff_srv;
 
 void candidateCallback(const std_msgs::String::ConstPtr _msg);
 
 float gAltitude = 15;
+float gFlyAltitude = 15; 
 
 void altitudeCallback(const std_msgs::Float64::ConstPtr _msg){
     gAltitude = _msg->data;
@@ -70,6 +72,19 @@ bool targetCallback(uav_visual_servoing::target_service::Request  &req,
 
     return true;
 }
+
+bool takeoffCallback(uav_visual_servoing::takeoff_service::Request  &req,
+         uav_visual_servoing::takeoff_service::Response &res)
+{
+    gFlyAltitude = req.altitude;
+    hal::TaskState ts;
+    takeOff_srv ->send(gFlyAltitude, ts);
+
+    res.success = true;
+
+    return true;
+}
+
 mbzirc::Candidate bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs);
 
 hal::Server::PositionErrorService::Client *pos_error_srv;
@@ -82,24 +97,22 @@ int main(int _argc, char** _argv){
     grvc::utils::ArgumentParser args(_argc, _argv);
     pos_error_srv = new hal::Server::PositionErrorService::Client("/mbzirc_1/hal/pos_error", args);
 
+    takeOff_srv=new  hal::Server::TakeOffService::Client ("/mbzirc_1/hal/take_off", args);
+   
+    while(!takeOff_srv->isConnected()) {
+        this_thread::sleep_for(chrono::milliseconds(100));
+    }
+
     ros::Subscriber altitudeSubs;
     ros::NodeHandle nh;
 
-    ros::ServiceServer target_service = nh.advertiseService("/mbzirc_1/target_service/enabled", targetCallback);
+    ros::ServiceServer target_service = nh.advertiseService("/mbzirc_1/visual_servoing/enabled", targetCallback);
+    ros::ServiceServer takeoff_service = nh.advertiseService("/mbzirc_1/visual_servoing/takeoff", takeoffCallback);
 
     if(ros::isInitialized()){
         altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_1/global_position/rel_alt", 10, altitudeCallback);
     }
     
-
-    hal::Server::TakeOffService::Client takeOff_srv("/mbzirc_1/hal/take_off", args);
-    hal::TaskState ts;
-    while(!takeOff_srv.isConnected()) {
-        this_thread::sleep_for(chrono::milliseconds(100));
-    }
-
-    double flyZ = 15.0;
-    takeOff_srv.send(flyZ, ts);
 
     std::this_thread::sleep_for(std::chrono::seconds(5));
     std::cout << "Connected to hal" << std::endl;
@@ -136,7 +149,7 @@ void candidateCallback(const std_msgs::String::ConstPtr _msg){
         
         mbzirc::Candidate target = bestCandidateMatch(candidateList, specs);
         std::cout << "tracking candidate with error " << target.location.transpose() << std::endl;
-        target.location[2] = 15-gAltitude;
+        target.location[2] = gFlyAltitude-gAltitude;
         pos_error_srv->send(target.location, ts);
 
         }
