@@ -29,12 +29,42 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index) {
 
     mOdometryLayoutUav = new QVBoxLayout();
     mMainLayoutUav->addLayout(mOdometryLayoutUav);
+
+    QHBoxLayout *altitudeLayout = new QHBoxLayout();
     QLabel *altitudeText = new QLabel(tr("Altitude:  "));
+    mAltitudeBox = new QLCDNumber();
+    mAltitudeBox->setMode(QLCDNumber::Dec);
+    mAltitudeBox->display(0.0);
+    altitudeLayout->addWidget(altitudeText);
+    altitudeLayout->addWidget(mAltitudeBox);
+    mOdometryLayoutUav->addLayout(altitudeLayout);
+    ros::NodeHandle nh;
+    mAltitudeSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/global_position/rel_alt",
+                                       1,
+                                       &UavInterface::altitudeCallback,this);
+
+    QHBoxLayout *latitudeLayout = new QHBoxLayout();
     QLabel *latitudeText = new QLabel(tr("Latitude:  "));
+    mLatitudeBox  = new QLCDNumber();
+    mLatitudeBox->setMode(QLCDNumber::Dec);
+    mLatitudeBox->display(0.0);
+    mLatitudeBox->setDigitCount(8);
+    latitudeLayout->addWidget(latitudeText);
+    latitudeLayout->addWidget(mLatitudeBox);
+    mOdometryLayoutUav->addLayout(latitudeLayout);
+
+    QHBoxLayout *longitudeLayout = new QHBoxLayout();
     QLabel *longitudeText = new QLabel(tr("Longitude:  "));
-    mOdometryLayoutUav->addWidget(altitudeText);
-    mOdometryLayoutUav->addWidget(latitudeText);
-    mOdometryLayoutUav->addWidget(longitudeText);
+    mLongitudeBox = new QLCDNumber();
+    mLongitudeBox->setMode(QLCDNumber::Dec);
+    mLongitudeBox->display(0.0);
+    mLongitudeBox->setDigitCount(8);
+    longitudeLayout->addWidget(longitudeText);
+    longitudeLayout->addWidget(mLongitudeBox);
+    mOdometryLayoutUav->addLayout(longitudeLayout);
+    mGeodesicSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/global_position/global",
+                                       1,
+                                       &UavInterface::geodesicCallback,this);
 
     mActionsLayoutUav = new QVBoxLayout();
     mMainLayoutUav->addLayout(mActionsLayoutUav);
@@ -88,4 +118,14 @@ void UavInterface::targetCallback(){
     call.request.color = mColorSpin->value();
     call.request.shape = mShapeSpin->value();
     client.call(call);
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::altitudeCallback(const std_msgs::Float64ConstPtr &_msg) {
+    mAltitudeBox->display(_msg->data);
+}
+
+void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) {
+    mLongitudeBox->display(_msg->longitude);
+    mLatitudeBox->display(_msg->latitude);
 }
