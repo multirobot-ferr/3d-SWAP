@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find mbzirc_gcs_view)/world/exaple_actor_tag.world">
+        <env name="LC_NUMERIC" value="C"/>
+        <env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/>
+    </node>
+
+    <!-- launch gazebo client -->
+    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
+        <env name="LC_NUMERIC" value="C"/>
+    </node>
+
+</launch>
