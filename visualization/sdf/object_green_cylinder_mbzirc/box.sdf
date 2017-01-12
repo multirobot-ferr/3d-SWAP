@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <sdf version="1.4">
-<model name="Black cylinder object">
+<model name="Green cylinder object">
   <pose>0 0 0.08 0 0 0</pose>
   <static>true</static>
     <link name="link">
@@ -18,7 +18,7 @@
       <collision name="collision">
         <geometry>
           <cylinder>
-            <radius>0.15</radius>
+            <radius>0.10</radius>
             <length>0.2</length>
           </cylinder>
         </geometry>
@@ -26,14 +26,14 @@
       <visual name="visual">
         <geometry>
           <cylinder>
-            <radius>0.15</radius>
+            <radius>0.10</radius>
             <length>0.2</length>
           </cylinder>
         </geometry>
         <material>
         	<script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Black</name>
+              <name>Gazebo/Green</name>
             </script>
         </material>
       </visual>
