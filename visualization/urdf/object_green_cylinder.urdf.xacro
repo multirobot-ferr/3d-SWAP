@@ -9,7 +9,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 -->
-<robot name="grvc_quadrotor" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="green_cylinder" xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:arg name="model_name" default="object_green_cylinder_mov"/>
   <xacro:arg name="id" default="1"/>
@@ -17,8 +17,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   <!-- Included URDF Files -->
   <xacro:include filename="$(find mbzirc_gcs_view)/urdf/object_green_cylinder_base.urdf.xacro" />
   
-  <!-- Instantiate quadrotor_base_macro once (has no parameters atm) -->
   <!-- model_name must be ual_${id} for ual node to find the uav -->
-  <xacro:quadrotor_base_macro id="$(arg id)" model_name="$(arg model_name)"/>
+  <xacro:green_cylinder id="$(arg id)" model_name="$(arg model_name)"/>
 
 </robot>

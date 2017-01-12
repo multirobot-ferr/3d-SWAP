@@ -11,7 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Main object link -->
-  <xacro:macro name="quadrotor_base_macro" params="id model_name">
+  <xacro:macro name="red_cylinder" params="id model_name">
     <link name="base_link_${id}">
       <inertial>
         <mass value="0.5" />
