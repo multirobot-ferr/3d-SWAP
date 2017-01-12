@@ -23,11 +23,15 @@
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/NavSatFix.h>
 
+#include <marble/MarbleWidget.h>
+
+#include "qt_gcs/uavLayerPaint.h"
+
 class UavInterface : public QGroupBox {
     Q_OBJECT
 
 public:
-    UavInterface(int _argc, char **_argv, int _index);
+    UavInterface(int _argc, char **_argv, int _index,  Marble::MarbleWidget* _mapPtr);
     ~UavInterface();
 
 private slots:
@@ -57,6 +61,9 @@ private:
     QRadioButton *mTargetEnable;
     QSpinBox *mColorSpin;
     QSpinBox *mShapeSpin;
+
+    Marble::MarbleWidget *mMapPtr;
+    UavLayerPaint *mUavDisplayLayer;
 
 };
 

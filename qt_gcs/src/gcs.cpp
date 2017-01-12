@@ -10,8 +10,6 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QSpinBox>
-
-
 //---------------------------------------------------------------------------------------------------------------------
 GCS::GCS(int _argc, char **_argv, QWidget *parent) : QMainWindow(parent) {
     this->setWindowTitle("Ground Control Station");
@@ -22,7 +20,7 @@ GCS::GCS(int _argc, char **_argv, QWidget *parent) : QMainWindow(parent) {
     this->setCentralWidget(mCentralWidget);
 
     // Set up  map
-    mMapWidget= new Marble::MarbleWidget;
+    mMapWidget= new Marble::MarbleWidget();
     mMapWidget->setProjection(Marble::Mercator);
     mMapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
     mMapWidget->show();
@@ -35,11 +33,11 @@ GCS::GCS(int _argc, char **_argv, QWidget *parent) : QMainWindow(parent) {
     mUavListGroup->setLayout(mUavListLayout);
     mMainLayout->addWidget(mUavListGroup);
 
-    mUavInterface1 = new UavInterface(_argc, _argv, 1);
+    mUavInterface1 = new UavInterface(_argc, _argv, 1, mMapWidget);
     mUavListLayout->addWidget(mUavInterface1);
-    mUavInterface2 = new UavInterface(_argc, _argv, 2);
+    mUavInterface2 = new UavInterface(_argc, _argv, 2, mMapWidget);
     mUavListLayout->addWidget(mUavInterface2);
-    mUavInterface3 = new UavInterface(_argc, _argv, 3);
+    mUavInterface3 = new UavInterface(_argc, _argv, 3, mMapWidget);
     mUavListLayout->addWidget(mUavInterface3);
 }
 

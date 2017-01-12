@@ -30,7 +30,6 @@ private:
     QVBoxLayout *mUavListLayout;
 
     UavInterface *mUavInterface1, *mUavInterface2, *mUavInterface3;
-
 };
 
 #endif // MYCLASS_H

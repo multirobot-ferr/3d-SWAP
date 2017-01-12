@@ -20,8 +20,10 @@
 #include <ros/ros.h>
 
 //---------------------------------------------------------------------------------------------------------------------
-UavInterface::UavInterface(int _argc, char** _argv, int _index) {
+UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWidget *_mapPtr) {
     mUavId = _index;
+    mMapPtr = _mapPtr;
+
     std::string title = "UAV " + std::to_string(_index);
     this->setTitle(title.c_str());
     mMainLayoutUav = new QHBoxLayout();
@@ -93,6 +95,17 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index) {
     // Set callbacks
     connect(mTakeOffButton, SIGNAL (released()), this, SLOT (takeOffCallback()));
     connect(mTargetButton, SIGNAL (released()), this, SLOT (targetCallback()));
+
+
+    // Add visualization on map
+    // Create and register our paint layer
+    mUavDisplayLayer = new UavLayerPaint(mMapPtr);
+    // Uncomment for older versions of Marble:
+    // mapWidget->map()->model()->addLayer(layer);
+    mMapPtr->addLayer(mUavDisplayLayer);
+
+    // Install an event handler: Pressing + will change the layer we paint at
+    mMapPtr->installEventFilter(mUavDisplayLayer);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -128,4 +141,5 @@ void UavInterface::altitudeCallback(const std_msgs::Float64ConstPtr &_msg) {
 void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) {
     mLongitudeBox->display(_msg->longitude);
     mLatitudeBox->display(_msg->latitude);
+    mUavDisplayLayer->position(_msg->longitude, _msg->latitude);
 }
