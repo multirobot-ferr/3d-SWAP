@@ -4,8 +4,6 @@
     <!-- Configurable options -->
     <arg name="robot_name"/> <!-- Robot name defines the namespace for all topics regarding the robot -->
     <arg name="urdf_file"/>
-    <!--arg name="urdf_name"/-->
-    <arg name="quad_name"/>
     <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
     <arg name="pos_x" default="0.0"/>
     <arg name="pos_y" default="0.0"/>
