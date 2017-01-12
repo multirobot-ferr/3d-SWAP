@@ -98,14 +98,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
 
 
     // Add visualization on map
-    // Create and register our paint layer
-    mUavDisplayLayer = new UavLayerPaint(mMapPtr);
-    // Uncomment for older versions of Marble:
-    // mapWidget->map()->model()->addLayer(layer);
-    mMapPtr->addLayer(mUavDisplayLayer);
-
-    // Install an event handler: Pressing + will change the layer we paint at
-    mMapPtr->installEventFilter(mUavDisplayLayer);
+    mUavMark = new UavMark(_mapPtr, "Uav_"+std::to_string(mUavId));
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -141,5 +134,5 @@ void UavInterface::altitudeCallback(const std_msgs::Float64ConstPtr &_msg) {
 void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) {
     mLongitudeBox->display(_msg->longitude);
     mLatitudeBox->display(_msg->latitude);
-    mUavDisplayLayer->position(_msg->longitude, _msg->latitude);
+    mUavMark->newPosition(_msg->longitude, _msg->latitude);
 }

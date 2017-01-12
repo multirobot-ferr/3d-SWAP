@@ -25,7 +25,7 @@
 
 #include <marble/MarbleWidget.h>
 
-#include "qt_gcs/uavLayerPaint.h"
+#include "qt_gcs/UavMark.h"
 
 class UavInterface : public QGroupBox {
     Q_OBJECT
@@ -63,7 +63,7 @@ private:
     QSpinBox *mShapeSpin;
 
     Marble::MarbleWidget *mMapPtr;
-    UavLayerPaint *mUavDisplayLayer;
+    UavMark *mUavMark;
 
 };
 
