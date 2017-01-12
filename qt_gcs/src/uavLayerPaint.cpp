@@ -42,7 +42,7 @@ void UavLayerPaint::position(double _longitude, double _latitude) {
 bool UavLayerPaint::render( GeoPainter *painter, ViewportParams *viewport, const QString& renderPos, GeoSceneLayer * layer ) {
     // Have window title reflect the current paint layer
     m_widget->setWindowTitle(renderPosition().first());
-    GeoDataCoordinates home(mLatitude, mLongitude, 0.0, GeoDataCoordinates::Degree);
+    GeoDataCoordinates home(mLongitude, mLatitude, 0.0, GeoDataCoordinates::Degree);
 
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setPen( QPen(QBrush(QColor::fromRgb(255,255,255,200)), 3.0, Qt::SolidLine, Qt::RoundCap ) );
