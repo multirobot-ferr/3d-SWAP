@@ -71,7 +71,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="static_object_1"/>
-        <arg name="urdf_file" value="object_black_box.urdf.xacro"/>
+        <arg name="urdf_file" value="object_green_cylinder.urdf.xacro"/>
         <arg name="quad_name" value="quad1"/>
         <arg name="id" value="4"/>
         <arg name="pos_x" value="47"/>
@@ -81,7 +81,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="static_object_2"/>
-        <arg name="urdf_file" value="object_black_cylinder.urdf.xacro"/>
+        <arg name="urdf_file" value="object_green_cylinder.urdf.xacro"/>
         <arg name="quad_name" value="quad1"/>
         <arg name="id" value="5"/>
         <arg name="pos_x" value="16"/>
@@ -91,7 +91,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="static_object_3"/>
-        <arg name="urdf_file" value="object_black_box.urdf.xacro"/>
+        <arg name="urdf_file" value="object_green_cylinder.urdf.xacro"/>
         <arg name="quad_name" value="quad1"/>
         <arg name="id" value="6"/>
         <arg name="pos_x" value="36"/>
@@ -121,7 +121,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="static_object_6"/>
-        <arg name="urdf_file" value="object_blue_box.urdf.xacro"/>
+        <arg name="urdf_file" value="object_blue_cylinder.urdf.xacro"/>
         <arg name="quad_name" value="quad1"/>
         <arg name="id" value="9"/>
         <arg name="pos_x" value="24"/>
@@ -131,7 +131,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="static_object_7"/>
-        <arg name="urdf_file" value="object_blue_box.urdf.xacro"/>
+        <arg name="urdf_file" value="object_blue_cylinder.urdf.xacro"/>
         <arg name="quad_name" value="quad1"/>
         <arg name="id" value="10"/>
         <arg name="pos_x" value="53"/>
@@ -161,7 +161,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="static_object_10"/>
-        <arg name="urdf_file" value="object_red_box.urdf.xacro"/>
+        <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
         <arg name="quad_name" value="quad1"/>
         <arg name="id" value="13"/>
         <arg name="pos_x" value="54"/>
