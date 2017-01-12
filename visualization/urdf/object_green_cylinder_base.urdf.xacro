@@ -10,10 +10,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-
-<xacro:include filename="$(find grvc_quadrotor_gazebo)/urdf/quadrotor_plugins.urdf.xacro" />
-
-<!--#####################################################################################-->
 <!-- Main object link -->
 <xacro:macro name="quadrotor_base_macro" params="id model_name">
   <link name="base_link_${id}">
@@ -28,8 +24,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <geometry>
         <cylinder length="0.2" radius="0.1"/>
     </geometry>
-    <material name="black">
-        <color rgba="0 0 0 1"/>
+    <material name="green">
+        <color rgba="0 0.8 0 1"/>
     </material>
   </visual>
   <collision>
@@ -44,9 +40,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <material>Gazebo/Green</material>
     <turnGravityOff>false</turnGravityOff>
   </gazebo>
-
-  <!-- Gazebo Plugins -->
-  <xacro:quadrotor_plugins model_name="${model_name}" base_link="base_link_${id}"/>
 
 </xacro:macro>
 
