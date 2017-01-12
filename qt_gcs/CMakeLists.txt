@@ -33,8 +33,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-std=c++11)
 endif()
 
+include("./cmake/CMakeFindDependencyMacro.cmake")
+
 # ----- Dependencies -----
-find_package(Qt5Widgets)
 include_directories(include) # So that generated include files can be found
 
 
@@ -58,6 +59,9 @@ if(GRVCQUAD_USE_ROS)
 	link_libraries(${catkin_LIBRARIES})
 endif(GRVCQUAD_USE_ROS)
 
+find_package(Qt5Widgets)
+find_package(Marble REQUIRED)
+
 
 file(GLOB_RECURSE GCS_UI_FILES "ui/*.ui")
 file(GLOB_RECURSE GCS_SRC_FILES "src/*.cpp" "include/qt_gcs/*.h")
@@ -67,7 +71,4 @@ GroupSources("include/qt_gcs" qt_gcs)
 
 QT5_WRAP_UI(UI_HEADERS ${GCS_UI_FILES})
 add_executable(qt_gcs ${GCS_SRC_FILES} ${GCS_UI_FILES})
-target_link_libraries(qt_gcs Qt5::Widgets)
-
-
-configure_file(resources/dummyMap.png ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}/dummyMap.png COPYONLY)
+target_link_libraries(qt_gcs Qt5::Widgets Marble)

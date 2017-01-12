@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 
 #include "qt_gcs/uavInterface.h"
+#include <marble/MarbleWidget.h>
 
 class GCS : public QMainWindow {
     Q_OBJECT
@@ -22,8 +23,8 @@ private:
     QHBoxLayout *mMainLayout;
     QWidget *mCentralWidget;
 
-    QImage *mDummyMap;
-    QLabel *mMapLayout;
+    Marble::MarbleWidget *mMapWidget;
+
 
     QGroupBox *mUavListGroup;
     QVBoxLayout *mUavListLayout;

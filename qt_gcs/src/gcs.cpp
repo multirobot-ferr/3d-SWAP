@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QSpinBox>
 
+
 //---------------------------------------------------------------------------------------------------------------------
 GCS::GCS(int _argc, char **_argv, QWidget *parent) : QMainWindow(parent) {
     this->setWindowTitle("Ground Control Station");
@@ -20,12 +21,12 @@ GCS::GCS(int _argc, char **_argv, QWidget *parent) : QMainWindow(parent) {
     mCentralWidget->setLayout(mMainLayout);
     this->setCentralWidget(mCentralWidget);
 
-    // Set up dummy map
-    mDummyMap = new QImage();
-    mDummyMap->load("./dummyMap.png");
-    mMapLayout = new QLabel();
-    mMapLayout->setPixmap(QPixmap::fromImage(*mDummyMap));
-    mMainLayout->addWidget(mMapLayout);
+    // Set up  map
+    mMapWidget= new Marble::MarbleWidget;
+    mMapWidget->setProjection(Marble::Mercator);
+    mMapWidget->setMapThemeId("earth/openstreetmap/openstreetmap.dgml");
+    mMapWidget->show();
+    mMainLayout->addWidget(mMapWidget);
 
     // Set up uav list
     mUavListGroup = new QGroupBox();
