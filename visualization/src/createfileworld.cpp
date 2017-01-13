@@ -86,7 +86,7 @@ int main (int argc, char **argv)
 		   <<"\n"
 	       <<"		<model name=\"testbed_scene\">\n"
 		   <<"			<static>true</static>\n"
-		   <<"			<pose>4.262532 7.173285 0 0 0 0</pose>\n"
+		   <<"			<pose>23.158678 75.310852 0 0 0 1.57</pose>\n"
 		   <<"			<link name=\"test_scene\">\n"
 		   <<"				<visual name=\"visual\">\n"
 		   <<"					<geometry>\n"

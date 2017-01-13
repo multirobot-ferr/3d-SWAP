@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot name="green_cylinder" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="id" default="1"/>
+
+  <!-- Included URDF Files -->
+  <xacro:include filename="$(find mbzirc_gcs_view)/urdf/object_green_cylinder_base.urdf.xacro" />
+  
+  <!-- model_name must be ual_${id} for ual node to find the uav -->
+  <xacro:green_cylinder id="$(arg id)"/>
+
+</robot>

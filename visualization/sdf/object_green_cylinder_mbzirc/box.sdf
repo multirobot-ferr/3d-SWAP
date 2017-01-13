@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <sdf version="1.4">
-<model name="Red cylinder object">
+<model name="Green cylinder object">
   <pose>0 0 0.08 0 0 0</pose>
   <static>true</static>
     <link name="link">
@@ -33,7 +33,7 @@
         <material>
         	<script>
               <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Red</name>
+              <name>Gazebo/Green</name>
             </script>
         </material>
       </visual>
