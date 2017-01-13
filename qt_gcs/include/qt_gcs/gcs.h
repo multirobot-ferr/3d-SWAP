@@ -2,21 +2,34 @@
 #define MYCLASS_H
 
 #include <QMainWindow>
+#include <QGroupBox>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
-namespace Ui {
-class GCSInterface;
-}
+#include "qt_gcs/uavInterface.h"
+#include <marble/MarbleWidget.h>
 
-class GCS : public QMainWindow
-{
+class GCS : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit GCS(QWidget *parent = 0);
+    explicit GCS(int _argc, char **_argv, QWidget *parent = 0);
     ~GCS();
 
 private:
-    Ui::GCSInterface*ui;
+    QMenuBar *mMenuBar;
+
+    QHBoxLayout *mMainLayout;
+    QWidget *mCentralWidget;
+
+    Marble::MarbleWidget *mMapWidget;
+
+
+    QGroupBox *mUavListGroup;
+    QVBoxLayout *mUavListLayout;
+
+    UavInterface *mUavInterface1, *mUavInterface2, *mUavInterface3;
 };
 
 #endif // MYCLASS_H

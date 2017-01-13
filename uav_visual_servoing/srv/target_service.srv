@@ -1,0 +1,7 @@
+bool enabled
+int8 color
+int8 shape
+float32[2] position
+
+---
+bool success
