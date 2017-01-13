@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!-- 
+The MIT License (MIT)
+Copyright (c) 2016 GRVC University of Seville
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+-->
+
+<!-- First of all, define your uavs. Each uav requires a uri (usually, the root namespace of its ros topics), and an id to
+identify it during the mission, inside this xml -->
+<uav uri="/quad1" id="1"/>
+<uav uri="/quad2" id="2"/>
+
+<!-- Parallel actions. Each of the sequences will start at the same time, and group will finish after all sequences have finished -->
+<command type="parallel">
+	<command type="sequence" robotId="1">
+		<goto x="0" y="2"/>
+		<land/>
+	</sequence>
+	
+	<command type="sequence" robotId="2">
+		<goto x="0" y="2"/>
+		<goto x="2" y="0"/>
+		<land/>
+	</sequence>
+</command>
+
+<!-- You can add parallel actions after each other to force synch points at the start of each one -->
+<command type="parallel">
+	<command type="sequence" robotId="1">
+		<goto x="0" y="0"/>
+		<land/>
+	</command>
+	
+	<command type="sequence" robotId="2">
+		<goto x="0" y="0"/>
+		<land/>
+	</command>
+</command>

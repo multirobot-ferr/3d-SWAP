@@ -2,32 +2,26 @@
 <package>
   <name>mbzirc_gcs_core</name>
   <version>0.0.0</version>
-  <description>The mbzirc package</description>
+  <description>Core library containing common functionality reused in different mbzirc modules</description>
   <maintainer email="luisgrvc@todo.todo">luisgrvc</maintainer>
   <license>BSD</license>
-  <author>Luis Manuel Ramirez</author>
-  <url>http://ros.org/wiki/mbzirc</url>
+  <author>GRVC Seville University</author>
+  <url>https://github.com/grvcTeam/mbzirc</url>
 
   <buildtool_depend>catkin</buildtool_depend>
   
   <build_depend>grvc_quadrotor_com</build_depend>
+  <build_depend>grvc_quadrotor_hal</build_depend>
+  <build_depend>grvc_quadrotor_uav</build_depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>image_transport</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>opencv2</build_depend>
 
 
   <run_depend>grvc_quadrotor_com</run_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>image_transport</run_depend>
+  <run_depend>grvc_quadrotor_hal</run_depend>
+  <run_depend>grvc_quadrotor_uav</run_depend>
+  <run_depend>roscpp</run_depend>pend>
   <run_depend>std_msgs</run_depend>
-  <run_depend>cv_bridge</run_depend>
-  <run_depend>opencv2</run_depend>
-
- 
 
   <export>
     <!-- Other tools can request additional information be placed here -->

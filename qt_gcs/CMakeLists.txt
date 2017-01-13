@@ -21,9 +21,47 @@ macro(GroupSources curdir dirLabel)
 	endforeach()
 endmacro()
 
+# Pass this options to CMake in command line to select specific functionality for this project
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	option(GRVCQUAD_USE_ROS "Enable ros-specific code and interfaces" ON)
+else()
+	option(GRVCQUAD_USE_ROS "Enable ros-specific code and interfaces" OFF)
+endif()
+
+# --- Compiler specific options ---
+if(CMAKE_COMPILER_IS_GNUCXX)
+    add_definitions(-std=c++11)
+endif()
+
+include("./cmake/CMakeFindDependencyMacro.cmake")
+
 # ----- Dependencies -----
-find_package(Qt5Widgets)
 include_directories(include) # So that generated include files can be found
+
+
+if(GRVCQUAD_USE_ROS)
+	add_definitions(-DGRVC_USE_ROS)
+
+	find_package(catkin REQUIRED COMPONENTS
+			geometry_msgs
+			mavros
+			mavros_msgs
+		    	roscpp
+			grvc_quadrotor_uav
+			uav_visual_servoing
+			)
+
+	catkin_package(CATKIN_DEPENDS
+			grvc_quadrotor_uav
+			uav_visual_servoing)
+
+	include_directories(${catkin_INCLUDE_DIRS})
+	link_libraries(${catkin_LIBRARIES})
+endif(GRVCQUAD_USE_ROS)
+
+find_package(Qt5Widgets)
+find_package(Marble REQUIRED)
+
 
 file(GLOB_RECURSE GCS_UI_FILES "ui/*.ui")
 file(GLOB_RECURSE GCS_SRC_FILES "src/*.cpp" "include/qt_gcs/*.h")
@@ -33,4 +71,4 @@ GroupSources("include/qt_gcs" qt_gcs)
 
 QT5_WRAP_UI(UI_HEADERS ${GCS_UI_FILES})
 add_executable(qt_gcs ${GCS_SRC_FILES} ${GCS_UI_FILES})
-target_link_libraries(qt_gcs Qt5::Widgets)
+target_link_libraries(qt_gcs Qt5::Widgets Marble)
