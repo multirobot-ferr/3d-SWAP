@@ -37,6 +37,7 @@ public:
 private slots:
     void takeOffCallback();
     void targetCallback();
+    void centerCallback();
 
     void altitudeCallback(const std_msgs::Float64ConstPtr &_msg);
     void geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg);
@@ -44,6 +45,7 @@ private:
     int mUavId;
     QHBoxLayout *mMainLayoutUav;
 
+    // Odometry items ------
     QVBoxLayout *mOdometryLayoutUav;
     QLCDNumber *mAltitudeBox;
     ros::Subscriber mAltitudeSubscriber;
@@ -51,17 +53,24 @@ private:
     QLCDNumber *mLongitudeBox;
     ros::Subscriber mGeodesicSubscriber;
 
+    // Action items --------
     QVBoxLayout *mActionsLayoutUav;
+    // Take off
     QHBoxLayout *mTakeOffLayout;
     QPushButton *mTakeOffButton;
     QDoubleSpinBox *mTakeOffAltitude;
 
+    // Target
     QHBoxLayout *mTargetLayout;
     QPushButton *mTargetButton;
     QRadioButton *mTargetEnable;
     QSpinBox *mColorSpin;
     QSpinBox *mShapeSpin;
 
+    // Center map on UAV
+    QPushButton *mCenterTarget;
+
+    // Uav map mark
     Marble::MarbleWidget *mMapPtr;
     UavMark *mUavMark;
 

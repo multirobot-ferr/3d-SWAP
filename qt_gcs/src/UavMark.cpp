@@ -26,11 +26,15 @@ UavMark::UavMark(Marble::MarbleWidget *mainMapWidget, std::string _id):mMainMapW
 void UavMark::newPosition(double _longitude, double _latitude) {
     mLastCoordinate = Marble::GeoDataCoordinates(_longitude, _latitude, 0, Marble::GeoDataCoordinates::Degree);
      emit coordinatesChanged(mLastCoordinate);
-    std::cout << "PrevUpdate" << std::endl;
+}
+
+void UavMark::position(double &_longitude, double &_latitude) {
+    _longitude = mLastCoordinate.longitude();
+    _latitude = mLastCoordinate.latitude();
+
 }
 
 void UavMark::setUavCoordinates(const Marble::GeoDataCoordinates &coord) {
     mMark->setCoordinate(coord);
     mMainMapWidget->model()->treeModel()->updateFeature(mMark);
-    std::cout << "Update" << std::endl;
 }

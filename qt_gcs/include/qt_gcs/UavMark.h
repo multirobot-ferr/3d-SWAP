@@ -23,6 +23,7 @@ class UavMark : public QObject{
 public:
     UavMark(Marble::MarbleWidget *mainMapWidget, std::__cxx11::string _id);
     void newPosition(double _longitude, double _latitude);
+    void position(double &_longitude, double &_latitude);
 
 signals:
     void coordinatesChanged(Marble::GeoDataCoordinates coord);

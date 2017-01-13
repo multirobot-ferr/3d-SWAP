@@ -71,6 +71,9 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mActionsLayoutUav = new QVBoxLayout();
     mMainLayoutUav->addLayout(mActionsLayoutUav);
 
+    mCenterTarget = new QPushButton("Center target");
+    mActionsLayoutUav->addWidget(mCenterTarget);
+
     mTakeOffLayout = new QHBoxLayout();
     mActionsLayoutUav->addLayout(mTakeOffLayout);
     mTakeOffButton = new QPushButton("Take off");
@@ -92,9 +95,11 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mTargetLayout->addWidget(mColorSpin);
     mTargetLayout->addWidget(mShapeSpin);
 
+
     // Set callbacks
     connect(mTakeOffButton, SIGNAL (released()), this, SLOT (takeOffCallback()));
     connect(mTargetButton, SIGNAL (released()), this, SLOT (targetCallback()));
+    connect(mCenterTarget, SIGNAL (released()), this, SLOT (centerCallback()));
 
 
     // Add visualization on map
@@ -127,10 +132,18 @@ void UavInterface::targetCallback(){
 }
 
 //---------------------------------------------------------------------------------------------------------------------
+void UavInterface::centerCallback() {
+    double longitude, latitude;
+    mUavMark->position(longitude, latitude);
+    mMapPtr->centerOn(Marble::GeoDataCoordinates(longitude, latitude));
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 void UavInterface::altitudeCallback(const std_msgs::Float64ConstPtr &_msg) {
     mAltitudeBox->display(_msg->data);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
 void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) {
     mLongitudeBox->display(_msg->longitude);
     mLatitudeBox->display(_msg->latitude);
