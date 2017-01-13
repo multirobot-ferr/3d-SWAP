@@ -113,11 +113,16 @@ UavInterface::~UavInterface() {
 
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::takeOffCallback(){
-    ros::NodeHandle nh;
-    ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/takeoff");
-    uav_visual_servoing::takeoff_service call;
-    call.request.altitude = mTakeOffAltitude->value();
-    client.call(call);
+    mTakeOffButton->setEnabled(false);
+    mTakeOffThread = new std::thread([this](){
+        ros::NodeHandle nh;
+        ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/takeoff");
+        uav_visual_servoing::takeoff_service call;
+        call.request.altitude = mTakeOffAltitude->value();
+        client.call(call);
+        mTakeOffButton->setEnabled(true);
+    });
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------
