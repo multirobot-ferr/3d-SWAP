@@ -39,6 +39,7 @@ private slots:
     void takeOffCallback();
     void targetCallback();
     void centerCallback();
+    void switchMagnetCallback(bool _state);
 
     void altitudeCallback(const std_msgs::Float64ConstPtr &_msg);
     void geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg);
@@ -68,6 +69,10 @@ private:
     QRadioButton *mTargetEnable;
     QSpinBox *mColorSpin;
     QSpinBox *mShapeSpin;
+
+    // Magnet
+    QPushButton *mToggleMagnet;
+    std::thread *mToggleMagnetThread;
 
     // Center map on UAV
     QPushButton *mCenterTarget;

@@ -19,11 +19,14 @@
 
 #include <ros/ros.h>
 
+#include <mavros_msgs/ActuatorControl.h>
+
 //---------------------------------------------------------------------------------------------------------------------
 UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWidget *_mapPtr) {
     mUavId = _index;
     mMapPtr = _mapPtr;
 
+    // Main config
     std::string title = "UAV " + std::to_string(_index);
     this->setTitle(title.c_str());
     mMainLayoutUav = new QHBoxLayout();
@@ -32,6 +35,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mOdometryLayoutUav = new QVBoxLayout();
     mMainLayoutUav->addLayout(mOdometryLayoutUav);
 
+    // Odometry altitude
     QHBoxLayout *altitudeLayout = new QHBoxLayout();
     QLabel *altitudeText = new QLabel(tr("Altitude:  "));
     mAltitudeBox = new QLCDNumber();
@@ -45,6 +49,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
                                        1,
                                        &UavInterface::altitudeCallback,this);
 
+    // Odometri geodesics
     QHBoxLayout *latitudeLayout = new QHBoxLayout();
     QLabel *latitudeText = new QLabel(tr("Latitude:  "));
     mLatitudeBox  = new QLCDNumber();
@@ -68,12 +73,15 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
                                        1,
                                        &UavInterface::geodesicCallback,this);
 
+    // Actions
     mActionsLayoutUav = new QVBoxLayout();
     mMainLayoutUav->addLayout(mActionsLayoutUav);
 
+    // Center target on map
     mCenterTarget = new QPushButton("Center target");
     mActionsLayoutUav->addWidget(mCenterTarget);
 
+    // Take off panel
     mTakeOffLayout = new QHBoxLayout();
     mActionsLayoutUav->addLayout(mTakeOffLayout);
     mTakeOffButton = new QPushButton("Take off");
@@ -82,6 +90,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mTakeOffAltitude->setRange(1, 30);
     mTakeOffLayout->addWidget(mTakeOffAltitude);
 
+    // Target panel
     mTargetLayout = new QHBoxLayout();
     mActionsLayoutUav->addLayout(mTargetLayout);
     mTargetButton = new QPushButton("Send target");
@@ -95,11 +104,18 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mTargetLayout->addWidget(mColorSpin);
     mTargetLayout->addWidget(mShapeSpin);
 
+    // Magnet
+    mToggleMagnet = new QPushButton("Switch magnet");
+    mToggleMagnet->setCheckable(true);
+    mActionsLayoutUav->addWidget(mToggleMagnet);
 
     // Set callbacks
     connect(mTakeOffButton, SIGNAL (released()), this, SLOT (takeOffCallback()));
     connect(mTargetButton, SIGNAL (released()), this, SLOT (targetCallback()));
     connect(mCenterTarget, SIGNAL (released()), this, SLOT (centerCallback()));
+    connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
+    connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
+
 
 
     // Add visualization on map
@@ -141,6 +157,37 @@ void UavInterface::centerCallback() {
     double longitude, latitude;
     mUavMark->position(longitude, latitude);
     mMapPtr->centerOn(Marble::GeoDataCoordinates(longitude, latitude));
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::switchMagnetCallback(bool _state) {
+    mToggleMagnet->setEnabled(false);
+    mToggleMagnetThread = new std::thread([this, _state](){
+        ros::NodeHandle nh;
+        ros::Publisher magnetPublisher = nh.advertise<mavros_msgs::ActuatorControl>("/mavros_"+std::to_string(mUavId)+"/actuator_control",1);
+        mavros_msgs::ActuatorControl controlSignal;
+        controlSignal.group_mix = 3;
+        controlSignal.controls[6] = (_state ? 1.0 : -1.0);
+
+        // Start magnetization/demagnetization
+        std::chrono::time_point<std::chrono::steady_clock> t0 = std::chrono::steady_clock::now();
+        double sleepTime = 3000;
+        while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count() < sleepTime){
+            magnetPublisher.publish(controlSignal);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        // Ensure that the magnet is resting
+        controlSignal.controls[6] = 0.0;
+        t0 = std::chrono::steady_clock::now();
+        while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count() < sleepTime){
+            magnetPublisher.publish(controlSignal);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        mToggleMagnet->setEnabled(true);
+    });
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------
