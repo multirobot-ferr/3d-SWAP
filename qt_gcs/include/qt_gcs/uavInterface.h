@@ -24,6 +24,7 @@
 #include <sensor_msgs/NavSatFix.h>
 
 #include <marble/MarbleWidget.h>
+#include <thread>
 
 #include "qt_gcs/UavMark.h"
 
@@ -59,6 +60,7 @@ private:
     QHBoxLayout *mTakeOffLayout;
     QPushButton *mTakeOffButton;
     QDoubleSpinBox *mTakeOffAltitude;
+    std::thread *mTakeOffThread;
 
     // Target
     QHBoxLayout *mTargetLayout;
