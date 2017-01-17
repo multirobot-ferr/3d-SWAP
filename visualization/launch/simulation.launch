@@ -161,10 +161,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <!--****************************BIG OBJECTS*************************************-->
 
-    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
-        <arg name="robot_name" value="object_big_black"/>
-        <arg name="urdf_file" value="object_big_black.urdf.xacro"/>
-        <arg name="quad_name" value="quad1"/>
+    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
+        <arg name="robot_name" value="object_big_1"/>
+        <arg name="urdf_file" value="object_big.urdf.xacro"/>
         <arg name="id" value="14"/>
         <arg name="pos_x" value="35"/>
         <arg name="pos_y" value="44"/>
@@ -172,9 +171,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     </include>
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
-        <arg name="robot_name" value="object_big_blue"/>
-        <arg name="urdf_file" value="object_big_blue.urdf.xacro"/>
-        <arg name="quad_name" value="quad1"/>
+        <arg name="robot_name" value="object_big_2"/>
+        <arg name="urdf_file" value="object_big.urdf.xacro"/>
         <arg name="id" value="15"/>
         <arg name="pos_x" value="45"/>
         <arg name="pos_y" value="79"/>
@@ -182,14 +180,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     </include>
 
     <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
-        <arg name="robot_name" value="object_big_red"/>
-        <arg name="urdf_file" value="object_big_red.urdf.xacro"/>
-        <arg name="quad_name" value="quad1"/>
+        <arg name="robot_name" value="object_big_3"/>
+        <arg name="urdf_file" value="object_big.urdf.xacro"/>
         <arg name="id" value="16"/>
         <arg name="pos_x" value="25"/>
         <arg name="pos_y" value="91"/>
         <arg name="pos_z" value="0.12"/>
-    </include-->
+    </include>
 
 
 <!--******************************DINAMIC_OBJECTS****************************************-->
