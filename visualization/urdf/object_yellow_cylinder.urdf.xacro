@@ -7,6 +7,6 @@
   <xacro:include filename="$(find mbzirc_gcs_view)/urdf/object_yellow_cylinder_base.urdf.xacro" />
 
   <!-- model_name must be ual_${id} for ual node to find the uav -->
-  <xacro:red_cylinder id="$(arg id)" model_name="$(arg model_name)"/>
+  <xacro:yellow_cylinder id="$(arg id)" model_name="$(arg model_name)"/>
 
 </robot>

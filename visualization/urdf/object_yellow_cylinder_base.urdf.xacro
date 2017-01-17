@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Main object link -->
-  <xacro:macro name="yellow_cylinder" params="id">
+  <xacro:macro name="yellow_cylinder" params="id model_name">
     <link name="base_link_${id}">
       <inertial>
         <mass value="0.5" />
