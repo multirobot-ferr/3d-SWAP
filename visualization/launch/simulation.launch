@@ -287,8 +287,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="robot_name" value="dropping_box"/>
         <arg name="urdf_file" value="dropping_box.urdf.xacro"/>
         <arg name="id" value="27"/>
-        <arg name="pos_x" value="55.33"/>
-        <arg name="pos_y" value="136.87"/>
+        <arg name="pos_x" value="30.5"/>
+        <arg name="pos_y" value="97.3"/>
         <arg name="pos_z" value="0.01"/>
     </include>
 
