@@ -43,6 +43,7 @@
 #include <std_msgs/Float64.h>
 #include <uav_visual_servoing/target_service.h>
 #include <uav_visual_servoing/takeoff_service.h>
+#include <sensor_msgs/Joy.h>
 
 using namespace grvc;
 using namespace std;
@@ -54,7 +55,13 @@ hal::Server::TakeOffService::Client* takeOff_srv;
 void candidateCallback(const std_msgs::String::ConstPtr _msg);
 
 float gAltitude = 15;
-float gFlyAltitude = 15; 
+float gFlyTargetAltitude = 15; 
+
+void joystickCb(const sensor_msgs::Joy::ConstPtr& _joy) {
+        //Callback
+        gFlyTargetAltitude += _joy->axes[1];
+        std::cout << gFlyTargetAltitude << std::endl;
+}
 
 void altitudeCallback(const std_msgs::Float64::ConstPtr _msg){
     gAltitude = _msg->data;
@@ -76,9 +83,9 @@ bool targetCallback(uav_visual_servoing::target_service::Request  &req,
 bool takeoffCallback(uav_visual_servoing::takeoff_service::Request  &req,
          uav_visual_servoing::takeoff_service::Response &res)
 {
-    gFlyAltitude = req.altitude;
+    gFlyTargetAltitude = req.altitude;
     hal::TaskState ts;
-    takeOff_srv ->send(gFlyAltitude, ts);
+    takeOff_srv ->send(gFlyTargetAltitude, ts);
 
     res.success = true;
 
@@ -119,6 +126,7 @@ int main(int _argc, char** _argv){
 
     mbzirc::CandidateList candidateList;
     ros::Subscriber candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, candidateCallback);
+    ros::Subscriber joystickSubscriber = nh.subscribe<sensor_msgs::Joy>("/joy", 100, joystickCb);
 
     if(!candidateSubscriber){
         std::cout << ("Can't start candidate subscriber.") << std::endl;
@@ -149,7 +157,7 @@ void candidateCallback(const std_msgs::String::ConstPtr _msg){
         
         mbzirc::Candidate target = bestCandidateMatch(candidateList, specs);
         std::cout << "tracking candidate with error " << target.location.transpose() << std::endl;
-        target.location[2] = gFlyAltitude-gAltitude;
+        target.location[2] = gFlyTargetAltitude-gAltitude;
         pos_error_srv->send(target.location, ts);
 
         }
