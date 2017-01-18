@@ -10,6 +10,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QPalette>
 //---------------------------------------------------------------------------------------------------------------------
 GCS::GCS(int _argc, char **_argv, QWidget *parent) : QMainWindow(parent) {
     this->setWindowTitle("Ground Control Station");
@@ -39,6 +40,12 @@ GCS::GCS(int _argc, char **_argv, QWidget *parent) : QMainWindow(parent) {
     mUavListLayout->addWidget(mUavInterface2);
     mUavInterface3 = new UavInterface(_argc, _argv, 3, mMapWidget);
     mUavListLayout->addWidget(mUavInterface3);
+
+    // Set color Background
+    QPalette Pal(palette());
+    Pal.setColor(QPalette::Background, Qt::gray);
+    this->setAutoFillBackground(true);
+    this->setPalette(Pal);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
