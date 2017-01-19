@@ -32,6 +32,7 @@ if(GRVCQUAD_USE_ROS)
 		   FILES
 		   target_service.srv
 		   takeoff_service.srv
+		   land_service.srv
 	 )
 
 	## Generate added messages and services with any dependencies listed here

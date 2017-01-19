@@ -16,6 +16,7 @@
 
 #include <uav_visual_servoing/target_service.h>
 #include <uav_visual_servoing/takeoff_service.h>
+#include <uav_visual_servoing/land_service.h>
 
 #include <ros/ros.h>
 
@@ -90,6 +91,13 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mTakeOffAltitude->setRange(1, 30);
     mTakeOffLayout->addWidget(mTakeOffAltitude);
 
+    // Land panel
+    mLandLayout = new QHBoxLayout();
+    mActionsLayoutUav->addLayout(mLandLayout);
+    mLandButton = new QPushButton("Land");
+    mLandLayout->addWidget(mLandButton);
+
+
     // Target panel
     mTargetLayout = new QHBoxLayout();
     mActionsLayoutUav->addLayout(mTargetLayout);
@@ -111,6 +119,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
 
     // Set callbacks
     connect(mTakeOffButton, SIGNAL (released()), this, SLOT (takeOffCallback()));
+    connect(mLandButton, SIGNAL (released()), this, SLOT (landCallback()));
     connect(mTargetButton, SIGNAL (released()), this, SLOT (targetCallback()));
     connect(mCenterTarget, SIGNAL (released()), this, SLOT (centerCallback()));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
@@ -137,6 +146,19 @@ void UavInterface::takeOffCallback(){
         call.request.altitude = mTakeOffAltitude->value();
         client.call(call);
         mTakeOffButton->setEnabled(true);
+    });
+
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::landCallback(){
+    mLandButton->setEnabled(false);
+    mLandThread = new std::thread([this](){
+        ros::NodeHandle nh;
+        ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::land_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/land");
+        uav_visual_servoing::land_service call;
+        client.call(call);
+        mLandButton->setEnabled(true);
     });
 
 }

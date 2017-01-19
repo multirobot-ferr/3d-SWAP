@@ -43,6 +43,7 @@
 #include <std_msgs/Float64.h>
 #include <uav_visual_servoing/target_service.h>
 #include <uav_visual_servoing/takeoff_service.h>
+#include <uav_visual_servoing/land_service.h>
 #include <sensor_msgs/Joy.h>
 
 using namespace grvc;
@@ -51,6 +52,7 @@ using namespace std;
 mbzirc::Candidate specs;
 bool target_state = false;
 hal::Server::TakeOffService::Client* takeOff_srv;
+hal::Server::LandService::Client* land_srv;
 
 void candidateCallback(const std_msgs::String::ConstPtr _msg);
 
@@ -92,6 +94,17 @@ bool takeoffCallback(uav_visual_servoing::takeoff_service::Request  &req,
     return true;
 }
 
+bool landCallback(uav_visual_servoing::land_service::Request  &req,
+         uav_visual_servoing::land_service::Response &res)
+{
+    hal::TaskState ts;
+    land_srv ->send(ts);
+
+    res.success = true;
+
+    return true;
+}
+
 mbzirc::Candidate bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs);
 
 hal::Server::PositionErrorService::Client *pos_error_srv;
@@ -104,7 +117,8 @@ int main(int _argc, char** _argv){
     grvc::utils::ArgumentParser args(_argc, _argv);
     pos_error_srv = new hal::Server::PositionErrorService::Client("/mbzirc_1/hal/pos_error", args);
 
-    takeOff_srv=new  hal::Server::TakeOffService::Client ("/mbzirc_1/hal/take_off", args);
+    takeOff_srv = new  hal::Server::TakeOffService::Client ("/mbzirc_1/hal/take_off", args);
+    land_srv = new  hal::Server::LandService::Client ("/mbzirc_1/hal/land", args);
    
     while(!takeOff_srv->isConnected()) {
         this_thread::sleep_for(chrono::milliseconds(100));
@@ -115,6 +129,7 @@ int main(int _argc, char** _argv){
 
     ros::ServiceServer target_service = nh.advertiseService("/mbzirc_1/visual_servoing/enabled", targetCallback);
     ros::ServiceServer takeoff_service = nh.advertiseService("/mbzirc_1/visual_servoing/takeoff", takeoffCallback);
+    ros::ServiceServer land_service = nh.advertiseService("/mbzirc_1/visual_servoing/land", landCallback);
 
     if(ros::isInitialized()){
         altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_1/global_position/rel_alt", 10, altitudeCallback);

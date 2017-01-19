@@ -37,6 +37,7 @@ public:
 
 private slots:
     void takeOffCallback();
+    void landCallback();
     void targetCallback();
     void centerCallback();
     void switchMagnetCallback(bool _state);
@@ -62,6 +63,11 @@ private:
     QPushButton *mTakeOffButton;
     QDoubleSpinBox *mTakeOffAltitude;
     std::thread *mTakeOffThread;
+
+    // Land
+    QHBoxLayout *mLandLayout;
+    QPushButton *mLandButton;
+    std::thread *mLandThread;
 
     // Target
     QHBoxLayout *mTargetLayout;
