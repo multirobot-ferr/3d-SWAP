@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(uav_visual_servoing)
+project(uav_state_machine)
 
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -50,7 +50,7 @@ endif(GRVCQUAD_USE_ROS)
 
 ## Declare a C++ executable
 file(GLOB_RECURSE VISUALSERVOING_SOURCE_FILES "src/*.cpp" "include/*.h" "include/*.inl")
-add_executable(uav_visual_servoing ${VISUALSERVOING_SOURCE_FILES})
-target_include_directories(uav_visual_servoing PUBLIC "include")
-target_link_libraries(uav_visual_servoing LINK_PUBLIC uav_server)
-link_libraries(uav_visual_servoing LINK ${GRVCQUADROTOR_LIBRARIES})
+add_executable(uav_state_machine ${VISUALSERVOING_SOURCE_FILES})
+target_include_directories(uav_state_machine PUBLIC "include")
+target_link_libraries(uav_state_machine LINK_PUBLIC uav_server)
+link_libraries(uav_state_machine LINK ${GRVCQUADROTOR_LIBRARIES})

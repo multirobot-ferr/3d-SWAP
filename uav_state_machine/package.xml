@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>uav_visual_servoing</name>
+  <name>uav_state_machine</name>
   <version>0.0.0</version>
   <description>Application that commands the uav using information from the vision system</description>
   <maintainer email="prs@us.es">prs</maintainer>

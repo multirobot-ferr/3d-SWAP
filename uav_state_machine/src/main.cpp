@@ -24,25 +24,57 @@
 // SOFTWARE.
 //------------------------------------------------------------------------------
 
-#include <string>
+#include <std_msgs/String.h>
+#include <grvc_utils/argument_parser.h>
 
-class GcsLink{
-public:
-    /// Available actions for the module.
-    enum class actions {error, hovering, visualServoing};
+#include <thread>
+#include <chrono>
+#include <mutex>
 
-    /// Make sure that the GCS is enabled and it is ready to send messages to the module.
-    bool init();
+#include <uav_state_machine/state_machine.h>
 
-    /// Check the connection still available.
-    bool isConnected();
+using namespace grvc;
+using namespace std;
 
-    /// get last mission sent by the GCS.
-    void getCurrentMission(actions &_action, std::string &_data);
+mbzirc::Candidate specs;
+bool target_state = false;
 
-private:
-    bool mConnected = false;
+mbzirc::Candidate bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs);
 
-    actions mLastAction     = actions::error;
-    std::string mLastData   = "";
-};
+int main(int _argc, char** _argv){
+
+    std::cout << "Setting up" << std::endl;
+
+    // Init services.
+    grvc::utils::ArgumentParser args(_argc, _argv);
+    
+    UavStateMachine uav_sm(args);
+    while(true){
+
+    }
+}
+
+mbzirc::Candidate bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs){
+    double bestScore= 0;
+    mbzirc::Candidate bestCandidate;
+    bestCandidate.location = {999,9999,9999};
+    for(auto&candidate:_list.candidates){
+        double score = 0;
+        if(candidate.color == _specs.color){
+            score +=1;
+        }
+
+        if(candidate.shape == _specs.shape){
+            score +=1;
+        }
+
+        if((candidate.location - _specs.location).norm() < (bestCandidate.location - _specs.location).norm()){
+            score +=1;
+        }
+
+        if(score > bestScore){
+            bestCandidate = candidate;
+        }
+    }
+    return bestCandidate;
+}
