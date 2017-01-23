@@ -60,8 +60,6 @@ private:
          uav_visual_servoing::takeoff_service::Response &res);
     bool landCallback(uav_visual_servoing::land_service::Request  &req,
          uav_visual_servoing::land_service::Response &res);
-    
-    std::thread ObstacleAvoidance_;
 
     hal::Server::PositionErrorService::Client *pos_error_srv;
 

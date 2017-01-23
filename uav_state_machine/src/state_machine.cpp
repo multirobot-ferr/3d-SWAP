@@ -29,12 +29,6 @@
 //-------------------------------------------------------------------------------------------------------------------------------
 Uav_State_Machine::Uav_State_Machine(grvc::utils::ArgumentParser _args){
 
-    ObstacleAvoidanceThread_ = std::thread([this](){
-        while(ros::ok()){
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-    }
-
      // Init services.
     pos_error_srv   = new hal::Server::PositionErrorService::Client ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/pos_error",   _args);
     takeOff_srv     = new  hal::Server::TakeOffService::Client      ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/take_off",    _args);
@@ -66,8 +60,6 @@ Uav_State_Machine::Uav_State_Machine(grvc::utils::ArgumentParser _args){
     }
 
     std::cout << "Initialized" << std::endl;
-
-    std::this_thread::sleep_for(std::chrono::seconds(5));
     std::cout << "Connected to hal" << std::endl;
 }
 //--------------------------------------------------------------------------------------------------------------------------------
