@@ -41,7 +41,7 @@
 
 class UavStateMachine{
 public:
-    enum class eState { REPOSE, TAKINGOFF, HOVER, CATCHING }
+    enum class eState { REPOSE, TAKINGOFF, HOVER, CATCHING, LAND }
 
     UavStateMachine(int _argc, char** _argv);
     ~UavStateMachine();

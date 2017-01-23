@@ -69,15 +69,23 @@ Uav_State_Machine::step(){
 
         switch(mState){
             case REPOSE:
+                reposeCallback();
                 break;
             
             case TAKINGOFF:
+                takeoffCallback();
                 break;
 
             case HOVER:
+                hoverCallback();
                 break;
 
             case CATCHING:
+                catchingCallback();
+                break;
+
+            case LAND:
+                landCallback();
                 break;
         }
 
@@ -147,8 +155,25 @@ bool targetCallback(uav_visual_servoing::target_service::Request  &req,
     }
     
 }
+
 //---------------------------------------------------------------------------------------------------------------------------------
-void catching(){
+void reposeCallback(){
+    //GotoTargetPosition
+    //TargetTracking
+    //Pickup
+    //GotoDeploy
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------
+void hoverCallback(){
+    //GotoTargetPosition
+    //TargetTracking
+    //Pickup
+    //GotoDeploy
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------
+void catchingCallback(){
     //GotoTargetPosition
     //TargetTracking
     //Pickup
