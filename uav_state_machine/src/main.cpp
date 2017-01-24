@@ -39,6 +39,7 @@ int main(int _argc, char** _argv){
         return -1;
     }
     while(true){
-
+        uav_sm.step();
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }

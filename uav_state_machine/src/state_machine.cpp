@@ -51,7 +51,7 @@ bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
     if(ros::isInitialized()){
         altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
     }
-    
+
     candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
     joystickSubscriber = nh.subscribe<sensor_msgs::Joy>("/joy", 100, &UavStateMachine::joystickCb, this);
 
@@ -74,19 +74,31 @@ void UavStateMachine::step(){
 
         switch(mState){
             case eState::REPOSE:
+            {
                 break;
-            
+            }
             case eState::TAKINGOFF:
+            {
+                grvc::hal::TaskState ts;
+                takeOff_srv ->send(mFlyTargetAltitude, ts);
+                mState = eState::HOVER;
                 break;
-
+            }
             case eState::HOVER:
+            {
                 break;
-
+            }
             case eState::CATCHING:
+            {
                 break;
-
+            }
             case eState::LAND:
+            {
+                grvc::hal::TaskState ts;
+                land_srv ->send(ts);
+                mState = eState::REPOSE;
                 break;
+            }
         }
 
     }
@@ -175,21 +187,25 @@ void catchingCallback(){
 bool UavStateMachine::takeoffCallback(uav_state_machine::takeoff_service::Request  &req,
          uav_state_machine::takeoff_service::Response &res)
 {
-    mFlyTargetAltitude = req.altitude;
-    grvc::hal::TaskState ts;
-    takeOff_srv ->send(mFlyTargetAltitude, ts);
+    
+    if(mState == eState::REPOSE){
+        mFlyTargetAltitude = req.altitude;
+        mState = eState::TAKINGOFF;
+        res.success = true;
 
-    res.success = true;
+        return true;
+    }else{
+        res.success = false;
 
-    return true;
+        return false;
+    }
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 bool UavStateMachine::landCallback(uav_state_machine::land_service::Request  &req,
          uav_state_machine::land_service::Response &res)
 {
-    grvc::hal::TaskState ts;
-    land_srv ->send(ts);
-
+    mFlyTargetAltitude = 0;
+    mState = eState::LAND;
     res.success = true;
 
     return true;
