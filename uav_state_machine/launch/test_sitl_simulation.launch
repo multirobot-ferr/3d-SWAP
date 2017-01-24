@@ -15,8 +15,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <!--include file="$(find px4_bringup)/launch/simulate.launch"/-->
 	
     <node name="grvc_hal_quad1" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
-		args="-hal_ns=/mbzirc_1/hal"/>
+		  args="-hal_ns=/mbzirc_1/hal"/>
 
-	<node name="uav_visual_servoing" pkg="uav_visual_servoing" type="uav_visual_servoing" respawn="false" output="screen"/>
+  	<node name="uav_state_machine" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
+      args="-uavId=1"/>
 
 </launch>

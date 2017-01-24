@@ -33,18 +33,14 @@ bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
 
     
      // Init services.
-    std::cout <<"/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/pos_error" <<std::endl;
     pos_error_srv   = new grvc::hal::Server::PositionErrorService::Client ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/pos_error",   _args);
-    std::cout <<"/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/take_off" <<std::endl;
     takeOff_srv     = new  grvc::hal::Server::TakeOffService::Client      ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/take_off",    _args);
-    std::cout <<"/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/land" <<std::endl;
     land_srv        = new  grvc::hal::Server::LandService::Client         ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/land",        _args);
-   
-    std::cout << "Pepe" <<std::endl;
+
     while(!takeOff_srv->isConnected()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-std::cout << "Antonio" <<std::endl;
+
     ros::NodeHandle nh;
 
     target_service   = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/enabled", &UavStateMachine::targetServiceCallback, this);
@@ -55,7 +51,7 @@ std::cout << "Antonio" <<std::endl;
     if(ros::isInitialized()){
         altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
     }
-    std::cout << "Juan" <<std::endl;
+    
     candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
     joystickSubscriber = nh.subscribe<sensor_msgs::Joy>("/joy", 100, &UavStateMachine::joystickCb, this);
 
