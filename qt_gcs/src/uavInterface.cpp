@@ -113,9 +113,18 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mTargetLayout->addWidget(mShapeSpin);
 
     // Magnet
+    QHBoxLayout *mMagnetLayout = new QHBoxLayout();
     mToggleMagnet = new QPushButton("Switch magnet");
     mToggleMagnet->setCheckable(true);
-    mActionsLayoutUav->addWidget(mToggleMagnet);
+    mMagnetLayout->addWidget(mToggleMagnet);
+    mMagnetLed = new LedIndicator();
+    mMagnetLed->setState(false);
+    mMagnetLayout->addWidget(mMagnetLed);
+    mActionsLayoutUav->addLayout(mMagnetLayout);
+    mMagnetSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/rc/out",
+                                     1,
+                                     &UavInterface::magnetInterruptorCallback,this);
+
 
     // Set callbacks
     connect(mTakeOffButton, SIGNAL (released()), this, SLOT (takeOffCallback()));
@@ -193,19 +202,13 @@ void UavInterface::switchMagnetCallback(bool _state) {
 
         // Start magnetization/demagnetization
         std::chrono::time_point<std::chrono::steady_clock> t0 = std::chrono::steady_clock::now();
-        double sleepTime = 3000;
-        while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count() < sleepTime){
-            magnetPublisher.publish(controlSignal);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
+        magnetPublisher.publish(controlSignal);
+        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
         // Ensure that the magnet is resting
         controlSignal.controls[6] = 0.0;
-        t0 = std::chrono::steady_clock::now();
-        while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count() < sleepTime){
-            magnetPublisher.publish(controlSignal);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
+        magnetPublisher.publish(controlSignal);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
         mToggleMagnet->setEnabled(true);
     });
@@ -222,4 +225,12 @@ void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) 
     mLongitudeBox->display(_msg->longitude);
     mLatitudeBox->display(_msg->latitude);
     mUavMark->newPosition(_msg->longitude, _msg->latitude);
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::magnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg) {
+    if(_msg->channels[8] < 1100)
+        mMagnetLed->setState(false);
+    else if(_msg->channels[8] > 1900)
+        mMagnetLed->setState(true);
 }

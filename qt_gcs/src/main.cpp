@@ -10,9 +10,11 @@
 #include <QApplication>
 #include <ros/ros.h>
 #include <thread>
+#include <qt_gcs/LogManager.h>
 
 int main(int argc, char *argv[])
 {
+    LogManager::init();
     if(!ros::isInitialized()){
         ros::init(argc, argv, "qt_gcs");
     }
