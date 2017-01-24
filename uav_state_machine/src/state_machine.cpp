@@ -136,7 +136,7 @@ void altitudeCallback(const std_msgs::Float64::ConstPtr _msg){
     gAltitude = _msg->data;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-bool targetCallback(uav_visual_servoing::target_service::Request  &req,
+bool targetServiceCallback(uav_visual_servoing::target_service::Request  &req,
          uav_visual_servoing::target_service::Response &res)
 {
     if(mState == eState::HOVER){

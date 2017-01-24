@@ -50,11 +50,13 @@ public:
 
 private:
 
-    void catching();
+    void reposeCallback();
+    void hoverCallback();
+    void catchingCallback();
     void candidateCallback(const std_msgs::String::ConstPtr _msg);
     void joystickCb(const sensor_msgs::Joy::ConstPtr& _joy);
     void altitudeCallback(const std_msgs::Float64::ConstPtr _msg);
-    bool targetCallback(uav_visual_servoing::target_service::Request  &req,
+    bool targetServiceCallback(uav_visual_servoing::target_service::Request  &req,
          uav_visual_servoing::target_service::Response &res);
     bool takeoffCallback(uav_visual_servoing::takeoff_service::Request  &req,
          uav_visual_servoing::takeoff_service::Response &res);
