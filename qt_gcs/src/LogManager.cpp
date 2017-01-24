@@ -76,7 +76,7 @@ LogManager::LogManager() {
     // create folder for current run
     mkdir(ss.str().c_str(),0777);
     // init files
-
+    mBasePath = ss.str() + "/";
 
     std::cout << "Created log files in: " << ss.str() << std::endl;
     mInitPoint = std::chrono::high_resolution_clock::now();
@@ -106,6 +106,6 @@ void LogManager::checkTag(std::string _tag) {
             return;
         }
     }
-    mLogFiles[_tag] = new std::ofstream("log_"+_tag+".txt");
+    mLogFiles[_tag] = new std::ofstream(mBasePath + "log_"+_tag+".txt");
     mSecureWrite[_tag];
 }
