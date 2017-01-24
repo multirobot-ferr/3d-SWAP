@@ -25,67 +25,71 @@
 //----------
 
 #include <uav_state_machine/state_machine.h>
+#include <uav_state_machine/CandidateList.h>
+#include <uav_state_machine/Candidate.h>
 
 //-------------------------------------------------------------------------------------------------------------------------------
-Uav_State_Machine::Uav_State_Machine(grvc::utils::ArgumentParser _args){
+bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
 
+    
      // Init services.
-    pos_error_srv   = new hal::Server::PositionErrorService::Client ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/pos_error",   _args);
-    takeOff_srv     = new  hal::Server::TakeOffService::Client      ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/take_off",    _args);
-    land_srv        = new  hal::Server::LandService::Client         ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/land",        _args);
+    std::cout <<"/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/pos_error" <<std::endl;
+    pos_error_srv   = new grvc::hal::Server::PositionErrorService::Client ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/pos_error",   _args);
+    std::cout <<"/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/take_off" <<std::endl;
+    takeOff_srv     = new  grvc::hal::Server::TakeOffService::Client      ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/take_off",    _args);
+    std::cout <<"/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/land" <<std::endl;
+    land_srv        = new  grvc::hal::Server::LandService::Client         ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/land",        _args);
    
+    std::cout << "Pepe" <<std::endl;
     while(!takeOff_srv->isConnected()) {
-        this_thread::sleep_for(chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-
+std::cout << "Antonio" <<std::endl;
     ros::NodeHandle nh;
 
-    target_service   = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/enabled", targetCallback);
-    takeoff_service  = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/takeoff", takeoffCallback);
-    land_service     = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/land", landCallback);
+    target_service   = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/enabled", &UavStateMachine::targetServiceCallback, this);
+    takeoff_service  = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/takeoff", &UavStateMachine::takeoffCallback, this);
+    land_service     = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/land",    &UavStateMachine::landCallback, this);
 
     ros::Subscriber altitudeSubs;
     if(ros::isInitialized()){
-        altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, altitudeCallback);
+        altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
     }
-    
-    candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, candidateCallback);
-    joystickSubscriber = nh.subscribe<sensor_msgs::Joy>("/joy", 100, joystickCb);
+    std::cout << "Juan" <<std::endl;
+    candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
+    joystickSubscriber = nh.subscribe<sensor_msgs::Joy>("/joy", 100, &UavStateMachine::joystickCb, this);
 
     if(!candidateSubscriber){
         std::cout << ("Can't start candidate subscriber.") << std::endl;
-        return -1;
+        return false;
     }else{
         std::cout << "Subscribed to candidate topic" << std::endl;
     }
 
     std::cout << "Initialized" << std::endl;
     std::cout << "Connected to hal" << std::endl;
+
+    return true;
 }
 //--------------------------------------------------------------------------------------------------------------------------------
-Uav_State_Machine::step(){
+void UavStateMachine::step(){
     
     while(ros::ok()){
 
         switch(mState){
-            case REPOSE:
-                reposeCallback();
+            case eState::REPOSE:
                 break;
             
-            case TAKINGOFF:
-                takeoffCallback();
+            case eState::TAKINGOFF:
                 break;
 
-            case HOVER:
-                hoverCallback();
+            case eState::HOVER:
                 break;
 
-            case CATCHING:
-                catchingCallback();
+            case eState::CATCHING:
                 break;
 
-            case LAND:
-                landCallback();
+            case eState::LAND:
                 break;
         }
 
@@ -93,57 +97,49 @@ Uav_State_Machine::step(){
 
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-void candidateCallback(const std_msgs::String::ConstPtr _msg){
+void UavStateMachine::candidateCallback(const std_msgs::String::ConstPtr& _msg){
     //mbzirc::Candidate specs;
     //specs.color = 1;
-    hal::TaskState ts;
+    if(mState == eState::CATCHING){
+        grvc::hal::TaskState ts;
 
-    std::stringstream msg;
-    msg << _msg->data;
-    mbzirc::CandidateList candidateList;
-    msg >> candidateList;
+        std::stringstream msg;
+        msg << _msg->data;
+        mbzirc::CandidateList candidateList;
+        msg >> candidateList;
 
-    if(target_state){
         if(candidateList.candidates.size() > 0){
-        
-        mbzirc::Candidate target = bestCandidateMatch(candidateList, specs);
-        std::cout << "tracking candidate with error " << target.location.transpose() << std::endl;
-        target.location[2] = gFlyTargetAltitude-gAltitude;
-        pos_error_srv->send(target.location, ts);
+    
+            mbzirc::Candidate target = bestCandidateMatch(candidateList, *mTarget);
+            std::cout << "tracking candidate with error " << target.location.transpose() << std::endl;
+            target.location[2] = mFlyTargetAltitude-mCurrentAltitude;
+            pos_error_srv->send(target.location, ts);
 
         }
-    }
-   /* if(candidateList.candidates.size() > 0){
-        mbzirc::Candidate target = bestCandidateMatch(candidateList, specs);
-        std::cout << "tracking candidate with error " << target.location.transpose() << std::endl;
-        target.location[2] = 15-gAltitude;
-        pos_error_srv->send(target.location, ts);
 
-    }else{
-        hal::Vec3 zeroError = {0,0,0};
-        pos_error_srv->send(zeroError, ts);
-    }*/
-    this_thread::sleep_for(chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    }
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-void joystickCb(const sensor_msgs::Joy::ConstPtr& _joy) {
+void UavStateMachine::joystickCb(const sensor_msgs::Joy::ConstPtr& _joy) {
         //Callback
-        gFlyTargetAltitude += _joy->axes[1];
-        std::cout << gFlyTargetAltitude << std::endl;
+        mFlyTargetAltitude += _joy->axes[1];
+        std::cout << mFlyTargetAltitude << std::endl;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-void altitudeCallback(const std_msgs::Float64::ConstPtr _msg){
-    gAltitude = _msg->data;
+void UavStateMachine::altitudeCallback(const std_msgs::Float64::ConstPtr& _msg){
+    mCurrentAltitude = _msg->data;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-bool targetServiceCallback(uav_visual_servoing::target_service::Request  &req,
-         uav_visual_servoing::target_service::Response &res)
+bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::Request  &req,
+         uav_state_machine::target_service::Response &res)
 {
     if(mState == eState::HOVER){
-        mTarget.color = req.color;
-        mTarget.shape = req.shape;
-        mTarget.location[0] = req.position[0];
-        mTarget.location[1] = req.position[1];
+        mTarget->color = req.color;
+        mTarget->shape = req.shape;
+        mTarget->location[0] = req.position[0];
+        mTarget->location[1] = req.position[1];
         res.success = true;
         mState = eState::CATCHING;
 
@@ -180,25 +176,50 @@ void catchingCallback(){
     //GotoDeploy
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-bool takeoffCallback(uav_visual_servoing::takeoff_service::Request  &req,
-         uav_visual_servoing::takeoff_service::Response &res)
+bool UavStateMachine::takeoffCallback(uav_state_machine::takeoff_service::Request  &req,
+         uav_state_machine::takeoff_service::Response &res)
 {
-    gFlyTargetAltitude = req.altitude;
-    hal::TaskState ts;
-    takeOff_srv ->send(gFlyTargetAltitude, ts);
+    mFlyTargetAltitude = req.altitude;
+    grvc::hal::TaskState ts;
+    takeOff_srv ->send(mFlyTargetAltitude, ts);
 
     res.success = true;
 
     return true;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-bool landCallback(uav_visual_servoing::land_service::Request  &req,
-         uav_visual_servoing::land_service::Response &res)
+bool UavStateMachine::landCallback(uav_state_machine::land_service::Request  &req,
+         uav_state_machine::land_service::Response &res)
 {
-    hal::TaskState ts;
+    grvc::hal::TaskState ts;
     land_srv ->send(ts);
 
     res.success = true;
 
     return true;
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+mbzirc::Candidate UavStateMachine::bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs){
+    double bestScore= 0;
+    mbzirc::Candidate bestCandidate;
+    bestCandidate.location = {999,9999,9999};
+    for(auto&candidate:_list.candidates){
+        double score = 0;
+        if(candidate.color == _specs.color){
+            score +=1;
+        }
+
+        if(candidate.shape == _specs.shape){
+            score +=1;
+        }
+
+        if((candidate.location - _specs.location).norm() < (bestCandidate.location - _specs.location).norm()){
+            score +=1;
+        }
+
+        if(score > bestScore){
+            bestCandidate = candidate;
+        }
+    }
+    return bestCandidate;
 }

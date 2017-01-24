@@ -24,7 +24,7 @@ if(GRVCQUAD_USE_ROS)
 			geometry_msgs
 			mavros
 			mavros_msgs
-		    	roscpp
+		    roscpp
 			grvc_quadrotor_uav
 			message_generation)
 			## Generate services in the 'srv' folder

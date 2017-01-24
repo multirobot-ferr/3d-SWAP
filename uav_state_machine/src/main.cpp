@@ -23,23 +23,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //------------------------------------------------------------------------------
-
-#include <std_msgs/String.h>
 #include <grvc_utils/argument_parser.h>
 
-#include <thread>
-#include <chrono>
-#include <mutex>
-
 #include <uav_state_machine/state_machine.h>
-
-using namespace grvc;
-using namespace std;
-
-mbzirc::Candidate specs;
-bool target_state = false;
-
-mbzirc::Candidate bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs);
 
 int main(int _argc, char** _argv){
 
@@ -48,33 +34,11 @@ int main(int _argc, char** _argv){
     // Init services.
     grvc::utils::ArgumentParser args(_argc, _argv);
     
-    UavStateMachine uav_sm(args);
+    UavStateMachine uav_sm;
+    if(!uav_sm.Init(args)){
+        return -1;
+    }
     while(true){
 
     }
-}
-
-mbzirc::Candidate bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs){
-    double bestScore= 0;
-    mbzirc::Candidate bestCandidate;
-    bestCandidate.location = {999,9999,9999};
-    for(auto&candidate:_list.candidates){
-        double score = 0;
-        if(candidate.color == _specs.color){
-            score +=1;
-        }
-
-        if(candidate.shape == _specs.shape){
-            score +=1;
-        }
-
-        if((candidate.location - _specs.location).norm() < (bestCandidate.location - _specs.location).norm()){
-            score +=1;
-        }
-
-        if(score > bestScore){
-            bestCandidate = candidate;
-        }
-    }
-    return bestCandidate;
 }

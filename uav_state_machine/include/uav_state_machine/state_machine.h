@@ -23,28 +23,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //------------------------------------------------------------------------------
+#ifndef _MBZIRC_STATEMACHINE_H_
+#define _MBZIRC_STATEMACHINE_H_
 
 #include <ros/ros.h>
 #include <thread>
-#include <CandidateList.h>
-#include <Candidate.h>
 #include <std_msgs/Float64.h>
 #include <uav_state_machine/target_service.h>
 #include <uav_state_machine/takeoff_service.h>
 #include <uav_state_machine/land_service.h>
 #include <sensor_msgs/Joy.h>
+#include <std_msgs/String.h>
 
 #include <grvc_utils/argument_parser.h>
 #include <grvc_quadrotor_hal/types.h>
 #include <grvc_quadrotor_hal/server.h>
 
+namespace mbzirc{
+    class Candidate;
+    class CandidateList;
+}
 
 class UavStateMachine{
 public:
-    enum class eState { REPOSE, TAKINGOFF, HOVER, CATCHING, LAND }
+    enum class eState { REPOSE, TAKINGOFF, HOVER, CATCHING, LAND };
 
-    UavStateMachine(int _argc, char** _argv);
-    ~UavStateMachine();
+    bool Init(grvc::utils::ArgumentParser _args);
 
     void step();
 
@@ -53,20 +57,22 @@ private:
     void reposeCallback();
     void hoverCallback();
     void catchingCallback();
-    void candidateCallback(const std_msgs::String::ConstPtr _msg);
+    void candidateCallback(const std_msgs::String::ConstPtr& _msg);
     void joystickCb(const sensor_msgs::Joy::ConstPtr& _joy);
-    void altitudeCallback(const std_msgs::Float64::ConstPtr _msg);
-    bool targetServiceCallback(uav_visual_servoing::target_service::Request  &req,
-         uav_visual_servoing::target_service::Response &res);
-    bool takeoffCallback(uav_visual_servoing::takeoff_service::Request  &req,
-         uav_visual_servoing::takeoff_service::Response &res);
-    bool landCallback(uav_visual_servoing::land_service::Request  &req,
-         uav_visual_servoing::land_service::Response &res);
+    void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
+    bool targetServiceCallback(uav_state_machine::target_service::Request  &req,
+         uav_state_machine::target_service::Response &res);
+    bool takeoffCallback(uav_state_machine::takeoff_service::Request  &req,
+         uav_state_machine::takeoff_service::Response &res);
+    bool landCallback(uav_state_machine::land_service::Request  &req,
+         uav_state_machine::land_service::Response &res);
 
-    hal::Server::PositionErrorService::Client *pos_error_srv;
+    mbzirc::Candidate bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs);
 
-    hal::Server::TakeOffService::Client* takeOff_srv;
-    hal::Server::LandService::Client* land_srv;
+    grvc::hal::Server::PositionErrorService::Client *pos_error_srv;
+
+    grvc::hal::Server::TakeOffService::Client* takeOff_srv;
+    grvc::hal::Server::LandService::Client* land_srv;
 
     ros::ServiceServer target_service;   
     ros::ServiceServer takeoff_service;  
@@ -75,10 +81,11 @@ private:
     ros::Subscriber joystickSubscriber;
 
     
-    float mAltitude = 15;
-    float mFlyTargetAltitude = 15;  
+    float mCurrentAltitude = 0;
+    float mFlyTargetAltitude = 0;  
 
     eState mState;
-    Candidate mTarget;
+    mbzirc::Candidate *mTarget;
 
-}
+};
+#endif
