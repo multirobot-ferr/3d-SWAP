@@ -31,21 +31,21 @@
 //-------------------------------------------------------------------------------------------------------------------------------
 bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
 
-    
      // Init services.
-    pos_error_srv   = new grvc::hal::Server::PositionErrorService::Client ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/pos_error",   _args);
+    pos_error_srv   = new  grvc::hal::Server::PositionErrorService::Client ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/pos_error",   _args);
     takeOff_srv     = new  grvc::hal::Server::TakeOffService::Client      ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/take_off",    _args);
     land_srv        = new  grvc::hal::Server::LandService::Client         ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/land",        _args);
+    waypoint_srv    = new  grvc::hal::Server::WaypointService::Client     ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/go_to_wp",    _args);
 
     while(!takeOff_srv->isConnected()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-
     ros::NodeHandle nh;
 
     target_service   = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/enabled", &UavStateMachine::targetServiceCallback, this);
     takeoff_service  = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/takeoff", &UavStateMachine::takeoffCallback, this);
     land_service     = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/land",    &UavStateMachine::landCallback, this);
+    waypoint_service = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/visual_servoing/waypoint",&UavStateMachine::searchingCallback, this);
 
     ros::Subscriber altitudeSubs;
     if(ros::isInitialized()){
@@ -86,6 +86,17 @@ void UavStateMachine::step(){
             }
             case eState::HOVER:
             {
+                break;
+            }
+            case eState::SEARCHING:
+            {   
+                //When the UAV finish the track, it starts again the same track
+                grvc::hal::TaskState ts;
+                waypoint_srv->send(mWaypointList[mWaypointItem], ts);
+                mWaypointItem++;
+                if(mWaypointItem > (mWaypointList.size()-1)){
+                    mWaypointItem = 0;
+                }
                 break;
             }
             case eState::CATCHING:
@@ -169,8 +180,45 @@ void reposeCallback(){
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
-void hoverCallback(){
-    //GotoTargetPosition
+bool UavStateMachine::searchingCallback(uav_state_machine::waypoint_service::Request &req, uav_state_machine::waypoint_service::Response &res)
+{
+    //GotoPosition
+    //1- start searching 0- stop searching 2- restart searching 
+    //The difference between start and restart is that restart continues by the last wp  
+    if(req.action == 0)
+    {
+        if(mState == eState::SEARCHING)
+        {
+            mState = eState::HOVER;
+            res.success = true;
+        }else{
+            res.success = false;
+        }
+    }
+    else if(req.action == 1)
+    {
+        if(mState == eState::HOVER){
+            mWaypointItem = 0;
+            mWaypointList.clear();
+            for(int i=0; i< req.waypoint_track.size(); i++)  
+               mWaypointList.push_back({{req.waypoint_track[i].x, req.waypoint_track[i].y, req.waypoint_track[i].z}, 0.0});
+            mState = eState::SEARCHING;
+            res.success = true;
+        }else{
+            res.success = false;
+        }
+    }
+    else if(req.action == 2)
+    {
+        if(mState == eState::HOVER){
+            mState = eState::SEARCHING;
+            res.success = true;
+        }else{
+            res.success = false;
+        }
+    }
+    
+    return true;
     //TargetTracking
     //Pickup
     //GotoDeploy
@@ -184,8 +232,7 @@ void catchingCallback(){
     //GotoDeploy
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-bool UavStateMachine::takeoffCallback(uav_state_machine::takeoff_service::Request  &req,
-         uav_state_machine::takeoff_service::Response &res)
+bool UavStateMachine::takeoffCallback(uav_state_machine::takeoff_service::Request  &req, uav_state_machine::takeoff_service::Response &res)
 {
     
     if(mState == eState::REPOSE){
@@ -193,16 +240,13 @@ bool UavStateMachine::takeoffCallback(uav_state_machine::takeoff_service::Reques
         mState = eState::TAKINGOFF;
         res.success = true;
 
-        return true;
     }else{
         res.success = false;
-
-        return false;
     }
+    return true;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-bool UavStateMachine::landCallback(uav_state_machine::land_service::Request  &req,
-         uav_state_machine::land_service::Response &res)
+bool UavStateMachine::landCallback(uav_state_machine::land_service::Request  &req, uav_state_machine::land_service::Response &res)
 {
     mFlyTargetAltitude = 0;
     mState = eState::LAND;

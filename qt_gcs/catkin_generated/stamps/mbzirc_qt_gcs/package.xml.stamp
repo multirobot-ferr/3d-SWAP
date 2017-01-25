@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>uav_state_machine</name>
+  <name>mbzirc_qt_gcs</name>
   <version>0.0.0</version>
-  <description>Application that commands the uav using information from the vision system</description>
+  <description>Basic GCS GUI</description>
   <maintainer email="prs@us.es">prs</maintainer>
   <license>BSD</license>
   <author>prs</author>
@@ -13,12 +13,10 @@
   <build_depend>grvc_quadrotor_uav</build_depend>
   <build_depend>grvc_quadrotor_utils</build_depend>
   <build_depend>mbzirc_gcs_core</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>message_generation</build_depend>
+  <build_depend>uav_visual_servoing</build_depend>
   
-  <run_depend>message_runtime</run_depend>
+  <run_depend>uav_visual_servoing</run_depend>
   <run_depend>grvc_quadrotor_uav</run_depend>
   <run_depend>grvc_quadrotor_utils</run_depend>
-  <run_depend>geometry_msgs</run_depend>
   <run_depend>mbzirc_gcs_core</run_depend>
 </package>

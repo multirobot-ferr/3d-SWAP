@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: mbzirc_quick_mission
+Description: Description of mbzirc_quick_mission
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: mbzirc_gcs_core grvc_quadrotor_utils

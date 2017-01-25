@@ -32,6 +32,7 @@ if(GRVCQUAD_USE_ROS)
 		   FILES
 		   target_service.srv
 		   takeoff_service.srv
+		   waypoint_service.srv
 		   land_service.srv
 	 )
 
@@ -39,6 +40,7 @@ if(GRVCQUAD_USE_ROS)
 	 generate_messages(
 		   DEPENDENCIES
 		   std_msgs
+		   geometry_msgs
 	 )
 
 	catkin_package(CATKIN_DEPENDS

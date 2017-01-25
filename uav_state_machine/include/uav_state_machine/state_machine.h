@@ -32,12 +32,18 @@
 #include <uav_state_machine/target_service.h>
 #include <uav_state_machine/takeoff_service.h>
 #include <uav_state_machine/land_service.h>
+#include <uav_state_machine/waypoint_service.h>
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/String.h>
 
 #include <grvc_utils/argument_parser.h>
 #include <grvc_quadrotor_hal/types.h>
 #include <grvc_quadrotor_hal/server.h>
+using namespace std;
+using namespace grvc::hal;
+using namespace grvc::com;
+using namespace grvc::utils;
+using namespace grvc;
 
 namespace mbzirc{
     class Candidate;
@@ -46,7 +52,7 @@ namespace mbzirc{
 
 class UavStateMachine{
 public:
-    enum class eState { REPOSE, TAKINGOFF, HOVER, CATCHING, LAND };
+    enum class eState { REPOSE, TAKINGOFF, HOVER, SEARCHING, CATCHING, LAND };
 
     bool Init(grvc::utils::ArgumentParser _args);
 
@@ -55,7 +61,7 @@ public:
 private:
 
     void reposeCallback();
-    void hoverCallback();
+    bool searchingCallback(uav_state_machine::waypoint_service::Request &req, uav_state_machine::waypoint_service::Response &res);
     void catchingCallback();
     void candidateCallback(const std_msgs::String::ConstPtr& _msg);
     void joystickCb(const sensor_msgs::Joy::ConstPtr& _joy);
@@ -73,18 +79,23 @@ private:
 
     grvc::hal::Server::TakeOffService::Client* takeOff_srv;
     grvc::hal::Server::LandService::Client* land_srv;
-
+    grvc::hal::Server::WaypointService::Client* waypoint_srv;
+    
     ros::ServiceServer target_service;   
     ros::ServiceServer takeoff_service;  
-    ros::ServiceServer land_service;    
+    ros::ServiceServer land_service;
+    ros::ServiceServer waypoint_service;    
     ros::Subscriber candidateSubscriber;
     ros::Subscriber joystickSubscriber;
 
     
     float mCurrentAltitude = 0;
-    float mFlyTargetAltitude = 0;  
+    float mFlyTargetAltitude = 0;
 
-    eState mState;
+    std::vector<Waypoint> mWaypointList;  
+    int mWaypointItem = 0;
+
+    eState mState =eState::REPOSE;
     mbzirc::Candidate *mTarget;
 
 };
