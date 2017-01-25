@@ -14,9 +14,9 @@
 
 #include <grvc_utils/argument_parser.h>
 
-#include <uav_visual_servoing/target_service.h>
-#include <uav_visual_servoing/takeoff_service.h>
-#include <uav_visual_servoing/land_service.h>
+#include <uav_state_machine/target_service.h>
+#include <uav_state_machine/takeoff_service.h>
+#include <uav_state_machine/land_service.h>
 
 #include <ros/ros.h>
 
@@ -141,8 +141,8 @@ void UavInterface::takeOffCallback(){
     mTakeOffButton->setEnabled(false);
     mTakeOffThread = new std::thread([this](){
         ros::NodeHandle nh;
-        ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/takeoff");
-        uav_visual_servoing::takeoff_service call;
+        ros::ServiceClient client = nh.serviceClient<uav_state_machine::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/uav_state_machine/takeoff");
+        uav_state_machine::takeoff_service call;
         call.request.altitude = mTakeOffAltitude->value();
         client.call(call);
         mTakeOffButton->setEnabled(true);
@@ -155,8 +155,8 @@ void UavInterface::landCallback(){
     mLandButton->setEnabled(false);
     mLandThread = new std::thread([this](){
         ros::NodeHandle nh;
-        ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::land_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/land");
-        uav_visual_servoing::land_service call;
+        ros::ServiceClient client = nh.serviceClient<uav_state_machine::land_service>("/mbzirc_"+std::to_string(mUavId)+"/uav_state_machine/land");
+        uav_state_machine::land_service call;
         client.call(call);
         mLandButton->setEnabled(true);
     });
@@ -166,8 +166,8 @@ void UavInterface::landCallback(){
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::targetCallback(){
     ros::NodeHandle nh;
-    ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::target_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/enabled");
-    uav_visual_servoing::target_service call;
+    ros::ServiceClient client = nh.serviceClient<uav_state_machine::target_service>("/mbzirc_"+std::to_string(mUavId)+"/uav_state_machine/enabled");
+    uav_state_machine::target_service call;
     call.request.enabled = mTargetEnable->isChecked();
     call.request.color = mColorSpin->value();
     call.request.shape = mShapeSpin->value();
