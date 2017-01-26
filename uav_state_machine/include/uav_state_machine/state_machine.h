@@ -35,6 +35,7 @@
 #include <uav_state_machine/waypoint_service.h>
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/String.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include <grvc_utils/argument_parser.h>
 #include <grvc_quadrotor_hal/types.h>
@@ -65,6 +66,7 @@ private:
     void catchingCallback();
     void candidateCallback(const std_msgs::String::ConstPtr& _msg);
     void joystickCb(const sensor_msgs::Joy::ConstPtr& _joy);
+    void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
     void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
     bool targetServiceCallback(uav_state_machine::target_service::Request  &req,
          uav_state_machine::target_service::Response &res);
@@ -80,18 +82,22 @@ private:
     grvc::hal::Server::TakeOffService::Client* takeOff_srv;
     grvc::hal::Server::LandService::Client* land_srv;
     grvc::hal::Server::WaypointService::Client* waypoint_srv;
+    grvc::hal::Server::AbortService::Client* abort_srv;
     
     ros::ServiceServer target_service;   
     ros::ServiceServer takeoff_service;  
     ros::ServiceServer land_service;
-    ros::ServiceServer waypoint_service;    
+    ros::ServiceServer waypoint_service; 
+
     ros::Subscriber candidateSubscriber;
     ros::Subscriber joystickSubscriber;
+    ros::Subscriber positionSubs;
+    ros::Subscriber altitudeSubs;
 
-    
     float mCurrentAltitude = 0;
     float mFlyTargetAltitude = 0;
 
+    Waypoint mCurrentWaypoint;
     std::vector<Waypoint> mWaypointList;  
     int mWaypointItem = 0;
 

@@ -36,6 +36,7 @@ bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
     takeOff_srv     = new  grvc::hal::Server::TakeOffService::Client      ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/take_off",    _args);
     land_srv        = new  grvc::hal::Server::LandService::Client         ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/land",        _args);
     waypoint_srv    = new  grvc::hal::Server::WaypointService::Client     ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/go_to_wp",    _args);
+    abort_srv       = new  grvc::hal::Server::AbortService::Client     ("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/hal/abort",    _args);
 
     while(!takeOff_srv->isConnected()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -47,11 +48,14 @@ bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
     land_service     = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/land",    &UavStateMachine::landCallback, this);
     waypoint_service = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/waypoint",&UavStateMachine::searchingCallback, this);
 
-    ros::Subscriber altitudeSubs;
-    if(ros::isInitialized()){
-        altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
-    }
 
+    /**if(ros::isInitialized()){
+        positionSubs = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/local_position/pose", 10, &UavStateMachine::positionCallback, this);
+        altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
+    }**/
+
+    positionSubs = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/local_position/pose", 10, &UavStateMachine::positionCallback, this);
+    altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
     candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
     joystickSubscriber = nh.subscribe<sensor_msgs::Joy>("/joy", 100, &UavStateMachine::joystickCb, this);
 
@@ -85,7 +89,8 @@ void UavStateMachine::step(){
                 break;
             }
             case eState::HOVER:
-            {
+            {   
+
                 break;
             }
             case eState::SEARCHING:
@@ -93,9 +98,13 @@ void UavStateMachine::step(){
                 //When the UAV finish the track, it starts again the same track
                 grvc::hal::TaskState ts;
                 waypoint_srv->send(mWaypointList[mWaypointItem], ts);
-                mWaypointItem++;
-                if(mWaypointItem > (mWaypointList.size()-1)){
-                    mWaypointItem = 0;
+                if(ts==TaskState::finished)
+                {
+                    mWaypointItem++;
+                    if(mWaypointItem > (mWaypointList.size()-1)){
+                        mWaypointItem = 0;
+                        mState = eState::HOVER;         
+                    }
                 }
                 break;
             }
@@ -135,9 +144,7 @@ void UavStateMachine::candidateCallback(const std_msgs::String::ConstPtr& _msg){
             pos_error_srv->send(target.location, ts);
 
         }
-
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
     }
 }
 //---------------------------------------------------------------------------------------------------------------------------------
@@ -149,6 +156,11 @@ void UavStateMachine::joystickCb(const sensor_msgs::Joy::ConstPtr& _joy) {
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::altitudeCallback(const std_msgs::Float64::ConstPtr& _msg){
     mCurrentAltitude = _msg->data;
+}
+//---------------------------------------------------------------------------------------------------------------------------------
+void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg){
+    mCurrentWaypoint = {{_msg->pose.position.x, _msg->pose.position.y, _msg->pose.position.z}, 0.0};
+
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::Request  &req,
@@ -190,6 +202,9 @@ bool UavStateMachine::searchingCallback(uav_state_machine::waypoint_service::Req
         if(mState == eState::SEARCHING)
         {
             mState = eState::HOVER;
+            grvc::hal::TaskState ts;
+            abort_srv->send(ts);
+            waypoint_srv->send(mCurrentWaypoint, ts);
             res.success = true;
         }else{
             res.success = false;
