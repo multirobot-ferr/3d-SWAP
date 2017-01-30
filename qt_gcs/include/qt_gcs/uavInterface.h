@@ -46,7 +46,13 @@ private slots:
 
     void altitudeCallback(const std_msgs::Float64ConstPtr &_msg);
     void geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg);
-    void magnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg);
+    void rcMagnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg);
+
+signals:
+    void magnetInterruptorStateChanged(bool _state);
+private slots:
+    void ledIndicatorMagnetQtSlot(bool _state);
+
 private:
     int mUavId;
     QHBoxLayout *mMainLayoutUav;

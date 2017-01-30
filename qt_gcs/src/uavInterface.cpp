@@ -128,7 +128,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mActionsLayoutUav->addLayout(mMagnetLayout);
     mMagnetSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/rc/out",
                                      1,
-                                     &UavInterface::magnetInterruptorCallback,this);
+                                     &UavInterface::rcMagnetInterruptorCallback,this);
 
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized action buttons.");
 
@@ -139,6 +139,9 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     connect(mCenterTarget, SIGNAL (released()), this, SLOT (centerCallback()));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
+    connect(this, SIGNAL (magnetInterruptorStateChanged(bool)), this, SLOT(ledIndicatorMagnetQtSlot(bool)), Qt::BlockingQueuedConnection);
+
+
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized connected callbacks of action buttons.");
 
     // Add visualization on map
@@ -251,9 +254,14 @@ void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) 
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void UavInterface::magnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg) {
+void UavInterface::rcMagnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg) {
     if(_msg->channels[8] < 1100)
-        mMagnetLed->setState(false);
+        emit magnetInterruptorStateChanged(false);
     else if(_msg->channels[8] > 1900)
-        mMagnetLed->setState(true);
+        emit magnetInterruptorStateChanged(true);
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::ledIndicatorMagnetQtSlot(bool _state) {
+    mMagnetLed->setState(_state);
 }

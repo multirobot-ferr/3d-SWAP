@@ -21,15 +21,19 @@ UavMark::UavMark(Marble::MarbleWidget *mainMapWidget, std::string _id):mMainMapW
     connect(this, SIGNAL(coordinatesChanged(Marble::GeoDataCoordinates)),
                 this, SLOT(setUavCoordinates(Marble::GeoDataCoordinates)), Qt::BlockingQueuedConnection);
 
+    mLastTimeUpdated = std::chrono::system_clock::now();
 }
 
 void UavMark::newPosition(double _longitude, double _latitude) {
-
     auto coordinates = Marble::GeoDataCoordinates(_longitude, _latitude, 0, Marble::GeoDataCoordinates::Degree);
     mCoodinatesMutex.lock();
     mLastCoordinate = coordinates;
     mCoodinatesMutex.unlock();
-    emit coordinatesChanged(coordinates);
+    int elapsedTime= std::chrono::duration_cast<std::chrono::milliseconds> ( std::chrono::system_clock::now()-mLastTimeUpdated).count();
+    if(elapsedTime>100){
+        emit coordinatesChanged(coordinates);
+        mLastTimeUpdated = std::chrono::system_clock::now();
+    }
 
 }
 

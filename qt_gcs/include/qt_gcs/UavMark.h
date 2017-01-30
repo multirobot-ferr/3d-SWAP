@@ -33,6 +33,7 @@ public slots:
 
 private:
     std::mutex mCoodinatesMutex;
+    std::chrono::time_point<std::chrono::system_clock> mLastTimeUpdated;
     Marble::GeoDataCoordinates mLastCoordinate;
     qreal mAlpha;
 
