@@ -16,7 +16,7 @@
 #include <marble/GeoDataPlacemark.h>
 
 #include <string>
-
+#include <mutex>
 class UavMark : public QObject{
     Q_OBJECT
 
@@ -32,6 +32,7 @@ public slots:
     void setUavCoordinates(const Marble::GeoDataCoordinates &coord);
 
 private:
+    std::mutex mCoodinatesMutex;
     Marble::GeoDataCoordinates mLastCoordinate;
     qreal mAlpha;
 
