@@ -122,9 +122,9 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mToggleMagnet = new QPushButton("Switch magnet");
     mToggleMagnet->setCheckable(true);
     mMagnetLayout->addWidget(mToggleMagnet);
-    mMagnetLed = new LedIndicator();
-    mMagnetLed->setState(false);
-    mMagnetLayout->addWidget(mMagnetLed);
+    mInterruptorLed = new LedIndicator();
+    mInterruptorLed->setState(false);
+    mMagnetLayout->addWidget(mInterruptorLed);
     mActionsLayoutUav->addLayout(mMagnetLayout);
     mMagnetSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/rc/out",
                                      1,
@@ -139,19 +139,29 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     connect(mCenterTarget, SIGNAL (released()), this, SLOT (centerCallback()));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
-    connect(this, SIGNAL (magnetInterruptorStateChanged(bool)), this, SLOT(ledIndicatorMagnetQtSlot(bool)), Qt::BlockingQueuedConnection);
-
 
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized connected callbacks of action buttons.");
 
     // Add visualization on map
     mUavMark = new UavMark(_mapPtr, "Uav_"+std::to_string(mUavId));
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Created mark on map.");
+
+    // Start updating Gui
+    mRunGui = true;
+    mGuiThread = std::thread([&](){
+        while(mRunGui){
+            updateGui();
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+    });
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 UavInterface::~UavInterface() {
-
+    mRunGui = false;
+    if(mGuiThread.joinable()){
+        mGuiThread.join();
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -238,30 +248,36 @@ void UavInterface::switchMagnetCallback(bool _state) {
 
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::altitudeCallback(const std_msgs::Float64ConstPtr &_msg) {
-    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display altitude: " + std::to_string(_msg->data));
-    mAltitudeBox->display(_msg->data);
+    mAltitude = _msg->data;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) {
-    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display longitude: " + std::to_string(_msg->longitude));
-    mLongitudeBox->display(_msg->longitude);
-    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display latitude: " + std::to_string(_msg->latitude));
-    mLatitudeBox->display(_msg->latitude);
-    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating position in map");
-    mUavMark->newPosition(_msg->longitude, _msg->latitude);
-    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updated position in map");
+    mLatitude = _msg->latitude;
+    mLongitude = _msg->longitude;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::rcMagnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg) {
     if(_msg->channels[8] < 1100)
-        emit magnetInterruptorStateChanged(false);
+        mInterruptorState = false;
     else if(_msg->channels[8] > 1900)
-        emit magnetInterruptorStateChanged(true);
+        mInterruptorState = true;
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void UavInterface::ledIndicatorMagnetQtSlot(bool _state) {
-    mMagnetLed->setState(_state);
+void UavInterface::updateGui() {
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display altitude: " + std::to_string(mAltitude));
+    mAltitudeBox->display(mAltitude);
+
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display longitude: " + std::to_string(mLongitude));
+    mLongitudeBox->display(mLongitude);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display latitude: " + std::to_string(mLatitude));
+    mLatitudeBox->display(mLatitude);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating position in map");
+    mUavMark->newPosition(mLongitude, mLatitude);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updated position in map");
+
+    mInterruptorLed->setState(mInterruptorState);
 }

@@ -21,42 +21,42 @@ void LedIndicator::paintEvent(QPaintEvent *) {
 
 void LedIndicator::switchLedIndicator() {
   lit = ! lit;
-  repaint();
+  update();
 }
 void LedIndicator::setState(bool state)
 {
     lit = state;
-    repaint();
+    update();
 }
 void LedIndicator::toggle()
 {
     lit = ! lit;
-    repaint();
+    update();
 }
 
 void LedIndicator::setOnColor(QColor onColor)
 {
     ledOnColor=onColor;
-    repaint();
+    update();
 }
 void LedIndicator::setOffColor(QColor offColor)
 {
     ledOffColor=offColor;
-    repaint();
+    update();
 }
 void LedIndicator::setOnPattern(Qt::BrushStyle onPattern)
 {
     ledOnPattern=onPattern;
-    repaint();
+    update();
 }
 void LedIndicator::setOffPattern(Qt::BrushStyle offPattern)
 {
     ledOffPattern=offPattern;
-    repaint();
+    update();
 }
 void LedIndicator::setLedSize(int size)
 {
     ledSize=size;
     setFixedSize(size+10, size+10);
-    repaint();
+    update();
 }

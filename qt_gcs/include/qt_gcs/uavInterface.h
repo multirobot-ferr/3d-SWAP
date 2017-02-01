@@ -48,10 +48,7 @@ private slots:
     void geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg);
     void rcMagnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg);
 
-signals:
-    void magnetInterruptorStateChanged(bool _state);
-private slots:
-    void ledIndicatorMagnetQtSlot(bool _state);
+    void updateGui();
 
 private:
     int mUavId;
@@ -64,6 +61,7 @@ private:
     QLCDNumber *mLatitudeBox;
     QLCDNumber *mLongitudeBox;
     ros::Subscriber mGeodesicSubscriber;
+    double mAltitude, mLongitude, mLatitude;
 
     // Action items --------
     QVBoxLayout *mActionsLayoutUav;
@@ -88,8 +86,9 @@ private:
     // Magnet
     QPushButton *mToggleMagnet;
     std::thread *mToggleMagnetThread;
-    LedIndicator *mMagnetLed;
+    LedIndicator *mInterruptorLed;
     ros::Subscriber mMagnetSubscriber;
+    bool mInterruptorState;
 
     // Center map on UAV
     QPushButton *mCenterTarget;
@@ -97,6 +96,10 @@ private:
     // Uav map mark
     Marble::MarbleWidget *mMapPtr;
     UavMark *mUavMark;
+
+    // GUI THREAD
+    std::thread mGuiThread;
+    bool mRunGui = false;
 
 };
 
