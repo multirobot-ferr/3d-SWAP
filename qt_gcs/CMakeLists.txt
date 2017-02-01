@@ -71,4 +71,4 @@ GroupSources("include/qt_gcs" qt_gcs)
 
 QT5_WRAP_UI(UI_HEADERS ${GCS_UI_FILES})
 add_executable(qt_gcs ${GCS_SRC_FILES} ${GCS_UI_FILES})
-target_link_libraries(qt_gcs Qt5::Widgets Marble)
+target_link_libraries(qt_gcs Qt5::Widgets Qt5::WebKitWidgets Marble)

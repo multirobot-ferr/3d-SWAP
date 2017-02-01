@@ -25,12 +25,6 @@ public:
     void newPosition(double _longitude, double _latitude);
     void position(double &_longitude, double &_latitude);
 
-signals:
-    void coordinatesChanged(Marble::GeoDataCoordinates coord);
-
-public slots:
-    void setUavCoordinates(const Marble::GeoDataCoordinates &coord);
-
 private:
     std::mutex mCoodinatesMutex;
     std::chrono::time_point<std::chrono::system_clock> mLastTimeUpdated;

@@ -276,7 +276,7 @@ void UavInterface::updateGui() {
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display latitude: " + std::to_string(mLatitude));
     mLatitudeBox->display(mLatitude);
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating position in map");
-    mUavMark->newPosition(mLongitude, mLatitude);
+    //mUavMark->newPosition(mLongitude, mLatitude);
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updated position in map");
 
     mInterruptorLed->setState(mInterruptorState);

@@ -25,8 +25,10 @@ void LedIndicator::switchLedIndicator() {
 }
 void LedIndicator::setState(bool state)
 {
-    lit = state;
-    update();
+    if(lit != state){
+        lit = state;
+        update();
+    }
 }
 void LedIndicator::toggle()
 {
