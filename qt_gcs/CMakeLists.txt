@@ -48,12 +48,12 @@ if(GRVCQUAD_USE_ROS)
 			mavros_msgs
 		    	roscpp
 			grvc_quadrotor_uav
-			uav_visual_servoing
+			uav_state_machine
 			)
 
 	catkin_package(CATKIN_DEPENDS
 			grvc_quadrotor_uav
-			uav_visual_servoing)
+			uav_state_machine)
 
 	include_directories(${catkin_INCLUDE_DIRS})
 	link_libraries(${catkin_LIBRARIES})
