@@ -171,8 +171,8 @@ void UavInterface::takeOffCallback(){
     mTakeOffThread = new std::thread([this](){
         ros::NodeHandle nh;
         LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending take off service.");
-        ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/takeoff");
-        uav_visual_servoing::takeoff_service call;
+        ros::ServiceClient client = nh.serviceClient<uav_state_machine::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/takeoff");
+        uav_state_machine::takeoff_service call;
         call.request.altitude = mTakeOffAltitude->value();
         auto res = client.call(call);
         LogManager::get()->status("UAV_"+std::to_string(mUavId), "Returned call with result: "+std::to_string(res));
@@ -190,8 +190,8 @@ void UavInterface::landCallback(){
         ros::NodeHandle nh;
 
         LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending land service.");
-        ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::land_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/land");
-        uav_visual_servoing::land_service call;
+        ros::ServiceClient client = nh.serviceClient<uav_state_machine::land_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/land");
+        uav_state_machine::land_service call;
         auto res = client.call(call);
         LogManager::get()->status("UAV_"+std::to_string(mUavId), "Returned call with result: "+std::to_string(res));
         mLandButton->setEnabled(true);
