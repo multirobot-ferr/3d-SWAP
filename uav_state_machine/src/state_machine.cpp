@@ -57,14 +57,6 @@ bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
     positionSubs = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/local_position/pose", 10, &UavStateMachine::positionCallback, this);
     altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);   
     joystickSubscriber = nh.subscribe<sensor_msgs::Joy>("/joy", 100, &UavStateMachine::joystickCb, this);
-
-    if(!candidateSubscriber){
-        std::cout << ("Can't start candidate subscriber.") << std::endl;
-        return false;
-    }else{
-        std::cout << "Subscribed to candidate topic" << std::endl;
-    }
-
     std::cout << "Initialized" << std::endl;
     std::cout << "Connected to hal" << std::endl;
 
@@ -249,6 +241,13 @@ void UavStateMachine::catchingCallback(){
     /// Init subscriber to candidates
     ros::NodeHandle nh;
     ros::Subscriber candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
+    if(!candidateSubscriber){
+        std::cout << ("Can't start candidate subscriber.") << std::endl;
+	mState = eState::HOVER;
+	return;
+    }else{
+        std::cout << "Subscribed to candidate topic" << std::endl;
+    }
 
     while(mState == eState::CATCHING){
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

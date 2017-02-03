@@ -89,7 +89,6 @@ private:
     ros::ServiceServer land_service;
     ros::ServiceServer waypoint_service; 
 
-    ros::Subscriber candidateSubscriber;
     ros::Subscriber joystickSubscriber;
     ros::Subscriber positionSubs;
     ros::Subscriber altitudeSubs;
