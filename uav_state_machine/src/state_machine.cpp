@@ -55,8 +55,7 @@ bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
     }**/
 
     positionSubs = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/local_position/pose", 10, &UavStateMachine::positionCallback, this);
-    altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
-    candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
+    altitudeSubs = nh.subscribe<std_msgs::Float64>("/mavros_"+_args.getArgument<std::string>("uavId","1")+"/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);   
     joystickSubscriber = nh.subscribe<sensor_msgs::Joy>("/joy", 100, &UavStateMachine::joystickCb, this);
 
     if(!candidateSubscriber){
@@ -110,6 +109,7 @@ void UavStateMachine::step(){
             }
             case eState::CATCHING:
             {
+                catchingCallback();
                 break;
             }
             case eState::LAND:
@@ -137,12 +137,14 @@ void UavStateMachine::candidateCallback(const std_msgs::String::ConstPtr& _msg){
         msg >> candidateList;
 
         if(candidateList.candidates.size() > 0){
-    
-            mbzirc::Candidate target = bestCandidateMatch(candidateList, *mTarget);
-            std::cout << "tracking candidate with error " << target.location.transpose() << std::endl;
-            target.location[2] = mFlyTargetAltitude-mCurrentAltitude;
-            pos_error_srv->send(target.location, ts);
-
+            mbzirc::Candidate matchedCandidate;
+            if(bestCandidateMatch(candidateList, *mTarget, matchedCandidate)){
+                std::cout << "tracking candidate with error " << matchedCandidate.location.transpose() << std::endl;
+                matchedCandidate.location[2] = mFlyTargetAltitude-mCurrentAltitude;
+                pos_error_srv->send(matchedCandidate.location, ts);
+            }else{
+                std::cout << "Cant find a valid candidate" << std::endl;
+            }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
@@ -186,7 +188,7 @@ bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::R
 //---------------------------------------------------------------------------------------------------------------------------------
 void reposeCallback(){
     //GotoTargetPosition
-    //TargetTracking
+    //TargetTrackingcandidateCallback
     //Pickup
     //GotoDeploy
 }
@@ -240,9 +242,19 @@ bool UavStateMachine::searchingCallback(uav_state_machine::waypoint_service::Req
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
-void catchingCallback(){
+void UavStateMachine::catchingCallback(){
     //GotoTargetPosition
-    //TargetTracking
+
+    //TargetTracking (aka visual servoing)
+    /// Init subscriber to candidates
+    ros::NodeHandle nh;
+    ros::Subscriber candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
+
+    while(mState == eState::CATCHING){
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+
     //Pickup
     //GotoDeploy
 }
@@ -270,10 +282,9 @@ bool UavStateMachine::landCallback(uav_state_machine::land_service::Request  &re
     return true;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-mbzirc::Candidate UavStateMachine::bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs){
+bool UavStateMachine::bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs, mbzirc::Candidate &_result){
     double bestScore= 0;
-    mbzirc::Candidate bestCandidate;
-    bestCandidate.location = {999,9999,9999};
+    bool foundMatch = false;
     for(auto&candidate:_list.candidates){
         double score = 0;
         if(candidate.color == _specs.color){
@@ -284,13 +295,14 @@ mbzirc::Candidate UavStateMachine::bestCandidateMatch(const mbzirc::CandidateLis
             score +=1;
         }
 
-        if((candidate.location - _specs.location).norm() < (bestCandidate.location - _specs.location).norm()){
+        if((candidate.location - _specs.location).norm() < (_result.location - _specs.location).norm()){
             score +=1;
         }
 
         if(score > bestScore){
-            bestCandidate = candidate;
+            _result = candidate;
+            foundMatch = true;
         }
     }
-    return bestCandidate;
+    return foundMatch;
 }

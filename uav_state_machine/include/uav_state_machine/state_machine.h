@@ -75,7 +75,7 @@ private:
     bool landCallback(uav_state_machine::land_service::Request  &req,
          uav_state_machine::land_service::Response &res);
 
-    mbzirc::Candidate bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs);
+    bool bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs, mbzirc::Candidate &_matchedCandidate);
 
     grvc::hal::Server::PositionErrorService::Client *pos_error_srv;
 
