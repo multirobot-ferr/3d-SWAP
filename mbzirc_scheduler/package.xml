@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>mbzirc_scheduler</name>
+  <version>0.0.0</version>
+  <description>The mbzirc_scheduler package, integrating the targets estimator, which fuses data from all cameras to estimate targets states; and the task allocator, which assigns different tasks/targets to the UAVs. </description>
+
+  <maintainer email="jcapitan@us.es">Jesus Capitan</maintainer>
+  <license>MIT</license>
+  <author email="jcapitan@us.es">Jesus Capitan</author>
+  <author>Ricardo Ragel</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>uav_visual_servoing</build_depend>
+  <build_depend>eigen</build_depend>
+  <build_depend>roscpp</build_depend>
+
+  <run_depend>uav_visual_servoing</run_depend>
+  <run_depend>eigen</run_depend>
+  <run_depend>roscpp</run_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>
