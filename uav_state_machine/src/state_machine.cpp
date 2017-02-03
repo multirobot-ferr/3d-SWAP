@@ -160,6 +160,7 @@ void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPt
 bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::Request  &req,
          uav_state_machine::target_service::Response &res)
 {
+    std::cout << "Received target of color: " << req.color << ", and position :["<< req.position[0] << ", " << req.position[1] << "];" << std::endl;
     if(mState == eState::HOVER){
         mTarget->color = req.color;
         mTarget->shape = req.shape;
@@ -241,6 +242,7 @@ void UavStateMachine::catchingCallback(){
     /// Init subscriber to candidates
     ros::NodeHandle nh;
     ros::Subscriber candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
+
     if(!candidateSubscriber){
         std::cout << ("Can't start candidate subscriber.") << std::endl;
 	mState = eState::HOVER;
