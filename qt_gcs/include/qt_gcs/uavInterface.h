@@ -22,11 +22,13 @@
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <mavros_msgs/RCOut.h>
 
 #include <marble/MarbleWidget.h>
 #include <thread>
 
-#include "qt_gcs/UavMark.h"
+#include <qt_gcs/UavMark.h>
+#include <qt_gcs/LedIndicator.h>
 
 class UavInterface : public QGroupBox {
     Q_OBJECT
@@ -44,6 +46,10 @@ private slots:
 
     void altitudeCallback(const std_msgs::Float64ConstPtr &_msg);
     void geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg);
+    void rcMagnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg);
+
+    void updateGui();
+
 private:
     int mUavId;
     QHBoxLayout *mMainLayoutUav;
@@ -55,6 +61,7 @@ private:
     QLCDNumber *mLatitudeBox;
     QLCDNumber *mLongitudeBox;
     ros::Subscriber mGeodesicSubscriber;
+    double mAltitude, mLongitude, mLatitude;
 
     // Action items --------
     QVBoxLayout *mActionsLayoutUav;
@@ -79,6 +86,9 @@ private:
     // Magnet
     QPushButton *mToggleMagnet;
     std::thread *mToggleMagnetThread;
+    LedIndicator *mInterruptorLed;
+    ros::Subscriber mMagnetSubscriber;
+    bool mInterruptorState;
 
     // Center map on UAV
     QPushButton *mCenterTarget;
@@ -86,6 +96,10 @@ private:
     // Uav map mark
     Marble::MarbleWidget *mMapPtr;
     UavMark *mUavMark;
+
+    // GUI THREAD
+    std::thread mGuiThread;
+    bool mRunGui = false;
 
 };
 

@@ -22,12 +22,15 @@
 
 #include <mavros_msgs/ActuatorControl.h>
 
+#include <qt_gcs/LogManager.h>
+
 //---------------------------------------------------------------------------------------------------------------------
 UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWidget *_mapPtr) {
     mUavId = _index;
     mMapPtr = _mapPtr;
 
     // Main config
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initializing UAV interface.");
     std::string title = "UAV " + std::to_string(_index);
     this->setTitle(title.c_str());
     mMainLayoutUav = new QHBoxLayout();
@@ -49,6 +52,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mAltitudeSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/global_position/rel_alt",
                                        1,
                                        &UavInterface::altitudeCallback,this);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized subscription to altitude.");
 
     // Odometri geodesics
     QHBoxLayout *latitudeLayout = new QHBoxLayout();
@@ -73,6 +77,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mGeodesicSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/global_position/global",
                                        1,
                                        &UavInterface::geodesicCallback,this);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized subscription to geodesic position.");
 
     // Actions
     mActionsLayoutUav = new QVBoxLayout();
@@ -113,9 +118,19 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mTargetLayout->addWidget(mShapeSpin);
 
     // Magnet
+    QHBoxLayout *mMagnetLayout = new QHBoxLayout();
     mToggleMagnet = new QPushButton("Switch magnet");
     mToggleMagnet->setCheckable(true);
-    mActionsLayoutUav->addWidget(mToggleMagnet);
+    mMagnetLayout->addWidget(mToggleMagnet);
+    mInterruptorLed = new LedIndicator();
+    mInterruptorLed->setState(false);
+    mMagnetLayout->addWidget(mInterruptorLed);
+    mActionsLayoutUav->addLayout(mMagnetLayout);
+    mMagnetSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/rc/out",
+                                     1,
+                                     &UavInterface::rcMagnetInterruptorCallback,this);
+
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized action buttons.");
 
     // Set callbacks
     connect(mTakeOffButton, SIGNAL (released()), this, SLOT (takeOffCallback()));
@@ -125,27 +140,44 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
 
-
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized connected callbacks of action buttons.");
 
     // Add visualization on map
     mUavMark = new UavMark(_mapPtr, "Uav_"+std::to_string(mUavId));
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Created mark on map.");
+
+    // Start updating Gui
+    mRunGui = true;
+    mGuiThread = std::thread([&](){
+        while(mRunGui){
+            updateGui();
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+    });
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 UavInterface::~UavInterface() {
-
+    mRunGui = false;
+    if(mGuiThread.joinable()){
+        mGuiThread.join();
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::takeOffCallback(){
     mTakeOffButton->setEnabled(false);
+    mLandButton->setEnabled(false);
     mTakeOffThread = new std::thread([this](){
         ros::NodeHandle nh;
-        ros::ServiceClient client = nh.serviceClient<uav_state_machine::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/uav_state_machine/takeoff");
-        uav_state_machine::takeoff_service call;
+        LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending take off service.");
+        ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/takeoff");
+        uav_visual_servoing::takeoff_service call;
         call.request.altitude = mTakeOffAltitude->value();
-        client.call(call);
+        auto res = client.call(call);
+        LogManager::get()->status("UAV_"+std::to_string(mUavId), "Returned call with result: "+std::to_string(res));
         mTakeOffButton->setEnabled(true);
+        mLandButton->setEnabled(true);
     });
 
 }
@@ -153,12 +185,17 @@ void UavInterface::takeOffCallback(){
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::landCallback(){
     mLandButton->setEnabled(false);
+    mTakeOffButton->setEnabled(false);
     mLandThread = new std::thread([this](){
         ros::NodeHandle nh;
-        ros::ServiceClient client = nh.serviceClient<uav_state_machine::land_service>("/mbzirc_"+std::to_string(mUavId)+"/uav_state_machine/land");
-        uav_state_machine::land_service call;
-        client.call(call);
+
+        LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending land service.");
+        ros::ServiceClient client = nh.serviceClient<uav_visual_servoing::land_service>("/mbzirc_"+std::to_string(mUavId)+"/visual_servoing/land");
+        uav_visual_servoing::land_service call;
+        auto res = client.call(call);
+        LogManager::get()->status("UAV_"+std::to_string(mUavId), "Returned call with result: "+std::to_string(res));
         mLandButton->setEnabled(true);
+        mTakeOffButton->setEnabled(true);
     });
 
 }
@@ -171,13 +208,16 @@ void UavInterface::targetCallback(){
     call.request.enabled = mTargetEnable->isChecked();
     call.request.color = mColorSpin->value();
     call.request.shape = mShapeSpin->value();
-    client.call(call);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending new target to UAV. Color: "+std::to_string(mColorSpin->value()));
+    auto res = client.call(call);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Returned call with result: "+std::to_string(res));
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::centerCallback() {
     double longitude, latitude;
     mUavMark->position(longitude, latitude);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Centering map on UAV. latitude: " +std::to_string(latitude) + "and longitude: "+std::to_string(longitude));
     mMapPtr->centerOn(Marble::GeoDataCoordinates(longitude, latitude));
 }
 
@@ -186,6 +226,7 @@ void UavInterface::switchMagnetCallback(bool _state) {
     mToggleMagnet->setEnabled(false);
     mToggleMagnetThread = new std::thread([this, _state](){
         ros::NodeHandle nh;
+        LogManager::get()->status("UAV_"+std::to_string(mUavId), "Switching magnet.");
         ros::Publisher magnetPublisher = nh.advertise<mavros_msgs::ActuatorControl>("/mavros_"+std::to_string(mUavId)+"/actuator_control",1);
         mavros_msgs::ActuatorControl controlSignal;
         controlSignal.group_mix = 3;
@@ -193,19 +234,13 @@ void UavInterface::switchMagnetCallback(bool _state) {
 
         // Start magnetization/demagnetization
         std::chrono::time_point<std::chrono::steady_clock> t0 = std::chrono::steady_clock::now();
-        double sleepTime = 3000;
-        while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count() < sleepTime){
-            magnetPublisher.publish(controlSignal);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
+        magnetPublisher.publish(controlSignal);
+        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
         // Ensure that the magnet is resting
         controlSignal.controls[6] = 0.0;
-        t0 = std::chrono::steady_clock::now();
-        while(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count() < sleepTime){
-            magnetPublisher.publish(controlSignal);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
+        magnetPublisher.publish(controlSignal);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
         mToggleMagnet->setEnabled(true);
     });
@@ -214,12 +249,36 @@ void UavInterface::switchMagnetCallback(bool _state) {
 
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::altitudeCallback(const std_msgs::Float64ConstPtr &_msg) {
-    mAltitudeBox->display(_msg->data);
+    mAltitude = _msg->data;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) {
-    mLongitudeBox->display(_msg->longitude);
-    mLatitudeBox->display(_msg->latitude);
-    mUavMark->newPosition(_msg->longitude, _msg->latitude);
+    mLatitude = _msg->latitude;
+    mLongitude = _msg->longitude;
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::rcMagnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg) {
+    if(_msg->channels[8] < 1100)
+        mInterruptorState = false;
+    else if(_msg->channels[8] > 1900)
+        mInterruptorState = true;
+
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::updateGui() {
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display altitude: " + std::to_string(mAltitude));
+    mAltitudeBox->display(mAltitude);
+
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display longitude: " + std::to_string(mLongitude));
+    mLongitudeBox->display(mLongitude);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating display latitude: " + std::to_string(mLatitude));
+    mLatitudeBox->display(mLatitude);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updating position in map");
+    //mUavMark->newPosition(mLongitude, mLatitude);
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Updated position in map");
+
+    mInterruptorLed->setState(mInterruptorState);
 }

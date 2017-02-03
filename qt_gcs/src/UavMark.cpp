@@ -18,23 +18,23 @@ UavMark::UavMark(Marble::MarbleWidget *mainMapWidget, std::string _id):mMainMapW
     mDocument->append(mMark);
     mMainMapWidget->model()->treeModel()->addDocument(mDocument);
 
-    connect(this, SIGNAL(coordinatesChanged(Marble::GeoDataCoordinates)),
-                this, SLOT(setUavCoordinates(Marble::GeoDataCoordinates)), Qt::BlockingQueuedConnection);
-
+    mLastTimeUpdated = std::chrono::system_clock::now();
 }
 
 void UavMark::newPosition(double _longitude, double _latitude) {
-    mLastCoordinate = Marble::GeoDataCoordinates(_longitude, _latitude, 0, Marble::GeoDataCoordinates::Degree);
-     emit coordinatesChanged(mLastCoordinate);
+    auto coordinates = Marble::GeoDataCoordinates(_longitude, _latitude, 0, Marble::GeoDataCoordinates::Degree);
+    mCoodinatesMutex.lock();
+    mLastCoordinate = coordinates;
+    mCoodinatesMutex.unlock();
+    mMark->setCoordinate(coordinates);
+    mMainMapWidget->model()->treeModel()->updateFeature(mMark);
+
 }
 
 void UavMark::position(double &_longitude, double &_latitude) {
+    mCoodinatesMutex.lock();
     _longitude = mLastCoordinate.longitude();
     _latitude = mLastCoordinate.latitude();
+    mCoodinatesMutex.unlock();
 
-}
-
-void UavMark::setUavCoordinates(const Marble::GeoDataCoordinates &coord) {
-    mMark->setCoordinate(coord);
-    mMainMapWidget->model()->treeModel()->updateFeature(mMark);
 }
