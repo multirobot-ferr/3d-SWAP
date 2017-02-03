@@ -44,6 +44,7 @@ bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
     ros::NodeHandle nh;
 
     target_service   = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/enabled", &UavStateMachine::targetServiceCallback, this);
+    mTarget = new mbzirc::Candidate();
     takeoff_service  = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/takeoff", &UavStateMachine::takeoffCallback, this);
     land_service     = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/land",    &UavStateMachine::landCallback, this);
     waypoint_service = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/waypoint",&UavStateMachine::searchingCallback, this);
