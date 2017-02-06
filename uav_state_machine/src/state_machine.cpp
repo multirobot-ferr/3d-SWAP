@@ -145,7 +145,7 @@ void UavStateMachine::candidateCallback(const std_msgs::String::ConstPtr& _msg){
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::joystickCb(const sensor_msgs::Joy::ConstPtr& _joy) {
         //Callback
-        mFlyTargetAltitude += _joy->axes[1];
+        mFlyTargetAltitude += 0.1*_joy->axes[1];
         std::cout << mFlyTargetAltitude << std::endl;
 }
 //---------------------------------------------------------------------------------------------------------------------------------
