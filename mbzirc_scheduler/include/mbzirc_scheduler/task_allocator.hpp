@@ -1,5 +1,7 @@
 //------------------------------------------------------------------------------
-// GRVC MBZIRC Vision
+// GRVC MBZIRC
+// Author Jesus Capitan <jcapitan@us.es>
+// Author Ricardo Ragel
 //------------------------------------------------------------------------------
 // The MIT License (MIT)
 //
@@ -24,33 +26,28 @@
 // SOFTWARE.
 //------------------------------------------------------------------------------
 
-#ifndef MBZIRC_CANDIDATELIST_H_
-#define MBZIRC_CANDIDATELIST_H_
+#ifndef TASK_ALLOCATOR_HPP_
+#define TASK_ALLOCATOR_HPP_
 
-#include "Candidate.h"
-#include <vector>
+using namespace std;
 
-namespace mbzirc{
-	struct CandidateList{
-        std::vector<Candidate> candidates;
-    };
-    // Serialize candidate.
-    std::ostream& operator<<(std::ostream& _os, const CandidateList& _candidates){
-        for(auto candidate: _candidates.candidates){
-            _os << candidate;
-        }
-        return _os;
-    }
+namespace mbzirc {
 
-    // Deserialize candidate.
-    std::istream& operator>>(std::istream& _is, CandidateList &_candidates){
-        do{
-            Candidate candidate;
-            _is >> candidate;
-            _candidates.candidates.push_back(candidate);
-        }while(_is);
-        return _is;
-    }
+class TaskAllocator 
+{
+	public:
+		/**
+			Default constructor
+		**/
+		TaskAllocator();
+		
+		/**
+			Default destructor
+		**/
+		~TaskAllocator();
+	
+	protected:
+};
 
 }
 

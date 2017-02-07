@@ -37,10 +37,9 @@
 
 namespace mbzirc {
 
-enum TargetStatus {UNKNOWN, STATIC, MOVING, CAUGHT, DEPLOYED, N_STATUS};
-enum Color {BLACK, RED, BLUE, N_COLORS};
-enum Shape {RECTANGLE, SQUARE, CIRCLE, N_SHAPES};
-enum Factor {STATUS, COLOR, SHAPE};
+enum TargetStatus {UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, N_STATUS};
+enum Color {UNKNOWN, RED, GREEN, BLUE, YELLOW, ORANGE, N_COLORS};
+enum Factor {COLOR};
     
 /** \brief This class implements a stochastic filter for an object. 
 
@@ -65,12 +64,18 @@ public:
 	TargetStatus getStatus();
 	void setStatus(TargetStatus status);
 	int getId();
+	bool isLarge();
+	bool isStatic();
+	Color getColor();
 
 protected:
 	Timer update_timer_;				/// Timer for last update
 	int id_;					/// Target identifier
+	bool is_static_;				/// It indicates whether the target is static/dynamic
+	bool is_large_;					/// It indicates whether the targes is large
+	TargetStatus status_;				/// Current status
 
-	/// Factored discrete belief: STATUS, COLOR and SHAPE	
+	/// Factored discrete belief: COLOR	
 	std::vector<std::vector<double> > fact_bel_;	
 	
 	/// State vector: [x (m), y (m), vx (m/s), vy (m/s)]

@@ -6,7 +6,6 @@ project(mbzirc_scheduler)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  uav_visual_servoing
   roscpp
 )
 
@@ -104,7 +103,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES mbzirc_target_estimator
-  CATKIN_DEPENDS uav_visual_servoing roscpp
+  CATKIN_DEPENDS roscpp
   DEPENDS eigen 
 )
 

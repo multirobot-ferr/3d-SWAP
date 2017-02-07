@@ -49,7 +49,7 @@ public:
 	bool update(Candidate z);
 
 	int getNumTargets();
-	bool getTarget(int target_id, double &x, double &y, TargetStatus &type);
+	bool getTargetInfo(int target_id, double &x, double &y, TargetStatus &type, Color &color);
 	bool setTargetStatus(int target_id, TargetStatus &type);
 	void removeLostTargets();
 

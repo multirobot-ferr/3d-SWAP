@@ -27,7 +27,7 @@
 //------------------------------------------------------------------------------
 
 
-#include <mbzirc_scheduler/task_allocator.h>
+#include <mbzirc_scheduler/task_allocator.hpp>
 #include <mbzirc_scheduler/centralized_estimator.h>
 
 #include <ros/ros.h>

@@ -106,9 +106,10 @@ int CentralizedEstimator::getNumTargets()
 \param x Position of the target
 \param y Position of the target
 \param Status Status of the target 
+\param color Color of the target
 \return True if the target was found 
 */
-bool CentralizedEstimator::getTarget(int target_id, double &x, double &y, TargetStatus &status)
+bool CentralizedEstimator::getTargetInfo(int target_id, double &x, double &y, TargetStatus &status, Color &color)
 {
 	bool found = false;
 
@@ -118,6 +119,7 @@ bool CentralizedEstimator::getTarget(int target_id, double &x, double &y, Target
 		found = true;
 		targets_[target_id]->getPose(x, y);
 		status = targets_[target_id]->getStatus();
+		color = targets_[target_id]->getColor();
 	}
 	
 	return found;
@@ -150,7 +152,7 @@ void CentralizedEstimator::removeLostTargets()
 
 	while(it != targets_.end())
 	{		
-		if((it->second)->getStatus() == MOVING && (it->second)->lastUpdateTime() > lost_th_)
+		if((it->second)->isStatic() == false && (it->second)->lastUpdateTime() > lost_th_)
 		{
 			delete(it->second);
 			it = targets_.erase(it);

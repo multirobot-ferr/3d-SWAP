@@ -11,11 +11,11 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>uav_visual_servoing</build_depend>
+  
   <build_depend>eigen</build_depend>
   <build_depend>roscpp</build_depend>
 
-  <run_depend>uav_visual_servoing</run_depend>
+  
   <run_depend>eigen</run_depend>
   <run_depend>roscpp</run_depend>
 
