@@ -29,6 +29,7 @@
 #include <mbzirc_scheduler/target_tracker.h>
 
 #define VEL_NOISE_VAR 0.2 
+#define COLOR_DETECTOR_PD 0.9
 
 namespace mbzirc {
 
@@ -61,27 +62,6 @@ TargetTracker::~TargetTracker()
 */
 void TargetTracker::initialize(Candidate z)
 {
-	int i;
-
-	// Init factored belief
-	for(int fact = 0; fact < fact_bel_.size(); fact++)
-	{
-		switch(fact)
-		{
-			case COLOR:
-
-			for(i = 0; i < N_COLORS; i++)
-			{
-				fact_bel_[COLOR][i] = 0.0;
-			}
-
-			fact_bel_[COLOR][UNKNOWN] = 1.0;	
-
-			break;			
-		}
-	}
-
-	//TODO: update factors/type
 
 	// Setup state vector
 	pose_.setZero(4, 1);
@@ -102,6 +82,51 @@ void TargetTracker::initialize(Candidate z)
 	pose_cov_(3,2) = z.speedCovariance(1,0);
 	pose_cov_(3,3) = z.speedCovariance(1,1);
 
+
+	// Init and update factored belief 
+	for(int fact = 0; fact < fact_bel_.size(); fact++)
+	{
+		switch(fact)
+		{
+			case COLOR:
+
+			double prob_z, total_prob = 0.0;
+
+			for(int i = 0; i < N_COLORS; i++)
+			{
+				if(z.color == i)
+					prob_z = COLOR_DETECTOR_PD;
+				else
+					prob_z = (1.0 - COLOR_DETECTOR_PD)/(N_COLORS-1);
+
+				fact_bel_[COLOR][i] = (1.0/(N_COLORS))*prob_z;
+				total_prob += fact_bel_[COLOR][i];
+			}
+			
+			// Normalize
+			for(int i = 0; i < N_COLORS; i++)
+			{
+				fact_bel_[COLOR][i] /= total_prob;
+			}	
+
+			break;			
+		}
+	}
+
+	if(fact_bel_[COLOR][ORANGE] > (1.0 - fact_bel_[COLOR][ORANGE]))
+		is_large_ = true;
+	else
+		is_large_ = false;
+ 
+	if(fact_bel_[COLOR][YELLOW] > (1.0 - fact_bel_[COLOR][YELLOW]))
+	{
+		is_static_ = false;
+	}
+	else
+	{
+		is_static_ = true;
+	}
+
 	// Update timer
 	update_timer_.reset();
 }
@@ -112,11 +137,9 @@ void TargetTracker::initialize(Candidate z)
 */
 void TargetTracker::predict(double dt)
 {
-	if(is_static_)
-	{
-		//TODO: prediction for static
-	}
-	else
+	// static factors do not vary. Position depending on whether it is dynamic or not.
+
+	if(!is_static_)
 	{
 		// State vector prediction
 		pose_(0,0) += pose_(2,0)*dt;
@@ -142,9 +165,50 @@ void TargetTracker::predict(double dt)
 */
 bool TargetTracker::update(Candidate z)
 {
+	// Update factored belief 
+	for(int fact = 0; fact < fact_bel_.size(); fact++)
+	{
+		switch(fact)
+		{
+			case COLOR:
 
-	//TODO: update factors/type
+			double prob_z, total_prob = 0.0;
 
+			for(int i = 0; i < N_COLORS; i++)
+			{
+				if(z.color == i)
+					prob_z = COLOR_DETECTOR_PD;
+				else
+					prob_z = (1.0 - COLOR_DETECTOR_PD)/(N_COLORS-1);
+
+				fact_bel_[COLOR][i] *= prob_z;
+				total_prob += fact_bel_[COLOR][i];
+			}
+			
+			// Normalize
+			for(int i = 0; i < N_COLORS; i++)
+			{
+				fact_bel_[COLOR][i] /= total_prob;
+			}	
+
+			break;			
+		}
+	}
+
+	if(fact_bel_[COLOR][ORANGE] > (1.0 - fact_bel_[COLOR][ORANGE]))
+		is_large_ = true;
+	else
+		is_large_ = false;
+ 
+	if(fact_bel_[COLOR][YELLOW] > (1.0 - fact_bel_[COLOR][YELLOW]))
+	{
+		is_static_ = false;
+	}
+	else
+	{
+		is_static_ = true;
+	}
+	
 	// Compute update jacobian
 	Eigen::Matrix<double, 2, 4> H;
 	H.setZero(2, 4);
@@ -258,16 +322,21 @@ bool TargetTracker::isLarge()
 Color TargetTracker::getColor()
 {
 	double max_prob = -1.0;
-	Color color;
+	Color color, color_max;
 
 	for(int i = 0; i < N_COLORS; i++)
 	{
 		if(fact_bel_[COLOR][i] > max_prob)
 		{
 			max_prob = fact_bel_[COLOR][i];
-			color = (Color)i;
+			color_max = (Color)i;
 		}
 	}
+
+	if(max_prob > 1.0 - max_prob)
+		color = color_max;
+	else
+		color = UNKNOWN;
 
 	return color;
 }

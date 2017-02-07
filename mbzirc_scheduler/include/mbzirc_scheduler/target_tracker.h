@@ -37,8 +37,8 @@
 
 namespace mbzirc {
 
-enum TargetStatus {UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, N_STATUS};
-enum Color {UNKNOWN, RED, GREEN, BLUE, YELLOW, ORANGE, N_COLORS};
+enum TargetStatus {UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST, N_STATUS};
+enum Color {UNKNOWN = -1, RED = 0, GREEN, BLUE, YELLOW, ORANGE, N_COLORS};
 enum Factor {COLOR};
     
 /** \brief This class implements a stochastic filter for an object. 
