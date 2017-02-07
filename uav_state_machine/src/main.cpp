@@ -23,26 +23,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //------------------------------------------------------------------------------
+#include <grvc_utils/argument_parser.h>
 
-#include <string>
+#include <uav_state_machine/state_machine.h>
 
-class GcsLink{
-public:
-    /// Available actions for the module.
-    enum class actions {error, hovering, visualServoing};
+int main(int _argc, char** _argv){
 
-    /// Make sure that the GCS is enabled and it is ready to send messages to the module.
-    bool init();
+    std::cout << "Setting up" << std::endl;
 
-    /// Check the connection still available.
-    bool isConnected();
-
-    /// get last mission sent by the GCS.
-    void getCurrentMission(actions &_action, std::string &_data);
-
-private:
-    bool mConnected = false;
-
-    actions mLastAction     = actions::error;
-    std::string mLastData   = "";
-};
+    // Init services.
+    grvc::utils::ArgumentParser args(_argc, _argv);
+    
+    UavStateMachine uav_sm;
+    if(!uav_sm.Init(args)){
+        return -1;
+    }
+    while(true){
+        uav_sm.step();
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}

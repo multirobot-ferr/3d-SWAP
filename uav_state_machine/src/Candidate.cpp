@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 
 
-#include <Candidate.h>
+#include <uav_state_machine/Candidate.h>
 
 #include <boost/tokenizer.hpp>
 #include <vector>
