@@ -39,10 +39,12 @@ TargetTracker::TargetTracker(int id)
 {
 	id_ = id;
 
-	fact_bel_.resize(3);
-	fact_bel_[STATUS].resize(N_STATUS);
+	is_static_ = false;
+	is_large_ = false;
+	status_ = UNASSIGNED;
+
+	fact_bel_.resize(1);
 	fact_bel_[COLOR].resize(N_COLORS);
-	fact_bel_[SHAPE].resize(N_SHAPES);
 
 	pose_ = Eigen::MatrixXd::Zero(4,1);
 	pose_cov_ = Eigen::MatrixXd::Identity(4,4);
@@ -66,34 +68,20 @@ void TargetTracker::initialize(Candidate z)
 	{
 		switch(fact)
 		{
-			case STATUS:
-
-			for(i = 0; i < N_STATUS; i++)
-			{
-				if(i == UNKNOWN)
-					fact_bel_[STATUS][i] = 1.0;
-				else
-					fact_bel_[STATUS][i] = 0.0;
-			}	
-			break;
-
 			case COLOR:
 
 			for(i = 0; i < N_COLORS; i++)
 			{
-				fact_bel_[COLOR][i] = 1.0/N_COLORS;
-			}	
-			break;
-			
-			case SHAPE:
+				fact_bel_[COLOR][i] = 0.0;
+			}
 
-			for(i = 0; i < N_SHAPES; i++)
-			{
-				fact_bel_[STATUS][i] = 1.0/N_SHAPES;
-			}	
-			break;
+			fact_bel_[COLOR][UNKNOWN] = 1.0;	
+
+			break;			
 		}
 	}
+
+	//TODO: update factors/type
 
 	// Setup state vector
 	pose_.setZero(4, 1);
@@ -124,20 +112,27 @@ void TargetTracker::initialize(Candidate z)
 */
 void TargetTracker::predict(double dt)
 {
-	// State vector prediction
-	pose_(0,0) += pose_(2,0)*dt;
-	pose_(1,0) += pose_(3,0)*dt;
+	if(is_static_)
+	{
+		//TODO: prediction for static
+	}
+	else
+	{
+		// State vector prediction
+		pose_(0,0) += pose_(2,0)*dt;
+		pose_(1,0) += pose_(3,0)*dt;
 		
-	// Convariance matrix prediction
-	Eigen::Matrix<double, 4, 4> F;
-	F.setIdentity(4, 4);
-	F(0,2) = dt;
-	F(1,3) = dt;
-	Eigen::Matrix<double, 4, 4> Q;
-	Q.setZero(4, 4);
-	Q(2,2) = VEL_NOISE_VAR*dt*dt;
-	Q(3,3) = VEL_NOISE_VAR*dt*dt;
-	pose_cov_ = F*pose_cov_*F.transpose() + Q;
+		// Convariance matrix prediction
+		Eigen::Matrix<double, 4, 4> F;
+		F.setIdentity(4, 4);
+		F(0,2) = dt;
+		F(1,3) = dt;
+		Eigen::Matrix<double, 4, 4> Q;
+		Q.setZero(4, 4);
+		Q(2,2) = VEL_NOISE_VAR*dt*dt;
+		Q(3,3) = VEL_NOISE_VAR*dt*dt;
+		pose_cov_ = F*pose_cov_*F.transpose() + Q;
+	}
 }
 
 /**
@@ -147,6 +142,9 @@ void TargetTracker::predict(double dt)
 */
 bool TargetTracker::update(Candidate z)
 {
+
+	//TODO: update factors/type
+
 	// Compute update jacobian
 	Eigen::Matrix<double, 2, 4> H;
 	H.setZero(2, 4);
@@ -192,6 +190,7 @@ Compute the likelihood of an observation with current belief.
 */
 double TargetTracker::getLikelihood(Candidate z)
 {
+	//TODO
 }
 
 /**
@@ -218,19 +217,7 @@ void TargetTracker::getPose(double &x, double &y)
 */
 TargetStatus TargetTracker::getStatus()
 {
-	TargetStatus status;
-	double max_prob = -1.0;
-
-	for(int i = 0; i < N_STATUS; i++)
-	{
-		if(fact_bel_[STATUS][i] > max_prob)
-		{
-			max_prob = fact_bel_[STATUS][i];
-			status = (TargetStatus)i;
-		}
-	}
-
-	return status;
+	return status_;
 }
 
 /** \brief Set a new target status
@@ -238,13 +225,7 @@ TargetStatus TargetTracker::getStatus()
 */
 void TargetTracker::setStatus(TargetStatus status)
 {
-	for(int i = 0; i < N_STATUS; i++)
-	{
-		if(i == status)
-			fact_bel_[STATUS][i] = 1.0;
-		else
-			fact_bel_[STATUS][i] = 0.0;
-	}		
+	status_ = status;
 }
 
 /** \brief Return target identifier
@@ -253,6 +234,42 @@ void TargetTracker::setStatus(TargetStatus status)
 int TargetTracker::getId()
 {
 	return id_;
+}
+
+/** \brief Return whether target is static or not
+\return True if it is static
+*/
+bool TargetTracker::isStatic()
+{
+	return is_static_;
+}
+
+/** \brief Return whether target is large or not
+\return True if it is large
+*/
+bool TargetTracker::isLarge()
+{
+	return is_large_;
+}
+
+/** \brief Return the likeliest color for the target
+\return A color
+*/
+Color TargetTracker::getColor()
+{
+	double max_prob = -1.0;
+	Color color;
+
+	for(int i = 0; i < N_COLORS; i++)
+	{
+		if(fact_bel_[COLOR][i] > max_prob)
+		{
+			max_prob = fact_bel_[COLOR][i];
+			color = (Color)i;
+		}
+	}
+
+	return color;
 }
 
 }
