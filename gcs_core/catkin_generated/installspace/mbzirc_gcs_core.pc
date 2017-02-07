@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: mbzirc_gcs_core
+Description: Description of mbzirc_gcs_core
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: grvc_quadrotor_com grvc_quadrotor_hal grvc_quadrotor_uav

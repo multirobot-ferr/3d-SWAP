@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: mbzirc_qt_gcs
+Description: Description of mbzirc_qt_gcs
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: grvc_quadrotor_uav uav_visual_servoing

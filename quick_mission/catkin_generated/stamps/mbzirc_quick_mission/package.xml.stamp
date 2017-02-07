@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <package>
-  <name>mbzirc_qt_gcs</name>
+  <name>mbzirc_quick_mission</name>
   <version>0.0.0</version>
-  <description>Basic GCS GUI</description>
-  <maintainer email="prs@us.es">prs</maintainer>
+  <description>Xml mission tool</description>
+  <maintainer email="luisgrvc@todo.todo">luisgrvc</maintainer>
   <license>BSD</license>
-  <author>prs</author>
+  <author>Carmelo J</author>
   <url>http://ros.org/wiki/mbzirc</url>
 
   <buildtool_depend>catkin</buildtool_depend>
@@ -13,9 +13,7 @@
   <build_depend>grvc_quadrotor_uav</build_depend>
   <build_depend>grvc_quadrotor_utils</build_depend>
   <build_depend>mbzirc_gcs_core</build_depend>
-  <build_depend>uav_state_machine</build_depend>
-  
-  <run_depend>uav_state_machine</run_depend>
+
   <run_depend>grvc_quadrotor_uav</run_depend>
   <run_depend>grvc_quadrotor_utils</run_depend>
   <run_depend>mbzirc_gcs_core</run_depend>

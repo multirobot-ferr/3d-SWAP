@@ -1,0 +1,2 @@
+set(uav_state_machine_MESSAGE_FILES "")
+set(uav_state_machine_SERVICE_FILES "/home/luisgrvc/catkin_ws/src/mbzirc/uav_state_machine/srv/target_service.srv;/home/luisgrvc/catkin_ws/src/mbzirc/uav_state_machine/srv/takeoff_service.srv;/home/luisgrvc/catkin_ws/src/mbzirc/uav_state_machine/srv/waypoint_service.srv;/home/luisgrvc/catkin_ws/src/mbzirc/uav_state_machine/srv/land_service.srv")

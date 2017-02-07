@@ -1,0 +1,4 @@
+uint8 action  #0 (stop)  1(start) 2(restart)
+geometry_msgs/Point[] waypoint_track
+---
+bool success
