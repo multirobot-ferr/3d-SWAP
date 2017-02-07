@@ -27,7 +27,7 @@
 //------------------------------------------------------------------------------
 
 
-#include <mbzirc_scheduler/task_allocator.h>
+#include <mbzirc_scheduler/task_allocator.hpp>
 
 namespace mbzirc {
 

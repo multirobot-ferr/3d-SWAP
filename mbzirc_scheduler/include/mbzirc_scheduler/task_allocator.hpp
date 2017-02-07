@@ -26,14 +26,27 @@
 // SOFTWARE.
 //------------------------------------------------------------------------------
 
-#ifndef TASK_ALLOCATOR_H_
-#define TASK_ALLOCATOR_H_
+#ifndef TASK_ALLOCATOR_HPP_
+#define TASK_ALLOCATOR_HPP_
 
+using namespace std;
 
 namespace mbzirc {
 
 class TaskAllocator 
 {
+	public:
+		/**
+			Default constructor
+		**/
+		TaskAllocator();
+		
+		/**
+			Default destructor
+		**/
+		~TaskAllocator();
+	
+	protected:
 };
 
 }
