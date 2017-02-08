@@ -255,6 +255,11 @@ Compute the likelihood of an observation with current belief.
 double TargetTracker::getLikelihood(Candidate z)
 {
 	//TODO
+	double dx, dy;
+	dx = pose_(0,0) - z.location(0);
+	dy = pose_(1,0) - z.location(1);
+
+	return sqrt(dx*dx + dy*dy);
 }
 
 /**
