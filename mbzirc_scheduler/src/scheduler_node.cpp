@@ -37,6 +37,18 @@ using namespace mbzirc;
 int main (int argc, char** argv)
 {
   ros::init (argc, argv, "scheduler_node");
+  
+  // Centralized filter for all the target objects
+  CentralizedEstimator estimator(0.0, 0.0);
+  
+  /**	
+  \todo:
+	Jesus, inicializo a cualquier valor tu clase solo para pruebas
+  **/
+  
+  // Task allocator
+  TaskAllocator task_alloc(&estimator);
+  
   ros::spin ();
   return (0);
 }
