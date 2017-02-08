@@ -26,27 +26,58 @@
 // SOFTWARE.
 //------------------------------------------------------------------------------
 
+#include <ros/ros.h>
+#include <mbzirc_scheduler/centralized_estimator.h>
+
 #ifndef TASK_ALLOCATOR_HPP_
 #define TASK_ALLOCATOR_HPP_
+
+#define NUM_OF_UAVS 3	// Number of UAVs in operation
 
 using namespace std;
 
 namespace mbzirc {
 
+// Simple UAV data info
+class Uav
+{
+	public:
+	   int id;		// Unique identifier
+	   double x,y,z;	// Global Position
+
+};
+
+// Task allocator: class to get the optimal target to a UAV given the current targets estimations
 class TaskAllocator 
 {
 	public:
 		/**
-			Default constructor
+		 * Constructor
 		**/
-		TaskAllocator();
+		TaskAllocator(CentralizedEstimator* targets_ptr_);
 		
 		/**
-			Default destructor
+		 * Destructor
 		**/
 		~TaskAllocator();
-	
+		
+		/**
+		 * Update a UAV position given its identifier
+		**/
+		void updateUavPosition(int id, double x, double y, double z);
+		
+		/**
+		 * Get optimal Target given the UAV identifier (-1 if error)
+		**/
+		int getOptimalTarget(int id);
+		
 	protected:
+	
+		// Pointer to the targets interface
+		CentralizedEstimator* targets_ptr;
+		
+		// UAVs positions
+		std::vector<Uav> uav;
 };
 
 }
