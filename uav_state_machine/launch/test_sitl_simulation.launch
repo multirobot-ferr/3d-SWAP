@@ -20,4 +20,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   	<node name="uav_state_machine" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
       args="-uavId=1"/>
 
+	<node name="joy" pkg="joy" type="joy_node" respawn="false" output="screen">
+        <param name="dev" value="/dev/input/js0"/>
+        <param name="autorepeat_rate" value="2"/>
+	</node>
+
 </launch>
