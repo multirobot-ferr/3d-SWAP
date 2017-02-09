@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   visualization_msgs
   std_msgs
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -98,7 +99,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES mbzirc_target_estimator
-  CATKIN_DEPENDS message_runtime roscpp visualization_msgs std_msgs
+  CATKIN_DEPENDS message_runtime roscpp visualization_msgs std_msgs geometry_msgs
   DEPENDS eigen 
 )
 
