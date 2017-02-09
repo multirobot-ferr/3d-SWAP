@@ -29,6 +29,8 @@
 #define CENTRALIZED_ESTIMATOR_H_
 
 #include <map>
+#include <vector>
+
 #include <mbzirc_scheduler/target_tracker.h>
 
 namespace mbzirc {
@@ -46,7 +48,7 @@ public:
 	~CentralizedEstimator();
 
 	void predict(double dt);
-	bool update(Candidate z);
+	bool update(std::vector<Candidate> z_list);
 
 	int getNumTargets();
 	bool getTargetInfo(int target_id, double &x, double &y, TargetStatus &type, Color &color);

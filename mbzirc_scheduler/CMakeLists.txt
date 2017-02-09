@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   visualization_msgs
   std_msgs
   geometry_msgs
+  uav_state_machine
 )
 
 ## System dependencies are found with CMake's conventions
@@ -99,7 +100,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES mbzirc_target_estimator
-  CATKIN_DEPENDS message_runtime roscpp visualization_msgs std_msgs geometry_msgs
+  CATKIN_DEPENDS message_runtime roscpp visualization_msgs std_msgs geometry_msgs uav_state_machine
   DEPENDS eigen 
 )
 
@@ -118,7 +119,7 @@ include_directories(
 
 ## Declare a C++ library
 add_library(mbzirc_target_estimator
-   src/estimator/centralized_estimator.cpp src/estimator/target_tracker.cpp include/mbzirc_scheduler/timer.hpp src/estimator/Candidate.cpp)
+   src/estimator/centralized_estimator.cpp src/estimator/target_tracker.cpp include/mbzirc_scheduler/timer.hpp)
 target_link_libraries(mbzirc_target_estimator ${EIGEN3_LIBRARIES})
 
 add_executable(scheduler_node src/scheduler_node.cpp src/task_allocator.cpp)

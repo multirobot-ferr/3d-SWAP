@@ -67,8 +67,9 @@ void CentralizedEstimator::predict(double dt)
 \param z Observation to update
 \return True if everything was fine
 */
-bool CentralizedEstimator::update(Candidate z)
+bool CentralizedEstimator::update(std::vector<Candidate> z_list)
 {
+	// TODO modify to vector<Candidate>
 	double max_likelihood = -1, likelihood;
 	int best_id;
 

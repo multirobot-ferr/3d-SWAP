@@ -32,8 +32,6 @@
 #ifndef TASK_ALLOCATOR_HPP_
 #define TASK_ALLOCATOR_HPP_
 
-#define NUM_OF_UAVS 3	// Number of UAVs in operation
-
 enum TargetSelectionMode {NEAREST = 1, LOWER_SCORE_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3};
 // NEAREST: get the closest target to the UAV
 // LOWER_SCORE_NEAREST: get the easier target closest to the UAV
@@ -70,7 +68,7 @@ class TaskAllocator
 		/**
 		 * Constructor
 		**/
-		TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_);
+		TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_);
 		
 		/**
 		 * Destructor
@@ -103,6 +101,9 @@ class TaskAllocator
 		
 		// Target selection mode
 		TargetSelectionMode mode;
+
+		// Number of UAVs in operation
+		int num_of_uavs;
 };
 
 }

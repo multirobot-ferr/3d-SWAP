@@ -34,9 +34,10 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <mbzirc_scheduler/AssignTarget.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <uav_state_machine/candidate_list.h>
 
 #include<string>
-#include<list>
+#include<vector>
 
 using namespace std;
 
@@ -66,8 +67,8 @@ protected:
 	ros::NodeHandle* pnh_;
 
 	/// Subscribers
-	list<ros::Subscriber *> uav_subs_;
-	list<ros::Subscriber *> candidate_subs_;
+	vector<ros::Subscriber *> uav_subs_;
+	vector<ros::Subscriber *> candidate_subs_;
 
 	/// Estimator frequency
 	double estimator_rate_;
@@ -100,22 +101,24 @@ Scheduler::Scheduler()
 
 	// Estimator and allocator
 	estimator_ = new CentralizedEstimator(association_th, lost_time_th);
-	allocator_ = new TaskAllocator(estimator_, LOWER_SCORE_NEAREST);	// set different modes (second arg) to select target using different strategies
+	allocator_ = new TaskAllocator(estimator_, LOWER_SCORE_NEAREST, n_uavs_);
 
-	// TODO Subscriptions/publications
+	// Subscriptions/publications
 	for(int i = 0; i < n_uavs_; i++)
 	{
 		string uav_topic_name = "/mavros_" + to_string(i+1) + "/local_position/pose";
-		string candidate_topic_name = "/mavros_" + to_string(i+1) + "/local_position/pose";
+		string candidate_topic_name = "/candidate_list_" + to_string(i+1);
+
 		ros::Subscriber* candidate_sub = new ros::Subscriber();
-		*candidate_sub = nh_->subscribe<mbzirc_scheduler::Candidate>("/candidates", 1, &Scheduler::candidatesReceived, this);
+		*candidate_sub = nh_->subscribe<uav_state_machine::candidate_list>(candidate_topic_name.str(), 1, &Scheduler::candidatesReceived, this);
 		candidate_subs_.push(candidate_sub);
 
-		uav_subs_.push(new);
+		ros::Subscriber* uav_sub = new ros::Subscriber();
+		*uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.str(), 1, &Scheduler::uavPoseReceived, this);
+		uav_subs_.push(uav_sub);
 	}
-	//ros::Subscriber candidates_sub = nh_->subscribe<mbzirc_scheduler::Candidate>("/candidates", 10, &Scheduler::candidatesReceived, this);
-	ros::Subscriber uavs_sub = nh_->subscribe<>("/uav_poses", 10, &Scheduler::uavPoseReceived, this);
-	//ros::Publisher belief_markers_pub = nh_->advertise<visualization_msgs::MarkerArray>("/belief", 1);
+	
+	ros::Publisher belief_markers_pub = nh_->advertise<visualization_msgs::MarkerArray>("/belief", 1);
 
 	// Services
 	ros::ServiceServer assign_target_srv = nh_->advertiseService("/scheduler/assign_target", &Scheduler::assignTarget, this);
@@ -123,12 +126,21 @@ Scheduler::Scheduler()
 	// Main loop
 
 	ros::Rate r(estimator_rate_);
+	ros::Time prev_time, time_now;
 
 	while(nh_->ok())
 	{
 		ros::spinOnce();
 
-		// TODO predict estimator, publish markers
+		// Predict estimator
+		time_now = ros::Time::now();
+		double elapsed_time = (time_now - prev_time).elapsed();
+		prev_time = time_now;
+
+		if(elapsed_time)
+			estimator_->predict(elapsed_time);
+
+		publishBelief();
 
 		r.sleep();
 	}
@@ -142,17 +154,22 @@ Scheduler::~Scheduler()
 	delete pnh_;
 	delete estimator_;
 	delete allocator_;
+
+	for(int i = 0; i < n_uavs_; i++)
+	{
+		delete candidate_subs_[i];
+		delete uav_subs_[i];
+	}
+	candidate_subs_.clear();
+	uav_subs_.clear();
 }
 
 /** \brief Callback to receive observations from vision module
 */
-// TODO
-/*
-void Scheduler::candidatesReceived(const mbzirc_scheduler::Candidate::ConstPtr& candidate)
+void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
 {
-	
+	// TODO
 }
-*/
 
 /** \brief Callback to receive UAVs poses
 */
@@ -164,7 +181,9 @@ void Scheduler::uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_
 /** \brief Callback for service. Request the assignment of a target
 */
 bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzirc_scheduler::AssignTarget::Response &res)
-{
+{	
+	res.target_id = allocator_->getOptimalTarget(req.uav_id);
+
 	return true;
 }
 
@@ -172,6 +191,7 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 */
 void Scheduler::publishBelief()
 {
+	// TODO
 }
 
 }

@@ -34,17 +34,20 @@ namespace mbzirc {
 /** Constructor
 \param	targets_ptr_	Pointer to the targets interface
 \param	select_mode_	Target selection mode: one of TargetSelectionMode
+\param  num_of_uavs_	Number of UAVs
 **/
-TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_)
+TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_)
 {
+	num_of_uavs = num_of_uavs_;
+
 	// Assign targets pointer
 	targets_estimation_ptr = targets_estimation_ptr_;
 	
 	// Resize vector for three UAVs
-	uav.resize(NUM_OF_UAVS);
+	uav.resize(num_of_uavs);
 	
 	// Init UAVs position
-	for(int i=0; i<NUM_OF_UAVS; i++)
+	for(int i=0; i<num_of_uavs; i++)
 	{
 		uav[i].id = i+1;
 		uav[i].x = 0.0;
@@ -70,9 +73,9 @@ TaskAllocator::~TaskAllocator()
 **/
 void TaskAllocator::updateUavPosition(int id, double x, double y, double z)
 {
-	if(id < 1 && id > NUM_OF_UAVS )
+	if(id < 1 && id > num_of_uavs )
 	{
-		ROS_ERROR("TaskAllocator::updateUavPosition() id argument must be bigger than 1 and lower than %d", NUM_OF_UAVS);
+		ROS_ERROR("TaskAllocator::updateUavPosition() id argument must be bigger than 1 and lower than %d", num_of_uavs);
 		exit(0);
 	}
 	
