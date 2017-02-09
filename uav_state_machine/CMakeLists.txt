@@ -35,6 +35,11 @@ if(GRVCQUAD_USE_ROS)
 		   waypoint_service.srv
 		   land_service.srv
 	 )
+	add_message_files(
+		   FILES
+		   candidate.msg
+		   candidate_list.msg
+	 )
 
 	## Generate added messages and services with any dependencies listed here
 	 generate_messages(

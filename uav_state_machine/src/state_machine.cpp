@@ -25,8 +25,6 @@
 //----------
 
 #include <uav_state_machine/state_machine.h>
-#include <uav_state_machine/CandidateList.h>
-#include <uav_state_machine/Candidate.h>
 
 //-------------------------------------------------------------------------------------------------------------------------------
 bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
@@ -44,7 +42,6 @@ bool UavStateMachine::Init(grvc::utils::ArgumentParser _args){
     ros::NodeHandle nh;
 
     target_service   = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/enabled", &UavStateMachine::targetServiceCallback, this);
-    mTarget = new mbzirc::Candidate();
     takeoff_service  = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/takeoff", &UavStateMachine::takeoffCallback, this);
     land_service     = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/land",    &UavStateMachine::landCallback, this);
     waypoint_service = nh.advertiseService("/mbzirc_"+_args.getArgument<std::string>("uavId","1")+"/uav_state_machine/waypoint",&UavStateMachine::searchingCallback, this);
@@ -118,23 +115,21 @@ void UavStateMachine::step(){
 
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-void UavStateMachine::candidateCallback(const std_msgs::String::ConstPtr& _msg){
+void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list::ConstPtr& _msg){
     //mbzirc::Candidate specs;
     //specs.color = 1;
     if(mState == eState::CATCHING){
         grvc::hal::TaskState ts;
-
-        std::stringstream msg;
-        msg << _msg->data;
-        mbzirc::CandidateList candidateList;
-        msg >> candidateList;
+        uav_state_machine::candidate_list candidateList = *_msg;
 
         if(candidateList.candidates.size() > 0){
-            mbzirc::Candidate matchedCandidate;
-            if(bestCandidateMatch(candidateList, *mTarget, matchedCandidate)){
-                std::cout << "tracking candidate with error " << matchedCandidate.location.transpose() << std::endl;
-                matchedCandidate.location[2] = mFlyTargetAltitude-mCurrentAltitude;
-                pos_error_srv->send(matchedCandidate.location, ts);
+	    uav_state_machine::candidate matchedCandidate;
+            if(bestCandidateMatch(candidateList, mTarget, matchedCandidate)){
+                std::cout << "tracking candidate with error " << matchedCandidate.position << std::endl;
+                matchedCandidate.position.z = mFlyTargetAltitude-mCurrentAltitude;
+		Eigen::Matrix<double, 3, 1> targetPosition;
+		targetPosition << matchedCandidate.position.x, matchedCandidate.position.y, matchedCandidate.position.z;
+                pos_error_srv->send(targetPosition, ts);
             }else{
                 std::cout << "Cant find a valid candidate" << std::endl;
             }
@@ -163,10 +158,10 @@ bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::R
 {
     std::cout << "Received target of color: " << req.color << ", and position :["<< req.position[0] << ", " << req.position[1] << "];" << std::endl;
     if(mState == eState::HOVER){
-        mTarget->color = req.color;
-        mTarget->shape = req.shape;
-        mTarget->location[0] = req.position[0];
-        mTarget->location[1] = req.position[1];
+        mTarget.color = req.color;
+        mTarget.shape = req.shape;
+        mTarget.position.x = req.position[0];
+        mTarget.position.y = req.position[1];
         res.success = true;
         mState = eState::CATCHING;
 
@@ -242,7 +237,7 @@ void UavStateMachine::catchingCallback(){
     //TargetTracking (aka visual servoing)
     /// Init subscriber to candidates
     ros::NodeHandle nh;
-    ros::Subscriber candidateSubscriber = nh.subscribe<std_msgs::String>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
+    ros::Subscriber candidateSubscriber = nh.subscribe<uav_state_machine::candidate_list>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
 
     if(!candidateSubscriber){
         std::cout << ("Can't start candidate subscriber.") << std::endl;
@@ -284,7 +279,7 @@ bool UavStateMachine::landCallback(uav_state_machine::land_service::Request  &re
     return true;
 }
 //----------------------------------------------------------------------------------------------------------------------------------
-bool UavStateMachine::bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs, mbzirc::Candidate &_result){
+bool UavStateMachine::bestCandidateMatch(const uav_state_machine::candidate_list _list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result){
     double bestScore= 0;
     bool foundMatch = false;
     for(auto&candidate:_list.candidates){
@@ -293,13 +288,13 @@ bool UavStateMachine::bestCandidateMatch(const mbzirc::CandidateList &_list, con
             score +=1;
         }
 
-        if(candidate.shape == _specs.shape){
-            score +=1;
-        }
+        //if(candidate.shape == _specs.shape){
+        //    score +=1;
+        //}
 
-        if((candidate.location - _specs.location).norm() < (_result.location - _specs.location).norm()){
-            score +=1;
-        }
+        //if((candidate.location - _specs.location).norm() < (_result.location - _specs.location).norm()){
+        //    score +=1;
+        //}
 
         if(score > bestScore){
             _result = candidate;

@@ -40,16 +40,15 @@
 #include <grvc_utils/argument_parser.h>
 #include <grvc_quadrotor_hal/types.h>
 #include <grvc_quadrotor_hal/server.h>
+
+#include <uav_state_machine/candidate_list.h>
+#include <uav_state_machine/candidate.h>
+
 using namespace std;
 using namespace grvc::hal;
 using namespace grvc::com;
 using namespace grvc::utils;
 using namespace grvc;
-
-namespace mbzirc{
-    class Candidate;
-    class CandidateList;
-}
 
 class UavStateMachine{
 public:
@@ -64,7 +63,6 @@ private:
     void reposeCallback();
     bool searchingCallback(uav_state_machine::waypoint_service::Request &req, uav_state_machine::waypoint_service::Response &res);
     void catchingCallback();
-    void candidateCallback(const std_msgs::String::ConstPtr& _msg);
     void joystickCb(const sensor_msgs::Joy::ConstPtr& _joy);
     void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
     void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
@@ -75,7 +73,8 @@ private:
     bool landCallback(uav_state_machine::land_service::Request  &req,
          uav_state_machine::land_service::Response &res);
 
-    bool bestCandidateMatch(const mbzirc::CandidateList &_list, const mbzirc::Candidate &_specs, mbzirc::Candidate &_matchedCandidate);
+    void candidateCallback(const uav_state_machine::candidate_list::ConstPtr& _msg);
+    bool bestCandidateMatch(const uav_state_machine::candidate_list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result);
 
     grvc::hal::Server::PositionErrorService::Client *pos_error_srv;
 
@@ -101,7 +100,7 @@ private:
     int mWaypointItem = 0;
 
     eState mState =eState::REPOSE;
-    mbzirc::Candidate *mTarget;
+    uav_state_machine::candidate mTarget;
 
 };
 #endif
