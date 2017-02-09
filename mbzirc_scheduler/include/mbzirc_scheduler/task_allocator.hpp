@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // GRVC MBZIRC
 // Author Jesus Capitan <jcapitan@us.es>
-// Author Ricardo Ragel
+// Author Ricardo Ragel <delatorre@us.es>
 //------------------------------------------------------------------------------
 // The MIT License (MIT)
 //
@@ -34,6 +34,11 @@
 
 #define NUM_OF_UAVS 3	// Number of UAVs in operation
 
+enum TargetSelectionMode {NEAREST = 1, LOWER_SCORE_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3};
+// NEAREST: get the closest target to the UAV
+// LOWER_SCORE_NEAREST: get the easier target closest to the UAV
+// WEIGHTED_SCORE_AND_DISTANCE: TODO
+
 using namespace std;
 
 namespace mbzirc {
@@ -47,14 +52,25 @@ class Uav
 
 };
 
-// Task allocator: class to get the optimal target to a UAV given the current targets estimations
+class Target
+{
+	public:
+	   int id;		// Unique identifier
+	   TargetStatus status;	// Possible status: {UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST, N_STATUS}
+	   Color score;		// Score/Difficulty according to the color: {UNKNOWN = -1, RED = 0, GREEN, BLUE, YELLOW, ORANGE, N_COLORS}
+	   double x,y;		// Global Position
+};
+
+bool getTargetInfo(int target_id, double &x, double &y, TargetStatus &type, Color &color);
+
+// Task allocator: class to get the optimal target to a UAV given the current targets estimations and the selection mode
 class TaskAllocator 
 {
 	public:
 		/**
 		 * Constructor
 		**/
-		TaskAllocator(CentralizedEstimator* targets_ptr_);
+		TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_);
 		
 		/**
 		 * Destructor
@@ -73,11 +89,20 @@ class TaskAllocator
 		
 	protected:
 	
+		// Return module of [dx,dy]
+		double getModule(double dx, double dy);
+		
+		// Return the minimum score inside the 'targets' vect
+		Color getMinScore(std::vector<Target> targets_);
+	
 		// Pointer to the targets interface
-		CentralizedEstimator* targets_ptr;
+		CentralizedEstimator* targets_estimation_ptr;
 		
 		// UAVs positions
 		std::vector<Uav> uav;
+		
+		// Target selection mode
+		TargetSelectionMode mode;
 };
 
 }

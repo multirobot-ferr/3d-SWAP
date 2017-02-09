@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // GRVC MBZIRC
 // Author Jesus Capitan <jcapitan@us.es>
-// Author Ricardo Ragel
+// Author Ricardo Ragel <delatorre@us.es>
 //------------------------------------------------------------------------------
 // The MIT License (MIT)
 //
@@ -33,11 +33,12 @@ namespace mbzirc {
 
 /** Constructor
 \param	targets_ptr_	Pointer to the targets interface
+\param	select_mode_	Target selection mode: one of TargetSelectionMode
 **/
-TaskAllocator::TaskAllocator(CentralizedEstimator* targets_ptr_)
+TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_)
 {
 	// Assign targets pointer
-	targets_ptr = targets_ptr_;
+	targets_estimation_ptr = targets_estimation_ptr_;
 	
 	// Resize vector for three UAVs
 	uav.resize(NUM_OF_UAVS);
@@ -50,6 +51,9 @@ TaskAllocator::TaskAllocator(CentralizedEstimator* targets_ptr_)
 		uav[i].y = 0.0;
 		uav[i].z = 0.0;
 	}
+	
+	// Select mode
+	mode = mode_;
 }
 
 /// Destructor
@@ -57,7 +61,7 @@ TaskAllocator::~TaskAllocator()
 {
 	// Clear and free the vectors
 	uav.clear();	
-	vector<Uav>().swap(uav);
+	std::vector<Uav>().swap(uav);
 }
 
 /** Update a UAV position given its identifier
@@ -78,32 +82,119 @@ void TaskAllocator::updateUavPosition(int id, double x, double y, double z)
 	uav[id-1].z = z;
 }
 
-/** Get optimal Target
+/** Get optimal Target according to the selected mode. If all targets has 
+    UNKNOWN difficulty (in other word: score/color) the optimal target 
+    will be the nearest to the UAV.
 \param	id		UAV identifier
 \return	target_id	Optimal target identifier (-1 if it doesn not exist)
 **/
 int TaskAllocator::getOptimalTarget(int id)
-{
-	int optimal_target = -1;
+{	
+	// Get valid targets info
+	int targets_num = targets_estimation_ptr->getNumTargets();
+	std::vector<Target> targets;
+	Target tmp_target;
+	for(int i=0; i<targets_num; i++)
+	{
+		tmp_target.id = i;
+		targets_estimation_ptr->getTargetInfo(i, tmp_target.x, tmp_target.y, tmp_target.status, tmp_target.score);
+		if(tmp_target.status == UNASSIGNED)
+			targets.push_back(tmp_target);
+	}
 	
-	return optimal_target;
+	// Get optimal target: lower difficulty and/or nearest target in 'targets', according to selected mode
+	int optimal_target_id = -1; 
+	double minimum_distance = std::numeric_limits<double>::max();
+	Color minimum_difficult = getMinScore(targets);
+	double mod; // distance from UAV to targets
+	
+	TargetSelectionMode tmp_mode = mode;
+	if(minimum_difficult == UNKNOWN)	// if all targets difficult are unknown, set NEAREST mode by default
+		tmp_mode = NEAREST;
+	
+	for(int i=0; i<targets.size(); i++)
+	{
+		switch(mode)
+		{
+			case NEAREST:
+				
+				// Only by distance (lower)
+				mod = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y);
+				if(mod < minimum_distance)
+				{
+					minimum_distance = mod;
+					optimal_target_id = targets[i].id;
+				}
+				break;
+			
+			case LOWER_SCORE_NEAREST:
+				
+				// By difficulty (lower) and after distance (lower)
+				if(targets[i].score == minimum_difficult)
+				{
+					mod = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y);
+					if(mod < minimum_distance)
+					{
+						minimum_distance = mod;
+						optimal_target_id = targets[i].id;
+					}
+				}
+				
+				break;
+			
+			case WEIGHTED_SCORE_AND_DISTANCE:
+				
+				// Weighted Selection
+				/// ****************************** todo *****************************************
+				break;
+			
+			default:
+				ROS_ERROR("TaskAllocator::TaskAllocator() mode argument must be one of enumered by TargetSelectionMode");
+				exit(0);
+		}
+	}
+	
+	
+	// Clean vars
+	targets.clear();
+	std::vector<Target>().swap(targets);
+	
+	
+	return optimal_target_id;
 }
 
+
+
+// Auxiliar function that returns the module of [dx,dy]
+double TaskAllocator::getModule(double dx, double dy)
+{
+	return sqrtf(dx*dx+dy*dy);
+}
+
+// Auxiliar function that returns the minimum score inside the 'targets' vect
+Color TaskAllocator::getMinScore(std::vector<Target> targets_)
+{
+	Color min_score = ORANGE; //maximum (4)
+	bool one_known_at_least = false;
+	for(int i=0; i<targets_.size(); i++)
+	{
+		if(targets_[i].score != UNKNOWN)
+		{
+			one_known_at_least = true;
+			if(targets_[i].score < min_score)
+				min_score = targets_[i].score;
+		}
+		
+	}
+	
+	if(one_known_at_least)
+		return min_score;
+	else
+		return UNKNOWN;
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
