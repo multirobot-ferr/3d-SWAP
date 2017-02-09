@@ -60,27 +60,27 @@ TargetTracker::~TargetTracker()
 \brief Initialize the filter. 
 \param z Initial observation
 */
-void TargetTracker::initialize(Candidate z)
+void TargetTracker::initialize(Candidate* z)
 {
 
 	// Setup state vector
 	pose_.setZero(4, 1);
-	pose_(0,0) = z.location(0);
-	pose_(1,0) = z.location(1);
-	pose_(2,0) = z.speed(0);
-	pose_(3,0) = z.speed(1);
+	pose_(0,0) = z->location(0);
+	pose_(1,0) = z->location(1);
+	pose_(2,0) = z->speed(0);
+	pose_(3,0) = z->speed(1);
 		
 	// Setup cov matrix
 	pose_cov_.setIdentity(4, 4);
-	pose_cov_(0,0) = z.locationCovariance(0,0);
-	pose_cov_(0,1) = z.locationCovariance(0,1);
-	pose_cov_(1,0) = z.locationCovariance(1,0);
-	pose_cov_(1,1) = z.locationCovariance(1,1);
+	pose_cov_(0,0) = z->locationCovariance(0,0);
+	pose_cov_(0,1) = z->locationCovariance(0,1);
+	pose_cov_(1,0) = z->locationCovariance(1,0);
+	pose_cov_(1,1) = z->locationCovariance(1,1);
 
-	pose_cov_(2,2) = z.speedCovariance(0,0);
-	pose_cov_(2,3) = z.speedCovariance(0,1);
-	pose_cov_(3,2) = z.speedCovariance(1,0);
-	pose_cov_(3,3) = z.speedCovariance(1,1);
+	pose_cov_(2,2) = z->speedCovariance(0,0);
+	pose_cov_(2,3) = z->speedCovariance(0,1);
+	pose_cov_(3,2) = z->speedCovariance(1,0);
+	pose_cov_(3,3) = z->speedCovariance(1,1);
 
 
 	// Init and update factored belief 
@@ -94,7 +94,7 @@ void TargetTracker::initialize(Candidate z)
 
 			for(int i = 0; i < N_COLORS; i++)
 			{
-				if(z.color == i)
+				if(z->color == i)
 					prob_z = COLOR_DETECTOR_PD;
 				else
 					prob_z = (1.0 - COLOR_DETECTOR_PD)/(N_COLORS-1);
@@ -163,7 +163,7 @@ void TargetTracker::predict(double dt)
 \param z Observation to update. 
 \return True if everything was fine
 */
-bool TargetTracker::update(Candidate z)
+bool TargetTracker::update(Candidate* z)
 {
 	// Update factored belief 
 	for(int fact = 0; fact < fact_bel_.size(); fact++)
@@ -176,7 +176,7 @@ bool TargetTracker::update(Candidate z)
 
 			for(int i = 0; i < N_COLORS; i++)
 			{
-				if(z.color == i)
+				if(z->color == i)
 					prob_z = COLOR_DETECTOR_PD;
 				else
 					prob_z = (1.0 - COLOR_DETECTOR_PD)/(N_COLORS-1);
@@ -217,10 +217,10 @@ bool TargetTracker::update(Candidate z)
 		
 	// Compute update noise matrix
 	Eigen::Matrix<double, 2, 2> R;
-	R(0,0) = z.locationCovariance(0,0);
-	R(0,1) = z.locationCovariance(0,1);
-	R(1,0) = z.locationCovariance(1,0);
-	R(1,1) = z.locationCovariance(1,1);
+	R(0,0) = z->locationCovariance(0,0);
+	R(0,1) = z->locationCovariance(0,1);
+	R(1,0) = z->locationCovariance(1,0);
+	R(1,1) = z->locationCovariance(1,1);
 		
 	// Calculate innovation matrix
 	Eigen::Matrix<double, 2, 2> S;
@@ -232,8 +232,8 @@ bool TargetTracker::update(Candidate z)
 		
 	// Calculate innovation vector
 	Eigen::Matrix<double, 2, 1> y;
-	y(0,0) = z.location(0) - pose_(0,0);
-	y(1,0) = z.location(1) - pose_(1,0);
+	y(0,0) = z->location(0) - pose_(0,0);
+	y(1,0) = z->location(1) - pose_(1,0);
 		
 	// Calculate new state vector
 	pose_ = pose_ + K*y;
@@ -252,12 +252,12 @@ Compute the likelihood of an observation with current belief.
 \param z Observation. 
 \return Likelihood measurement
 */
-double TargetTracker::getLikelihood(Candidate z)
+double TargetTracker::getLikelihood(Candidate* z)
 {
 	//TODO
 	double dx, dy;
-	dx = pose_(0,0) - z.location(0);
-	dy = pose_(1,0) - z.location(1);
+	dx = pose_(0,0) - z->location(0);
+	dy = pose_(1,0) - z->location(1);
 
 	return sqrt(dx*dx + dy*dy);
 }

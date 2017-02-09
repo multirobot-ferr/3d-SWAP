@@ -48,7 +48,7 @@ public:
 	~CentralizedEstimator();
 
 	void predict(double dt);
-	bool update(std::vector<Candidate> z_list);
+	bool update(std::vector<Candidate*> z_list);
 
 	int getNumTargets();
 	bool getTargetInfo(int target_id, double &x, double &y, TargetStatus &type, Color &color);

@@ -28,6 +28,8 @@
 
 #include <mbzirc_scheduler/centralized_estimator.h>
 
+using namespace std;
+
 namespace mbzirc {
 
 /** Constructor
@@ -64,35 +66,104 @@ void CentralizedEstimator::predict(double dt)
 
 /**
 \brief Update step for a target
-\param z Observation to update
+\param z_list List with observations to update
 \return True if everything was fine
 */
-bool CentralizedEstimator::update(std::vector<Candidate> z_list)
+bool CentralizedEstimator::update(vector<Candidate*> z_list)
 {
-	// TODO modify to vector<Candidate>
-	double max_likelihood = -1, likelihood;
-	int best_id;
+	vector<vector<double> > distances;
+	vector<int> valid_targets;
+	vector<int> valid_candidates;
+	int n_valid_targets = 0, n_valid_candidates = 0;
 
+	// Compute distances for each association. And count valid targets
 	for(auto it = targets_.begin(); it != targets_.end(); ++it)
 	{
-		if((it->second)->getStatus() != CAUGHT && (it->second)->getStatus() != DEPLOYED)
+		bool target_valid = true;
+
+		if((it->second)->getStatus() != CAUGHT && (it->second)->getStatus() != DEPLOYED && (it->second)->getStatus() != LOST)
 		{
-			likelihood = (it->second)->getLikelihood(z);
-			if(likelihood > max_likelihood)
-			{
-				max_likelihood = likelihood;
-				best_id = (it->second)->getId();;
+			valid_targets.push_back((it->second)->getId());
+			n_valid_targets++;
+		}
+		else
+		{
+			valid_targets.push_back(-1);
+			target_valid = false;
+		}
+
+		vector<double> t_distances;
+		double likelihood;
+
+		for(int i = 0; i < z_list.size(); i++)
+		{
+			if(target_valid)
+			{		
+				likelihood = (it->second)->getLikelihood(z_list[i]);
+				t_distances.push_back(likelihood);
 			}
+			else
+				t_distances.push_back(-1.0);
+		}
+
+		distances.push_back(t_distances);
+	}
+
+	// All candidates valid initially
+	for(int i = 0; i < z_list.size(); i++)
+		valid_candidates.push_back(1);
+
+	n_valid_candidates = z_list.size();
+
+	// Look for best pairs until running out of candidates or targets
+	while(n_valid_targets != 0 && n_valid_candidates != 0 )
+	{
+		double min_dist = -1.0;
+		pair<int, int> best_pair;
+
+		for(int t_id = 0; t_id < distances.size(); t_id++)
+		{
+			if(valid_targets[t_id])
+			{
+				for(int c_id = 0; c_id < distances[t_id].size(); c_id++)
+				{
+					if(valid_candidates[c_id] && (min_dist == -1.0 || distances[t_id][c_id] < min_dist))
+					{
+						min_dist = distances[t_id][c_id];
+						best_pair.first = t_id;
+						best_pair.second = c_id;
+					}		
+				}
+			}
+		}
+
+		// Update with best pair and remove it
+		valid_targets[best_pair.first] = false;
+		valid_candidates[best_pair.second] = false;
+		n_valid_targets--;
+		n_valid_candidates--;
+		
+		// If there is no good data association, create new target
+		if(min_dist <= likelihood_th_)
+			targets_[valid_targets[best_pair.first]]->update(z_list[best_pair.second]);
+		else
+		{
+			targets_[track_id_count_] = new TargetTracker(track_id_count_);
+			targets_[track_id_count_++]->initialize(z_list[best_pair.second]);		
 		}
 	}
 
-	// If there is no good data association, create new target
-	if(max_likelihood > likelihood_th_)
-		targets_[best_id]->update(z);
-	else
+	// Create new targets with remaining candidates
+	if(n_valid_candidates)
 	{
-		targets_[track_id_count_] = new TargetTracker(track_id_count_);
-		targets_[track_id_count_++]->initialize(z);		
+		for(int i = 0; i < z_list.size(); i++)
+		{
+			if(valid_candidates[i])
+			{
+				targets_[track_id_count_] = new TargetTracker(track_id_count_);
+				targets_[track_id_count_++]->initialize(z_list[i]);
+			}
+		}
 	}
 }
 

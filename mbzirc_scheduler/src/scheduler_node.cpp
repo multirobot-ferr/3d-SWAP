@@ -56,7 +56,7 @@ public:
 protected:
 
 	/// TODO Callbacks
-	//void candidatesReceived(const mbzirc_scheduler::Candidate::ConstPtr& candidate);
+	void candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list);
 	void uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
 
 	void publishBelief();
@@ -110,12 +110,12 @@ Scheduler::Scheduler()
 		string candidate_topic_name = "/candidate_list_" + to_string(i+1);
 
 		ros::Subscriber* candidate_sub = new ros::Subscriber();
-		*candidate_sub = nh_->subscribe<uav_state_machine::candidate_list>(candidate_topic_name.str(), 1, &Scheduler::candidatesReceived, this);
-		candidate_subs_.push(candidate_sub);
+		*candidate_sub = nh_->subscribe<uav_state_machine::candidate_list>(candidate_topic_name.c_str(), 1, &Scheduler::candidatesReceived, this);
+		candidate_subs_.push_back(candidate_sub);
 
 		ros::Subscriber* uav_sub = new ros::Subscriber();
-		*uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.str(), 1, &Scheduler::uavPoseReceived, this);
-		uav_subs_.push(uav_sub);
+		*uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, &Scheduler::uavPoseReceived, this);
+		uav_subs_.push_back(uav_sub);
 	}
 	
 	ros::Publisher belief_markers_pub = nh_->advertise<visualization_msgs::MarkerArray>("/belief", 1);
@@ -134,11 +134,14 @@ Scheduler::Scheduler()
 
 		// Predict estimator
 		time_now = ros::Time::now();
-		double elapsed_time = (time_now - prev_time).elapsed();
+		double elapsed_time = (time_now - prev_time).toSec();
 		prev_time = time_now;
 
 		if(elapsed_time)
 			estimator_->predict(elapsed_time);
+
+		// TODO estimator_->update()
+		estimator_->removeLostTargets();
 
 		publishBelief();
 
@@ -168,7 +171,7 @@ Scheduler::~Scheduler()
 */
 void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
 {
-	// TODO
+	// TODO Check whether candidate_list is empty and free candidate lists
 }
 
 /** \brief Callback to receive UAVs poses

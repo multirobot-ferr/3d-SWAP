@@ -38,7 +38,7 @@
 namespace mbzirc {
 
 enum TargetStatus {UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST, N_STATUS};
-enum Color {UNKNOWN = -1, RED = 0, GREEN, BLUE, YELLOW, ORANGE, N_COLORS};
+enum Color {UNKNOWN = -1, RED = 0, BLUE, GREEN, YELLOW, ORANGE, N_COLORS};
 enum Factor {COLOR};
     
 /** \brief This class implements a stochastic filter for an object. 
@@ -55,10 +55,10 @@ public:
 	TargetTracker(int id);
 	~TargetTracker();
 
-	void initialize(Candidate z);
+	void initialize(Candidate* z);
 	void predict(double dt);
-	bool update(Candidate z);
-	double getLikelihood(Candidate z);
+	bool update(Candidate* z);
+	double getLikelihood(Candidate* z);
 	double lastUpdateTime();
 	void getPose(double &x, double &y);
 	TargetStatus getStatus();
