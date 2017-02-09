@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 // GRVC MBZIRC
 // Author Jesus Capitan <jcapitan@us.es>
-// Author Ricardo Ragel
+// Author Ricardo Ragel <delatorre@us.es>
 //------------------------------------------------------------------------------
 // The MIT License (MIT)
 //
@@ -100,7 +100,7 @@ Scheduler::Scheduler()
 
 	// Estimator and allocator
 	estimator_ = new CentralizedEstimator(association_th, lost_time_th);
-	allocator_ = new TaskAllocator(estimator_);
+	allocator_ = new TaskAllocator(estimator_, LOWER_SCORE_NEAREST);	// set different modes (second arg) to select target using different strategies
 
 	// TODO Subscriptions/publications
 	for(int i = 0; i < n_uavs_; i++)
