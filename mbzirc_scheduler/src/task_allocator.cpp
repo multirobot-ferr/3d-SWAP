@@ -35,8 +35,9 @@ namespace mbzirc {
 \param	targets_ptr_	Pointer to the targets interface
 \param	select_mode_	Target selection mode: one of TargetSelectionMode
 \param  num_of_uavs_	Number of UAVs
+\param  alpha_		Distance Weight (coefficient) for WEIGHTED_SCORE_AND_DISTANCE target selection mode
 **/
-TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_)
+TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_, double alpha_)
 {
 	num_of_uavs = num_of_uavs_;
 
@@ -57,6 +58,9 @@ TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, Targ
 	
 	// Select mode
 	mode = mode_;
+	
+	// Target selection coefficient
+	alpha = alpha_;
 }
 
 /// Destructor
@@ -93,11 +97,10 @@ void TaskAllocator::updateUavPosition(int id, double x, double y, double z)
 **/
 int TaskAllocator::getOptimalTarget(int id)
 {	
-	// Get valid targets info
-	int targets_num = targets_estimation_ptr->getNumTargets();
+	// Get valid targets info --> targets vector
 	std::vector<Target> targets;
 	Target tmp_target;
-	for(int i=0; i<targets_num; i++)
+	for(int i=0; i<targets_estimation_ptr->getNumTargets(); i++)
 	{
 		tmp_target.id = i;
 		targets_estimation_ptr->getTargetInfo(i, tmp_target.x, tmp_target.y, tmp_target.status, tmp_target.score);
@@ -106,10 +109,10 @@ int TaskAllocator::getOptimalTarget(int id)
 	}
 	
 	// Get optimal target: lower difficulty and/or nearest target in 'targets', according to selected mode
-	int optimal_target_id = -1; 
-	double minimum_distance = std::numeric_limits<double>::max();
-	Color minimum_difficult = getMinScore(targets);
-	double mod; // distance from UAV to targets
+	int optimal_target_id = -1; 					// Optimal target result
+	double minimum_distance = std::numeric_limits<double>::max();	// Minimum distance in all or a group of estimated targets
+	Color minimum_difficult = getMinScore(targets);			// Minimum score in estimated targets
+	double distance = std::numeric_limits<double>::max(); 		// Distance from UAV to targets
 	
 	TargetSelectionMode tmp_mode = mode;
 	if(minimum_difficult == UNKNOWN)	// if all targets difficult are unknown, set NEAREST mode by default
@@ -122,10 +125,10 @@ int TaskAllocator::getOptimalTarget(int id)
 			case NEAREST:
 				
 				// Only by distance (lower)
-				mod = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y);
-				if(mod < minimum_distance)
+				distance = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y);
+				if(distance < minimum_distance)
 				{
-					minimum_distance = mod;
+					minimum_distance = distance;
 					optimal_target_id = targets[i].id;
 				}
 				break;
@@ -135,10 +138,10 @@ int TaskAllocator::getOptimalTarget(int id)
 				// By difficulty (lower) and after distance (lower)
 				if(targets[i].score == minimum_difficult)
 				{
-					mod = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y);
-					if(mod < minimum_distance)
+					distance = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y);
+					if(distance < minimum_distance)
 					{
-						minimum_distance = mod;
+						minimum_distance = distance;
 						optimal_target_id = targets[i].id;
 					}
 				}
@@ -149,6 +152,8 @@ int TaskAllocator::getOptimalTarget(int id)
 				
 				// Weighted Selection
 				/// ****************************** todo *****************************************
+				
+				
 				break;
 			
 			default:

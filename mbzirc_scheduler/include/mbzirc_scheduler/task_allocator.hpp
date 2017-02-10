@@ -68,7 +68,7 @@ class TaskAllocator
 		/**
 		 * Constructor
 		**/
-		TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_);
+		TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_, double alpha_);
 		
 		/**
 		 * Destructor
@@ -99,11 +99,14 @@ class TaskAllocator
 		// UAVs positions
 		std::vector<Uav> uav;
 		
+		// Number of UAVs in operation
+		int num_of_uavs;		
+		
 		// Target selection mode
 		TargetSelectionMode mode;
-
-		// Number of UAVs in operation
-		int num_of_uavs;
+		
+		// Distance Weight for WEIGHTED_SCORE_AND_DISTANCE target selection mode
+		double alpha;
 };
 
 }

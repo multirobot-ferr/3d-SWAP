@@ -73,6 +73,13 @@ protected:
 	/// Estimator frequency
 	double estimator_rate_;
 
+	/// Task Allocator selection mode {NEAREST = 1, LOWER_SCORE_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3}
+	int task_alloc_mode;
+
+	/// Task Allocator coefficient beetween Distance from UAV and Score/Difficulty 
+	/// Only needed if WEIGHTED_SCORE_AND_DISTANCE target selection mode.
+	double task_alloc_alpha;
+
 	/// Number of UAVs
 	int n_uavs_;
 
@@ -97,11 +104,13 @@ Scheduler::Scheduler()
 	pnh_->param<double>("estimator_rate", estimator_rate_, 5.0); 
 	pnh_->param<double>("lost_time_th", lost_time_th, 20.0); 
 	pnh_->param<double>("association_th",association_th, 3.0);
+	pnh_->param<int>("task_alloc_mode",task_alloc_mode, LOWER_SCORE_NEAREST);
+	pnh_->param<double>("task_alloc_alpha",task_alloc_alpha, 0.8);
 	pnh_->param<int>("n_uavs",n_uavs_, 3);
 
 	// Estimator and allocator
 	estimator_ = new CentralizedEstimator(association_th, lost_time_th);
-	allocator_ = new TaskAllocator(estimator_, LOWER_SCORE_NEAREST, n_uavs_);
+	allocator_ = new TaskAllocator(estimator_, (TargetSelectionMode)task_alloc_mode, n_uavs_, task_alloc_alpha);
 
 	// Subscriptions/publications
 	for(int i = 0; i < n_uavs_; i++)
