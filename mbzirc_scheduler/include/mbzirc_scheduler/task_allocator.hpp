@@ -32,6 +32,11 @@
 #ifndef TASK_ALLOCATOR_HPP_
 #define TASK_ALLOCATOR_HPP_
 
+// Arena dimmensions
+#define LONG_ARENA	90.0
+#define ALT_ARENA	60.0
+
+
 enum TargetSelectionMode {NEAREST = 1, LOWER_SCORE_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3};
 // NEAREST: get the closest target to the UAV
 // LOWER_SCORE_NEAREST: get the easier target closest to the UAV
@@ -107,6 +112,9 @@ class TaskAllocator
 		
 		// Distance Weight for WEIGHTED_SCORE_AND_DISTANCE target selection mode
 		double alpha;
+		
+		// Diagonal of Arena field [m]
+		double maximum_distance;
 };
 
 }

@@ -61,6 +61,9 @@ TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, Targ
 	
 	// Target selection coefficient
 	alpha = alpha_;
+	
+	// Pre-compute maximum distance in the Arena [m]
+	maximum_distance = sqrtf(LONG_ARENA*LONG_ARENA + ALT_ARENA*ALT_ARENA);
 }
 
 /// Destructor
@@ -111,8 +114,12 @@ int TaskAllocator::getOptimalTarget(int id)
 	// Get optimal target: lower difficulty and/or nearest target in 'targets', according to selected mode
 	int optimal_target_id = -1; 					// Optimal target result
 	double minimum_distance = std::numeric_limits<double>::max();	// Minimum distance in all or a group of estimated targets
-	Color minimum_difficult = getMinScore(targets);			// Minimum score in estimated targets
+	Color minimum_difficult = getMinScore(targets);			// Minimum score (difficult) in estimated targets
 	double distance = std::numeric_limits<double>::max(); 		// Distance from UAV to targets
+	double norm_distance = std::numeric_limits<double>::max();	// Normalized distance from UAV to targets according to the Arena field dimensions
+	double norm_score = ORANGE;					// Normalized score according to the maximum difficult
+	double J = std::numeric_limits<double>::max();			// Ratio between distance and difficult
+	double Jmin = std::numeric_limits<double>::max();		// Minimum ratio between distance and difficult
 	
 	TargetSelectionMode tmp_mode = mode;
 	if(minimum_difficult == UNKNOWN)	// if all targets difficult are unknown, set NEAREST mode by default
@@ -151,8 +158,16 @@ int TaskAllocator::getOptimalTarget(int id)
 			case WEIGHTED_SCORE_AND_DISTANCE:
 				
 				// Weighted Selection
-				/// ****************************** todo *****************************************
+				norm_distance = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y)/maximum_distance;
+				norm_score = (double)targets[i].score/(double)ORANGE;
 				
+				J = alpha * norm_distance + (1.0-alpha) * norm_score;
+				
+				if(J < Jmin)
+				{
+					Jmin = J;
+					optimal_target_id = targets[i].id;
+				}
 				
 				break;
 			
@@ -203,6 +218,3 @@ Color TaskAllocator::getMinScore(std::vector<Target> targets_)
 
 
 }
-
-
-
