@@ -8,6 +8,7 @@ project(mbzirc_scheduler)
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   roscpp
+  tf
   visualization_msgs
   std_msgs
   geometry_msgs
@@ -60,6 +61,7 @@ find_package(Eigen3 REQUIRED)
  add_service_files(
    FILES
    AssignTarget.srv
+   SetTargetStatus.srv
  )
 
 ## Generate added messages and services with any dependencies listed here
@@ -100,7 +102,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES mbzirc_target_estimator
-  CATKIN_DEPENDS message_runtime roscpp visualization_msgs std_msgs geometry_msgs uav_state_machine
+  CATKIN_DEPENDS message_runtime roscpp visualization_msgs std_msgs geometry_msgs uav_state_machine tf
   DEPENDS eigen 
 )
 

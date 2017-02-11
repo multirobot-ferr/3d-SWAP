@@ -61,6 +61,9 @@ public:
 	double getLikelihood(Candidate* z);
 	double lastUpdateTime();
 	void getPose(double &x, double &y);
+	void getVelocity(double &vx, double &vy);
+	std::vector<std::vector<double> > getCov();
+
 	TargetStatus getStatus();
 	void setStatus(TargetStatus status);
 	int getId();

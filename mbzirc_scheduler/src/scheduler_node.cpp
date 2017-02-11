@@ -33,8 +33,10 @@
 
 #include <visualization_msgs/MarkerArray.h>
 #include <mbzirc_scheduler/AssignTarget.h>
+#include <mbzirc_scheduler/SetTargetStatus.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <uav_state_machine/candidate_list.h>
+#include <tf/transform_datatypes.h>
 
 #include<string>
 #include<vector>
@@ -61,7 +63,9 @@ protected:
 	void uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
 
 	void publishBelief();
+	void eigendec(double c11, double c22, double c12, vector<double> &D, vector<double> &E);
 	bool assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzirc_scheduler::AssignTarget::Response &res);
+	bool setTargetStatus(mbzirc_scheduler::SetTargetStatus::Request &req, mbzirc_scheduler::SetTargetStatus::Response &res);
 
 	/// Node handlers
 	ros::NodeHandle* nh_; 
@@ -71,6 +75,9 @@ protected:
 	vector<ros::Subscriber *> uav_subs_;
 	vector<ros::Subscriber *> candidate_subs_;
 
+	/// Publishers
+	ros::Publisher belief_pub_;
+
 	/// Candidates queues
 	map<int, vector<Candidate *> > candidates_;
 
@@ -79,13 +86,6 @@ protected:
 
 	/// Maximum delay allowed for candidates (seconds)
 	double delay_max_;
-
-	/// Task Allocator selection mode {NEAREST = 1, LOWER_SCORE_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3}
-	int task_alloc_mode;
-
-	/// Task Allocator coefficient beetween Distance from UAV and Score/Difficulty 
-	/// Only needed if WEIGHTED_SCORE_AND_DISTANCE target selection mode.
-	double task_alloc_alpha;
 
 	/// Number of UAVs
 	int n_uavs_;
@@ -104,8 +104,10 @@ Scheduler::Scheduler()
 	nh_ = new ros::NodeHandle();
 	pnh_ = new ros::NodeHandle("~");
 
-	double lost_time_th;
-	double association_th;
+	double lost_time_th, association_th;
+	int task_alloc_mode;
+	double task_alloc_alpha;
+	
 
 	// Read parameters
 	pnh_->param<double>("estimator_rate", estimator_rate_, 5.0); 
@@ -138,11 +140,13 @@ Scheduler::Scheduler()
 		candidates_[i+1] = empty_vector;
 	}
 	
-	ros::Publisher belief_markers_pub = nh_->advertise<visualization_msgs::MarkerArray>("/belief", 1);
+	belief_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/targets_belief", 1);
 
 	// Services
 	ros::ServiceServer assign_target_srv = nh_->advertiseService("/scheduler/assign_target", &Scheduler::assignTarget, this);
+	ros::ServiceServer set_target_status_srv = nh_->advertiseService("/scheduler/set_target_status", &Scheduler::setTargetStatus, this);
 
+	
 	// Main loop
 
 	ros::Rate r(estimator_rate_);
@@ -263,11 +267,145 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 	return true;
 }
 
+/** \brief Callback for service. Set the status of a target
+*/
+bool Scheduler::setTargetStatus(mbzirc_scheduler::SetTargetStatus::Request &req, mbzirc_scheduler::SetTargetStatus::Response &res)
+{	
+	estimator_->setTargetStatus(req.target_id, (TargetStatus)req.target_status);
+
+	return true;
+}
+
 /** \brief Publish markers to represent targets beliefs
 */
 void Scheduler::publishBelief()
 {
-	// TODO
+	visualization_msgs::MarkerArray marker_array;
+	ros::Time curr_time = ros::Time::now();
+
+	vector<double> w(2);
+	vector<double> v(4);
+	vector<vector<double> > covariances;
+	double a, b, yaw, x, y, vx, vy;
+
+	// Get ids to plot active targets
+	vector<int> active_targets = estimator_->getActiveTargets();
+
+	for(int i = 0; i < active_targets.size(); i++)
+	{
+		if(estimator_->getTargetInfo(active_targets[i], x, y, covariances, vx, vy))
+		{
+
+			// Compute SVD of cholesky. The singular values are the square roots of the eigenvalues of
+			// the covariance matrix 
+			eigendec(4*covariances[0][0], 4*covariances[1][1], 4*covariances[0][1], w, v);
+
+			a = sqrt(fabs(w[0]));
+			b = sqrt(fabs(w[1]));
+
+			yaw = atan2(v[1],v[0]);
+			
+			// Fill in marker
+			visualization_msgs::Marker marker;
+		
+			// Set the frame ID and timestamp
+			marker.header.frame_id = "/map";    
+			marker.header.stamp = curr_time;
+
+			// Set the namespace and id for this marker.  This serves to create a unique ID    
+			// Any marker sent with the same namespace and id will overwrite the old one    
+			marker.ns = "cov_ellipse";    
+			marker.id = i;
+		
+			// Set the marker type    
+			marker.type = visualization_msgs::Marker::SPHERE;
+
+			// Set the marker action.  Options are ADD and DELETE    
+			marker.action = visualization_msgs::Marker::ADD;
+			
+			// Set the scale of the marker -- 1x1x1 here means 1m on a side
+			marker.scale.x = a;
+			marker.scale.y = b;    
+			marker.scale.z = 0.1;
+
+			marker.lifetime = ros::Duration();
+			marker.color.r = 1.0;
+			marker.color.g = 0.0;
+			marker.color.b = 0.0;
+			marker.color.a = 1;
+
+			// Set the central pose of the marker. This is a full 6DOF pose relative to the frame/time specified in the header    
+			marker.pose.position.x = x;
+			marker.pose.position.y = y;
+			marker.pose.position.z = 0;
+			marker.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
+
+			marker_array.markers.push_back(marker);
+
+			// Plot velocity
+			marker.ns = "velocity";
+			marker.type = visualization_msgs::Marker::ARROW;    
+			marker.scale.x = sqrt(vx*vx+vy*vy);
+			marker.scale.y = 0.1;    
+			marker.scale.z = 0.1;
+			
+			marker_array.markers.push_back(marker);
+
+			// Plot target ID
+			marker.ns = "target_id";
+			marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+			marker.text = to_string(active_targets[i]);    
+			marker.scale.z = 0.25;
+			
+			marker_array.markers.push_back(marker);
+		}
+		else
+			ROS_ERROR("Target ID not found");
+	}
+	// Publish the marker    
+	belief_pub_.publish(marker_array);
+}
+
+/**
+ Closed form eigenvalue decomposition
+ 
+ C  Positive definite input matrix of form
+        I[0] I[1]
+        I[2] I[3]   where I[1]=I[2]
+ D  Output eigenvalues
+ E  Eigenvector matrix of form
+        E[0] E[2]
+        E[1] E[3]
+*/
+void Scheduler::eigendec(double c11, double c22, double c12, vector<double> &D, vector<double> &E)
+{ 
+	double a,b,enorm;
+
+	// Find eigenvalues 
+	a = c11+c22;                         // trace 
+ 	b = sqrt((c11-c22)*(c11-c22)+4*c12*c12);
+ 	D[0] = (a+b)/2;
+ 	D[1] = (a-b)/2;
+
+	// Find eigenvector 1 
+	E[0] = c22+c12-D[0];
+	E[1] = D[0]-c11-c12;
+	enorm = sqrt(E[0]*E[0]+E[1]*E[1]);
+
+	if(enorm > 0.0) {
+		E[0] = E[0]/enorm;
+		E[1] = E[1]/enorm;
+	}
+
+	// Find eigenvector 2 
+	E[2] = c22+c12-D[1];
+	E[3] = D[1]-c11-c12;
+	enorm = sqrt(E[2]*E[2]+E[3]*E[3]);
+
+	if(enorm > 0.0) {
+		E[2] = E[2]/enorm;
+		E[3] = E[3]/enorm;
+	}
 }
 
 }

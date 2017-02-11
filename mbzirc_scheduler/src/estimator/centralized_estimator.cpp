@@ -173,6 +173,22 @@ int CentralizedEstimator::getNumTargets()
 	return targets_.size();
 }
 
+/// Return Identifiers of active targets not caught, lost or deployed
+vector<int> CentralizedEstimator::getActiveTargets()
+{
+	vector<int> targets_ids;
+
+	for(auto it = targets_.begin(); it != targets_.end(); ++it)
+	{
+		if( (it->second)->getStatus() != LOST && (it->second)->getStatus() != CAUGHT && (it->second)->getStatus() != DEPLOYED )
+		{
+			targets_ids.push_back((it->second)->getId());
+		}
+	}
+
+	return targets_ids;
+}
+
 /** \brief Return information from a target
 \param target_id Identifier of the target
 \param x Position of the target
@@ -197,12 +213,59 @@ bool CentralizedEstimator::getTargetInfo(int target_id, double &x, double &y, Ta
 	return found;
 }
 
+/** \brief Return position information from a target
+\param target_id Identifier of the target
+\param x Position of the target
+\param y Position of the target
+\param covariance Covariance matrix for position
+\return True if the target was found 
+*/
+bool CentralizedEstimator::getTargetInfo(int target_id, double &x, double &y, vector<vector<double> > &covariances)
+{
+	bool found = false;
+
+	auto it = targets_.find(target_id);
+	if(it != targets_.end())
+	{
+		found = true;
+		targets_[target_id]->getPose(x, y);
+		covariances = targets_[target_id]->getCov();
+	}
+	
+	return found;
+}
+
+/** \brief Return position and velocity information from a target
+\param target_id Identifier of the target
+\param x Position of the target
+\param y Position of the target
+\param covariance Covariance matrix for position
+\param vx Velocity of the target
+\param vy Velocity of the target
+\return True if the target was found 
+*/
+bool CentralizedEstimator::getTargetInfo(int target_id, double &x, double &y, vector<vector<double> > &covariances, double &vx, double &vy)
+{
+	bool found = false;
+
+	auto it = targets_.find(target_id);
+	if(it != targets_.end())
+	{
+		found = true;
+		targets_[target_id]->getPose(x, y);
+		covariances = targets_[target_id]->getCov();
+		targets_[target_id]->getVelocity(vx, vy);
+	}
+	
+	return found;
+}
+
 /** \brief Set the status of a target
 \param target_id Identifier of the target
 \param Status Status of the target 
 \return True if the target was found 
 */
-bool CentralizedEstimator::setTargetStatus(int target_id, TargetStatus &status)
+bool CentralizedEstimator::setTargetStatus(int target_id, TargetStatus status)
 {
 	bool found = false;
 

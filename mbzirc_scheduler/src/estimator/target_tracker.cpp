@@ -31,6 +31,8 @@
 #define VEL_NOISE_VAR 0.2 
 #define COLOR_DETECTOR_PD 0.9
 
+using namespace std;
+
 namespace mbzirc {
 
 /** Constructor
@@ -279,6 +281,34 @@ void TargetTracker::getPose(double &x, double &y)
 {
 	x = pose_(0,0);
 	y = pose_(1,0);
+}
+
+/** \brief Return velocity information from the target
+\param vx Velocity of the target
+\param vy Velocity of the target
+*/
+void TargetTracker::getVelocity(double &vx, double &vy)
+{
+	vx = pose_(2,0);
+	vy = pose_(3,0);
+}
+
+/** \brief Return covariance matrix from the target
+\return Covariance matrix
+*/
+vector<vector<double> > TargetTracker::getCov()
+{
+	vector<vector<double> > covariance;
+	covariance.resize(2);
+	covariance[0].resize(2);
+	covariance[1].resize(2);
+
+	covariance[0][0] = pose_cov_(0,0);
+	covariance[0][1] = pose_cov_(0,1);
+	covariance[1][0] = pose_cov_(1,0);
+	covariance[1][1] = pose_cov_(1,1);
+
+	return covariance;
 }
 
 /** \brief Return likeliest target status

@@ -51,8 +51,11 @@ public:
 	bool update(std::vector<Candidate*> z_list);
 
 	int getNumTargets();
+	std::vector<int> getActiveTargets();
 	bool getTargetInfo(int target_id, double &x, double &y, TargetStatus &type, Color &color);
-	bool setTargetStatus(int target_id, TargetStatus &type);
+	bool getTargetInfo(int target_id, double &x, double &y, std::vector<std::vector<double> > &covariances);
+	bool getTargetInfo(int target_id, double &x, double &y, std::vector<std::vector<double> > &covariances, double &vx, double &vy);
+	bool setTargetStatus(int target_id, TargetStatus status);
 	void removeLostTargets();
 
 protected:
