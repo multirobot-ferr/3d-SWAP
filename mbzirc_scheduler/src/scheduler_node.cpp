@@ -38,6 +38,7 @@
 
 #include<string>
 #include<vector>
+#include<map>
 
 using namespace std;
 
@@ -55,7 +56,7 @@ public:
 
 protected:
 
-	/// TODO Callbacks
+	/// Callbacks
 	void candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list);
 	void uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
 
@@ -70,8 +71,14 @@ protected:
 	vector<ros::Subscriber *> uav_subs_;
 	vector<ros::Subscriber *> candidate_subs_;
 
+	/// Candidates queues
+	map<int, vector<Candidate *> > candidates_;
+
 	/// Estimator frequency
 	double estimator_rate_;
+
+	/// Maximum delay allowed for candidates (seconds)
+	double delay_max_;
 
 	/// Task Allocator selection mode {NEAREST = 1, LOWER_SCORE_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3}
 	int task_alloc_mode;
@@ -103,7 +110,8 @@ Scheduler::Scheduler()
 	// Read parameters
 	pnh_->param<double>("estimator_rate", estimator_rate_, 5.0); 
 	pnh_->param<double>("lost_time_th", lost_time_th, 20.0); 
-	pnh_->param<double>("association_th",association_th, 3.0);
+	pnh_->param<double>("association_th", association_th, 3.0);
+	pnh_->param<double>("delay_max", delay_max_, 2.0);
 	pnh_->param<int>("task_alloc_mode",task_alloc_mode, LOWER_SCORE_NEAREST);
 	pnh_->param<double>("task_alloc_alpha",task_alloc_alpha, 0.8);
 	pnh_->param<int>("n_uavs",n_uavs_, 3);
@@ -125,6 +133,9 @@ Scheduler::Scheduler()
 		ros::Subscriber* uav_sub = new ros::Subscriber();
 		*uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, &Scheduler::uavPoseReceived, this);
 		uav_subs_.push_back(uav_sub);
+
+		vector<Candidate *> empty_vector;
+		candidates_[i+1] = empty_vector;
 	}
 	
 	ros::Publisher belief_markers_pub = nh_->advertise<visualization_msgs::MarkerArray>("/belief", 1);
@@ -149,7 +160,13 @@ Scheduler::Scheduler()
 		if(elapsed_time)
 			estimator_->predict(elapsed_time);
 
-		// TODO estimator_->update()
+		// Update 
+		for(auto it = candidates_.begin(); it != candidates_.end(); ++it)
+		{
+			if((it->second).size())
+				estimator_->update(it->second);
+		}
+
 		estimator_->removeLostTargets();
 
 		publishBelief();
@@ -171,7 +188,14 @@ Scheduler::~Scheduler()
 	{
 		delete candidate_subs_[i];
 		delete uav_subs_[i];
+
+		for(int j = 0; j < candidates_[i+1].size(); j++)
+		{
+			delete candidates_[i+1][j];
+		}
+		candidates_[i+1].clear();
 	}
+	candidates_.clear();
 	candidate_subs_.clear();
 	uav_subs_.clear();
 }
@@ -180,7 +204,47 @@ Scheduler::~Scheduler()
 */
 void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
 {
-	// TODO Check whether candidate_list is empty and free candidate lists
+	double delay = (ros::Time::now() - candidate_list->stamp).toSec();
+
+	if(candidate_list->candidates.size() && delay < delay_max_)
+	{
+		int uav = candidate_list->uav_id;
+
+		// Remove existing candidates
+		if(candidates_[uav].size())
+		{
+			for(int j = 0; j < candidates_[uav].size(); j++)
+			{
+				delete candidates_[uav][j];
+			}
+			candidates_[uav].clear();
+		}
+
+		// Store received candidates
+		for(int j = 0; j < candidate_list->candidates.size(); j++)
+		{
+			Candidate* cand_p = new Candidate;
+
+			cand_p->color = candidate_list->candidates[j].color;
+			cand_p->shape = candidate_list->candidates[j].shape;
+			cand_p->height = candidate_list->candidates[j].height;
+			cand_p->width = candidate_list->candidates[j].width;
+
+			cand_p->location(0) = candidate_list->candidates[j].position.x;
+			cand_p->location(1) = candidate_list->candidates[j].position.y;
+			cand_p->location(1) = candidate_list->candidates[j].position.z;
+
+			for(int i = 0; i < 3; i++)
+			{
+				for(int k = 0; k < 3; k++)
+				{
+					cand_p->locationCovariance(i,k) = candidate_list->candidates[j].position_covariance[i*3+j];
+				}	
+			}			
+
+			candidates_[uav].push_back(cand_p); 
+		}
+	}
 }
 
 /** \brief Callback to receive UAVs poses

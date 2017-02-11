@@ -5,6 +5,7 @@ float64[] pixel
 int32 width
 int32 height
 geometry_msgs/Vector3 position
+float64[] position_covariance
 
 int32 COLOR_UNKNOWN=-1
 int32 COLOR_RED=0
