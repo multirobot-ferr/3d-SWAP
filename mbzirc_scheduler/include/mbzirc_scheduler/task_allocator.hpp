@@ -39,12 +39,14 @@
 
 enum TargetSelectionMode {NEAREST = 1, LOWER_SCORE_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3};
 // NEAREST: get the closest target to the UAV
-// LOWER_SCORE_NEAREST: get the easier target closest to the UAV
+// LOWER_SCORE_NEAREST: get the easiest target closest to the UAV
 // WEIGHTED_SCORE_AND_DISTANCE: TODO
 
 using namespace std;
 
 namespace mbzirc {
+
+enum Score {UNKNOWN_S = -1, RED_S = 1, GREEN_S = 2, BLUE_S = 3, YELLOW_S = 5, ORANGE_DOUBLE_S = 10};
 
 // Simple UAV data info
 class Uav
@@ -59,8 +61,8 @@ class Target
 {
 	public:
 	   int id;		// Unique identifier
-	   TargetStatus status;	// Possible status: {UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST, N_STATUS}
-	   Color score;		// Score/Difficulty according to the color: {UNKNOWN = -1, RED = 0, GREEN, BLUE, YELLOW, ORANGE, N_COLORS}
+	   TargetStatus status;	// Possible status: UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST
+	   Score score;		// Score/Difficulty according to the color 
 	   double x,y;		// Global Position
 };
 
@@ -96,7 +98,7 @@ class TaskAllocator
 		double getModule(double dx, double dy);
 		
 		// Return the minimum score inside the 'targets' vect
-		Color getMinScore(std::vector<Target> targets_);
+		Score getMinScore(std::vector<Target> targets_);
 	
 		// Pointer to the targets interface
 		CentralizedEstimator* targets_estimation_ptr;

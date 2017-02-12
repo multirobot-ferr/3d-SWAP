@@ -93,39 +93,67 @@ void TaskAllocator::updateUavPosition(int id, double x, double y, double z)
 }
 
 /** Get optimal Target according to the selected mode. If all targets has 
-    UNKNOWN difficulty (in other word: score/color) the optimal target 
+    UNKNOWN score (i.e., color) the optimal target 
     will be the nearest to the UAV.
 \param	id		UAV identifier
-\return	target_id	Optimal target identifier (-1 if it doesn not exist)
+\return	target_id	Optimal target identifier (-1 if it does not exist)
 **/
 int TaskAllocator::getOptimalTarget(int id)
 {	
 	// Get valid targets info --> targets vector
 	std::vector<Target> targets;
 	Target tmp_target;
-	for(int i=0; i<targets_estimation_ptr->getNumTargets(); i++)
+	Color target_color;
+
+	std::vector<int> active_targets = targets_estimation_ptr->getActiveTargets();
+
+	for(int i = 0; i < active_targets.size(); i++)
 	{
-		tmp_target.id = i;
-		targets_estimation_ptr->getTargetInfo(i, tmp_target.x, tmp_target.y, tmp_target.status, tmp_target.score);
+		tmp_target.id = active_targets[i];
+		targets_estimation_ptr->getTargetInfo(active_targets[i], tmp_target.x, tmp_target.y, tmp_target.status, target_color);
+
 		if(tmp_target.status == UNASSIGNED)
+		{
+			switch(target_color)
+			{
+				case UNKNOWN: 
+				tmp_target.score = UNKNOWN_S;
+				break;
+				case RED:
+				tmp_target.score = RED_S;
+				break;
+				case GREEN:
+				tmp_target.score = GREEN_S;
+				break;
+				case BLUE:
+				tmp_target.score = BLUE_S;
+				break;
+				case YELLOW:
+				tmp_target.score = YELLOW_S;
+				break;
+				case ORANGE:
+				tmp_target.score = YELLOW_S;
+				break;
+			}
 			targets.push_back(tmp_target);
+		}
 	}
 	
 	// Get optimal target: lower difficulty and/or nearest target in 'targets', according to selected mode
 	int optimal_target_id = -1; 					// Optimal target result
 	double minimum_distance = std::numeric_limits<double>::max();	// Minimum distance in all or a group of estimated targets
-	Color minimum_difficult = getMinScore(targets);			// Minimum score (difficult) in estimated targets
+	Score minimum_difficult = getMinScore(targets);			// Minimum score (difficult) in estimated targets
 	double distance = std::numeric_limits<double>::max(); 		// Distance from UAV to targets
 	double norm_distance = std::numeric_limits<double>::max();	// Normalized distance from UAV to targets according to the Arena field dimensions
-	double norm_score = ORANGE;					// Normalized score according to the maximum difficult
+	double norm_score = ORANGE_DOUBLE_S;					// Normalized score according to the maximum difficult
 	double J = std::numeric_limits<double>::max();			// Ratio between distance and difficult
 	double Jmin = std::numeric_limits<double>::max();		// Minimum ratio between distance and difficult
 	
 	TargetSelectionMode tmp_mode = mode;
-	if(minimum_difficult == UNKNOWN)	// if all targets difficult are unknown, set NEAREST mode by default
+	if(minimum_difficult == UNKNOWN_S)	// if all targets difficult are unknown, set NEAREST mode by default
 		tmp_mode = NEAREST;
 	
-	for(int i=0; i<targets.size(); i++)
+	for(int i = 0; i < targets.size(); i++)
 	{
 		switch(mode)
 		{
@@ -159,7 +187,7 @@ int TaskAllocator::getOptimalTarget(int id)
 				
 				// Weighted Selection
 				norm_distance = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y)/maximum_distance;
-				norm_score = (double)targets[i].score/(double)ORANGE;
+				norm_score = (double)targets[i].score/(double)ORANGE_DOUBLE_S;
 				
 				J = alpha * norm_distance + (1.0-alpha) * norm_score;
 				
@@ -195,13 +223,13 @@ double TaskAllocator::getModule(double dx, double dy)
 }
 
 // Auxiliar function that returns the minimum score inside the 'targets' vect
-Color TaskAllocator::getMinScore(std::vector<Target> targets_)
+Score TaskAllocator::getMinScore(std::vector<Target> targets_)
 {
-	Color min_score = ORANGE; //maximum (4)
+	Score min_score = ORANGE_DOUBLE_S; // maximum 
 	bool one_known_at_least = false;
-	for(int i=0; i<targets_.size(); i++)
+	for(int i = 0; i < targets_.size(); i++)
 	{
-		if(targets_[i].score != UNKNOWN)
+		if(targets_[i].score != UNKNOWN_S)
 		{
 			one_known_at_least = true;
 			if(targets_[i].score < min_score)
@@ -213,7 +241,7 @@ Color TaskAllocator::getMinScore(std::vector<Target> targets_)
 	if(one_known_at_least)
 		return min_score;
 	else
-		return UNKNOWN;
+		return UNKNOWN_S;
 }
 
 
