@@ -40,7 +40,7 @@
 enum TargetSelectionMode {NEAREST = 1, LOWER_SCORE_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3};
 // NEAREST: get the closest target to the UAV
 // LOWER_SCORE_NEAREST: get the easiest target closest to the UAV
-// WEIGHTED_SCORE_AND_DISTANCE: TODO
+// WEIGHTED_SCORE_AND_DISTANCE: weight distance and score with a factor
 
 using namespace std;
 
@@ -66,7 +66,7 @@ class Target
 	   double x,y;		// Global Position
 };
 
-bool getTargetInfo(int target_id, double &x, double &y, TargetStatus &type, Color &color);
+//bool getTargetInfo(int target_id, double &x, double &y, TargetStatus &type, Color &color);
 
 // Task allocator: class to get the optimal target to a UAV given the current targets estimations and the selection mode
 class TaskAllocator 
