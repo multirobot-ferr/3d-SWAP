@@ -234,8 +234,9 @@ bool TargetTracker::update(Candidate* z)
 		
 	// Calculate innovation vector
 	Eigen::Matrix<double, 2, 1> y;
-	y(0,0) = z->location(0) - pose_(0,0);
-	y(1,0) = z->location(1) - pose_(1,0);
+	y = H*pose_;
+	y(0,0) = z->location(0) - y(0,0);
+	y(1,0) = z->location(1) - y(1,0);
 		
 	// Calculate new state vector
 	pose_ = pose_ + K*y;
@@ -250,13 +251,45 @@ bool TargetTracker::update(Candidate* z)
 }
     
 /**
-Compute the likelihood of an observation with current belief.
+Compute the likelihood of an observation with current belief. Based on Mahalanobis distance. 
 \param z Observation. 
 \return Likelihood measurement
 */
 double TargetTracker::getLikelihood(Candidate* z)
 {
-	//TODO
+	// Compute update jacobian
+	Eigen::Matrix<double, 2, 4> H;
+	H.setZero(2, 4);
+	H(0,0) = 1.0;
+	H(1,1) = 1.0;
+		
+	// Compute update noise matrix
+	Eigen::Matrix<double, 2, 2> R;
+	R(0,0) = z->locationCovariance(0,0);
+	R(0,1) = z->locationCovariance(0,1);
+	R(1,0) = z->locationCovariance(1,0);
+	R(1,1) = z->locationCovariance(1,1);
+		
+	// Calculate innovation matrix
+	Eigen::Matrix<double, 2, 2> S;
+	S = H*pose_cov_*H.transpose() + R;
+			
+	// Calculate innovation vector
+	Eigen::Matrix<double, 2, 1> y;
+	y = H*pose_;
+	y(0,0) = z->location(0) - y(0,0);
+	y(1,0) = z->location(1) - y(1,0);
+	
+	return y.transpose()*S.inverse()*y;
+}
+
+/**
+Compute the euclidean distance of an observation with current belief.
+\param z Observation. 
+\return Euclidean distance
+*/
+double TargetTracker::getDistance(Candidate* z)
+{
 	double dx, dy;
 	dx = pose_(0,0) - z->location(0);
 	dy = pose_(1,0) - z->location(1);

@@ -66,8 +66,6 @@ class Target
 	   double x,y;		// Global Position
 };
 
-//bool getTargetInfo(int target_id, double &x, double &y, TargetStatus &type, Color &color);
-
 // Task allocator: class to get the optimal target to a UAV given the current targets estimations and the selection mode
 class TaskAllocator 
 {

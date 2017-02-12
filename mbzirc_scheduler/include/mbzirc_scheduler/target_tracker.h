@@ -59,6 +59,7 @@ public:
 	void predict(double dt);
 	bool update(Candidate* z);
 	double getLikelihood(Candidate* z);
+	double getDistance(Candidate* z);
 	double lastUpdateTime();
 	void getPose(double &x, double &y);
 	void getVelocity(double &vx, double &vy);
@@ -85,7 +86,6 @@ protected:
 	Eigen::MatrixXd pose_;
 	Eigen::MatrixXd pose_cov_;
 
-	
 };
 
 }
