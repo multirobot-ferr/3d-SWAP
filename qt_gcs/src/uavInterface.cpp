@@ -163,7 +163,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     connect(mTargetButton, SIGNAL (released()), this, SLOT (targetCallback()));
     connect(mAddWpButton, SIGNAL (released()), this, SLOT (addWpButtonCallback()));
     connect(mEraseWpButton, SIGNAL (released()), this, SLOT (eraseWpButtonCallback()));
-    connect(mSendWpList, SIGNAL (released()), this, SLOT (sendWpButtonCallback();));
+    connect(mSendWpList, SIGNAL (released()), this, SLOT (sendWpButtonCallback()));
     //connect(mCenterTarget, SIGNAL (released()), this, SLOT (centerCallback()));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
@@ -302,8 +302,8 @@ void UavInterface::sendWpButtonCallback(){
     mEraseWpButton->setEnabled(false);
     mTakeOffThread = new std::thread([this](){
         ros::NodeHandle nh;
-        LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending wps.");
-        ros::ServiceClient client = nh.serviceClient<uav_state_machine::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/uav_state_machine/waypoint");
+        LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending "+std::to_string(mWaypoints.size())+" wps.");
+        ros::ServiceClient client = nh.serviceClient<uav_state_machine::waypoint_service>("/mbzirc_"+std::to_string(mUavId)+"/uav_state_machine/waypoint");
         uav_state_machine::waypoint_service req;
         req.request.action = mWpAction->value();
         for(auto wp: mWaypoints){
