@@ -15,9 +15,13 @@
 #include <QSpinBox>
 #include <QRadioButton>
 #include <QLCDNumber>
+#include <QComboBox>
+#include <QIntValidator>
+#include <QLineEdit>
 
 #include <grvc_quadrotor_hal/types.h>
 #include <grvc_quadrotor_hal/server.h>
+
 
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
@@ -29,6 +33,7 @@
 
 #include <qt_gcs/UavMark.h>
 #include <qt_gcs/LedIndicator.h>
+#include <uav_state_machine/waypoint_service.h>
 
 class UavInterface : public QGroupBox {
     Q_OBJECT
@@ -43,7 +48,11 @@ private slots:
     void targetCallback();
     void centerCallback();
     void switchMagnetCallback(bool _state);
+    void addWpButtonCallback();
+    void eraseWpButtonCallback();
+    void sendWpButtonCallback();
 
+private:
     void altitudeCallback(const std_msgs::Float64ConstPtr &_msg);
     void geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg);
     void rcMagnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg);
@@ -89,6 +98,17 @@ private:
     LedIndicator *mInterruptorLed;
     ros::Subscriber mMagnetSubscriber;
     bool mInterruptorState;
+
+    // Waypoints
+    QComboBox *mWaypointListBox;
+    QPushButton *mEraseWpButton;
+    QPushButton *mAddWpButton;
+    QPushButton *mSendWpList;
+    QSpinBox *mWpAction;
+    QLineEdit *mWpX, *mWpY, *mWpZ;
+    std::vector<std::array<double,3>> mWaypoints;
+    QVBoxLayout mWaypointLayout;
+    QHBoxLayout mWaypointListLayout, mWaypointEditLayout;
 
     // Center map on UAV
     QPushButton *mCenterTarget;

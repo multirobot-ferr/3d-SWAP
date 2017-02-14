@@ -67,6 +67,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
 
     QHBoxLayout *longitudeLayout = new QHBoxLayout();
     QLabel *longitudeText = new QLabel(tr("Longitude:  "));
+
     mLongitudeBox = new QLCDNumber();
     mLongitudeBox->setMode(QLCDNumber::Dec);
     mLongitudeBox->display(0.0);
@@ -83,9 +84,32 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mActionsLayoutUav = new QVBoxLayout();
     mMainLayoutUav->addLayout(mActionsLayoutUav);
 
+    // Waypoints
+    mWaypointListBox = new QComboBox();
+    mWpAction = new QSpinBox();
+    mWpAction->setRange(0,2);
+    mSendWpList = new QPushButton("Send");
+    mWaypointListLayout.addWidget(mWaypointListBox);
+    mWaypointListLayout.addWidget(mWpAction);
+    mWaypointListLayout.addWidget(mSendWpList);
+    mWaypointLayout.addLayout(&mWaypointListLayout);
+
+    mAddWpButton = new QPushButton("Add");
+    mWpX = new QLineEdit();
+    mWpY = new QLineEdit();
+    mWpZ = new QLineEdit();
+    mWaypointEditLayout.addWidget(mWpX);
+    mWaypointEditLayout.addWidget(mWpY);
+    mWaypointEditLayout.addWidget(mWpZ);
+    mWaypointEditLayout.addWidget(mAddWpButton);
+    mEraseWpButton = new QPushButton("Erase");
+    mWaypointListLayout.addWidget(mEraseWpButton);
+    mWaypointLayout.addLayout(&mWaypointEditLayout);
+    mActionsLayoutUav->addLayout(&mWaypointLayout);
+
     // Center target on map
-    mCenterTarget = new QPushButton("Center target");
-    mActionsLayoutUav->addWidget(mCenterTarget);
+    //mCenterTarget = new QPushButton("Center target");
+    //mActionsLayoutUav->addWidget(mCenterTarget);
 
     // Take off panel
     mTakeOffLayout = new QHBoxLayout();
@@ -97,10 +121,11 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mTakeOffLayout->addWidget(mTakeOffAltitude);
 
     // Land panel
-    mLandLayout = new QHBoxLayout();
-    mActionsLayoutUav->addLayout(mLandLayout);
+    //mLandLayout = new QHBoxLayout();
+    //mActionsLayoutUav->addLayout(mLandLayout);
     mLandButton = new QPushButton("Land");
-    mLandLayout->addWidget(mLandButton);
+    mTakeOffLayout->addWidget(mLandButton);
+    //mLandLayout->addWidget(mLandButton);
 
 
     // Target panel
@@ -109,13 +134,13 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mTargetButton = new QPushButton("Send target");
     mTargetLayout->addWidget(mTargetButton);
     mColorSpin = new QSpinBox();
-    mColorSpin->setRange(-1, 2);
-    mShapeSpin = new QSpinBox();
-    mShapeSpin->setRange(-1, 2);
+    mColorSpin->setRange(-1, 4);
+    //mShapeSpin = new QSpinBox();
+    //mShapeSpin->setRange(-1, 4);
     mTargetEnable = new QRadioButton();
     mTargetLayout->addWidget(mTargetEnable);
     mTargetLayout->addWidget(mColorSpin);
-    mTargetLayout->addWidget(mShapeSpin);
+    //mTargetLayout->addWidget(mShapeSpin);
 
     // Magnet
     QHBoxLayout *mMagnetLayout = new QHBoxLayout();
@@ -136,7 +161,10 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     connect(mTakeOffButton, SIGNAL (released()), this, SLOT (takeOffCallback()));
     connect(mLandButton, SIGNAL (released()), this, SLOT (landCallback()));
     connect(mTargetButton, SIGNAL (released()), this, SLOT (targetCallback()));
-    connect(mCenterTarget, SIGNAL (released()), this, SLOT (centerCallback()));
+    connect(mAddWpButton, SIGNAL (released()), this, SLOT (addWpButtonCallback()));
+    connect(mEraseWpButton, SIGNAL (released()), this, SLOT (eraseWpButtonCallback()));
+    connect(mSendWpList, SIGNAL (released()), this, SLOT (sendWpButtonCallback();));
+    //connect(mCenterTarget, SIGNAL (released()), this, SLOT (centerCallback()));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
     connect(mToggleMagnet, SIGNAL (toggled(bool)), this, SLOT (switchMagnetCallback(bool)));
 
@@ -245,6 +273,53 @@ void UavInterface::switchMagnetCallback(bool _state) {
         mToggleMagnet->setEnabled(true);
     });
 
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::addWpButtonCallback(){
+    double x = mWpX->text().toFloat();
+    double y = mWpY->text().toFloat();
+    double z = mWpZ->text().toFloat();
+
+    mWaypoints.push_back({x, y, z});
+    std::stringstream ss;
+    ss << "WP: [" << x << ", " << y << ", "<< z << "]";
+    mWaypointListBox->addItem(ss.str().c_str());
+
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::eraseWpButtonCallback() {
+    int index = mWaypointListBox->currentIndex();
+    mWaypointListBox->removeItem(index);
+    mWaypoints.erase(mWaypoints.begin()+index);
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::sendWpButtonCallback(){
+    mSendWpList->setEnabled(false);
+    mAddWpButton->setEnabled(false);
+    mEraseWpButton->setEnabled(false);
+    mTakeOffThread = new std::thread([this](){
+        ros::NodeHandle nh;
+        LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending wps.");
+        ros::ServiceClient client = nh.serviceClient<uav_state_machine::takeoff_service>("/mbzirc_"+std::to_string(mUavId)+"/uav_state_machine/waypoint");
+        uav_state_machine::waypoint_service req;
+        req.request.action = mWpAction->value();
+        for(auto wp: mWaypoints){
+            geometry_msgs::Point p;
+            p.x = wp[0];
+            p.y = wp[1];
+            p.z = wp[2];
+            req.request.waypoint_track.push_back(p);
+        }
+
+        auto res = client.call(req);
+        LogManager::get()->status("UAV_"+std::to_string(mUavId), "Returned call with result: "+std::to_string(res));
+        mSendWpList->setEnabled(true);
+        mAddWpButton->setEnabled(true);
+        mEraseWpButton->setEnabled(true);
+    });
 }
 
 //---------------------------------------------------------------------------------------------------------------------
