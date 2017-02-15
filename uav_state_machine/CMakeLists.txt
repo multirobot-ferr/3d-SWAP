@@ -39,6 +39,7 @@ if(GRVCQUAD_USE_ROS)
 		   FILES
 		   candidate.msg
 		   candidate_list.msg
+		   uav_state.msg
 	 )
 
 	## Generate added messages and services with any dependencies listed here
@@ -49,6 +50,7 @@ if(GRVCQUAD_USE_ROS)
 	 )
 
 	catkin_package(CATKIN_DEPENDS
+			message_runtime
 			grvc_quadrotor_uav)
 
 	include_directories(${catkin_INCLUDE_DIRS})

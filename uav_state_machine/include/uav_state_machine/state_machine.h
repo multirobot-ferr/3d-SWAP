@@ -27,80 +27,66 @@
 #define _MBZIRC_STATEMACHINE_H_
 
 #include <ros/ros.h>
-#include <thread>
 #include <std_msgs/Float64.h>
-#include <uav_state_machine/target_service.h>
-#include <uav_state_machine/takeoff_service.h>
-#include <uav_state_machine/land_service.h>
-#include <uav_state_machine/waypoint_service.h>
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/PoseStamped.h>
 
-#include <grvc_utils/argument_parser.h>
-#include <grvc_quadrotor_hal/types.h>
-#include <grvc_quadrotor_hal/server.h>
-
+#include <uav_state_machine/hal_client.h>
 #include <uav_state_machine/candidate_list.h>
 #include <uav_state_machine/candidate.h>
+#include <uav_state_machine/uav_state.h>
+#include <uav_state_machine/target_service.h>
+#include <uav_state_machine/takeoff_service.h>
+#include <uav_state_machine/land_service.h>
+#include <uav_state_machine/waypoint_service.h>
 
-using namespace std;
-using namespace grvc::hal;
-using namespace grvc::com;
-using namespace grvc::utils;
-using namespace grvc;
+#include <grvc_utils/argument_parser.h>
 
-class UavStateMachine{
+class UavStateMachine : public HalClient {
 public:
-    enum class eState { REPOSE, TAKINGOFF, HOVER, SEARCHING, CATCHING, LAND };
+    UavStateMachine(grvc::utils::ArgumentParser _args);
 
-    bool Init(grvc::utils::ArgumentParser _args);
-
+    bool init();
     void step();
 
 private:
-
-    void reposeCallback();
-    bool searchingCallback(uav_state_machine::waypoint_service::Request &req, uav_state_machine::waypoint_service::Response &res);
-    void catchingCallback();
-    void joystickCb(const sensor_msgs::Joy::ConstPtr& _joy);
-    void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
-    void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
+    bool takeoffServiceCallback(uav_state_machine::takeoff_service::Request  &req,
+         uav_state_machine::takeoff_service::Response &res);
+    bool landServiceCallback(uav_state_machine::land_service::Request  &req,
+         uav_state_machine::land_service::Response &res);
+    bool searchServiceCallback(uav_state_machine::waypoint_service::Request &req,
+         uav_state_machine::waypoint_service::Response &res);
     bool targetServiceCallback(uav_state_machine::target_service::Request  &req,
          uav_state_machine::target_service::Response &res);
-    bool takeoffCallback(uav_state_machine::takeoff_service::Request  &req,
-         uav_state_machine::takeoff_service::Response &res);
-    bool landCallback(uav_state_machine::land_service::Request  &req,
-         uav_state_machine::land_service::Response &res);
+
+    void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
+    void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
+    void joyCallback(const sensor_msgs::Joy::ConstPtr& _joy);
+
+    void onSearching();
+    void onCatching();
 
     void candidateCallback(const uav_state_machine::candidate_list::ConstPtr& _msg);
     bool bestCandidateMatch(const uav_state_machine::candidate_list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result);
-
-    grvc::hal::Server::PositionErrorService::Client *pos_error_srv;
-
-    grvc::hal::Server::TakeOffService::Client* takeOff_srv;
-    grvc::hal::Server::LandService::Client* land_srv;
-    grvc::hal::Server::WaypointService::Client* waypoint_srv;
-    grvc::hal::Server::AbortService::Client* abort_srv;
     
-    ros::ServiceServer target_service;   
-    ros::ServiceServer takeoff_service;  
-    ros::ServiceServer land_service;
-    ros::ServiceServer waypoint_service; 
+    ros::ServiceServer take_off_service_;
+    ros::ServiceServer land_service_;
+    ros::ServiceServer search_service_;
+    ros::ServiceServer target_service_;
 
-    ros::Subscriber joystickSubscriber;
-    ros::Subscriber positionSubs;
-    ros::Subscriber altitudeSubs;
+    ros::Subscriber position_sub_;
+    ros::Subscriber altitude_sub_;
+    ros::Subscriber joy_sub_;
 
-    float mCurrentAltitude = 0;
-    float mFlyTargetAltitude = 0;
+    uav_state_machine::uav_state state_;
 
-    Waypoint mCurrentWaypoint;
-    std::vector<Waypoint> mWaypointList;  
-    int mWaypointItem = 0;
-
-    eState mState =eState::REPOSE;
-    uav_state_machine::candidate mTarget;
-
+    grvc::hal::Waypoint current_position_waypoint_;
+    std::vector<grvc::hal::Waypoint> waypoint_list_;
+    unsigned int waypoint_index_ = 0;
+    float current_altitude_ = 0;
+    float target_altitude_ = 0;
+    uav_state_machine::candidate target_;
 };
-#endif
+
+#endif  // _MBZIRC_STATEMACHINE_H_
