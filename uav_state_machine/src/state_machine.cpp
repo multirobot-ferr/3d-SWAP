@@ -39,7 +39,18 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
 
     position_sub_ = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_" + uav_id + "/local_position/pose", 10, &UavStateMachine::positionCallback, this);
     altitude_sub_ = nh.subscribe<std_msgs::Float64>("/mavros_" + uav_id + "/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
+    lidar_altitude_sub_ = nh.subscribe<sensor_msgs::Range>("/mavros_" + uav_id + "/distance_sensor/lidarlite_pub", 10, &UavStateMachine::lidarAltitudeCallback, this);
+    lidar_altitude_remapped_pub_ = nh.advertise<std_msgs::Float64>("/mbzirc_" + uav_id + "/uav_state_machine/lidar_altitude", 1);
     joy_sub_ = nh.subscribe<sensor_msgs::Joy>("/joy", 10, &UavStateMachine::joyCallback, this);
+        
+
+    state_pub_thread_ = std::thread([&](){
+        ros::Publisher statePublisher = nh.advertise<uav_state_machine::uav_state>("/mbzirc_" + uav_id + "/uav_state_machine/state", 1);
+	while(ros::ok()){	
+            statePublisher.publish(state_);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    });
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------
@@ -207,7 +218,7 @@ bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::R
          uav_state_machine::target_service::Response &res)
 {
     std::cout << "Received target of color: " << req.color << ", and position :[" << req.position[0] << ", " << req.position[1] << "];" << std::endl;
-    if (state_.state == uav_state::HOVER) {
+    if (state_.state == uav_state::HOVER && req.enabled) {
         target_.color = req.color;
         target_.shape = req.shape;
         target_.position.x = req.position[0];
@@ -215,7 +226,10 @@ bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::R
         res.success = true;
         state_.state = uav_state::CATCHING;
         return true;
-    } else {
+    } else if(state_.state == uav_state::CATCHING && !req.enabled){
+        state_.state = uav_state::HOVER;
+        return true;
+    }else {
         res.success = false;
         return false;
     }
@@ -225,6 +239,13 @@ bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::R
 void UavStateMachine::altitudeCallback(const std_msgs::Float64::ConstPtr& _msg){
     current_altitude_ = _msg->data;
 }
+//---------------------------------------------------------------------------------------------------------------------------------
+void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg){
+    std_msgs::Float64 altitude;
+    altitude.data = _msg->range/100;
+    lidar_altitude_remapped_pub_.publish(altitude);
+}
+
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg){
     current_position_waypoint_ = {{_msg->pose.position.x, _msg->pose.position.y, _msg->pose.position.z}, 0.0};

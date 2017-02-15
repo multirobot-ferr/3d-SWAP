@@ -31,7 +31,8 @@
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/PoseStamped.h>
-
+#include <sensor_msgs/Range.h>
+	
 #include <uav_state_machine/hal_client.h>
 #include <uav_state_machine/catching_device.h>
 #include <uav_state_machine/candidate_list.h>
@@ -43,6 +44,8 @@
 #include <uav_state_machine/waypoint_service.h>
 
 #include <grvc_utils/argument_parser.h>
+
+#include <thread>
 
 class UavStateMachine : public HalClient {
 public:
@@ -63,6 +66,7 @@ private:
 
     void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
     void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
+    void lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg);
     void joyCallback(const sensor_msgs::Joy::ConstPtr& _joy);
 
     void onSearching();
@@ -79,9 +83,12 @@ private:
 
     ros::Subscriber position_sub_;
     ros::Subscriber altitude_sub_;
+    ros::Subscriber lidar_altitude_sub_;
+    ros::Publisher lidar_altitude_remapped_pub_;
     ros::Subscriber joy_sub_;
 
     uav_state_machine::uav_state state_;
+    std::thread state_pub_thread_;
 
     grvc::hal::Waypoint current_position_waypoint_;
     std::vector<grvc::hal::Waypoint> waypoint_list_;

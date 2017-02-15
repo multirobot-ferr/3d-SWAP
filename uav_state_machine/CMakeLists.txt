@@ -24,6 +24,8 @@ if(GRVCQUAD_USE_ROS)
 			geometry_msgs
 			mavros
 			mavros_msgs
+                        sensor_msgs
+                        mavros_extras
 		    roscpp
 			grvc_quadrotor_uav
 			message_generation)
