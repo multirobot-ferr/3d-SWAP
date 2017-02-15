@@ -43,11 +43,13 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     lidar_altitude_remapped_pub_ = nh.advertise<std_msgs::Float64>("/mbzirc_" + uav_id + "/uav_state_machine/lidar_altitude", 1);
     joy_sub_ = nh.subscribe<sensor_msgs::Joy>("/joy", 10, &UavStateMachine::joyCallback, this);
         
-
+    // Initial state is repose
+    state_.state = uav_state::REPOSE;
+    state_publisher_ = nh.advertise<uav_state_machine::uav_state>("/mbzirc_" + uav_id + "/uav_state_machine/state", 1);
+	    
     state_pub_thread_ = std::thread([&](){
-        ros::Publisher statePublisher = nh.advertise<uav_state_machine::uav_state>("/mbzirc_" + uav_id + "/uav_state_machine/state", 1);
-	while(ros::ok()){	
-            statePublisher.publish(state_);
+        while(ros::ok()){	
+            state_publisher_.publish(this->state_);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     });
@@ -55,9 +57,6 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
 
 //-------------------------------------------------------------------------------------------------------------------------------
 bool UavStateMachine::init() {
-    // Initial state is repose
-    state_.state = uav_state::REPOSE;
-
      // Wait for hal connection
     while(!take_off_srv_->isConnected()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

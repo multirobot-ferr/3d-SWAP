@@ -89,6 +89,7 @@ private:
 
     uav_state_machine::uav_state state_;
     std::thread state_pub_thread_;
+    ros::Publisher state_publisher_;
 
     grvc::hal::Waypoint current_position_waypoint_;
     std::vector<grvc::hal::Waypoint> waypoint_list_;
