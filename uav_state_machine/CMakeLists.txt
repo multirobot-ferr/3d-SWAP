@@ -34,6 +34,7 @@ if(GRVCQUAD_USE_ROS)
 		   takeoff_service.srv
 		   waypoint_service.srv
 		   land_service.srv
+		   magnetize_service.srv
 	 )
 	add_message_files(
 		   FILES

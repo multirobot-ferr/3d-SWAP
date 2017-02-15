@@ -31,6 +31,7 @@ using namespace uav_state_machine;
 UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(_args) {
     std::string uav_id = _args.getArgument<std::string>("uavId", "1");
     ros::NodeHandle nh;
+    catching_device_   = new CatchingDevice(std::stoi(uav_id), nh);
     take_off_service_  = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/takeoff",  &UavStateMachine::takeoffServiceCallback, this);
     land_service_      = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/land",     &UavStateMachine::landServiceCallback, this);
     search_service_    = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/waypoint", &UavStateMachine::searchServiceCallback, this);

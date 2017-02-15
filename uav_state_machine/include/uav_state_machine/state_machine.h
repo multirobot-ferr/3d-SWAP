@@ -33,6 +33,7 @@
 #include <geometry_msgs/PoseStamped.h>
 
 #include <uav_state_machine/hal_client.h>
+#include <uav_state_machine/catching_device.h>
 #include <uav_state_machine/candidate_list.h>
 #include <uav_state_machine/candidate.h>
 #include <uav_state_machine/uav_state.h>
@@ -70,6 +71,7 @@ private:
     void candidateCallback(const uav_state_machine::candidate_list::ConstPtr& _msg);
     bool bestCandidateMatch(const uav_state_machine::candidate_list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result);
     
+    CatchingDevice *catching_device_;
     ros::ServiceServer take_off_service_;
     ros::ServiceServer land_service_;
     ros::ServiceServer search_service_;
