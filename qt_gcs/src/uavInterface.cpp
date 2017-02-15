@@ -17,10 +17,9 @@
 #include <uav_state_machine/target_service.h>
 #include <uav_state_machine/takeoff_service.h>
 #include <uav_state_machine/land_service.h>
+#include <uav_state_machine/magnetize_service.h>
 
 #include <ros/ros.h>
-
-#include <mavros_msgs/ActuatorControl.h>
 
 #include <qt_gcs/LogManager.h>
 
@@ -151,7 +150,7 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
     mInterruptorLed->setState(false);
     mMagnetLayout->addWidget(mInterruptorLed);
     mActionsLayoutUav->addLayout(mMagnetLayout);
-    mMagnetSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/rc/out",
+    mMagnetSubscriber = nh.subscribe("/mbzirc_"+std::to_string(_index)+"/catching_device/switch",
                                      1,
                                      &UavInterface::rcMagnetInterruptorCallback,this);
 
@@ -255,24 +254,15 @@ void UavInterface::switchMagnetCallback(bool _state) {
     mToggleMagnetThread = new std::thread([this, _state](){
         ros::NodeHandle nh;
         LogManager::get()->status("UAV_"+std::to_string(mUavId), "Switching magnet.");
-        ros::Publisher magnetPublisher = nh.advertise<mavros_msgs::ActuatorControl>("/mavros_"+std::to_string(mUavId)+"/actuator_control",1);
-        mavros_msgs::ActuatorControl controlSignal;
-        controlSignal.group_mix = 3;
-        controlSignal.controls[6] = (_state ? 1.0 : -1.0);
-
-        // Start magnetization/demagnetization
-        std::chrono::time_point<std::chrono::steady_clock> t0 = std::chrono::steady_clock::now();
-        magnetPublisher.publish(controlSignal);
-        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-
-        // Ensure that the magnet is resting
-        controlSignal.controls[6] = 0.0;
-        magnetPublisher.publish(controlSignal);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-        mToggleMagnet->setEnabled(true);
+        ros::ServiceClient client = nh.serviceClient<uav_state_machine::magnetize_service>("/mbzirc_"+std::to_string(mUavId)+"/catching_device/magnetize");
+        uav_state_machine::magnetize_service srv;
+        srv.request.magnetize = _state;
+        if (client.call(srv)) {
+            mToggleMagnet->setEnabled(true);
+        } else {
+            LogManager::get()->status("UAV_"+std::to_string(mUavId), "Failed to switch magnet.");
+        }
     });
-
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -334,12 +324,8 @@ void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) 
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-void UavInterface::rcMagnetInterruptorCallback(const mavros_msgs::RCOutConstPtr &_msg) {
-    if(_msg->channels[8] < 1100)
-        mInterruptorState = false;
-    else if(_msg->channels[8] > 1900)
-        mInterruptorState = true;
-
+void UavInterface::rcMagnetInterruptorCallback(const std_msgs::BoolConstPtr &_msg) {
+    mInterruptorState = _msg->data;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
