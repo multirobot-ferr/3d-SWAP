@@ -241,7 +241,7 @@ void UavStateMachine::altitudeCallback(const std_msgs::Float64::ConstPtr& _msg){
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg){
     std_msgs::Float64 altitude;
-    altitude.data = _msg->range/100;
+    altitude.data = _msg->range;
     lidar_altitude_remapped_pub_.publish(altitude);
 }
 
