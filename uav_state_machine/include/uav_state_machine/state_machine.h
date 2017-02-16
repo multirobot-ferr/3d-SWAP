@@ -71,6 +71,7 @@ private:
 
     void onSearching();
     void onCatching();
+    void onGoToDeploy();
 
     void candidateCallback(const uav_state_machine::candidate_list::ConstPtr& _msg);
     bool bestCandidateMatch(const uav_state_machine::candidate_list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result);
