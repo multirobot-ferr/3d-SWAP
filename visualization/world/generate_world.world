@@ -17,7 +17,7 @@
 
 		<model name="testbed_scene">
 			<static>true</static>
-			<pose>23.158678 75.310852 0 0 0 1.57</pose>
+			<pose>6.5 37.33 0 0 0 0</pose>
 			<link name="test_scene">
 				<visual name="visual">
 					<geometry>
