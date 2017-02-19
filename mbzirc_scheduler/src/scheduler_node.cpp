@@ -126,7 +126,7 @@ Scheduler::Scheduler()
 	for(int i = 0; i < n_uavs_; i++)
 	{
 		string uav_topic_name = "/mavros_" + to_string(i+1) + "/local_position/pose";
-		string candidate_topic_name = "/candidate_list_" + to_string(i+1);
+		string candidate_topic_name = "mbzirc_" + to_string(i+1) + "/candidateList" ;
 
 		ros::Subscriber* candidate_sub = new ros::Subscriber();
 		*candidate_sub = nh_->subscribe<uav_state_machine::candidate_list>(candidate_topic_name.c_str(), 1, &Scheduler::candidatesReceived, this);
