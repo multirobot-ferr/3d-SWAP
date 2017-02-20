@@ -64,6 +64,8 @@ public:
 	void getPose(double &x, double &y);
 	void getVelocity(double &vx, double &vy);
 	std::vector<std::vector<double> > getCov();
+	int getNumFactors();
+	std::vector<double> getFactorProbs(int factor);
 
 	TargetStatus getStatus();
 	void setStatus(TargetStatus status);
