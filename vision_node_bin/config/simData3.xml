@@ -34,7 +34,7 @@
 	    0.0 0.0 0.0 1.0 </data></CameraTransformation>
 </CameraConfig>
 
-<ccsConfig>ccsRGBYO.json</ccsConfig>
+<ccsConfig>../config/ccsRGBYO.json</ccsConfig>
 
 <UavPoseTopic>/mavros_3/local_position/pose</UavPoseTopic>
 <UavAltitudeTopic>/mavros_3/global_position/rel_alt</UavAltitudeTopic>
@@ -42,7 +42,7 @@
 <PublishData>1</PublishData>
 <CandidateTopic>/mbzirc_3/candidateList</CandidateTopic>
 
-<VisualizeResults>1</VisualizeResults>
+<VisualizeResults>0</VisualizeResults>
 
 <MinObjectSize>0.15</MinObjectSize>
 <MaxObjectSize>1.0</MaxObjectSize>
