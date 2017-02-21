@@ -8,6 +8,5 @@ install_manifest.txt
 ./gcs/world/generate_world.world
 *~
 /gcs/build
-vision_node
 /gcs_core/build
 build
