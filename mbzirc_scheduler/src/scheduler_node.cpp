@@ -293,8 +293,6 @@ void Scheduler::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
 	grvc::hal::Pose pose;
 	msg >> pose;
 
-	// TODO. Remove
-	pose.id = "1";
 	allocator_->updateUavPosition(stoi(pose.id), pose.position[0], pose.position[1], pose.position[2]);
 }
 
