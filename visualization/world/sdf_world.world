@@ -30,93 +30,104 @@
         <!-- Model of Static Objects -->
 
         <model name="static_object_1">
-            <pose>-6 12 0.12 0 0 0</pose>
+            <pose>-6 12 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_green_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_2">
-            <pose>16 41 0.12 0 0 0</pose>
+            <pose>16 41 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_green_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_3">
-            <pose>-16 45 0.12 0 0 0</pose>
+            <pose>-16 45 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_green_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_4">
-            <pose>27 53 0.12 0 0 0</pose>
+            <pose>27 53 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_blue_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_5">
-            <pose>-7 27 0.12 0 0 0</pose>
+            <pose>-7 27 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_blue_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_6">
-            <pose>-38 14 0.12 0 0 0</pose>
+            <pose>-38 14 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_blue_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_7">
-            <pose>-26 39 0.12 0 0 0</pose>
+            <pose>-26 39 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_blue_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <!--model name="static_object_8">
-            <pose>2 44 0.12 0 0 0</pose>
+            <pose>2 44 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_red_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_9">
-            <pose>25 22 0.12 0 0 0</pose>
+            <pose>25 22 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_red_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_10">
-            <pose>-27 22 0.12 0 0 0</pose>
+            <pose>-27 22 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_red_cylinder_mbzirc</uri>
             </include>
         </model-->
 
+        <!-- BIG OBJECTS -->
+
         <model name="big_object_1">
-            <pose>35 44 0.12 0 0 0</pose>
+            <pose>35 44 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_big_mbzirc</uri>
             </include>
         </model>
 
         <model name="big_object_2">
-            <pose>-27 7 0.12 0 0 0</pose>
+            <pose>-27 7 0.05 0 0 0</pose>
             <include>
                 <uri>model://object_big_mbzirc</uri>
             </include>
         </model>
 
         <model name="big_object_3">
-            <pose>11 30 0.12 0 0 0</pose>
+            <pose>11 30 0.1 0 0 0</pose>
             <include>
                 <uri>model://object_big_mbzirc</uri>
+            </include>
+        </model>
+
+        <!-- DROP BOX -->
+        
+        <model name="drop_box">
+            <pose>27.5 30.2 0.05 0 0 0</pose>
+            <include>
+                <uri>model://dropping_box</uri>
             </include>
         </model>
 	</world>
