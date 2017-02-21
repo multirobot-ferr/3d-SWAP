@@ -115,6 +115,19 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 
 	n_valid_candidates = z_list.size();
 
+	#ifdef DEBUG_MODE
+
+	cout << "Distances: " << endl;
+	for(int i = 0; i < distances.size(); i++)
+	{
+		for(int j = 0; j < distances[i].size(); j++)
+			cout << distances[i][j] << " ";
+		cout << endl;
+	}
+	cout << endl;	
+
+	#endif
+
 	// Look for best pairs until running out of candidates or targets
 	while(n_valid_targets != 0 && n_valid_candidates != 0 )
 	{
@@ -123,11 +136,11 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 
 		for(int t_id = 0; t_id < distances.size(); t_id++)
 		{
-			if(valid_targets[t_id])
+			if(valid_targets[t_id] != -1)
 			{
 				for(int c_id = 0; c_id < distances[t_id].size(); c_id++)
 				{
-					if(valid_candidates[c_id] && (min_dist == -1.0 || distances[t_id][c_id] < min_dist))
+					if(valid_candidates[c_id] != -1 && (min_dist == -1.0 || distances[t_id][c_id] < min_dist))
 					{
 						min_dist = distances[t_id][c_id];
 						best_pair.first = t_id;
@@ -137,12 +150,6 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 			}
 		}
 
-		// Update with best pair and remove it
-		valid_targets[best_pair.first] = false;
-		valid_candidates[best_pair.second] = false;
-		n_valid_targets--;
-		n_valid_candidates--;
-		
 		// If there is no good data association, create new target
 		if(min_dist <= likelihood_th_)
 		{
@@ -161,6 +168,12 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 			targets_[track_id_count_] = new TargetTracker(track_id_count_);
 			targets_[track_id_count_++]->initialize(z_list[best_pair.second]);		
 		}
+
+		// Update with best pair and remove it
+		valid_targets[best_pair.first] = -1;
+		valid_candidates[best_pair.second] = -1;
+		n_valid_targets--;
+		n_valid_candidates--;
 	}
 
 	// Create new targets with remaining candidates
@@ -397,9 +410,8 @@ void CentralizedEstimator::printTargetsInfo()
 				cout << "yes. ";
 			else
 				cout << "no. ";
-
-			cout << endl;
 		}
+		cout << endl;
 	}
 }
 
