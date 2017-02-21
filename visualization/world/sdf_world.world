@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.5">
+<sdf version="1.4">
 	<world name="default">
 
 		<!-- A global light source -->
@@ -30,91 +30,91 @@
         <!-- Model of Static Objects -->
 
         <model name="static_object_1">
-            <pose>2 -2 0.05 0 0 0</pose>
+            <pose>-6 12 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_green_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_2">
-            <pose>-8 -24 0.05 0 0 0</pose>
+            <pose>16 41 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_green_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_3">
-            <pose>-4 10 0.05 0 0 0</pose>
+            <pose>-16 45 0.12 0 0 0</pose>
             <include>
-                <uri>model://object_green_box_mbzirc</uri>
+                <uri>model://object_green_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_4">
-            <pose>11 -27 0.05 0 0 0</pose>
+            <pose>27 53 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_blue_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_5">
-            <pose>-17 14 0.05 0 0 0</pose>
+            <pose>-7 27 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_blue_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_6">
-            <pose>-30 -26 0.05 0 0 0</pose>
+            <pose>-38 14 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_blue_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_7">
-            <pose>20 -5 0.05 0 0 0</pose>
+            <pose>-26 39 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_blue_cylinder_mbzirc</uri>
             </include>
         </model>
 
-        <model name="static_object_8">
-            <pose>-36 7 0.05 0 0 0</pose>
+        <!--model name="static_object_8">
+            <pose>2 44 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_red_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_9">
-            <pose>6 23 0.05 0 0 0</pose>
+            <pose>25 22 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_red_cylinder_mbzirc</uri>
             </include>
         </model>
 
         <model name="static_object_10">
-            <pose>-16 -14 0.05 0 0 0</pose>
+            <pose>-27 22 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_red_cylinder_mbzirc</uri>
             </include>
-        </model>
+        </model-->
 
         <model name="big_object_1">
-            <pose>-44 24 0.05 0 0 0</pose>
+            <pose>35 44 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_big_mbzirc</uri>
             </include>
         </model>
 
         <model name="big_object_2">
-            <pose>-38 9 0.05 0 0 0</pose>
+            <pose>-27 7 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_big_mbzirc</uri>
             </include>
         </model>
 
         <model name="big_object_3">
-            <pose>-45 27 0.05 0 0 0</pose>
+            <pose>11 30 0.12 0 0 0</pose>
             <include>
                 <uri>model://object_big_mbzirc</uri>
             </include>
