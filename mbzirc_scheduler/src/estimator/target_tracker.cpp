@@ -69,8 +69,8 @@ void TargetTracker::initialize(Candidate* z)
 	pose_.setZero(4, 1);
 	pose_(0,0) = z->location(0);
 	pose_(1,0) = z->location(1);
-	pose_(2,0) = z->speed(0);
-	pose_(3,0) = z->speed(1);
+	pose_(2,0) = 0.0;
+	pose_(3,0) = 0.0;
 		
 	// Setup cov matrix
 	pose_cov_.setIdentity(4, 4);
@@ -79,10 +79,8 @@ void TargetTracker::initialize(Candidate* z)
 	pose_cov_(1,0) = z->locationCovariance(1,0);
 	pose_cov_(1,1) = z->locationCovariance(1,1);
 
-	pose_cov_(2,2) = z->speedCovariance(0,0);
-	pose_cov_(2,3) = z->speedCovariance(0,1);
-	pose_cov_(3,2) = z->speedCovariance(1,0);
-	pose_cov_(3,3) = z->speedCovariance(1,1);
+	pose_cov_(2,2) = VEL_NOISE_VAR;
+	pose_cov_(3,3) = VEL_NOISE_VAR;
 
 
 	// Init and update factored belief 
