@@ -28,8 +28,11 @@
 #ifndef CENTRALIZED_ESTIMATOR_H_
 #define CENTRALIZED_ESTIMATOR_H_
 
+#define DEBUG_MODE
+
 #include <map>
 #include <vector>
+#include <iostream>
 
 #include <mbzirc_scheduler/target_tracker.h>
 
@@ -57,6 +60,7 @@ public:
 	bool getTargetInfo(int target_id, double &x, double &y, std::vector<std::vector<double> > &covariances, double &vx, double &vy);
 	bool setTargetStatus(int target_id, TargetStatus status);
 	void removeLostTargets();
+	void printTargetsInfo();
 
 protected:
 

@@ -34,13 +34,15 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <mbzirc_scheduler/AssignTarget.h>
 #include <mbzirc_scheduler/SetTargetStatus.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <std_msgs/String.h>
 #include <uav_state_machine/candidate_list.h>
+#include <grvc_quadrotor_hal/types.h>
 #include <tf/transform_datatypes.h>
 
 #include<string>
 #include<vector>
 #include<map>
+#include<sstream>
 
 using namespace std;
 
@@ -60,7 +62,7 @@ protected:
 
 	/// Callbacks
 	void candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list);
-	void uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
+	void uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose);
 
 	void publishBelief();
 	void eigendec(double c11, double c22, double c12, vector<double> &D, vector<double> &E);
@@ -125,15 +127,15 @@ Scheduler::Scheduler()
 	// Subscriptions/publications
 	for(int i = 0; i < n_uavs_; i++)
 	{
-		string uav_topic_name = "/mavros_" + to_string(i+1) + "/local_position/pose";
-		string candidate_topic_name = "/candidate_list_" + to_string(i+1);
+		string uav_topic_name = "/mbzirc_" + to_string(i+1) + "/hal/pose";
+		string candidate_topic_name = "mbzirc_" + to_string(i+1) + "/candidateList" ;
 
 		ros::Subscriber* candidate_sub = new ros::Subscriber();
 		*candidate_sub = nh_->subscribe<uav_state_machine::candidate_list>(candidate_topic_name.c_str(), 1, &Scheduler::candidatesReceived, this);
 		candidate_subs_.push_back(candidate_sub);
 
 		ros::Subscriber* uav_sub = new ros::Subscriber();
-		*uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, &Scheduler::uavPoseReceived, this);
+		*uav_sub = nh_->subscribe<std_msgs::String>(uav_topic_name.c_str(), 1, &Scheduler::uavPoseReceived, this);
 		uav_subs_.push_back(uav_sub);
 
 		vector<Candidate *> empty_vector;
@@ -152,6 +154,10 @@ Scheduler::Scheduler()
 	ros::Rate r(estimator_rate_);
 	ros::Time prev_time, time_now;
 
+	#ifdef DEBUG_MODE
+	int count = 0;
+	#endif
+
 	while(nh_->ok())
 	{
 		ros::spinOnce();
@@ -168,12 +174,37 @@ Scheduler::Scheduler()
 		for(auto it = candidates_.begin(); it != candidates_.end(); ++it)
 		{
 			if((it->second).size())
+			{
+				#ifdef DEBUG_MODE
+				cout << "Candidates from UAV " << it->first << endl;
+				#endif 
+
 				estimator_->update(it->second);
+
+				// Remove candidates
+				
+				for(int j = 0; j < (it->second).size(); j++)
+				{
+					delete (it->second)[j];
+				}
+				(it->second).clear();
+			}
 		}
 
 		estimator_->removeLostTargets();
 
 		publishBelief();
+
+		
+		#ifdef DEBUG_MODE
+		if(count == 5)
+		{
+			estimator_->printTargetsInfo();
+			count = 0;
+		}
+		else
+			count++;
+		#endif
 
 		r.sleep();
 	}
@@ -249,13 +280,22 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 			candidates_[uav].push_back(cand_p); 
 		}
 	}
+	else
+		ROS_WARN("Received candidates empty or with long delay.");
 }
 
 /** \brief Callback to receive UAVs poses
 */
-void Scheduler::uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose)
+void Scheduler::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
 {
-	allocator_->updateUavPosition(stoi(uav_pose->header.frame_id), uav_pose->pose.position.x, uav_pose->pose.position.y, uav_pose->pose.position.z);
+	stringstream msg;
+	msg << uav_pose->data;
+	grvc::hal::Pose pose;
+	msg >> pose;
+
+	// TODO. Remove
+	pose.id = "1";
+	allocator_->updateUavPosition(stoi(pose.id), pose.position[0], pose.position[1], pose.position[2]);
 }
 
 /** \brief Callback for service. Request the assignment of a target
