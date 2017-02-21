@@ -145,9 +145,19 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 		
 		// If there is no good data association, create new target
 		if(min_dist <= likelihood_th_)
+		{
+			#ifdef DEBUG_MODE
+			cout << "Candidate " << z_list[best_pair.second]->location(0) << "," << z_list[best_pair.second]->location(1) << ". Associated to target " << valid_targets[best_pair.first] << ", with distance " << min_dist << endl;
+			#endif
+
 			targets_[valid_targets[best_pair.first]]->update(z_list[best_pair.second]);
+		}
 		else
 		{
+			#ifdef DEBUG_MODE
+			cout << "Candidate " << z_list[best_pair.second]->location(0) << "," << z_list[best_pair.second]->location(1) << ". New target " << track_id_count_ << ", with distance " << min_dist << endl;
+			#endif
+
 			targets_[track_id_count_] = new TargetTracker(track_id_count_);
 			targets_[track_id_count_++]->initialize(z_list[best_pair.second]);		
 		}
@@ -160,6 +170,10 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 		{
 			if(valid_candidates[i])
 			{
+				#ifdef DEBUG_MODE
+				cout << "Candidate " << z_list[i]->location(0) << "," << z_list[i]->location(1) << ". New target " << track_id_count_ << endl;
+				#endif
+
 				targets_[track_id_count_] = new TargetTracker(track_id_count_);
 				targets_[track_id_count_++]->initialize(z_list[i]);
 			}
@@ -294,6 +308,98 @@ void CentralizedEstimator::removeLostTargets()
 		}
 		else
 			++it;
+	}
+}
+
+/** Print information from the targets for debugging
+*/
+void CentralizedEstimator::printTargetsInfo()
+{
+	cout << "****************************************************" << endl;
+	cout << "Number of targets: " << targets_.size() << endl;
+
+	for(auto it = targets_.begin(); it != targets_.end(); ++it)
+	{
+		cout << "Id: " << (it->second)->getId() << ". ";
+
+		switch((it->second)->getStatus())
+		{
+			case UNASSIGNED:
+			cout << "Status: " << "UNASSIGNED. "; 
+			break;
+			case ASSIGNED:
+			cout << "Status: " << "ASSIGNED. "; 
+			break;
+			case CAUGHT:
+			cout << "Status: " << "CAUGHT. "; 
+			break;
+			case DEPLOYED:
+			cout << "Status: " << "DEPLOYED. "; 
+			break;
+			case LOST:
+			cout << "Status: " << "LOST. "; 
+			break;
+			default:
+			cout << "Status: " << "ERROR. ";
+		}
+
+		if( (it->second)->getStatus() != LOST && (it->second)->getStatus() != CAUGHT && (it->second)->getStatus() != DEPLOYED )
+		{
+			double x, y, vx, vy;
+			vector<vector<double> > cov;
+			vector<double> color_probs;
+
+			(it->second)->getPose(x,y);
+			(it->second)->getVelocity(vx,vy);
+			cov = (it->second)->getCov();
+			color_probs = (it->second)->getFactorProbs(0);
+
+			cout << "Position: " << x << "," << y << ". Velocity: " << vx << "," << vy << ". Covariances: " << cov[0][0] << " " << cov[0][1] << "; " << cov[1][0] << " " << cov[1][1] << "." << endl;
+			cout << "Color: ";
+			switch((it->second)->getColor())
+			{
+				case UNKNOWN:
+				cout << "UNKNOWN. ";
+				break;
+				case RED:
+				cout << "RED. ";
+				break;
+				case BLUE:
+				cout << "BLUE. ";
+				break;
+				case GREEN:
+				cout << "GREEN. ";
+				break;
+				case YELLOW:
+				cout << "YELLOW. ";
+				break;
+				case ORANGE:
+				cout << "ORANGE. ";
+				break;
+				default:
+				cout << "ERROR. ";
+			}
+
+			cout << "( ";
+			for(int i = 0; i < color_probs.size(); i++)
+				cout << color_probs[i] << " ";
+
+			cout << "). ";
+
+			cout << "Static? ";
+			if((it->second)->isStatic())
+				cout << "yes. ";
+			else
+				cout << "no. ";
+
+			cout << "Large? ";
+			if((it->second)->isLarge())
+				cout << "yes. ";
+			else
+				cout << "no. ";
+
+			cout << endl;
+		}
 	}
 }
 

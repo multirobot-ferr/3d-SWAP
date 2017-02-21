@@ -22,20 +22,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <!--******************************WORLD****************************************-->
     <!-- Actually start gazebo server -->
 
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!---include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(find mbzirc_gcs_view)/world/generate_world.world"/>
         <arg name="paused" value="true"/>
-    </include>
-
-    <!--node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find mbzirc_gcs_view)/world/generate_world.world">
-        <env name="LC_NUMERIC" value="C"/>
         <env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/>
-    </node-->
+    </include-->
+
+    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find mbzirc_gcs_view)/world/sdf_world.world">
+        <env name="LC_NUMERIC" value="C"/>
+        <!--env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/-->
+    </node>
 
     <!-- launch gazebo client -->
-    <!--node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
+    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
         <env name="LC_NUMERIC" value="C"/>
-    </node-->
+    </node>
 
 <!--******************************UAVs****************************************-->
 
@@ -69,12 +70,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <!--******************************STATIC_OBJECTS****************************************-->
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="static_object_1"/>
         <arg name="urdf_file" value="object_green_cylinder.urdf.xacro"/>
         <arg name="id" value="4"/>
-        <arg name="pos_x" value="47"/>
-        <arg name="pos_y" value="65"/>
+        <arg name="pos_x" value="-6"/>
+        <arg name="pos_y" value="12"/>
         <arg name="pos_z" value="0.12"/>
     </include>
 
@@ -91,8 +92,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="robot_name" value="static_object_3"/>
         <arg name="urdf_file" value="object_green_cylinder.urdf.xacro"/>
         <arg name="id" value="6"/>
-        <arg name="pos_x" value="36"/>
-        <arg name="pos_y" value="100"/>
+        <arg name="pos_x" value="-16"/>
+        <arg name="pos_y" value="45"/>
         <arg name="pos_z" value="0.12"/>
     </include>
 
@@ -109,8 +110,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="robot_name" value="static_object_5"/>
         <arg name="urdf_file" value="object_blue_cylinder.urdf.xacro"/>
         <arg name="id" value="8"/>
-        <arg name="pos_x" value="7"/>
-        <arg name="pos_y" value="76"/>
+        <arg name="pos_x" value="-7"/>
+        <arg name="pos_y" value="27"/>
         <arg name="pos_z" value="0.12"/>
     </include>
 
@@ -118,8 +119,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="robot_name" value="static_object_6"/>
         <arg name="urdf_file" value="object_blue_cylinder.urdf.xacro"/>
         <arg name="id" value="9"/>
-        <arg name="pos_x" value="24"/>
-        <arg name="pos_y" value="107"/>
+        <arg name="pos_x" value="-38"/>
+        <arg name="pos_y" value="14"/>
         <arg name="pos_z" value="0.12"/>
     </include>
 
@@ -127,8 +128,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="robot_name" value="static_object_7"/>
         <arg name="urdf_file" value="object_blue_cylinder.urdf.xacro"/>
         <arg name="id" value="10"/>
-        <arg name="pos_x" value="53"/>
-        <arg name="pos_y" value="31"/>
+        <arg name="pos_x" value="-26"/>
+        <arg name="pos_y" value="39"/>
         <arg name="pos_z" value="0.12"/>
     </include>
 
@@ -136,8 +137,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="robot_name" value="static_object_8"/>
         <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
         <arg name="id" value="11"/>
-        <arg name="pos_x" value="17"/>
-        <arg name="pos_y" value="62"/>
+        <arg name="pos_x" value="2"/>
+        <arg name="pos_y" value="44"/>
         <arg name="pos_z" value="0.12"/>
     </include>
 
@@ -154,14 +155,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="robot_name" value="static_object_10"/>
         <arg name="urdf_file" value="object_red_cylinder.urdf.xacro"/>
         <arg name="id" value="13"/>
-        <arg name="pos_x" value="54"/>
-        <arg name="pos_y" value="93"/>
+        <arg name="pos_x" value="-27"/>
+        <arg name="pos_y" value="22"/>
         <arg name="pos_z" value="0.12"/>
-    </include>
+    </include-->
 
 <!--****************************BIG OBJECTS*************************************-->
 
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_object_fixed.launch">
         <arg name="robot_name" value="object_big_1"/>
         <arg name="urdf_file" value="object_big.urdf.xacro"/>
         <arg name="id" value="14"/>
@@ -174,8 +175,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="robot_name" value="object_big_2"/>
         <arg name="urdf_file" value="object_big.urdf.xacro"/>
         <arg name="id" value="15"/>
-        <arg name="pos_x" value="45"/>
-        <arg name="pos_y" value="79"/>
+        <arg name="pos_x" value="-27"/>
+        <arg name="pos_y" value="7"/>
         <arg name="pos_z" value="0.12"/>
     </include>
 
@@ -183,10 +184,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         <arg name="robot_name" value="object_big_3"/>
         <arg name="urdf_file" value="object_big.urdf.xacro"/>
         <arg name="id" value="16"/>
-        <arg name="pos_x" value="25"/>
-        <arg name="pos_y" value="91"/>
+        <arg name="pos_x" value="11"/>
+        <arg name="pos_y" value="30"/>
         <arg name="pos_z" value="0.12"/>
-    </include>
+    </include-->
 
 
 <!--******************************DINAMIC_OBJECTS****************************************-->
@@ -283,13 +284,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     </include-->
 
 <!--******************************DROP BOX****************************************-->
-    <include file="$(find mbzirc_gcs_view)/launch/spawn_dropping_box.launch">
+    <!--include file="$(find mbzirc_gcs_view)/launch/spawn_dropping_box.launch">
         <arg name="robot_name" value="dropping_box"/>
         <arg name="urdf_file" value="dropping_box.urdf.xacro"/>
         <arg name="id" value="27"/>
-        <arg name="pos_x" value="30.5"/>
-        <arg name="pos_y" value="97.3"/>
+        <arg name="pos_x" value="27.2"/>
+        <arg name="pos_y" value="29.8"/>
         <arg name="pos_z" value="0.01"/>
-    </include>
+    </include-->
 
 </launch>

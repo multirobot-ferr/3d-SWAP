@@ -50,7 +50,7 @@ if(GRVCQUAD_USE_ROS)
 	
 	find_package(catkin REQUIRED COMPONENTS 
         grvc_quadrotor_com roscpp sensor_msgs grvc_quadrotor_hal
-        image_transport std_msgs cv_bridge visualization_msgs tf geometry_msgs)
+        image_transport std_msgs cv_bridge visualization_msgs tf geometry_msgs gazebo_ros)
 
     find_package(OpenCV REQUIRED COMPONENTS)
 

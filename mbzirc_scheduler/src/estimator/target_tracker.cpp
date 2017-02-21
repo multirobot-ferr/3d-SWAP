@@ -326,7 +326,7 @@ void TargetTracker::getVelocity(double &vx, double &vy)
 	vy = pose_(3,0);
 }
 
-/** \brief Return covariance matrix from the target
+/** \brief Return covariance matrix from the target position
 \return Covariance matrix
 */
 vector<vector<double> > TargetTracker::getCov()
@@ -342,6 +342,23 @@ vector<vector<double> > TargetTracker::getCov()
 	covariance[1][1] = pose_cov_(1,1);
 
 	return covariance;
+}
+
+/** \brief Return number of discrete factors
+\return Number of discrete factors
+*/
+int TargetTracker::getNumFactors()
+{
+	return fact_bel_.size();
+}
+
+/** \brief Return probabilities for a given factor
+\param factor Factor to return
+\return Probabilities for a given factor
+*/
+vector<double> TargetTracker::getFactorProbs(int factor)
+{
+	return fact_bel_[factor];
 }
 
 /** \brief Return likeliest target status
