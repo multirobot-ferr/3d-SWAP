@@ -13,13 +13,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     <!--include file="$(find px4_bringup)/launch/simulate.launch"/-->
 	
     <node name="grvc_hal_quad1" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
-		  args="-hal_ns=/mbzirc_1/hal -mavros_ns=/mavros_1"/>
+		  args="-hal_ns=/mbzirc_1/hal -mavros_ns=/mavros_1 -uavId=1"/>
 
     <node name="grvc_hal_quad2" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
-          args="-hal_ns=/mbzirc_2/hal -mavros_ns=/mavros_2" />
+          args="-hal_ns=/mbzirc_2/hal -mavros_ns=/mavros_2 -uavId=2" />
 
     <node name="grvc_hal_quad3" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
-          args="-hal_ns=/mbzirc_3/hal -mavros_ns=/mavros_3" />
+          args="-hal_ns=/mbzirc_3/hal -mavros_ns=/mavros_3 -uavId=3" />
 
   	<node name="uav_state_machine_1" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
       args="-uavId=1"/>
