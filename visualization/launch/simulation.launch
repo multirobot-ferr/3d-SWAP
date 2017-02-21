@@ -30,7 +30,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find mbzirc_gcs_view)/world/sdf_world.world">
         <env name="LC_NUMERIC" value="C"/>
-        <env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/>
+        <!--env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/-->
     </node>
 
     <!-- launch gazebo client -->
