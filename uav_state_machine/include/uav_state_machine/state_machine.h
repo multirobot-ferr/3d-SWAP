@@ -71,6 +71,7 @@ private:
 
     void onSearching();
     void onCatching();
+    void onGoToDeploy();
 
     void candidateCallback(const uav_state_machine::candidate_list::ConstPtr& _msg);
     bool bestCandidateMatch(const uav_state_machine::candidate_list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result);
@@ -91,6 +92,9 @@ private:
     uav_state_machine::uav_state state_;
     std::thread state_pub_thread_;
     ros::Publisher state_publisher_;
+
+    uav_state_machine::candidate matched_candidate_;
+    Eigen::Matrix<double, 3, 1> target_position_ = {0.0, 0.0, 0.0};
 
     grvc::hal::Waypoint current_position_waypoint_;
     std::vector<grvc::hal::Waypoint> waypoint_list_;

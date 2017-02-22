@@ -5,6 +5,7 @@ uint8 HOVER=2
 uint8 SEARCHING=3
 uint8 CATCHING=4
 uint8 LANDING=5
+uint8 GOTO_DEPLOY=6
 
 # And here message itself:
 uint8 state

@@ -43,7 +43,11 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     lidar_altitude_sub_ = nh.subscribe<sensor_msgs::Range>("/mavros_" + uav_id + "/distance_sensor/lidarlite_pub", 10, &UavStateMachine::lidarAltitudeCallback, this);
     lidar_altitude_remapped_pub_ = nh.advertise<std_msgs::Float64>("/mbzirc_" + uav_id + "/uav_state_machine/lidar_altitude", 1);
     joy_sub_ = nh.subscribe<sensor_msgs::Joy>("/joy", 10, &UavStateMachine::joyCallback, this);
-        
+
+    // Matched candidate can't be invalid until first detection...
+    matched_candidate_.header.stamp.sec = 0;  // ...so initialize its timestamp in epoch
+    matched_candidate_.header.stamp.nsec = 0;
+
     // Initial state is repose
     state_.state = uav_state::REPOSE;
     state_publisher_ = nh.advertise<uav_state_machine::uav_state>("/mbzirc_" + uav_id + "/uav_state_machine/state", 1);
@@ -92,6 +96,10 @@ void UavStateMachine::step() {
             onCatching();
             break;
 
+        case uav_state::GOTO_DEPLOY:
+            onGoToDeploy();
+            break;
+
         case uav_state::LANDING:
             land_srv_->send(ts);
             state_.state = uav_state::REPOSE;
@@ -135,10 +143,44 @@ void UavStateMachine::onCatching() {
     }
 
     while (state_.state == uav_state::CATCHING) {
+        ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
+        ros::Duration timeout(1.0);  // TODO: from config, in [s]?
+        if (since_last_candidate < timeout) {
+            // x-y-control: in candidateCallback
+            // z-control: descend
+            target_position_[2] = -0.1;  // TODO: As a function of x-y error?
+            //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
+        } else {
+            // x-y-control slowly goes to 0
+            target_position_[0] = 0.9*target_position_[0];
+            target_position_[1] = 0.9*target_position_[1];
+            // z-control: ascend
+            target_position_[2] = +0.1;  // TODO: As a function of x-y error?
+            //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
+        }
+        // TODO: Check max altitude and change state to LOST?
+        // Send target_position
+        grvc::hal::TaskState ts;
+        pos_error_srv_->send(target_position_, ts);
+
+        if (catching_device_->switchIsPressed()) {
+            state_.state = uav_state::GOTO_DEPLOY;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     //Pickup
     //GotoDeploy
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------
+void UavStateMachine::onGoToDeploy() {
+    // Go up!
+    grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
+    up_waypoint.pos.z() = 5.0;  // TODO: Altitude as a parameter
+    grvc::hal::TaskState ts;
+    waypoint_srv_->send(up_waypoint, ts);  // Blocking!
+    // TODO: Go to deploy zone (what switch turns off?)
+    state_.state = uav_state::HOVER;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
@@ -156,9 +198,13 @@ bool UavStateMachine::takeoffServiceCallback(uav_state_machine::takeoff_service:
 //---------------------------------------------------------------------------------------------------------------------------------
 bool UavStateMachine::landServiceCallback(uav_state_machine::land_service::Request &req, uav_state_machine::land_service::Response &res) {
     target_altitude_ = 0;
-    state_.state = uav_state::LANDING;
-    res.success = true;
-
+    if (state_.state != uav_state::REPOSE) {
+        state_.state = uav_state::LANDING;
+        res.success = true;
+    } else {
+        std::cout << "Already landed!" << std::endl;
+        res.success = false;
+    }
     return true;
 }
 
@@ -253,7 +299,7 @@ void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPt
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::joyCallback(const sensor_msgs::Joy::ConstPtr& _joy) {
     target_altitude_ = current_altitude_ + _joy->axes[1];
-    std::cout << "Target altitude: " << target_altitude_ << std::endl;
+    //std::cout << "Target altitude: " << target_altitude_ << std::endl;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
@@ -261,22 +307,19 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
     //mbzirc::Candidate specs;
     //specs.color = 1;
     if (state_.state == uav_state::CATCHING) {
-        grvc::hal::TaskState ts;
         uav_state_machine::candidate_list candidateList = *_msg;
-
         if (candidateList.candidates.size() > 0) {
-	    uav_state_machine::candidate matchedCandidate;
-            if (bestCandidateMatch(candidateList, target_, matchedCandidate)) {
-                std::cout << "tracking candidate with error " << matchedCandidate.position << std::endl;
-                matchedCandidate.position.z = target_altitude_-current_altitude_;
-		Eigen::Matrix<double, 3, 1> targetPosition;
-		targetPosition << matchedCandidate.position.x, matchedCandidate.position.y, matchedCandidate.position.z;
-                pos_error_srv_->send(targetPosition, ts);
+            if (bestCandidateMatch(candidateList, target_, matched_candidate_)) {
+                matched_candidate_.header.stamp = ros::Time::now();
+                std::cout << "tracking candidate with error " << matched_candidate_.position << std::endl;
+                target_position_[0] = matched_candidate_.position.x;
+                target_position_[1] = matched_candidate_.position.y;
             } else {
                 std::cout << "Cant find a valid candidate" << std::endl;
             }
+        } else {
+            std::cout << "Candidate list is empty!" << std::endl;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
