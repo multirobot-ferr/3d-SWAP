@@ -30,6 +30,7 @@ using namespace uav_state_machine;
 
 UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(_args) {
     std::string uav_id = _args.getArgument<std::string>("uavId", "1");
+    uav_id_ = atoi(uav_id.c_str());
     ros::NodeHandle nh;
     catching_device_   = new CatchingDevice(std::stoi(uav_id), nh);
     take_off_service_  = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/takeoff",  &UavStateMachine::takeoffServiceCallback, this);
@@ -123,7 +124,7 @@ void UavStateMachine::onCatching() {
     //TargetTracking (aka visual servoing)
     /// Init subscriber to candidates
     ros::NodeHandle nh;
-    ros::Subscriber candidate_subscriber = nh.subscribe<uav_state_machine::candidate_list>("/candidateList", 1, &UavStateMachine::candidateCallback, this);
+    ros::Subscriber candidate_subscriber = nh.subscribe<uav_state_machine::candidate_list>("/mbzirc_" + std::to_string(uav_id_) +"/candidateList", 1, &UavStateMachine::candidateCallback, this);
 
     if (!candidate_subscriber) {
         std::cout << "Can't start candidate subscriber." << std::endl;
