@@ -22,12 +22,12 @@ if(GRVCQUAD_USE_ROS)
 
 	find_package(catkin REQUIRED COMPONENTS
 			geometry_msgs
-			mavros
 			mavros_msgs
-                        sensor_msgs
-                        mavros_extras
+            sensor_msgs
+			std_msgs
 		    roscpp
 			grvc_quadrotor_uav
+			grvc_quadrotor_utils
 			message_generation)
 			## Generate services in the 'srv' folder
 	 add_service_files(
@@ -54,7 +54,13 @@ if(GRVCQUAD_USE_ROS)
 
 	catkin_package(CATKIN_DEPENDS
 			message_runtime
-			grvc_quadrotor_uav)
+			geometry_msgs
+			mavros_msgs
+            sensor_msgs
+			std_msgs
+		    roscpp
+			grvc_quadrotor_uav
+			grvc_quadrotor_utils)
 
 	include_directories(${catkin_INCLUDE_DIRS})
 	link_libraries(${catkin_LIBRARIES})
