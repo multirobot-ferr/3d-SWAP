@@ -42,9 +42,9 @@
 <PublishData>1</PublishData>
 <CandidateTopic>/mbzirc_1/candidateList</CandidateTopic>
 
-<VisualizeResults>0</VisualizeResults>
+<VisualizeResults>1</VisualizeResults>
 
-<MinObjectSize>0.15</MinObjectSize>
+<MinObjectSize>0.05</MinObjectSize>
 <MaxObjectSize>1.0</MaxObjectSize>
 
 <MaskImagePath>/home/user/mask.png</MaskImagePath>
