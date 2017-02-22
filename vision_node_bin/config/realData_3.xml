@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<CameraConfig>
+	<IsStereo>1</IsStereo>
+	<ImageWidth>1280</ImageWidth>
+	<ImageHeight>720</ImageHeight>
+
+	<CameraType>real</CameraType>
+	<CameraIndex>0</CameraIndex>
+	<CameraTopic>/zed/camera/rwa</CameraTopic>
+	<VideoPath>/home/user/video.avi</VideoPath>
+
+	<IntrinsicMatrix type_id="opencv-matrix">
+	  <rows>3</rows>
+	  <cols>3</cols>
+	  <dt>d</dt>
+	  <data>
+	    6.9517382353855157e+02 0. 6.6930171982876743e+02 0.
+	    6.9336737646792437e+02 3.6224831350202550e+02 0. 0. 1.</data></IntrinsicMatrix>
+	<DistCoeffs type_id="opencv-matrix">
+	  <rows>5</rows>
+	  <cols>1</cols>
+	  <dt>d</dt>
+	  <data>
+	    -1.5900738178224180e-01 1.2221682895144999e-02
+	    -2.1171732515917535e-03 1.6666379555710460e-03
+	    7.3872337849587117e-03</data></DistCoeffs>
+	<Rectification type_id="opencv-matrix">
+	  <rows>3</rows>
+	  <cols>3</cols>
+	  <dt>d</dt>
+	  <data>
+	    9.9983801551897644e-01 6.8789062983668934e-05 1.7998277449237758e-02
+	    6.8831296006596898e-05 9.9997076978749899e-01
+	    -7.6455760312442332e-03 -1.7998277287774422e-02
+	    7.6455764113414013e-03 9.9980878530647577e-01</data></Rectification>
+	<Projection type_id="opencv-matrix">
+	  <rows>3</rows>
+	  <cols>4</cols>
+	  <dt>d</dt>
+	  <data>
+	    6.3794929551996165e+02 0. 7.2784994220733643e+02 0. 0.
+	    6.3794929551996165e+02 3.7300988388061523e+02 0. 0. 0. 1. 0.</data></Projection>
+	<RoiLeft>
+	  3 19 637 694</RoiLeft>
+	<CameraTransformation type_id="opencv-matrix">
+	  <rows>4</rows>
+	  <cols>4</cols>
+	  <dt>d</dt>
+	  <data>
+	    1.0 0.0 0 0.0
+	    0.0 -1.0 0.0 0.0
+	    0 0.0 -1.0 0.0
+	    0.0 0.0 0.0 1.0 </data></CameraTransformation>
+</CameraConfig>
+
+<ccsConfig>../config/ccsRGBYO.json</ccsConfig>
+
+<UavPoseTopic>/mavros_3/local_position/pose</UavPoseTopic>
+<UavAltitudeTopic>/mavros_3/global_position/rel_alt</UavAltitudeTopic>
+
+
+<PublishData>1</PublishData>
+<CandidateTopic>/mbzirc_3/candidateList</CandidateTopic>
+
+<VisualizeResults>1</VisualizeResults>
+
+<MinObjectSize>0.15</MinObjectSize>
+<MaxObjectSize>0.5</MaxObjectSize>
+
+<MaskImagePath>/home/user/mask.png</MaskImagePath>
+
+
+</opencv_storage>
