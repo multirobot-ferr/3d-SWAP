@@ -265,9 +265,9 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 			cand_p->height = candidate_list->candidates[j].height;
 			cand_p->width = candidate_list->candidates[j].width;
 
-			cand_p->location(0) = candidate_list->candidates[j].position.x;
-			cand_p->location(1) = candidate_list->candidates[j].position.y;
-			cand_p->location(1) = candidate_list->candidates[j].position.z;
+			cand_p->location(0) = candidate_list->candidates[j].global_position.x;
+			cand_p->location(1) = candidate_list->candidates[j].global_position.y;
+			cand_p->location(1) = candidate_list->candidates[j].global_position.z;
 
 			for(int i = 0; i < 3; i++)
 			{

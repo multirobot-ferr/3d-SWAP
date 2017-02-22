@@ -6,7 +6,8 @@ float64[] pixel
 float64[] normalized_centered_distance
 int32 width
 int32 height
-geometry_msgs/Vector3 position
+geometry_msgs/Vector3 local_position
+geometry_msgs/Vector3 global_position
 float64[] position_covariance
 
 
