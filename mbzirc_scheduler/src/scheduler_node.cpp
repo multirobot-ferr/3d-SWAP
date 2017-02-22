@@ -273,7 +273,7 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 			{
 				for(int k = 0; k < 3; k++)
 				{
-					cand_p->locationCovariance(i,k) = candidate_list->candidates[j].position_covariance[i*3+j];
+					cand_p->locationCovariance(i,k) = candidate_list->candidates[j].position_covariance[i*3+k];
 				}	
 			}			
 
@@ -292,26 +292,33 @@ void Scheduler::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
 	msg << uav_pose->data;
 	grvc::hal::Pose pose;
 	msg >> pose;
+	int uav_id = stoi(pose.id);
 
-	allocator_->updateUavPosition(stoi(pose.id), pose.position[0], pose.position[1], pose.position[2]);
+	if(0 < uav_id && uav_id <= n_uavs_)
+		allocator_->updateUavPosition(uav_id, pose.position[0], pose.position[1], pose.position[2]);
 }
 
 /** \brief Callback for service. Request the assignment of a target
 */
 bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzirc_scheduler::AssignTarget::Response &res)
 {	
-	res.target_id = allocator_->getOptimalTarget(req.uav_id);
+	bool result;
+	if(0 < req.uav_id && req.uav_id <= n_uavs_)
+	{
+		res.target_id = allocator_->getOptimalTarget(req.uav_id);
+		result = true;
+	}
+	else
+		result = false;
 
-	return true;
+	return result;
 }
 
 /** \brief Callback for service. Set the status of a target
 */
 bool Scheduler::setTargetStatus(mbzirc_scheduler::SetTargetStatus::Request &req, mbzirc_scheduler::SetTargetStatus::Response &res)
 {	
-	estimator_->setTargetStatus(req.target_id, (TargetStatus)req.target_status);
-
-	return true;
+	return estimator_->setTargetStatus(req.target_id, (TargetStatus)req.target_status);
 }
 
 /** \brief Publish markers to represent targets beliefs

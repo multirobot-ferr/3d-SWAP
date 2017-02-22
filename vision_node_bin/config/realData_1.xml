@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <opencv_storage>
 <CameraConfig>
-	<IsStereo>0</IsStereo>
+	<IsStereo>1</IsStereo>
 	<ImageWidth>1280</ImageWidth>
 	<ImageHeight>720</ImageHeight>
 
@@ -48,13 +48,13 @@
 	  <cols>4</cols>
 	  <dt>d</dt>
 	  <data>
-	    0.0 -1.0 0 0.0
-	    -1.0 0.0 0.0 0.0
+	    1.0 0.0 0 0.0
+	    0.0 -1.0 0.0 0.0
 	    0 0.0 -1.0 0.0
 	    0.0 0.0 0.0 1.0 </data></CameraTransformation>
 </CameraConfig>
 
-<ccsConfig>ccsRGBYO.json</ccsConfig>
+<ccsConfig>../config/ccsRGBYO.json</ccsConfig>
 
 <UavPoseTopic>/mavros_1/local_position/pose</UavPoseTopic>
 <UavAltitudeTopic>/mavros_1/global_position/rel_alt</UavAltitudeTopic>

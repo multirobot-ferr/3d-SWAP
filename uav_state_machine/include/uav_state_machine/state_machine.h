@@ -76,6 +76,7 @@ private:
     void candidateCallback(const uav_state_machine::candidate_list::ConstPtr& _msg);
     bool bestCandidateMatch(const uav_state_machine::candidate_list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result);
     
+    int uav_id_ = -1;
     CatchingDevice *catching_device_;
     ros::ServiceServer take_off_service_;
     ros::ServiceServer land_service_;
