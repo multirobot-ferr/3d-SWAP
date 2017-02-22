@@ -148,15 +148,16 @@ void UavStateMachine::onCatching() {
         if (since_last_candidate < timeout) {
             // x-y-control: in candidateCallback
             // z-control: descend
-            target_position_[2] = -0.1;  // TODO: As a function of x-y error?
+            target_position_[2] = -0.5;  // TODO: As a function of x-y error?
             //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
         } else {
             // x-y-control slowly goes to 0
             target_position_[0] = 0.9*target_position_[0];
             target_position_[1] = 0.9*target_position_[1];
             // z-control: ascend
-            target_position_[2] = +0.1;  // TODO: As a function of x-y error?
+            target_position_[2] = +0.5;  // TODO: As a function of x-y error?
             //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
+            std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
         }
         // TODO: Check max altitude and change state to LOST?
         // Send target_position
