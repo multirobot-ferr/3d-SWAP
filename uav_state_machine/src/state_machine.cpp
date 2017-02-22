@@ -43,6 +43,10 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     lidar_altitude_remapped_pub_ = nh.advertise<std_msgs::Float64>("/mbzirc_" + uav_id + "/uav_state_machine/lidar_altitude", 1);
     joy_sub_ = nh.subscribe<sensor_msgs::Joy>("/joy", 10, &UavStateMachine::joyCallback, this);
 
+    // Matched candidate can't be invalid until first detection...
+    matched_candidate_.header.stamp.sec = 0;  // ...so initialize its timestamp in epoch
+    matched_candidate_.header.stamp.nsec = 0;
+
     // Initial state is repose
     state_.state = uav_state::REPOSE;
     state_publisher_ = nh.advertise<uav_state_machine::uav_state>("/mbzirc_" + uav_id + "/uav_state_machine/state", 1);
@@ -138,6 +142,26 @@ void UavStateMachine::onCatching() {
     }
 
     while (state_.state == uav_state::CATCHING) {
+        ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
+        ros::Duration timeout(1.0);  // TODO: from config, in [s]?
+        if (since_last_candidate < timeout) {
+            // x-y-control: in candidateCallback
+            // z-control: descend
+            target_position_[2] = -0.1;  // TODO: As a function of x-y error?
+            //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
+        } else {
+            // x-y-control slowly goes to 0
+            target_position_[0] = 0.9*target_position_[0];
+            target_position_[1] = 0.9*target_position_[1];
+            // z-control: ascend
+            target_position_[2] = +0.1;  // TODO: As a function of x-y error?
+            //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
+        }
+        // TODO: Check max altitude and change state to LOST?
+        // Send target_position
+        grvc::hal::TaskState ts;
+        pos_error_srv_->send(target_position_, ts);
+
         if (catching_device_->switchIsPressed()) {
             state_.state = uav_state::GOTO_DEPLOY;
         }
@@ -282,28 +306,19 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
     //mbzirc::Candidate specs;
     //specs.color = 1;
     if (state_.state == uav_state::CATCHING) {
-        grvc::hal::TaskState ts;
         uav_state_machine::candidate_list candidateList = *_msg;
-        Eigen::Matrix<double, 3, 1> targetPosition(0.0, 0.0, 0.0);
-
         if (candidateList.candidates.size() > 0) {
-	    uav_state_machine::candidate matchedCandidate;
-            if (bestCandidateMatch(candidateList, target_, matchedCandidate)) {
-                std::cout << "tracking candidate with error " << matchedCandidate.position << std::endl;
-                targetPosition[0] = matchedCandidate.position.x;
-                targetPosition[1] = matchedCandidate.position.y;
-                //targetPosition[2] = target_altitude_-current_altitude_;  // From joystick!
-                targetPosition[2] = -0.1;  // TODO: As a function of x-y error?
+            if (bestCandidateMatch(candidateList, target_, matched_candidate_)) {
+                matched_candidate_.header.stamp = ros::Time::now();
+                std::cout << "tracking candidate with error " << matched_candidate_.position << std::endl;
+                target_position_[0] = matched_candidate_.position.x;
+                target_position_[1] = matched_candidate_.position.y;
             } else {
-                targetPosition[2] = +0.1;
                 std::cout << "Cant find a valid candidate" << std::endl;
             }
         } else {
-            targetPosition[2] = +0.1;  // TODO: Return to HOVER?
             std::cout << "Candidate list is empty!" << std::endl;
         }
-        pos_error_srv_->send(targetPosition, ts);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 

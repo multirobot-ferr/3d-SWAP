@@ -92,6 +92,9 @@ private:
     std::thread state_pub_thread_;
     ros::Publisher state_publisher_;
 
+    uav_state_machine::candidate matched_candidate_;
+    Eigen::Matrix<double, 3, 1> target_position_ = {0.0, 0.0, 0.0};
+
     grvc::hal::Waypoint current_position_waypoint_;
     std::vector<grvc::hal::Waypoint> waypoint_list_;
     unsigned int waypoint_index_ = 0;
