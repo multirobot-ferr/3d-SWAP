@@ -268,8 +268,8 @@ bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::R
     if (state_.state == uav_state::HOVER && req.enabled) {
         target_.color = req.color;
         target_.shape = req.shape;
-        target_.position.x = req.position[0];
-        target_.position.y = req.position[1];
+        target_.local_position.x = req.position[0];
+        target_.local_position.y = req.position[1];
         res.success = true;
         state_.state = uav_state::CATCHING;
         return true;
