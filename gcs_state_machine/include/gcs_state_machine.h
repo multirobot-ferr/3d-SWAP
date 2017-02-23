@@ -39,10 +39,17 @@ class GcsStateMachine{
 	private: // Private methods
 		void onStateMachine();
 
+		void onStateRepose();
+		void onStateStart();
+		void onStateSearching();
+		void onStateCatching();
+		void onStateEnd();
+		void onStateError();
 	private: // Members
 		// Members related to CGS state.
-		enum class eGcsState {STOP, SEARCHING, CATCHING, ERROR};
-		eGcsState 	gcs_state_ = eGcsState::STOP;
+		enum class eGcsState {REPOSE, START, SEARCHING, CATCHING, END, ERROR};
+		eGcsState 		gcs_state_ = eGcsState::REPOSE;
+		std::string  	state_msg_;
 		ros::Publisher	state_publisher_;
 		std::thread 	state_publisher_thread_;
 
