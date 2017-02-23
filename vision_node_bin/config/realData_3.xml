@@ -48,8 +48,8 @@
 	  <cols>4</cols>
 	  <dt>d</dt>
 	  <data>
-	    1.0 0.0 0 0.0
-	    0.0 -1.0 0.0 0.0
+	    -1.0 0.0 0 0.0
+	    0.0 1.0 0.0 0.0
 	    0 0.0 -1.0 0.0
 	    0.0 0.0 0.0 1.0 </data></CameraTransformation>
 </CameraConfig>
