@@ -25,6 +25,7 @@
 //----------
 #include <uav_state_machine/state_machine.h>
 #include <thread>
+#include <math.h>
 
 using namespace uav_state_machine;
 
@@ -140,6 +141,17 @@ void UavStateMachine::onCatching() {
 	    return;
     } else {
         std::cout << "Subscribed to candidate topic" << std::endl;
+    }
+
+    // Magnetize catching device
+    uav_state_machine::magnetize_service::Request req;
+    req.magnetize = true;
+    uav_state_machine::magnetize_service::Response res;
+    bool magnet_call = catching_device_->magnetizeServiceCallback(req, res);  // May block up to 4s, TODO: somewhere else?
+    if(!magnet_call || !res.success) {
+        std::cout << "Can't magnetize catching device" << std::endl;
+        state_.state = uav_state::HOVER;
+	    return;
     }
 
     while (state_.state == uav_state::CATCHING) {
@@ -294,8 +306,13 @@ void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& 
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
-void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg){
-    current_position_waypoint_ = {{_msg->pose.position.x, _msg->pose.position.y, _msg->pose.position.z}, 0.0};
+void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg) {
+    // TODO: Make an util for quaternion to euler conversion? Eigen?
+    double yaw = 2*atan2(_msg->pose.orientation.z, _msg->pose.orientation.w);
+    // Move yaw to [-pi, pi]; as atan2 output is in [-pi, pi], yaw is initially in [-2*pi, 2*pi]
+    if (yaw < -M_PI) yaw += 2*M_PI;
+    if (yaw >  M_PI) yaw -= 2*M_PI;
+    current_position_waypoint_ = {{_msg->pose.position.x, _msg->pose.position.y, _msg->pose.position.z}, yaw};
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::joyCallback(const sensor_msgs::Joy::ConstPtr& _joy) {
