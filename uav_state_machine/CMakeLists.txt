@@ -23,9 +23,9 @@ if(GRVCQUAD_USE_ROS)
 	find_package(catkin REQUIRED COMPONENTS
 			geometry_msgs
 			mavros_msgs
-            sensor_msgs
+            		sensor_msgs
 			std_msgs
-		    roscpp
+		    	roscpp
 			grvc_quadrotor_uav
 			grvc_quadrotor_utils
 			message_generation)
@@ -56,9 +56,9 @@ if(GRVCQUAD_USE_ROS)
 			message_runtime
 			geometry_msgs
 			mavros_msgs
-            sensor_msgs
+            		sensor_msgs
 			std_msgs
-		    roscpp
+		        roscpp
 			grvc_quadrotor_uav
 			grvc_quadrotor_utils)
 
