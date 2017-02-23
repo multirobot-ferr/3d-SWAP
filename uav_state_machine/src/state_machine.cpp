@@ -143,6 +143,17 @@ void UavStateMachine::onCatching() {
         std::cout << "Subscribed to candidate topic" << std::endl;
     }
 
+    // Magnetize catching device
+    uav_state_machine::magnetize_service::Request req;
+    req.magnetize = true;
+    uav_state_machine::magnetize_service::Response res;
+    bool magnet_call = catching_device_->magnetizeServiceCallback(req, res);  // May block up to 4s, TODO: somewhere else?
+    if(!magnet_call || !res.success) {
+        std::cout << "Can't magnetize catching device" << std::endl;
+        state_.state = uav_state::HOVER;
+	    return;
+    }
+
     while (state_.state == uav_state::CATCHING) {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
         ros::Duration timeout(1.0);  // TODO: from config, in [s]?
