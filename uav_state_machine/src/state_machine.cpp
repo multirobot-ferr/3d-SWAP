@@ -25,6 +25,7 @@
 //----------
 #include <uav_state_machine/state_machine.h>
 #include <thread>
+#include <math.h>
 
 using namespace uav_state_machine;
 
@@ -294,8 +295,13 @@ void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& 
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
-void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg){
-    current_position_waypoint_ = {{_msg->pose.position.x, _msg->pose.position.y, _msg->pose.position.z}, 0.0};
+void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg) {
+    // TODO: Make an util for quaternion to euler conversion? Eigen?
+    double yaw = 2*atan2(_msg->pose.orientation.z, _msg->pose.orientation.w);
+    // Move yaw to [-pi, pi]; as atan2 output is in [-pi, pi], yaw is initially in [-2*pi, 2*pi]
+    if (yaw < -M_PI) yaw += 2*M_PI;
+    if (yaw >  M_PI) yaw -= 2*M_PI;
+    current_position_waypoint_ = {{_msg->pose.position.x, _msg->pose.position.y, _msg->pose.position.z}, yaw};
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::joyCallback(const sensor_msgs::Joy::ConstPtr& _joy) {
