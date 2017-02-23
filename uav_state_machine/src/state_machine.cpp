@@ -25,6 +25,7 @@
 //----------
 #include <uav_state_machine/state_machine.h>
 #include <thread>
+#include <math.h>
 
 using namespace uav_state_machine;
 
@@ -142,6 +143,9 @@ void UavStateMachine::onCatching() {
         std::cout << "Subscribed to candidate topic" << std::endl;
     }
 
+    // Magnetize catching device
+    catching_device_->setMagnetization(true);
+
     while (state_.state == uav_state::CATCHING) {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
         ros::Duration timeout(1.0);  // TODO: from config, in [s]?
@@ -180,7 +184,20 @@ void UavStateMachine::onGoToDeploy() {
     up_waypoint.pos.z() = 5.0;  // TODO: Altitude as a parameter
     grvc::hal::TaskState ts;
     waypoint_srv_->send(up_waypoint, ts);  // Blocking!
-    // TODO: Go to deploy zone (what switch turns off?)
+    // TODO: Go to deploy zone (what if switch turns off?)
+    if (catching_device_->switchIsPressed()) {  // Check switch again
+        grvc::hal::Waypoint deploy_waypoint;  // TODO: From file
+        deploy_waypoint.pos.x() = -3.0;
+        deploy_waypoint.pos.y() = 0.0;
+        deploy_waypoint.pos.z() = 5.0;
+        deploy_waypoint.yaw = current_position_waypoint_.yaw;
+        waypoint_srv_->send(deploy_waypoint, ts);  // Blocking!
+        // Demagnetize catching device
+        catching_device_->setMagnetization(false);
+    } else {
+        std::cout << "Miss the catch, try again!" << std::endl;
+        state_.state = uav_state::CATCHING;
+    }
     state_.state = uav_state::HOVER;
 }
 
@@ -294,8 +311,13 @@ void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& 
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
-void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg){
-    current_position_waypoint_ = {{_msg->pose.position.x, _msg->pose.position.y, _msg->pose.position.z}, 0.0};
+void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg) {
+    // TODO: Make an util for quaternion to euler conversion? Eigen?
+    double yaw = 2*atan2(_msg->pose.orientation.z, _msg->pose.orientation.w);
+    // Move yaw to [-pi, pi]; as atan2 output is in [-pi, pi], yaw is initially in [-2*pi, 2*pi]
+    if (yaw < -M_PI) yaw += 2*M_PI;
+    if (yaw >  M_PI) yaw -= 2*M_PI;
+    current_position_waypoint_ = {{_msg->pose.position.x, _msg->pose.position.y, _msg->pose.position.z}, yaw};
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::joyCallback(const sensor_msgs::Joy::ConstPtr& _joy) {
