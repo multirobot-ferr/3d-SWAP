@@ -35,15 +35,13 @@ public:
     bool switchIsPressed() { return switch_state_; }
 
     // Handle the magnet (may be up to ~4s blocking!)
-    bool magnetizeServiceCallback(uav_state_machine::magnetize_service::Request &_req,
-         uav_state_machine::magnetize_service::Response &_res)
-    {
+    void setMagnetization(bool magnetize) {
         // Change magnetization only if needed
-        MagnetState wanted_state = (_req.magnetize? MagnetState::MAGNETIZED : MagnetState::DEMAGNETIZED);
+        MagnetState wanted_state = (magnetize? MagnetState::MAGNETIZED : MagnetState::DEMAGNETIZED);
         if (wanted_state != magnet_state_) {
             mavros_msgs::ActuatorControl control_signal;
             control_signal.group_mix = 3;
-            control_signal.controls[6] = (_req.magnetize ? 1.0 : -1.0);
+            control_signal.controls[6] = (magnetize ? 1.0 : -1.0);
 
             // Start magnetization/demagnetization
             std::chrono::time_point<std::chrono::steady_clock> t0 = std::chrono::steady_clock::now();
@@ -57,6 +55,12 @@ public:
 
             magnet_state_ = wanted_state;
         }
+    }
+
+    bool magnetizeServiceCallback(uav_state_machine::magnetize_service::Request &_req,
+         uav_state_machine::magnetize_service::Response &_res)
+    {
+        setMagnetization(_req.magnetize);
         _res.success = true;
         return true;
     }

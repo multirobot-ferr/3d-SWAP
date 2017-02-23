@@ -144,15 +144,7 @@ void UavStateMachine::onCatching() {
     }
 
     // Magnetize catching device
-    uav_state_machine::magnetize_service::Request req;
-    req.magnetize = true;
-    uav_state_machine::magnetize_service::Response res;
-    bool magnet_call = catching_device_->magnetizeServiceCallback(req, res);  // May block up to 4s, TODO: somewhere else?
-    if(!magnet_call || !res.success) {
-        std::cout << "Can't magnetize catching device" << std::endl;
-        state_.state = uav_state::HOVER;
-	    return;
-    }
+    catching_device_->setMagnetization(true);
 
     while (state_.state == uav_state::CATCHING) {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
@@ -192,7 +184,20 @@ void UavStateMachine::onGoToDeploy() {
     up_waypoint.pos.z() = 5.0;  // TODO: Altitude as a parameter
     grvc::hal::TaskState ts;
     waypoint_srv_->send(up_waypoint, ts);  // Blocking!
-    // TODO: Go to deploy zone (what switch turns off?)
+    // TODO: Go to deploy zone (what if switch turns off?)
+    if (catching_device_->switchIsPressed()) {  // Check switch again
+        grvc::hal::Waypoint deploy_waypoint;  // TODO: From file
+        deploy_waypoint.pos.x() = -3.0;
+        deploy_waypoint.pos.y() = 0.0;
+        deploy_waypoint.pos.z() = 5.0;
+        deploy_waypoint.yaw = current_position_waypoint_.yaw;
+        waypoint_srv_->send(deploy_waypoint, ts);  // Blocking!
+        // Demagnetize catching device
+        catching_device_->setMagnetization(false);
+    } else {
+        std::cout << "Miss the catch, try again!" << std::endl;
+        state_.state = uav_state::CATCHING;
+    }
     state_.state = uav_state::HOVER;
 }
 
