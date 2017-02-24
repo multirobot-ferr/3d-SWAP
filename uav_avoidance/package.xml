@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>uav_avoidance</name>
+  <version>0.0.1</version>
+  <description>The uav_avoidance package implements a 2 dimensional collision 
+  avoidance system for the quadcopters called SWAP. On it, when two or more
+  quadcopters are too close to each other, the system will command them to 
+  avoid the conflict creating a virtual roundabout.
+  
+  The system was created only for colaborative uav's.
+  </description>
+
+  <author email="eduardo.ferrera@uni-due.de">		Eduardo Ferrera	</author>
+  <maintainer email="eduardo.ferrera@uni-due.de">	Eduardo Ferrera	</maintainer>
+  <url type="website">					www.nes.uni-due.de	</url> 
+
+  <license>BSD</license>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>pcl</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>pcl</run_depend>
+  
+</package>
