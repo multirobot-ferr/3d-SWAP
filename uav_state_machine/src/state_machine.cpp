@@ -33,7 +33,7 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     std::string uav_id = _args.getArgument<std::string>("uavId", "1");
     uav_id_ = atoi(uav_id.c_str());
     ros::NodeHandle nh;
-    catching_device_   = new CatchingDevice(std::stoi(uav_id), nh);
+    catching_device_   = CatchingDevice::createCatchingDevice(std::stoi(uav_id), nh);
     take_off_service_  = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/takeoff",  &UavStateMachine::takeoffServiceCallback, this);
     land_service_      = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/land",     &UavStateMachine::landServiceCallback, this);
     search_service_    = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/waypoint", &UavStateMachine::searchServiceCallback, this);

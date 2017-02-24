@@ -62,8 +62,13 @@ if(GRVCQUAD_USE_ROS)
 			grvc_quadrotor_uav
 			grvc_quadrotor_utils)
 
-	include_directories(${catkin_INCLUDE_DIRS})
+	include_directories(
+		include
+		${catkin_INCLUDE_DIRS})
 	link_libraries(${catkin_LIBRARIES})
+
+	add_library(catching_device src/catching_device.cpp)
+
 endif(GRVCQUAD_USE_ROS)
 
 ## Declare a C++ executable

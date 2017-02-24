@@ -23,29 +23,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //----------
-#ifndef MBZIRC_CATCHING_DEVICE_H
-#define MBZIRC_CATCHING_DEVICE_H
+#include <uav_state_machine/catching_device.h>
+#include <uav_state_machine/mavros_catching_device.h>
+#include <uav_state_machine/gazebo_catching_device.h>
 
-#include <ros/ros.h>
-#include <uav_state_machine/magnetize_service.h>
-
-class CatchingDevice {
-public:
-    enum class MagnetState { UNKNOWN, MAGNETIZED, DEMAGNETIZED };
-    
-    static CatchingDevice* createCatchingDevice(unsigned int _uav_id, ros::NodeHandle& _nh);
-
-    // Ask about magnet status
-    virtual MagnetState magnetState() = 0;
-
-    // Ask about switch status
-    virtual bool switchIsPressed() = 0;
-
-    // Handle the magnet (may be up to ~4s blocking!)
-    virtual void setMagnetization(bool magnetize) = 0;
-
-    virtual bool magnetizeServiceCallback(uav_state_machine::magnetize_service::Request &_req,
-         uav_state_machine::magnetize_service::Response &_res) = 0;
-};
-
-#endif  // MBZIRC_CATCHING_DEVICE_H
+CatchingDevice* CatchingDevice::createCatchingDevice(unsigned int _uav_id, ros::NodeHandle& _nh) {
+    CatchingDevice* implementation = nullptr;
+    // Return an implementation based on rosparam 'mavros_spawn/(_uav_id)/mode'
+    std::string param_name = "mavros_spawn/" + std::to_string(_uav_id) + "/mode";
+    std::string mode;
+    _nh.param<std::string>(param_name, mode, "real");  // Get param, default is 'real' mode
+    if (mode == "real") {
+        implementation = new MavRosCatchingDevice(_uav_id, _nh);
+    } else if (mode == "sitl") {
+        implementation = new GazeboCatchingDevice(_uav_id, _nh);
+    }
+    return implementation;
+}
