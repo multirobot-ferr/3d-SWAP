@@ -285,8 +285,8 @@ bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::R
     if (state_.state == uav_state::HOVER && req.enabled) {
         target_.color = req.color;
         target_.shape = req.shape;
-        target_.position.x = req.position[0];
-        target_.position.y = req.position[1];
+        target_.local_position.x = req.position[0];
+        target_.local_position.y = req.position[1];
         res.success = true;
         state_.state = uav_state::CATCHING;
         return true;
@@ -334,9 +334,8 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
         if (candidateList.candidates.size() > 0) {
             if (bestCandidateMatch(candidateList, target_, matched_candidate_)) {
                 matched_candidate_.header.stamp = ros::Time::now();
-                std::cout << "tracking candidate with error " << matched_candidate_.position << std::endl;
-                target_position_[0] = matched_candidate_.position.x;
-                target_position_[1] = matched_candidate_.position.y;
+                target_position_[0] = matched_candidate_.local_position.x;
+                target_position_[1] = matched_candidate_.local_position.y;
             } else {
                 std::cout << "Cant find a valid candidate" << std::endl;
             }

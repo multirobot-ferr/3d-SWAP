@@ -260,14 +260,37 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 		{
 			Candidate* cand_p = new Candidate;
 
-			cand_p->color = candidate_list->candidates[j].color;
+			switch(candidate_list->candidates[j].color)
+			{
+				case uav_state_machine::candidate::COLOR_UNKNOWN:
+				cand_p->color = UNKNOWN;
+				break;
+				case uav_state_machine::candidate::COLOR_RED:
+				cand_p->color = RED;
+				break;
+				case uav_state_machine::candidate::COLOR_BLUE:
+				cand_p->color = BLUE;
+				break;
+				case uav_state_machine::candidate::COLOR_GREEN:
+				cand_p->color = GREEN;
+				break;
+				case uav_state_machine::candidate::COLOR_YELLOW:
+				cand_p->color = YELLOW;
+				break;
+				case uav_state_machine::candidate::COLOR_ORANGE:
+				cand_p->color = ORANGE;
+				break;
+				default:
+				ROS_ERROR("Invalid candidate color received.");
+			}
+
 			cand_p->shape = candidate_list->candidates[j].shape;
 			cand_p->height = candidate_list->candidates[j].height;
 			cand_p->width = candidate_list->candidates[j].width;
 
-			cand_p->location(0) = candidate_list->candidates[j].position.x;
-			cand_p->location(1) = candidate_list->candidates[j].position.y;
-			cand_p->location(1) = candidate_list->candidates[j].position.z;
+			cand_p->location(0) = candidate_list->candidates[j].global_position.x;
+			cand_p->location(1) = candidate_list->candidates[j].global_position.y;
+			cand_p->location(1) = candidate_list->candidates[j].global_position.z;
 
 			for(int i = 0; i < 3; i++)
 			{
@@ -303,9 +326,42 @@ void Scheduler::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
 bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzirc_scheduler::AssignTarget::Response &res)
 {	
 	bool result;
+	double x, y;
+	TargetStatus target_status;
+	Color target_color;
+
 	if(0 < req.uav_id && req.uav_id <= n_uavs_)
 	{
 		res.target_id = allocator_->getOptimalTarget(req.uav_id);
+
+		estimator_->getTargetInfo(res.target_id, x, y, target_status, target_color);
+
+		res.global_position.x = x;
+		res.global_position.y = y;
+		res.global_position.z = 0.0;
+
+		switch(target_color)
+		{
+			case UNKNOWN:
+			res.color = uav_state_machine::candidate::COLOR_UNKNOWN;
+			break;
+			case RED:
+			res.color = uav_state_machine::candidate::COLOR_RED;
+			break;
+			case BLUE:
+			res.color = uav_state_machine::candidate::COLOR_BLUE;
+			break;
+			case GREEN:
+			res.color = uav_state_machine::candidate::COLOR_GREEN;
+			break;
+			case YELLOW:
+			res.color = uav_state_machine::candidate::COLOR_YELLOW;
+			break;
+			case ORANGE:
+			res.color = uav_state_machine::candidate::COLOR_ORANGE;
+			break;
+		}
+
 		result = true;
 	}
 	else
@@ -317,8 +373,31 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 /** \brief Callback for service. Set the status of a target
 */
 bool Scheduler::setTargetStatus(mbzirc_scheduler::SetTargetStatus::Request &req, mbzirc_scheduler::SetTargetStatus::Response &res)
-{	
-	return estimator_->setTargetStatus(req.target_id, (TargetStatus)req.target_status);
+{
+	TargetStatus target_status;
+
+	switch(req.target_status)
+	{
+		case mbzirc_scheduler::SetTargetStatus::Request::UNASSIGNED:
+		target_status = UNASSIGNED;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::ASSIGNED:
+		target_status = ASSIGNED;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::CAUGHT:
+		target_status = CAUGHT;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::DEPLOYED:
+		target_status = DEPLOYED;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::LOST:
+		target_status = LOST;
+		break;
+		default:
+		ROS_ERROR("Not valid target status for assignment.");
+	}	
+
+	return estimator_->setTargetStatus(req.target_id, target_status);
 }
 
 /** \brief Publish markers to represent targets beliefs
@@ -332,6 +411,8 @@ void Scheduler::publishBelief()
 	vector<double> v(4);
 	vector<vector<double> > covariances;
 	double a, b, yaw, x, y, vx, vy;
+	TargetStatus target_status;
+	Color target_color;
 
 	// Get ids to plot active targets
 	vector<int> active_targets = estimator_->getActiveTargets();
@@ -340,6 +421,7 @@ void Scheduler::publishBelief()
 	{
 		if(estimator_->getTargetInfo(active_targets[i], x, y, covariances, vx, vy))
 		{
+			estimator_->getTargetInfo(active_targets[i], x, y, target_status, target_color);
 
 			// Compute SVD of cholesky. The singular values are the square roots of the eigenvalues of
 			// the covariance matrix 
@@ -352,6 +434,47 @@ void Scheduler::publishBelief()
 			
 			// Fill in marker
 			visualization_msgs::Marker marker;
+
+			// Set color for the target, default if UNKNOWN
+			switch(target_color)
+			{
+				case RED:
+				marker.color.r = 1.0;
+				marker.color.g = 0.0;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+				case BLUE:
+				marker.color.r = 0.0;
+				marker.color.g = 0.0;
+				marker.color.b = 1.0;
+				marker.color.a = 1;
+				break;
+				case GREEN:
+				marker.color.r = 0.0;
+				marker.color.g = 1.0;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+				case YELLOW:
+				marker.color.r = 1.0;
+				marker.color.g = 1.0;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+				case ORANGE:
+				marker.color.r = 1.0;
+				marker.color.g = 0.65;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+				default:
+				marker.color.r = 0.0;
+				marker.color.g = 0.0;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+			}
 		
 			// Set the frame ID and timestamp
 			marker.header.frame_id = "/map";    
@@ -374,10 +497,6 @@ void Scheduler::publishBelief()
 			marker.scale.z = 0.1;
 
 			marker.lifetime = ros::Duration();
-			marker.color.r = 1.0;
-			marker.color.g = 0.0;
-			marker.color.b = 0.0;
-			marker.color.a = 1;
 
 			// Set the central pose of the marker. This is a full 6DOF pose relative to the frame/time specified in the header    
 			marker.pose.position.x = x;
