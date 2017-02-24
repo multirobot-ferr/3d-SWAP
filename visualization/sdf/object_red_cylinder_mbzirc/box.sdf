@@ -2,8 +2,7 @@
 <sdf version="1.4">
 <model name="Red cylinder object">
   <pose>0 0 0.08 0 0 0</pose>
-  <static>true</static>
-    <link name="link">
+    <link name="grab_here">
       <inertial>
         <mass>0.5</mass>
         <inertia>
