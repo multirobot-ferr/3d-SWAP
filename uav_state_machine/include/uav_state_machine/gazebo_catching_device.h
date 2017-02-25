@@ -53,8 +53,10 @@ public:
 
         pub_thread_ = std::thread([&](){
             while (ros::ok()) {
-                // Can't grab if magnet is not magnetized
-                //grabbing_ = (magnet_state_ == MagnetState::MAGNETIZED);
+                // Release object if magnet is not magnetized
+                if (magnet_state_ != MagnetState::MAGNETIZED) {
+                    grabbing_ = false;
+                }
                 if (grabbing_) {
                     double z_grabbing = -0.5;  // TODO: as a param?
                     //std::cout << "Grabbing " << grabbed_link_name_ << std::endl;
@@ -109,7 +111,7 @@ protected:
     std::string grabbed_link_name_;
 
     void linkStatesCallback(const gazebo_msgs::LinkStatesConstPtr& _msg) {
-        if (!grabbing_) { // && (magnet_state_ == MagnetState::MAGNETIZED)) {
+        if (!grabbing_ && (magnet_state_ == MagnetState::MAGNETIZED)) {
             // All link states in world frame, find robot and grabbable objects
             Eigen::Vector3f robot_link_position;
             for (size_t i = 0; i < _msg->name.size(); i++) {
