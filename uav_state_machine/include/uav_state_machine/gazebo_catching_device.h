@@ -66,26 +66,16 @@ public:
                     grabbed.reference_frame = robot_link_name_;
                     link_state_publisher_.publish(grabbed);
                 } else if (magnet_state_ == MagnetState::MAGNETIZED) {
-                    // Check distances between robot and grabbable objects
+                    // Check if distances between robot and grabbable objects...
+                    // ... are below catching threshold TODO: as a param?
+                    double catching_threshold = 1.0;
                     for (auto& name_pos : name_to_position_map_) {
                         Eigen::Vector3f diff = name_pos.second - robot_link_position_;
-                        name_to_distance_map_[name_pos.first] = diff.norm();
-                        std:: cout << "n2d[" << name_pos.first << "] = " << diff.norm() << std::endl;
-                    }
-                    // Find min distance in name_to_distance_map_...
-                    auto min_distance_pair = std::min_element
-                    (
-                        std::begin(name_to_distance_map_), std::end(name_to_distance_map_),
-                        [] (const std::pair<std::string, double> & p1, const std::pair<std::string, double> & p2) {
-                            return p1.second < p2.second;
-                        }
-                    );
-                    if (min_distance_pair != std::end(name_to_distance_map_)) {
-                        // ... and check if its less than catching threshold TODO: as a param?
-                        double catching_threshold = 1.0;
-                        if (min_distance_pair->second < catching_threshold) {
-                            grabbed_link_name_ = min_distance_pair->first;
+                        double distance = diff.norm();
+                        if (distance < catching_threshold) {
+                            grabbed_link_name_ = name_pos.first;
                             grabbing_ = true;
+                            break;  // Grab first that holds catching condition (kiss)
                         }
                     }
                 }
@@ -127,7 +117,6 @@ protected:
     ros::Subscriber link_states_subscriber_;
     ros::Publisher link_state_publisher_;
     std::map<std::string, Eigen::Vector3f> name_to_position_map_;
-    std::map<std::string, double> name_to_distance_map_;
     std::thread pub_thread_;
 
     Eigen::Vector3f robot_link_position_;
