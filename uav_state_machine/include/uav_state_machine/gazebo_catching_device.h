@@ -65,19 +65,6 @@ public:
                     grabbed.pose.position.z = z_grabbing;
                     grabbed.reference_frame = robot_link_name_;
                     link_state_publisher_.publish(grabbed);
-                } else if (magnet_state_ == MagnetState::MAGNETIZED) {
-                    // Check if distances between robot and grabbable objects...
-                    // ... are below catching threshold TODO: as a param?
-                    double catching_threshold = 1.0;
-                    for (auto& name_pos : name_to_position_map_) {
-                        Eigen::Vector3f diff = name_pos.second - robot_link_position_;
-                        double distance = diff.norm();
-                        if (distance < catching_threshold) {
-                            grabbed_link_name_ = name_pos.first;
-                            grabbing_ = true;
-                            break;  // Grab first that holds catching condition (kiss)
-                        }
-                    }
                 }
                 // Publish switch state
                 std_msgs::Bool switch_state;
@@ -116,27 +103,39 @@ protected:
     ros::ServiceServer magnetize_service_;
     ros::Subscriber link_states_subscriber_;
     ros::Publisher link_state_publisher_;
-    std::map<std::string, Eigen::Vector3f> name_to_position_map_;
     std::thread pub_thread_;
 
-    Eigen::Vector3f robot_link_position_;
     std::string robot_link_name_;
     std::string grabbed_link_name_;
 
     void linkStatesCallback(const gazebo_msgs::LinkStatesConstPtr& _msg) {
         if (!grabbing_ && (magnet_state_ == MagnetState::MAGNETIZED)) {
             // All link states in world frame, find robot and grabbable objects
+            Eigen::Vector3f robot_link_position;
+            std::map<std::string, Eigen::Vector3f> name_to_position_map;
             for (size_t i = 0; i < _msg->name.size(); i++) {
                 std::string link_name = _msg->name[i];
                 if (link_name == robot_link_name_) {
-                    robot_link_position_ << _msg->pose[i].position.x, \
+                    robot_link_position << _msg->pose[i].position.x, \
                         _msg->pose[i].position.y, _msg->pose[i].position.z;
                 }
                 std::size_t found_grabbable = link_name.find("grab_here");
                 if (found_grabbable != std::string::npos) {
                     Eigen::Vector3f link_position(_msg->pose[i].position.x, \
                         _msg->pose[i].position.y, _msg->pose[i].position.z);
-                    name_to_position_map_[_msg->name[i]] = link_position;
+                    name_to_position_map[_msg->name[i]] = link_position;
+                }
+                // Check if distances between robot and grabbable objects
+                // are below catching threshold TODO: as a param?
+                double catching_threshold = 1.0;
+                for (auto& name_pos : name_to_position_map) {
+                    Eigen::Vector3f diff = name_pos.second - robot_link_position;
+                    double distance = diff.norm();
+                    if (distance < catching_threshold) {
+                        grabbed_link_name_ = name_pos.first;
+                        grabbing_ = true;
+                        break;  // Grab first that holds catching condition (kiss)
+                    }
                 }
             }
         }
