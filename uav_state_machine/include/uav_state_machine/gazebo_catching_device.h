@@ -65,13 +65,35 @@ public:
                     grabbed.pose.position.z = z_grabbing;
                     grabbed.reference_frame = robot_link_name_;
                     link_state_publisher_.publish(grabbed);
+                } else {
+                    // Check distances between robot and grabbable objects
+                    for (auto& name_pos : name_to_position_map_) {
+                        Eigen::Vector3f diff = name_pos.second - robot_link_position_;
+                        name_to_distance_map_[name_pos.first] = diff.norm();
+                    }
+                    // Find min distance in name_to_distance_map_...
+                    auto min_distance_pair = std::min_element
+                    (
+                        std::begin(name_to_distance_map_), std::end(name_to_distance_map_),
+                        [] (const std::pair<std::string, double> & p1, const std::pair<std::string, double> & p2) {
+                            return p1.second < p2.second;
+                        }
+                    );
+                    if (min_distance_pair != std::end(name_to_distance_map_)) {
+                        // ... and check if its less than catching threshold TODO: as a param?
+                        double catching_threshold = 1.0;
+                        if (min_distance_pair->second < catching_threshold) {
+                            grabbed_link_name_ = min_distance_pair->first;
+                            grabbing_ = true;
+                        }
+                    }
                 }
                 // Publish switch state
                 std_msgs::Bool switch_state;
                 switch_state.data = switchIsPressed();
                 switch_publisher_.publish(switch_state);
                 // Sleep!
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         });
     }
@@ -107,17 +129,17 @@ protected:
     std::map<std::string, double> name_to_distance_map_;
     std::thread pub_thread_;
 
+    Eigen::Vector3f robot_link_position_;
     std::string robot_link_name_;
     std::string grabbed_link_name_;
 
     void linkStatesCallback(const gazebo_msgs::LinkStatesConstPtr& _msg) {
         if (!grabbing_ && (magnet_state_ == MagnetState::MAGNETIZED)) {
             // All link states in world frame, find robot and grabbable objects
-            Eigen::Vector3f robot_link_position;
             for (size_t i = 0; i < _msg->name.size(); i++) {
                 std::string link_name = _msg->name[i];
                 if (link_name == robot_link_name_) {
-                    robot_link_position << _msg->pose[i].position.x, \
+                    robot_link_position_ << _msg->pose[i].position.x, \
                         _msg->pose[i].position.y, _msg->pose[i].position.z;
                 }
                 std::size_t found_grabbable = link_name.find("grab_here");
@@ -125,27 +147,6 @@ protected:
                     Eigen::Vector3f link_position(_msg->pose[i].position.x, \
                         _msg->pose[i].position.y, _msg->pose[i].position.z);
                     name_to_position_map_[_msg->name[i]] = link_position;
-                }
-            }
-            // Now check distances between robot and grabbable objects
-            for (auto& name_pos : name_to_position_map_) {
-                Eigen::Vector3f diff = name_pos.second - robot_link_position;
-                name_to_distance_map_[name_pos.first] = diff.norm();
-            }
-            // Find min distance in name_to_distance_map_...
-            auto min_distance_pair = std::min_element
-            (
-                std::begin(name_to_distance_map_), std::end(name_to_distance_map_),
-                [] (const std::pair<std::string, double> & p1, const std::pair<std::string, double> & p2) {
-                    return p1.second < p2.second;
-                }
-            );
-            if (min_distance_pair != std::end(name_to_distance_map_)) {
-                // ... and check if its less than catching threshold TODO: as a param?
-                double catching_threshold = 1.0;
-                if (min_distance_pair->second < catching_threshold) {
-                    grabbed_link_name_ = min_distance_pair->first;
-                    grabbing_ = true;
                 }
             }
         }
