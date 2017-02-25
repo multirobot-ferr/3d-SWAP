@@ -82,22 +82,26 @@ protected:
 
     void linkStatesCallback(const gazebo_msgs::LinkStatesConstPtr& _msg) {
         if (!grabbing_) { // && (magnet_state_ == MagnetState::MAGNETIZED)) {
-            // All link states in world frame
+            // All link states in world frame, find robot and grabbable objects
+            std::string robot_link_name = robot_name_ + "::base_link";
+            Eigen::Vector3f robot_link_position;
             for (size_t i = 0; i < _msg->name.size(); i++) {
-                Eigen::Vector3f link_position(_msg->pose[i].position.x, \
-                    _msg->pose[i].position.y, _msg->pose[i].position.z);
-                name_to_position_map_[_msg->name[i]] = link_position;
-            }
-            // Robot base link position:
-            std::string base_link_name = robot_name_ + "::base_link";
-            Eigen::Vector3f base_link_position = name_to_position_map_[base_link_name];
-            // Now check distances to grabbable object (link name = "grab_here")
-            for (auto& name_pos : name_to_position_map_) {
-                std::size_t found = name_pos.first.find("grab_here");
-                if (found != std::string::npos) {
-                    Eigen::Vector3f diff = name_pos.second - base_link_position;
-                    name_to_distance_map_[name_pos.first] = diff.norm();
+                std::string link_name = _msg->name[i];
+                if (link_name == robot_link_name) {
+                    robot_link_position << _msg->pose[i].position.x, \
+                        _msg->pose[i].position.y, _msg->pose[i].position.z;
                 }
+                std::size_t found_grabbable = link_name.find("grab_here");
+                if (found_grabbable != std::string::npos) {
+                    Eigen::Vector3f link_position(_msg->pose[i].position.x, \
+                        _msg->pose[i].position.y, _msg->pose[i].position.z);
+                    name_to_position_map_[_msg->name[i]] = link_position;
+                }
+            }
+            // Now check distances between robot and grabbable objects
+            for (auto& name_pos : name_to_position_map_) {
+                Eigen::Vector3f diff = name_pos.second - robot_link_position;
+                name_to_distance_map_[name_pos.first] = diff.norm();
                 std::cout << "n2p[" << name_pos.first << "] = " << name_pos.second << std::endl;  // debug
             }
             for (auto& name_dist : name_to_distance_map_) {
