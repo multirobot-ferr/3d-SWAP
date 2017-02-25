@@ -31,22 +31,41 @@
 #include <Eigen/Core>
 #include <std_msgs/Bool.h>
 #include <gazebo_msgs/LinkStates.h>
-#include <geometry_msgs/Point.h>
+#include <gazebo_msgs/LinkState.h>
 
 class GazeboCatchingDevice: public CatchingDevice {
 public:
     
     GazeboCatchingDevice(unsigned int _uav_id, ros::NodeHandle& _nh) {
-        robot_name_ = "mbzirc_" + std::to_string(_uav_id);
+        robot_link_name_ = "mbzirc_" + std::to_string(_uav_id) + "::base_link";
 
-        std::string magnetize_advertise = "/" + robot_name_ + "/catching_device/magnetize";
+        std::string magnetize_advertise = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/magnetize";
         magnetize_service_ = _nh.advertiseService(magnetize_advertise, &GazeboCatchingDevice::magnetizeServiceCallback, this);
 
-        std::string switch_pub_topic = "/" + robot_name_ + "/catching_device/switch";
+        std::string switch_pub_topic = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/switch";
         switch_publisher_ = _nh.advertise<std_msgs::Bool>(switch_pub_topic, 1);
 
         std::string link_states_sub_topic = "/gazebo/link_states";
         link_states_subscriber_ = _nh.subscribe(link_states_sub_topic, 1, &GazeboCatchingDevice::linkStatesCallback, this);
+
+        std::string link_state_pub_topic = "/gazebo/set_link_state";
+        link_state_publisher_ = _nh.advertise<gazebo_msgs::LinkState>(link_state_pub_topic, 1);
+
+        gazebo_pub_thread_ = std::thread([&](){
+            while (ros::ok()) {
+                // Can't grab if magnet is not magnetized
+                //grabbing_ = (magnet_state_ == MagnetState::MAGNETIZED);
+                if (grabbing_) {
+                    std::cout << "Grabbing " << grabbed_link_name_ << std::endl;
+                    gazebo_msgs::LinkState grabbed;
+                    grabbed.link_name = grabbed_link_name_;
+                    grabbed.pose.position.z = 1.0;  // TODO: param z_grabbing
+                    grabbed.reference_frame = robot_link_name_;
+                    link_state_publisher_.publish(grabbed);
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        });
     }
 
     // Ask about magnet status
@@ -75,20 +94,21 @@ protected:
     ros::Publisher switch_publisher_;
     ros::ServiceServer magnetize_service_;
     ros::Subscriber link_states_subscriber_;
+    ros::Publisher link_state_publisher_;
     std::map<std::string, Eigen::Vector3f> name_to_position_map_;
     std::map<std::string, double> name_to_distance_map_;
+    std::thread gazebo_pub_thread_;
 
-    std::string robot_name_;
+    std::string robot_link_name_;
     std::string grabbed_link_name_;
 
     void linkStatesCallback(const gazebo_msgs::LinkStatesConstPtr& _msg) {
         if (!grabbing_) { // && (magnet_state_ == MagnetState::MAGNETIZED)) {
             // All link states in world frame, find robot and grabbable objects
-            std::string robot_link_name = robot_name_ + "::base_link";
             Eigen::Vector3f robot_link_position;
             for (size_t i = 0; i < _msg->name.size(); i++) {
                 std::string link_name = _msg->name[i];
-                if (link_name == robot_link_name) {
+                if (link_name == robot_link_name_) {
                     robot_link_position << _msg->pose[i].position.x, \
                         _msg->pose[i].position.y, _msg->pose[i].position.z;
                 }
