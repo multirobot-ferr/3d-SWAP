@@ -51,19 +51,25 @@ public:
         std::string link_state_pub_topic = "/gazebo/set_link_state";
         link_state_publisher_ = _nh.advertise<gazebo_msgs::LinkState>(link_state_pub_topic, 1);
 
-        gazebo_pub_thread_ = std::thread([&](){
+        pub_thread_ = std::thread([&](){
             while (ros::ok()) {
                 // Can't grab if magnet is not magnetized
                 //grabbing_ = (magnet_state_ == MagnetState::MAGNETIZED);
                 if (grabbing_) {
-                    std::cout << "Grabbing " << grabbed_link_name_ << std::endl;
+                    double z_grabbing = -0.5;  // TODO: as a param?
+                    //std::cout << "Grabbing " << grabbed_link_name_ << std::endl;
                     gazebo_msgs::LinkState grabbed;
                     grabbed.link_name = grabbed_link_name_;
-                    grabbed.pose.position.z = 1.0;  // TODO: param z_grabbing
+                    grabbed.pose.position.z = z_grabbing;
                     grabbed.reference_frame = robot_link_name_;
                     link_state_publisher_.publish(grabbed);
                 }
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                // Publish switch state
+                std_msgs::Bool switch_state;
+                switch_state.data = switchIsPressed();
+                switch_publisher_.publish(switch_state);
+                // Sleep!
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
         });
     }
@@ -97,7 +103,7 @@ protected:
     ros::Publisher link_state_publisher_;
     std::map<std::string, Eigen::Vector3f> name_to_position_map_;
     std::map<std::string, double> name_to_distance_map_;
-    std::thread gazebo_pub_thread_;
+    std::thread pub_thread_;
 
     std::string robot_link_name_;
     std::string grabbed_link_name_;
@@ -123,11 +129,7 @@ protected:
             for (auto& name_pos : name_to_position_map_) {
                 Eigen::Vector3f diff = name_pos.second - robot_link_position;
                 name_to_distance_map_[name_pos.first] = diff.norm();
-                //std::cout << "n2p[" << name_pos.first << "] = " << name_pos.second << std::endl;
             }
-            //for (auto& name_dist : name_to_distance_map_) {
-            //    std::cout << "n2d[" << name_dist.first << "] = " << name_dist.second << std::endl;  // debug
-            //}
             // Find min distance in name_to_distance_map_...
             auto min_distance_pair = std::min_element
             (
@@ -137,14 +139,11 @@ protected:
                 }
             );
             if (min_distance_pair != std::end(name_to_distance_map_)) {
-                //std::cout << "Closest link is " << min_distance_pair->first << ", in " << \
-                min_distance_pair->second << std::endl;
                 // ... and check if its less than catching threshold TODO: as a param?
                 double catching_threshold = 1.0;
                 if (min_distance_pair->second < catching_threshold) {
                     grabbed_link_name_ = min_distance_pair->first;
                     grabbing_ = true;
-                    //std::cout << "Catch!" << std::endl;
                 }
             }
         }
