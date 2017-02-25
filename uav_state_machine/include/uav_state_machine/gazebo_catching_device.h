@@ -65,11 +65,12 @@ public:
                     grabbed.pose.position.z = z_grabbing;
                     grabbed.reference_frame = robot_link_name_;
                     link_state_publisher_.publish(grabbed);
-                } else {
+                } else if (magnet_state_ == MagnetState::MAGNETIZED) {
                     // Check distances between robot and grabbable objects
                     for (auto& name_pos : name_to_position_map_) {
                         Eigen::Vector3f diff = name_pos.second - robot_link_position_;
                         name_to_distance_map_[name_pos.first] = diff.norm();
+                        std:: cout << "n2d[" << name_pos.first << "] = " << diff.norm() << std::endl;
                     }
                     // Find min distance in name_to_distance_map_...
                     auto min_distance_pair = std::min_element
@@ -90,7 +91,7 @@ public:
                 }
                 // Publish switch state
                 std_msgs::Bool switch_state;
-                switch_state.data = switchIsPressed();
+                switch_state.data = grabbing_;
                 switch_publisher_.publish(switch_state);
                 // Sleep!
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -119,7 +120,7 @@ public:
 
 protected:
     MagnetState magnet_state_ = MagnetState::UNKNOWN;
-    bool grabbing_ = false;
+    volatile bool grabbing_ = false;
 
     ros::Publisher switch_publisher_;
     ros::ServiceServer magnetize_service_;
