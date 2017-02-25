@@ -79,6 +79,7 @@ protected:
     std::map<std::string, double> name_to_distance_map_;
 
     std::string robot_name_;
+    std::string grabbed_link_name_;
 
     void linkStatesCallback(const gazebo_msgs::LinkStatesConstPtr& _msg) {
         if (!grabbing_) { // && (magnet_state_ == MagnetState::MAGNETIZED)) {
@@ -102,10 +103,29 @@ protected:
             for (auto& name_pos : name_to_position_map_) {
                 Eigen::Vector3f diff = name_pos.second - robot_link_position;
                 name_to_distance_map_[name_pos.first] = diff.norm();
-                std::cout << "n2p[" << name_pos.first << "] = " << name_pos.second << std::endl;  // debug
+                //std::cout << "n2p[" << name_pos.first << "] = " << name_pos.second << std::endl;
             }
-            for (auto& name_dist : name_to_distance_map_) {
-                std::cout << "n2d[" << name_dist.first << "] = " << name_dist.second << std::endl;  // debug
+            //for (auto& name_dist : name_to_distance_map_) {
+            //    std::cout << "n2d[" << name_dist.first << "] = " << name_dist.second << std::endl;  // debug
+            //}
+            // Find min distance in name_to_distance_map_...
+            auto min_distance_pair = std::min_element
+            (
+                std::begin(name_to_distance_map_), std::end(name_to_distance_map_),
+                [] (const std::pair<std::string, double> & p1, const std::pair<std::string, double> & p2) {
+                    return p1.second < p2.second;
+                }
+            );
+            if (min_distance_pair != std::end(name_to_distance_map_)) {
+                //std::cout << "Closest link is " << min_distance_pair->first << ", in " << \
+                min_distance_pair->second << std::endl;
+                // ... and check if its less than catching threshold TODO: as a param?
+                double catching_threshold = 1.0;
+                if (min_distance_pair->second < catching_threshold) {
+                    grabbed_link_name_ = min_distance_pair->first;
+                    grabbing_ = true;
+                    //std::cout << "Catch!" << std::endl;
+                }
             }
         }
     }
