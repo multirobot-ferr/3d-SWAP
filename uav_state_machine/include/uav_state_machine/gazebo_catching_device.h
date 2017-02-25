@@ -125,17 +125,21 @@ protected:
                         _msg->pose[i].position.y, _msg->pose[i].position.z);
                     name_to_position_map[_msg->name[i]] = link_position;
                 }
-                // Check if distances between robot and grabbable objects
-                // are below catching threshold TODO: as a param?
-                double catching_threshold = 1.0;
+                // Calculate min distance between robot and all grabbable objects
+                double min_distance = 1e3;  // Huge initial value (1km)
                 for (auto& name_pos : name_to_position_map) {
                     Eigen::Vector3f diff = name_pos.second - robot_link_position;
                     double distance = diff.norm();
-                    if (distance < catching_threshold) {
-                        grabbed_link_name_ = name_pos.first;
-                        grabbing_ = true;
-                        break;  // Grab first that holds catching condition (kiss)
+                    if (distance < min_distance) {
+                        min_distance = distance;  // Keep min distance
+                        grabbed_link_name_ = name_pos.first;  // and best candidate
                     }
+                }
+                // Check if min distance is below catching threshold TODO: as a param?
+                double catching_threshold = 1.0;
+                if (min_distance < catching_threshold) {
+                    // Tell pub_thread_ to catch best candidate (grabbed_link_name_)
+                    grabbing_ = true;
                 }
             }
         }
