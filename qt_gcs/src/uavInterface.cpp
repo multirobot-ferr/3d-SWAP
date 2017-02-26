@@ -234,7 +234,7 @@ void UavInterface::targetCallback(){
     uav_state_machine::target_service call;
     call.request.enabled = mTargetEnable->isChecked();
     call.request.color = mColorSpin->value();
-    call.request.shape = mShapeSpin->value();
+    //call.request.shape = mShapeSpin->value();
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending new target to UAV. Color: "+std::to_string(mColorSpin->value()));
     auto res = client.call(call);
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Returned call with result: "+std::to_string(res));

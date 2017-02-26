@@ -90,7 +90,7 @@ private:
     QPushButton *mTargetButton;
     QRadioButton *mTargetEnable;
     QSpinBox *mColorSpin;
-    QSpinBox *mShapeSpin;
+    //QSpinBox *mShapeSpin;
 
     // Magnet
     QPushButton *mToggleMagnet;
