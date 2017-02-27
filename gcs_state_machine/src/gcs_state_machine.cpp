@@ -134,7 +134,7 @@ void GcsStateMachine::onStateSearching(){
 		state_msg_ = "Error sending waypoints";
 	}
 	else{
-		std::this_thread::sleep_for(std::chrono::seconds(5));
+		std::this_thread::sleep_for(std::chrono::seconds(10));
 		gcs_state_ = eGcsState::CATCHING;
 	} 
 }
