@@ -29,8 +29,6 @@
 #include <uav_state_machine/catching_device.h>
 #include <thread>
 #include <chrono>
-//#include <mavros_msgs/ActuatorControl.h>
-//#include <mavros_msgs/RCOut.h>
 #include <iostream>
 #include <SerialPort.h>
 #include <std_msgs/Bool.h>
@@ -72,14 +70,14 @@ public:
         this->echo[1] = packet[i+2] | (packet[i+3] << 8);
         i += 4;
         // Finally switch state
-        this->switch_state = (packet[i] & 0x01)? true: false;  // TODO: Where?
+        this->switch_state = (packet[i] & 0x01)? true: false;
         //i += 2;
     }
 };
 
 class PcToDeviceData {
 public:
-    uint16_t sequence;
+    uint16_t sequence = 0;
     uint16_t pwm[2];
 
     void setTo(SerialPort::DataBuffer& packet) {
@@ -120,6 +118,7 @@ public:
         switch_publisher_ = _nh.advertise<std_msgs::Bool>(switch_pub_topic, 1);
 
         serial_thread_ = std::thread([&](){
+            PcToDeviceData tx;
             SerialPort::DataBuffer tx_packet;
             unsigned char rx = 0;
             size_t index = 0;
@@ -131,16 +130,21 @@ public:
             while (ros::ok()) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 // TX
-                //if (this->tx_critical_.hasNewData()) {
-                    PcToDeviceData tx;
-                    this->tx_critical_.get();
+                if (this->pwm_magnet_critical_.hasNewData()) {
+                    tx.pwm[0] = pwm_magnet_critical_.get();
+                }
+                if (this->pwm_servo_critical_.hasNewData()) {
+                    tx.pwm[1] = pwm_servo_critical_.get();
+                }
+                if (tx.sequence >= 0x0FFF) {
+                    tx.sequence = 0;  // Force reset to keep it in 12 bits
+                } else {
                     tx.sequence++;
-                    tx.pwm[0] = 999;
-                    tx.pwm[1] = 1001;
-                    tx.setTo(tx_packet);
-                    this->serial_->Write(tx_packet);
-                    this->tx_critical_.set(tx);
-                //}
+                }
+                tx.pwm[0] = 999;  // TODO: test!
+                tx.pwm[1] = 1001;  // TODO: test!
+                tx.setTo(tx_packet);
+                this->serial_->Write(tx_packet);  // Always write!
                 // RX
                 SerialPort::DataBuffer serial_buffer;
                 this->serial_->Read(serial_buffer);
@@ -239,18 +243,12 @@ public:
         // Change magnetization only if needed
         MagnetState wanted_state = (_magnetize? MagnetState::MAGNETIZED : MagnetState::DEMAGNETIZED);
         if (wanted_state != magnet_state_) {
-            PcToDeviceData control;
-            control = tx_critical_.get();  // TODO: Watchout when other servo activation comes!
-            control.sequence++;
-            control.pwm[0] = (_magnetize ? MAGNET_PWM_MAGNETIZED : MAGNET_PWM_DEMAGNETIZED);
+            uint16_t pwm = (_magnetize ? MAGNET_PWM_MAGNETIZED : MAGNET_PWM_DEMAGNETIZED);
             // Start magnetization/demagnetization
-            tx_critical_.set(control);
+            pwm_magnet_critical_.set(pwm);
             std::this_thread::sleep_for(std::chrono::milliseconds(3000));
             // Ensure that the magnet is resting
-            //control = tx_critical_.get();  // TODO: Watchout when other servo activation comes!
-            control.sequence++;
-            control.pwm[0] = MAGNET_PWM_REST;
-            tx_critical_.set(control);
+            pwm_magnet_critical_.set(MAGNET_PWM_REST);
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             magnet_state_ = wanted_state;
         }
@@ -271,8 +269,8 @@ protected:
 	SerialPort* serial_;
     std::thread serial_thread_;
     grvc::utils::Critical<DeviceToPcData> rx_critical_;
-    grvc::utils::Critical<PcToDeviceData> tx_critical_;
-    uint16_t sequence_;
+    grvc::utils::Critical<uint16_t> pwm_magnet_critical_;
+    grvc::utils::Critical<uint16_t> pwm_servo_critical_;
 
     std::thread pub_thread_;
     ros::Publisher switch_publisher_;
