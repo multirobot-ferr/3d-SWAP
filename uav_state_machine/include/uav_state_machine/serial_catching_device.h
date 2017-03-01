@@ -111,7 +111,7 @@ public:
         std::string param_name = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/serial_port";
         ros::param::param<std::string>(param_name, serial_port, "/dev/ttyUSB0");
         serial_ = new SerialPort(serial_port);
-        serial_->Open(SerialPort::BAUD_9600, SerialPort::CHAR_SIZE_8, SerialPort::PARITY_NONE, SerialPort::STOP_BITS_1, SerialPort::FLOW_CONTROL_NONE);
+        serial_->Open(SerialPort::BAUD_115200, SerialPort::CHAR_SIZE_8, SerialPort::PARITY_NONE, SerialPort::STOP_BITS_1, SerialPort::FLOW_CONTROL_NONE);
 
         std::string magnetize_advertise = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/magnetize";
         magnetize_service_ = _nh.advertiseService(magnetize_advertise, &SerialCatchingDevice::magnetizeServiceCallback, this);
@@ -129,13 +129,18 @@ public:
             
             State state = INIT;
             while (ros::ok()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 // TX
-                if (this->tx_critical_.hasNewData()) {
+                //if (this->tx_critical_.hasNewData()) {
                     PcToDeviceData tx;
                     this->tx_critical_.get();
+                    tx.sequence++;
+                    tx.pwm[0] = 999;
+                    tx.pwm[1] = 1001;
                     tx.setTo(tx_packet);
                     this->serial_->Write(tx_packet);
-                }
+                    this->tx_critical_.set(tx);
+                //}
                 // RX
                 SerialPort::DataBuffer serial_buffer;
                 this->serial_->Read(serial_buffer);
@@ -204,17 +209,18 @@ public:
                 if (this->rx_critical_.hasNewData()) {
                     DeviceToPcData rx = this->rx_critical_.get();
                     this->switch_state_ = rx.switch_state;
-                    std::cout << "sequence: " << rx.sequence << \
-                    "echo[0]:"  << rx.echo[0] << \
-                    "echo[1]:"  << rx.echo[1] << \
-                    "switch:"  << rx.switch_state << std::endl;
+                    std::cout << "sequence:" << rx.sequence << \
+                    " echo[0]:"  << rx.echo[0] << \
+                    " echo[1]:"  << rx.echo[1] << \
+                    " switch:"  << rx.switch_state << std::endl;
                     // Publish switch state
                     std_msgs::Bool switch_state;
                     switch_state.data = this->switch_state_;
                     this->switch_publisher_.publish(switch_state);
+                } else {
+                    // Sleep!
+                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 }
-                // Sleep!
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
         });
 
