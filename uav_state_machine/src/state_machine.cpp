@@ -144,7 +144,7 @@ void UavStateMachine::onCatching() {
     }
 
     // Magnetize catching device
-    catching_device_->setMagnetization(true);
+    //catching_device_->setMagnetization(true);
 
     while (state_.state == uav_state::CATCHING) {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
@@ -193,7 +193,7 @@ void UavStateMachine::onGoToDeploy() {
         deploy_waypoint.yaw = current_position_waypoint_.yaw;
         waypoint_srv_->send(deploy_waypoint, ts);  // Blocking!
         // Demagnetize catching device
-        catching_device_->setMagnetization(false);
+        //catching_device_->setMagnetization(false);
     } else {
         std::cout << "Miss the catch, try again!" << std::endl;
         state_.state = uav_state::CATCHING;
