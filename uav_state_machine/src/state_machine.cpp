@@ -152,14 +152,23 @@ void UavStateMachine::onCatching() {
         if (since_last_candidate < timeout) {
             // x-y-control: in candidateCallback
             // z-control: descend
-            target_position_[2] = -0.5;  // TODO: As a function of x-y error?
+            if (current_altitude_ < 1.0) {
+                double xy_error = sqrt(target_position_[0]*target_position_[0] + target_position_[1]*target_position_[1]);
+                if (xy_error < 0.1) {
+                    target_position_[2] = -0.5;  // TODO: As a function of x-y error?
+                } else {
+                    target_position_[2] = 0.0;
+                }         
+            } else {
+                target_position_[2] = -0.5;  // TODO: As a function of x-y error?
+            }
             //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
         } else {
             // x-y-control slowly goes to 0
-            target_position_[0] = 0.9*target_position_[0];
-            target_position_[1] = 0.9*target_position_[1];
+            target_position_[0] = 0.99*target_position_[0];
+            target_position_[1] = 0.99*target_position_[1];
             // z-control: ascend
-            target_position_[2] = +0.5;  // TODO: As a function of x-y error?
+            target_position_[2] = +1.0;  // TODO: As a function of x-y error?
             //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
             std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
         }
@@ -198,7 +207,7 @@ void UavStateMachine::onGoToDeploy() {
         std::cout << "Miss the catch, try again!" << std::endl;
         state_.state = uav_state::CATCHING;
     }
-    state_.state = uav_state::HOVER;
+    //state_.state = uav_state::HOVER;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
