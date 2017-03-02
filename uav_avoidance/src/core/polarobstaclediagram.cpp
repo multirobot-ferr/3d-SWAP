@@ -53,7 +53,7 @@
  *
  */
 
-#include <uav_avoidance/core/polarobstaclediagram.h>
+#include <polarobstaclediagram.h>
 
 namespace avoid
 {

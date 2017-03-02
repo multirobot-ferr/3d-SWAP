@@ -33,8 +33,8 @@
 #ifndef SWAP_2_5D_H
 #define SWAP_2_5D_H
 
-#include "ros/ros.h"
-#include <uav_avoidance/core/swap.h>                    // base class
+#include <ros/ros.h>
+#include <swap.h>                    // base class
 
 // message need
 #include <grvc_quadrotor_hal/types.h>

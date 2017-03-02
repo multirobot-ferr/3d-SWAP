@@ -55,7 +55,7 @@
  *
  */
 
-#include <uav_avoidance/core/swap.h>
+#include <swap.h>
 
 namespace avoid
 {

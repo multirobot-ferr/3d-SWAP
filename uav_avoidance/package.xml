@@ -7,7 +7,7 @@
   quadcopters are too close to each other, the system will command them to 
   avoid the conflict creating a virtual roundabout.
   
-  The system was created only for colaborative uav's.
+  The system was created only for colaborative uavs.
   </description>
 
   <author email="eduardo.ferrera@uni-due.de">		Eduardo Ferrera	</author>
@@ -20,26 +20,13 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>roscpp</build_depend>
-  <build_depend>pcl</build_depend>
   <build_depend>grvc_quadrotor_hal</build_depend>
   <build_depend>std_msgs</build_depend>
-
-
+  <build_depend>armadillo</build_depend>
 
   <run_depend>roscpp</run_depend>
-  <run_depend>pcl</run_depend>
   <run_depend>grvc_quadrotor_hal</run_depend>
   <run_depend>std_msgs</run_depend>
-
-  <build_depend>eigen</build_depend>
-  <run_depend>eigen</run_depend>
-  <build_depend>tf</build_depend>
-  <run_depend>tf</run_depend>
-  <build_depend>message_runtime</build_depend>
-  <run_depend>message_runtime</run_depend>
-  <build_depend>visualization_msgs</build_depend>
-  <run_depend>visualization_msgs</run_depend>
-  <build_depend>uav_state_machine</build_depend>
-  <run_depend>uav_state_machine</run_depend>
+  <run_depend>armadillo</run_depend>
   
 </package>
