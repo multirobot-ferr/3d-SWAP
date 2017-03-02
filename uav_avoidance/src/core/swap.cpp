@@ -55,7 +55,7 @@
  *
  */
 
-#include "swap.h"
+#include <uav_avoidance/core/swap.h>
 
 namespace avoid
 {
@@ -64,19 +64,19 @@ namespace avoid
      *         Methods of the Swap class               *
      * *************************************************/
 
-    /**
-     * Constructor of the class
-     */
-    Swap::Swap()
-    {
-        //ctor
-    }
-
-    /* Default destructor */
-    Swap::~Swap()
-    {
-        //dtor
-    }
+//    /**
+//     * Constructor of the class
+//     */
+//    Swap::Swap()
+//    {
+//        //ctor
+//    }
+//
+//    /* Default destructor */
+//    Swap::~Swap()
+//    {
+//        //dtor
+//    }
 
     /**
      * IsReady returns if swap is well configurated or not. And if not, explains why.

@@ -76,15 +76,15 @@ namespace avoid
     class Swap: public PolarObstacleDiagram
     {
         public:
-            /**
-             * @brief Constructor of the class
-             *
-             * Initializes all the variables
-             */
-            Swap();
-
-            /** Default destructor */
-            virtual ~Swap();
+//            /**
+//             * @brief Constructor of the class
+//             *
+//             * Initializes all the variables
+//             */
+//            Swap();
+//
+//            /** Default destructor */
+//            virtual ~Swap();
 
             /**
              * @brief IsReady returns if swap is well configurated or not. And if not, explains why.

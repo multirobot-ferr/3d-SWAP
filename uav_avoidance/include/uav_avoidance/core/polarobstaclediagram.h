@@ -92,15 +92,15 @@ namespace avoid
     class PolarObstacleDiagram
     {
         public:
-            /**
-             * @brief Default constructor
-             */
-            PolarObstacleDiagram();
-
-            /**
-             * @brief Default destructor
-             */
-            virtual ~PolarObstacleDiagram();
+//            /**
+//             * @brief Default constructor
+//             */
+//            PolarObstacleDiagram();
+//
+//            /**
+//             * @brief Default destructor
+//             */
+//            virtual ~PolarObstacleDiagram();
 
             /**
              * @brief Structure that helps to print the full POD
@@ -137,14 +137,31 @@ namespace avoid
              * @brief Sets a measurement value in the POD, measured directly on the robot (E.g: with a ranger)
              *
              * This function rounds the specified angle to an angle inside of the granularity of the POD
-             * and merges the current value of that measurement with the incomming one.
-             * \param distance The distance between the center of the robot and the obstacle
-             * \param angle    Angle [rad] with respect to the front of the robot (positive values are left side of the robot)
-             * \param dynamic  If the measurement belongs to a dynamic obstacle or not.
+             * and merges the current value of that measurement with the incoming one.
+             * @param distance The distance between the center of the robot and the obstacle
+             * @param angle    Angle [rad] with respect to the front of the robot (positive values are left side of the robot)
+             * @param dynamic  If the measurement belongs to a dynamic obstacle or not.
              */
             void SetNewLocalMeasurement(double distance,
                                         double angle,
                                         bool   dynamic = false);
+
+            /**
+             * @brief Sets a measurement value in the POD, measured indirectly (E.g: information coming from the map)
+             *
+             * This function fills all measurements of the POD corresponding to a round object located in x_object,y_object
+             * with a radius r_object.
+             * @param x_robot Position x[m] of the robot with respect to the map
+             * @param y_robot Position y[m] of the robot with respect to the map
+             * @param yaw_robot Orientation yaw[rad] of the robot with respect to the map
+             * @param x_object Position x[m] of the object with respect to the map
+             * @param y_object Position y[m] of the object with respect to the map
+             * @param r_object Radius[m] of the object (system assumes a circular object)
+             * @param dynamic Boolean to determine if the obstacle is static or dynamic
+             */
+            void SetNewGlobalMeasurement(double x_robot,  double y_robot,  double yaw_robot,
+                                         double x_object, double y_object, double r_object,
+                                         bool dynamic = true);
 
             /**
              * @brief Analizes the full pod and finds the angles where a conflict exists.

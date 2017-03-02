@@ -53,7 +53,7 @@
  *
  */
 
-#include "polarobstaclediagram.h"
+#include <uav_avoidance/core/polarobstaclediagram.h>
 
 namespace avoid
 {
@@ -62,19 +62,19 @@ namespace avoid
      *   Methods of the Polar Obstacle Diagram class   *
      * *************************************************/
 
-    /**
-     * Initializes the class in an empty way
-     */
-    PolarObstacleDiagram::PolarObstacleDiagram()
-    {
-        //ctor
-    }
-
-    /* Default destructor */
-    PolarObstacleDiagram::~PolarObstacleDiagram()
-    {
-        //dtor
-    }
+//    /**
+//     * Initializes the class in an empty way
+//     */
+//    PolarObstacleDiagram::PolarObstacleDiagram()
+//    {
+//        //ctor
+//    }
+//
+//    /* Default destructor */
+//    PolarObstacleDiagram::~PolarObstacleDiagram()
+//    {
+//        //dtor
+//    }
 
     /* ****************************************************************************
      *   MAIN METHODS (Intended to control the behaviour of the POD)              *
@@ -203,10 +203,127 @@ namespace avoid
             //    pond' = 0.5
             //              (1.0 - 0.5)*dist2mix_min + (0.5)*dist2mix_max
             dist_[id_phi] = (1.0 - multi_input_pond_) * dist2mix_min + multi_input_pond_ * dist2mix_max;
+
+            //std::cout << dist2mix_max << " " << dist2mix_min << " " << multi_input_pond_ << " " << dist_[id_phi] << std::endl;
         }
 
         // Dynamic measurements (true) take over static ones (false)
         dynamic_[id_phi] = dynamic_[id_phi] || dynamic;
+    }
+
+    /**
+     * @brief Sets a measurement value in the POD, measured indirectly (E.g: information coming from the map)
+     */
+    void PolarObstacleDiagram::SetNewGlobalMeasurement( double x_robot,  double y_robot,  double yaw_robot,
+                                                        double x_object, double y_object, double r_object,
+                                                        bool dynamic)
+    {
+        // Centering the object in the position of the robot
+        arma::colvec2 position;
+        position(0,0) = x_object - x_robot;
+        position(1,0) = y_object - y_robot;
+
+        // Exchanging the angle to the robot's perspective
+        arma::mat22 rotation;
+        rotation(0,0) = +cos(-yaw_robot);
+        rotation(0,1) = -sin(-yaw_robot);
+        rotation(1,0) = +sin(-yaw_robot);
+        rotation(1,1) = +cos(-yaw_robot);
+
+        // Finding where the object is with respect to the robot
+        arma::colvec pos_object = rotation * position;
+        bool far_away = true;
+
+        if (arma::norm(pos_object, 1) <= r_object)
+        {
+            // The circle invades the center of the robot. This should not happen normally
+            far_away = false;
+        }
+
+        //Finding out the angle that points closer to the obstacle
+        unsigned obstacle_id_phi = Angle2Sector( atan2(pos_object(1), pos_object(0)));
+
+        if (far_away)
+        {
+            for (auto direction : {-1, 1})
+            {
+                unsigned guard  = 8;//id_phi_max_;   // Just in case that something wrong happens
+                int id_phi      = obstacle_id_phi;
+                double m,a,b,c;
+
+                while (guard > 0)
+                {
+                    // The system should stop by far earlier than this number
+                    --guard;
+
+                    if (angle_[id_phi] != 0.0)  // Normal resolution, m is finite in y = m*x
+                    {
+                        m = tan(angle_[id_phi]);
+
+                        /**
+                         * Since the line is centered in the (0,0), b = 0
+                         * We solve the following ecuation system:
+                         *      y = m*x
+                         *      (x - x_ob)^2 + (y - y_ob)^2 = r_ob^2
+                         *      -------------------------------------
+                         *      (1 + m^2)*x^2 + (-2*x_ob - 2*y_ob*m)*x + (-r_ob^2 + y_ob^2 + x_ob^2) = 0
+                         *
+                         * Solving it as a*x^2 + b*x + c = 0
+                         */
+                        a = (1.0 + pow( m, 2.0));
+                        b = -2*pos_object(0) -2*pos_object(1)*m;
+                        c = -pow(r_object, 2.0) + pow(pos_object(0), 2.0) + pow(pos_object(1), 2.0);
+                    }
+                    else // m is infinite in y = m*x
+                    {
+                        /**
+                         * Since the line is centered in the (0,0), b = 0
+                         * We solve the following ecuation system:
+                         *      y = 0
+                         *      (x - x_ob)^2 + (y - y_ob)^2 = r_ob^2
+                         *      -------------------------------------
+                         *      x^2 + (-2*x_ob)*x + (-r_ob^2 + y_ob^2 + x_ob^2) = 0
+                         *
+                         * Solving it as a*x^2 + b*x + c = 0
+                         */
+                        m = 0.0;
+                        a = 1.0;
+                        b = -2*pos_object(0);
+                        c = -pow(r_object, 2.0) + pow(pos_object(0), 2.0) + pow(pos_object(1), 2.0);
+                    }
+
+                    double discriminant = pow(b, 2.0) - 4*a*c;
+
+                    if (discriminant >= 0)
+                    {
+                        // There are two points hitting on the circle
+                        double dist = double_inf;
+                        for (double sign : {-1.0, +1.0})
+                        {
+                            double x_hit = (-b + sign*sqrt(discriminant))/(2*a);
+                            double y_hit = m*x_hit;
+
+                            dist = std::min( sqrt(pow(x_hit, 2.0) + pow(y_hit, 2.0)) , dist);
+                        }
+                        SetNewLocalMeasurement( dist, angle_[id_phi], dynamic);
+                    }
+                    else
+                    {
+                        // The circle will not be hit anymore
+                        break;
+                    }
+
+                    id_phi = CircularIndex(id_phi + direction, id_phi_max_);
+                }
+            }
+        }
+        else    // the obstacle is too close
+        {
+            // This should never happen, so we are only creating a safety system
+            // that introduces some information on the system
+            double dist = arma::norm(pos_object, 1) - r_object;
+            SetNewLocalMeasurement( dist, angle_[obstacle_id_phi], dynamic);
+        }
     }
 
     /**
