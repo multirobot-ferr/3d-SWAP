@@ -148,6 +148,7 @@ void Visualizer::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
 	msg << uav_pose->data;
 	grvc::hal::Pose pose;
 	msg >> pose;
+
 	int uav_id = stoi(pose.id);
 
 	if(0 < uav_id && uav_id <= n_uavs_)
@@ -201,7 +202,7 @@ void Visualizer::publishMarkers()
             marker.id = uav_id;
             marker.ns = "uavs";
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            marker.mesh_resource = "package://grvc_quadrotor_gazebo/model/grvc_quad.dae";
+            marker.mesh_resource = "package://robots_description/models/mbzirc/meshes/multirotor.dae";
             marker.color.a = 1;    
             marker.action = visualization_msgs::Marker::ADD;
 
@@ -213,9 +214,9 @@ void Visualizer::publishMarkers()
             marker.pose.orientation.z = uavs_poses_[uav_id].orientation[2];
             marker.pose.orientation.w = uavs_poses_[uav_id].orientation[3];
 
-            marker.scale.x = 1.0;
-            marker.scale.y = 1.0;
-            marker.scale.z = 1.0;
+            marker.scale.x = 0.001;
+            marker.scale.y = 0.001;
+            marker.scale.z = 0.001;
             marker.mesh_use_embedded_materials = true;
 
             uav_markers.markers.push_back(marker);
