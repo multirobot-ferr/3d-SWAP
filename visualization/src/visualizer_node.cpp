@@ -183,7 +183,7 @@ void Visualizer::publishMarkers()
     marker.scale.z = 1;
 
     marker.mesh_use_embedded_materials = true;
-    marker.color.a = 1.0;
+    marker.color.a = 0.5;
     marker.lifetime = ros::Duration();
 
     scenario_pub_.publish(marker);
@@ -218,6 +218,28 @@ void Visualizer::publishMarkers()
             marker.scale.y = 0.001;
             marker.scale.z = 0.001;
             marker.mesh_use_embedded_materials = true;
+
+            switch(uav_id)
+            {
+                case 1:
+                // orange
+                marker.color.r = 1.0;
+                marker.color.g = 0.647;
+                marker.color.b = 0.0;
+                break;
+                case 2:
+                // ingigo
+                marker.color.r = 0.294;
+                marker.color.g = 0.0;
+                marker.color.b = 0.510; 
+                break;
+                case 3:
+                // zinc yellow
+                marker.color.r = 0.945;
+                marker.color.g = 0.812;
+                marker.color.b = 0.267;
+                break;
+            }
 
             uav_markers.markers.push_back(marker);
         }
