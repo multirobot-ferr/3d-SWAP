@@ -6,6 +6,8 @@
 #include <geometry_msgs/Point.h>
 #include <gazebo_msgs/LinkState.h>
 
+#define ANIMATION_FPS 25.0
+
 struct Frame {
     Frame(double _x, double _y, double _z) {
         position.x = _x;
@@ -45,16 +47,58 @@ public:
         link_state_publisher_ = nh_.advertise<gazebo_msgs::LinkState>(link_state_pub_topic, 1);
     }
 
+    //GazeboAnimatedLink(const GazeboAnimatedLink&) = default;
+
     void addKeyFrame(const KeyFrame& _key_frame) {
         key_frames_.push_back(_key_frame);
     }
+
+    void playOnce() {
+        if (playing_) {
+            std::cerr << "Stop before playing again!" << std::endl;
+        } else {
+            playing_ = true;
+            playing_thread_ = std::thread([&](){
+                play(ANIMATION_FPS);
+            });
+        }
+    }
+
+    void playLoop() {
+        if (playing_) {
+            std::cerr << "Stop before playing again!" << std::endl;
+        } else {
+            playing_ = true;
+            playing_thread_ = std::thread([&](){
+                while(playing_ && ros::ok()) {
+                    play(ANIMATION_FPS);
+                }
+            });
+        }
+    }
+
+    bool isPlaying() { return playing_; }
+
+    void stop() {
+        playing_ = false;
+        playing_thread_.join();
+    }
+
+protected:
+    std::string link_name_;
+    std::string reference_frame_;
+    std::list<KeyFrame> key_frames_;
+    std::thread playing_thread_;
+    bool playing_ = false;
+    ros::NodeHandle nh_;
+    ros::Publisher link_state_publisher_;
 
     void play(double _fps) {
         if (key_frames_.size() < 2) {
             std::cerr << "At least two key frames needed!" << std::endl;  // TODO: Throw?
             return;
         }
-        playing_ = true;
+        //playing_ = true;
         key_frames_.sort();
         std::list<KeyFrame>::iterator next_frame = key_frames_.begin();
         // Wait for simulation time initialization
@@ -69,7 +113,7 @@ public:
             while (next_frame->time.toSec() < elapsed.toSec()) {
                 next_frame++;
                 if (next_frame == key_frames_.end()) {
-                    playing_ = false;
+                    //playing_ = false;
                     return;
                 }
             }
@@ -90,25 +134,24 @@ public:
             rate.sleep();
         }
     }
-
-    void stop() { playing_ = false; }
-
-protected:
-    std::string link_name_;
-    std::string reference_frame_;
-    std::list<KeyFrame> key_frames_;
-    bool playing_ = false;
-    ros::NodeHandle nh_;
-    ros::Publisher link_state_publisher_;
 };
 
 int main(int _argc, char** _argv) {
     ros::init(_argc, _argv, "gazebo_move");
     ROS_INFO("Starting gazebo_move");
-    GazeboAnimatedLink yellow("Yelow cylinder object::grab_here");  // WATCHOUT: misspelled!
-    yellow.addKeyFrame(KeyFrame(Frame(0.0, 0.0, 0.0), ros::Time(0.1)));
-    yellow.addKeyFrame(KeyFrame(Frame(1.0, 1.0, 1.0), ros::Time(5.0)));
-    yellow.addKeyFrame(KeyFrame(Frame(0.0, 0.0, 0.0), ros::Time(10.0)));
-    yellow.play(25);
+    // WATCHOUT: Yellow misspelled!
+    GazeboAnimatedLink yellow("Yelow cylinder object::grab_here");
+    // TODO: Trajectory from argument/file
+    yellow.addKeyFrame(KeyFrame(Frame(0.0, 0.0, 0.0), ros::Time(0.0)));
+    yellow.addKeyFrame(KeyFrame(Frame(9.0, 0.0, 0.0), ros::Time(10.0)));
+    yellow.addKeyFrame(KeyFrame(Frame(0.0, 0.0, 0.0), ros::Time(20.0)));
+    //yellow.playOnce();
+    yellow.playLoop();
+    char input = 'a';
+    while (input != 'q') {
+        std::cout << "Enter q to quit" << std::endl;
+        std::cin >> input;
+    }
+    yellow.stop();
     return 0;
 }
