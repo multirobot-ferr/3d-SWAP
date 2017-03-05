@@ -166,7 +166,7 @@ void Visualizer::publishMarkers()
     marker.ns = "scenario";
     marker.id = 0;
     marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-    marker.mesh_resource = "package://mbzirc_gcs_view/model/stage_02_gazebo.dae";
+    marker.mesh_resource = "package://mbzirc_gcs_view/model/stage_03_gazebo.dae";
     marker.action = visualization_msgs::Marker::ADD;
 
     marker.pose.position.x = 4;

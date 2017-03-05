@@ -17,11 +17,11 @@
 
 		<model name="testbed_scene">
 			<static>true</static>
-			<pose>6.5 37.33 0 0 0 0</pose>
+			<pose>0 30 0 0 0 0</pose>
 			<link name="test_scene">
 				<visual name="visual">
 					<geometry>
-						<mesh><uri>model://stage_02_gazebo.dae</uri></mesh>
+						<mesh><uri>model://stage_03_gazebo.dae</uri></mesh>
 					</geometry>
 				</visual>
 			</link>
@@ -197,7 +197,7 @@
         <!-- DROP BOX -->
 
         <model name="drop_box">
-            <pose>27.5 30.2 0.05 0 0 0</pose>
+            <pose>24 30 0.05 0 0 1.571</pose>
             <include>
                 <uri>model://dropping_box</uri>
             </include>
