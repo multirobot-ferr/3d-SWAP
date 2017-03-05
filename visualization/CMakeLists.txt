@@ -91,3 +91,6 @@ target_link_libraries(moving_object ${catkin_LIBRARIES})
 
 add_executable(visualizer_node src/visualizer_node.cpp)
 target_link_libraries(visualizer_node ${catkin_LIBRARIES})
+
+add_executable(gazebo_move src/gazebo_move.cpp)
+target_link_libraries(gazebo_move ${catkin_LIBRARIES})

@@ -1,15 +1,18 @@
 <?xml version="1.0"?>
 <opencv_storage>
 <CameraConfig>
+	<!--If streaming of the image contains a pair of images, set to 1 to crop it and use only the left one. Set 0 if monocular-->
 	<IsStereo>1</IsStereo>
+	<!--Size of image-->
 	<ImageWidth>1280</ImageWidth>
 	<ImageHeight>720</ImageHeight>
 
-	<CameraType>real</CameraType>
-	<CameraIndex>0</CameraIndex>
-	<CameraTopic>/zed/camera/rwa</CameraTopic>
-	<VideoPath>/home/user/video.avi</VideoPath>
+	<CameraType>real</CameraType>  <!--CameraTypes: ros, real, video-->
+	<CameraIndex>0</CameraIndex> <!--Index of the camera, only if CameraType is real-->
+	<CameraTopic>/zed/camera/rwa</CameraTopic> <!--ROS topic for the image stream, only if CameraType is ros-->
+	<VideoPath>/home/user/video.avi</VideoPath> <!--Path to a video, only if CameraType is video-->
 
+	<!--Intrinsic matrix from camera calibration-->
 	<IntrinsicMatrix type_id="opencv-matrix">
 	  <rows>3</rows>
 	  <cols>3</cols>
@@ -17,6 +20,8 @@
 	  <data>
 	    6.9517382353855157e+02 0. 6.6930171982876743e+02 0.
 	    6.9336737646792437e+02 3.6224831350202550e+02 0. 0. 1.</data></IntrinsicMatrix>
+
+	<!--Distortion coefficients from camera calibration-->
 	<DistCoeffs type_id="opencv-matrix">
 	  <rows>5</rows>
 	  <cols>1</cols>
@@ -25,6 +30,7 @@
 	    -1.5900738178224180e-01 1.2221682895144999e-02
 	    -2.1171732515917535e-03 1.6666379555710460e-03
 	    7.3872337849587117e-03</data></DistCoeffs>
+
 	<Rectification type_id="opencv-matrix">
 	  <rows>3</rows>
 	  <cols>3</cols>
@@ -43,32 +49,48 @@
 	    6.3794929551996165e+02 3.7300988388061523e+02 0. 0. 0. 1. 0.</data></Projection>
 	<RoiLeft>
 	  3 19 637 694</RoiLeft>
+	<!--Transformation between the camera and the body-frame of the Drone-->
 	<CameraTransformation type_id="opencv-matrix">
 	  <rows>4</rows>
 	  <cols>4</cols>
 	  <dt>d</dt>
 	  <data>
+	    <!-- Rotation is composed (by cols) for the vectors of the Camera CS in Drone CS-->
+            <!-- Translation is composed by the postion of the desired center in Camera CS-->
 	    -1.0 0.0 0 0.0
 	    0.0 1.0 0.0 0.0
 	    0 0.0 -1.0 0.0
 	    0.0 0.0 0.0 1.0 </data></CameraTransformation>
 </CameraConfig>
 
+<!--Path to the configuration of the file for segmentation of color-->
 <ccsConfig>../config/ccsRGBYO.json</ccsConfig>
 
+<!--Name of topic with PoseStamped message that contains the rotation of the UAV-->
 <UavPoseTopic>/mavros_3/local_position/pose</UavPoseTopic>
+
+<!--Name of topic with Float64 with the altitude of the drone, desiderable Z distance of the floor in the camera CS-->
 <UavAltitudeTopic>/mavros_3/global_position/rel_alt</UavAltitudeTopic>
 
+<!--Topic to position of UAV in map coordinates-->
+<UavMapCoordinatesTopic>/mbzirc_3/hal/pose</UavMapCoordinatesTopic>
 
+<!--Set to 1 if candidate lists needs to be published-->
 <PublishData>1</PublishData>
+<!--Name of topic in which the list of candidate is going to be published-->
 <CandidateTopic>/mbzirc_3/candidateList</CandidateTopic>
 
+<!--Set to 1 to see result of the algorithm in a screen, disable in a console environment-->
 <VisualizeResults>1</VisualizeResults>
 
-<MinObjectSize>0.15</MinObjectSize>
-<MaxObjectSize>0.5</MaxObjectSize>
+<!--UAV id-->
+<UavId>3</UavId>
 
+<!--Max and min side of the bounding box allowed for the candidates from the segmentation-->
+<MinObjectSize>0.05</MinObjectSize>
+<MaxObjectSize>1.5</MaxObjectSize>
+
+<!--Path to a image file with a mask for the input image. Pixels with value 1 are processed and with 0 not-->
 <MaskImagePath>/home/user/mask.png</MaskImagePath>
-
 
 </opencv_storage>
