@@ -171,8 +171,8 @@ void Visualizer::publishMarkers()
     marker.mesh_resource = "package://mbzirc_gcs_view/model/stage_03_gazebo.dae";
     marker.action = visualization_msgs::Marker::ADD;
 
-    marker.pose.position.x = 4;
-    marker.pose.position.y = 7;
+    marker.pose.position.x = 0;
+    marker.pose.position.y = 0;
     marker.pose.position.z = 0;
 
     marker.pose.orientation.x = 0.0;
