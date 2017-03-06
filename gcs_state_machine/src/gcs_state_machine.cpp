@@ -202,7 +202,6 @@ void GcsStateMachine::onStateCatching(){
 					catch_target_call.request.shape = 0;  // DEPRECATED!
 					catch_target_call.request.target_id = assign_target_call.response.target_id;
 					catch_target_call.request.global_position = assign_target_call.response.global_position;
-					//catch_target_call.request.local_position = assign_target_call.response.local_position;  // TODO: wtf!
 					if (!catch_target_client[i].call(catch_target_call)) {
 						gcs_state_ = eGcsState::ERROR;
 						state_msg_ = "Error sending targets to UAV_" + std::to_string(i+1);

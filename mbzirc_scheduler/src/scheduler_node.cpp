@@ -97,6 +97,7 @@ protected:
 	
 	/// Task allocator
 	TaskAllocator* allocator_;
+
 };
 
 /** \brief Constructor
@@ -290,7 +291,7 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 
 			cand_p->location(0) = candidate_list->candidates[j].global_position.x;
 			cand_p->location(1) = candidate_list->candidates[j].global_position.y;
-			cand_p->location(1) = candidate_list->candidates[j].global_position.z;
+			cand_p->location(2) = candidate_list->candidates[j].global_position.z;
 
 			for(int i = 0; i < 3; i++)
 			{
@@ -361,6 +362,9 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 			res.color = uav_state_machine::candidate::COLOR_ORANGE;
 			break;
 		}
+
+		// Set target to assigned
+		estimator_->setTargetStatus(res.target_id, ASSIGNED);
 
 		result = true;
 	}
@@ -518,8 +522,10 @@ void Scheduler::publishBelief()
 			// Plot target ID
 			marker.ns = "target_id";
 			marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-			marker.text = to_string(active_targets[i]);    
-			marker.scale.z = 0.25;
+			marker.text = to_string(active_targets[i]);
+			marker.pose.position.x += 1.0;
+			marker.pose.position.y += 1.0;    
+			marker.scale.z = 1.0;
 			
 			marker_array.markers.push_back(marker);
 		}

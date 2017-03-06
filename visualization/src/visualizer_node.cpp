@@ -133,8 +133,7 @@ Visualizer::~Visualizer()
 */
 void Visualizer::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
 {
-    // TODO fill in correctly in candidateList
-    int uav_id = candidate_list->uav_id + 1;
+    int uav_id = candidate_list->uav_id;
     if(0 < uav_id && uav_id <= n_uavs_)
     {
         uav_state_machine::candidate_list candidates = *candidate_list;
@@ -312,10 +311,6 @@ void Visualizer::publishMarkers()
 
                 if(uavs_poses_.find(uav_id) != uavs_poses_.end())
                 {
-                    // TODO. Remove
-                    marker.pose.position.x = uavs_poses_[uav_id].position[0]+candidates_[uav_id].candidates[i].local_position.x;
-                    marker.pose.position.y = uavs_poses_[uav_id].position[1]+candidates_[uav_id].candidates[i].local_position.y;
-                    // END TODO
                     marker.pose.orientation.x = uavs_poses_[uav_id].orientation[0];
                     marker.pose.orientation.y = uavs_poses_[uav_id].orientation[1];
                     marker.pose.orientation.z = uavs_poses_[uav_id].orientation[2];
