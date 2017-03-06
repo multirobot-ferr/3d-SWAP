@@ -60,15 +60,6 @@ class GcsStateMachine{
 		std::array<uav_state_machine::uav_state, 3> uav_state_;
 		std::array<ros::Subscriber, 3> uav_state_subscriber_;
 
-		// TODO: Move to utils, construct::Point()
-		static inline geometry_msgs::Point createPoint(double _x, double _y, double _z) {
-			geometry_msgs::Point p;
-			p.x = _x;
-			p.y = _y;
-			p.z = _z;
-			return p;
-		}
-
 };	// class GcsStateMachine
 
 

@@ -33,6 +33,7 @@
 #include <uav_state_machine/land_service.h>
 #include <uav_state_machine/waypoint_service.h>
 #include <mbzirc_scheduler/AssignTarget.h>
+#include <grvc_utils/frame_transform.h>
 
 #define Z_SEARCHING 10.0
 
@@ -111,20 +112,22 @@ void GcsStateMachine::onStateRepose(){
 void GcsStateMachine::onStateStart(){
 	std::array<std::vector<geometry_msgs::Point>, 3> start_path;
 	// TODO: Solve game-map transformation problem... load from file?
-	start_path[0].push_back(createPoint(-38.33, 46.67, Z_SEARCHING));
-	start_path[0].push_back(createPoint(+38.33, 46.67, Z_SEARCHING));
-	start_path[0].push_back(createPoint(+38.33, 53.33, Z_SEARCHING));
-	start_path[0].push_back(createPoint(-38.33, 53.33, Z_SEARCHING));
+	grvc::utils::frame_transform frameTransform;
 
-	start_path[1].push_back(createPoint(-38.33, 33.33, Z_SEARCHING));
-	start_path[1].push_back(createPoint(+38.33, 33.33, Z_SEARCHING));
-	start_path[1].push_back(createPoint(+38.33, 26.67, Z_SEARCHING));
-	start_path[1].push_back(createPoint(-38.33, 26.67, Z_SEARCHING));
+	start_path[0].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 46.67, Z_SEARCHING)));
+	start_path[0].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 46.67, Z_SEARCHING)));
+	start_path[0].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 53.33, Z_SEARCHING)));
+	start_path[0].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 53.33, Z_SEARCHING)));
 
-	start_path[2].push_back(createPoint(-38.33, 13.33, Z_SEARCHING));
-	start_path[2].push_back(createPoint(+38.33, 13.33, Z_SEARCHING));
-	start_path[2].push_back(createPoint(+38.33,  6.67, Z_SEARCHING));
-	start_path[2].push_back(createPoint(-38.33,  6.67, Z_SEARCHING));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 33.33, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 33.33, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 26.67, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 26.67, Z_SEARCHING)));
+
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 13.33, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 13.33, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33,  6.67, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33,  6.67, Z_SEARCHING)));
 
 	ros::NodeHandle nh;
 	std::array<int, 3> sequence = {1, 3, 2};  // Launching order

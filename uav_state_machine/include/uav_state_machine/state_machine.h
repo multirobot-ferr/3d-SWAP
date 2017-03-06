@@ -105,6 +105,7 @@ private:
     float target_altitude_ = 0;
     //uav_state_machine::candidate target_;
     uav_state_machine::target_service::Request target_;
+    grvc::hal::Waypoint deploy_waypoint_;
 };
 
 #endif  // _MBZIRC_STATEMACHINE_H_

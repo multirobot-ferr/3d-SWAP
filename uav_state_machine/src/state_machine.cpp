@@ -26,6 +26,7 @@
 #include <uav_state_machine/state_machine.h>
 #include <thread>
 #include <math.h>
+#include <grvc_utils/frame_transform.h>
 
 using namespace uav_state_machine;
 
@@ -70,6 +71,13 @@ bool UavStateMachine::init() {
     }
     std::cout << "Initialized" << std::endl;
     std::cout << "Connected to hal" << std::endl;
+
+    grvc::utils::frame_transform frameTransform;
+    geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(-24.0,30.0,3.0));
+    deploy_waypoint_.pos.x() = deploy_point.x;
+    deploy_waypoint_.pos.y() = deploy_point.y;
+    deploy_waypoint_.pos.z() = deploy_point.z;
+    //deploy_waypoint_.yaw = current_position_waypoint_.yaw;
 
     return true;
 }
@@ -203,12 +211,8 @@ void UavStateMachine::onGoToDeploy() {
 		if (!target_status_client_.call(target_status_call)) {
 		    ROS_ERROR("Error setting target status to CAUGHT in UAV_%d", uav_id_);
 		}
-        grvc::hal::Waypoint deploy_waypoint;  // TODO: From file
-        deploy_waypoint.pos.x() = -3.0;
-        deploy_waypoint.pos.y() = 0.0;
-        deploy_waypoint.pos.z() = 5.0;
-        deploy_waypoint.yaw = current_position_waypoint_.yaw;
-        waypoint_srv_->send(deploy_waypoint, ts);  // Blocking!
+        
+        waypoint_srv_->send(deploy_waypoint_, ts);  // Blocking!
         // Demagnetize catching device
         catching_device_->setMagnetization(false);
         // Update target status to DEPLOYED
