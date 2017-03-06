@@ -335,36 +335,39 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 	{
 		res.target_id = allocator_->getOptimalTarget(req.uav_id);
 
-		estimator_->getTargetInfo(res.target_id, x, y, target_status, target_color);
-
-		res.global_position.x = x;
-		res.global_position.y = y;
-		res.global_position.z = 0.0;
-
-		switch(target_color)
+		if(res.target_id != -1)
 		{
-			case UNKNOWN:
-			res.color = uav_state_machine::candidate::COLOR_UNKNOWN;
-			break;
-			case RED:
-			res.color = uav_state_machine::candidate::COLOR_RED;
-			break;
-			case BLUE:
-			res.color = uav_state_machine::candidate::COLOR_BLUE;
-			break;
-			case GREEN:
-			res.color = uav_state_machine::candidate::COLOR_GREEN;
-			break;
-			case YELLOW:
-			res.color = uav_state_machine::candidate::COLOR_YELLOW;
-			break;
-			case ORANGE:
-			res.color = uav_state_machine::candidate::COLOR_ORANGE;
-			break;
-		}
+			estimator_->getTargetInfo(res.target_id, x, y, target_status, target_color);
 
-		// Set target to assigned
-		estimator_->setTargetStatus(res.target_id, ASSIGNED);
+			res.global_position.x = x;
+			res.global_position.y = y;
+			res.global_position.z = 0.0;
+
+			switch(target_color)
+			{
+				case UNKNOWN:
+				res.color = uav_state_machine::candidate::COLOR_UNKNOWN;
+				break;
+				case RED:
+				res.color = uav_state_machine::candidate::COLOR_RED;
+				break;
+				case BLUE:
+				res.color = uav_state_machine::candidate::COLOR_BLUE;
+				break;
+				case GREEN:
+				res.color = uav_state_machine::candidate::COLOR_GREEN;
+				break;
+				case YELLOW:
+				res.color = uav_state_machine::candidate::COLOR_YELLOW;
+				break;
+				case ORANGE:
+				res.color = uav_state_machine::candidate::COLOR_ORANGE;
+				break;
+			}
+
+			// Set target to assigned
+			estimator_->setTargetStatus(res.target_id, ASSIGNED);
+		}
 
 		result = true;
 	}
