@@ -360,8 +360,8 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
             uav_state_machine::candidate target_candidate;
             target_candidate.color = target_.color;
             target_candidate.shape = target_.shape;
-            target_candidate.local_position.x = target_.local_position.x;
-            target_candidate.local_position.y = target_.local_position.x;
+            target_candidate.global_position.x = target_.global_position.x;
+            target_candidate.global_position.y = target_.global_position.x;
             if (bestCandidateMatch(candidateList, target_candidate, matched_candidate_)) {
                 matched_candidate_.header.stamp = ros::Time::now();
                 target_position_[0] = matched_candidate_.local_position.x;
