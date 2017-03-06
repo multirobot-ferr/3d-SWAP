@@ -1,7 +1,8 @@
 bool enabled
 int8 color
 int8 shape
-float32[2] position
+geometry_msgs/Vector3 global_position
+int16 target_id
 
 ---
 bool success

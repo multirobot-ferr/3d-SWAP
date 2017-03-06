@@ -17,11 +17,11 @@
 
 		<model name="testbed_scene">
 			<static>true</static>
-			<pose>0 30 0 0 0 0</pose>
+			<pose>0 0 0 0 0 2.1984</pose>
 			<link name="test_scene">
 				<visual name="visual">
 					<geometry>
-						<mesh><uri>model://stage_03_gazebo.dae</uri></mesh>
+						<mesh><uri>model://stage_04_gazebo.dae</uri></mesh>
 					</geometry>
 				</visual>
 			</link>
