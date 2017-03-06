@@ -110,6 +110,7 @@ void GcsStateMachine::onStateRepose(){
 //-------------------------------------------------------------------------------------------------------------
 void GcsStateMachine::onStateStart(){
 	std::array<std::vector<geometry_msgs::Point>, 3> start_path;
+	// TODO: Solve game-map transformation problem... load from file?
 	start_path[0].push_back(createPoint(-38.33, 46.67, Z_SEARCHING));
 	start_path[0].push_back(createPoint(+38.33, 46.67, Z_SEARCHING));
 	start_path[0].push_back(createPoint(+38.33, 53.33, Z_SEARCHING));
@@ -196,8 +197,9 @@ void GcsStateMachine::onStateCatching(){
 					catch_target_call.request.enabled = true;
 					catch_target_call.request.color = assign_target_call.response.color;
 					catch_target_call.request.shape = 0;  // DEPRECATED!
-					//catch_target_call.request.id = assign_target_call.target_id;  // TODO!
-					//catch_target_call.request.position = assign_target_call.global_position;
+					catch_target_call.request.target_id = assign_target_call.response.target_id;
+					catch_target_call.request.global_position = assign_target_call.response.global_position;
+					//catch_target_call.request.local_position = assign_target_call.response.local_position;  // TODO: wtf!
 					if (!catch_target_client[i].call(catch_target_call)) {
 						gcs_state_ = eGcsState::ERROR;
 						state_msg_ = "Error sending targets to UAV_" + std::to_string(i+1);

@@ -38,6 +38,7 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     land_service_      = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/land",     &UavStateMachine::landServiceCallback, this);
     search_service_    = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/waypoint", &UavStateMachine::searchServiceCallback, this);
     target_service_    = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/enabled",  &UavStateMachine::targetServiceCallback, this);
+    target_status_client_ = nh.serviceClient<mbzirc_scheduler::SetTargetStatus>("/scheduler/set_target_status");
 
     position_sub_ = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_" + uav_id + "/local_position/pose", 10, &UavStateMachine::positionCallback, this);
     altitude_sub_ = nh.subscribe<std_msgs::Float64>("/mavros_" + uav_id + "/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
@@ -93,6 +94,17 @@ void UavStateMachine::step() {
             onSearching();
             break;
 
+        case uav_state::GOTO_CATCH:
+            waypoint_srv_->send({{target_.global_position.x,
+                                  target_.global_position.y,
+                                  target_.global_position.z}, 0.0}, ts);
+            if (ts == grvc::hal::TaskState::finished) {
+                state_.state = uav_state::CATCHING;
+            } else {
+                state_.state = uav_state::HOVER;
+            }
+            break;
+
         case uav_state::CATCHING:
             onCatching();
             break;
@@ -128,8 +140,6 @@ void UavStateMachine::onSearching() {
 
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::onCatching() {
-    //GotoTargetPosition
-
     //TargetTracking (aka visual servoing)
     /// Init subscriber to candidates
     ros::NodeHandle nh;
@@ -186,6 +196,13 @@ void UavStateMachine::onGoToDeploy() {
     waypoint_srv_->send(up_waypoint, ts);  // Blocking!
     // TODO: Go to deploy zone (what if switch turns off?)
     if (catching_device_->switchIsPressed()) {  // Check switch again
+        // Update target status to CAUGHT
+        mbzirc_scheduler::SetTargetStatus target_status_call;
+		target_status_call.request.target_id = target_.target_id;
+        target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::CAUGHT;
+		if (!target_status_client_.call(target_status_call)) {
+		    ROS_ERROR("Error setting target status to CAUGHT in UAV_%d", uav_id_);
+		}
         grvc::hal::Waypoint deploy_waypoint;  // TODO: From file
         deploy_waypoint.pos.x() = -3.0;
         deploy_waypoint.pos.y() = 0.0;
@@ -194,6 +211,11 @@ void UavStateMachine::onGoToDeploy() {
         waypoint_srv_->send(deploy_waypoint, ts);  // Blocking!
         // Demagnetize catching device
         catching_device_->setMagnetization(false);
+        // Update target status to DEPLOYED
+        target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::DEPLOYED;
+		if (!target_status_client_.call(target_status_call)) {
+		    ROS_ERROR("Error setting target status to DEPLOYED in UAV_%d", uav_id_);
+		}
     } else {
         std::cout << "Miss the catch, try again!" << std::endl;
         state_.state = uav_state::CATCHING;
@@ -281,14 +303,13 @@ bool UavStateMachine::searchServiceCallback(uav_state_machine::waypoint_service:
 bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::Request  &req,
          uav_state_machine::target_service::Response &res)
 {
-    std::cout << "Received target of color: " << req.color << ", and position :[" << req.position[0] << ", " << req.position[1] << "];" << std::endl;
+    std::cout << "Received target of color: " << req.color << ", and position :[" \
+    << req.global_position.x << ", " << req.global_position.y << "];" << std::endl;
     if (state_.state == uav_state::HOVER && req.enabled) {
-        target_.color = req.color;
-        target_.shape = req.shape;
-        target_.local_position.x = req.position[0];
-        target_.local_position.y = req.position[1];
+        target_ = req;
         res.success = true;
-        state_.state = uav_state::CATCHING;
+        //state_.state = uav_state::CATCHING;
+        state_.state = uav_state::GOTO_CATCH;
         return true;
     } else if(state_.state == uav_state::CATCHING && !req.enabled){
         state_.state = uav_state::HOVER;
@@ -332,7 +353,12 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
     if (state_.state == uav_state::CATCHING) {
         uav_state_machine::candidate_list candidateList = *_msg;
         if (candidateList.candidates.size() > 0) {
-            if (bestCandidateMatch(candidateList, target_, matched_candidate_)) {
+            uav_state_machine::candidate target_candidate;
+            target_candidate.color = target_.color;
+            target_candidate.shape = target_.shape;
+            target_candidate.local_position.x = target_.local_position.x;
+            target_candidate.local_position.y = target_.local_position.x;
+            if (bestCandidateMatch(candidateList, target_candidate, matched_candidate_)) {
                 matched_candidate_.header.stamp = ros::Time::now();
                 target_position_[0] = matched_candidate_.local_position.x;
                 target_position_[1] = matched_candidate_.local_position.y;
