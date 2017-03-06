@@ -30,6 +30,8 @@
 #include <thread>
 
 #include <ros/ros.h>
+#include <geometry_msgs/Point.h>
+#include <uav_state_machine/uav_state.h>
 
 class GcsStateMachine{
 	public: // Public interface
@@ -55,7 +57,16 @@ class GcsStateMachine{
 
 		std::thread state_machine_thread_;
 
+		std::array<uav_state_machine::uav_state, 3> uav_state_;
+		std::array<ros::Subscriber, 3> uav_state_subscriber_;
 
+		static inline geometry_msgs::Point createPoint(double _x, double _y, double _z) {
+			geometry_msgs::Point p;
+			p.x = _x;
+			p.y = _y;
+			p.z = _z;
+			return p;
+		}
 
 };	// class GcsStateMachine
 
