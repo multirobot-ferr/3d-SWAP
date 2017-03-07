@@ -42,6 +42,7 @@
 #include <uav_state_machine/takeoff_service.h>
 #include <uav_state_machine/land_service.h>
 #include <uav_state_machine/waypoint_service.h>
+#include <mbzirc_scheduler/SetTargetStatus.h>
 
 #include <grvc_utils/argument_parser.h>
 
@@ -82,6 +83,7 @@ private:
     ros::ServiceServer land_service_;
     ros::ServiceServer search_service_;
     ros::ServiceServer target_service_;
+    ros::ServiceClient target_status_client_;
 
     ros::Subscriber position_sub_;
     ros::Subscriber altitude_sub_;
@@ -101,7 +103,9 @@ private:
     unsigned int waypoint_index_ = 0;
     float current_altitude_ = 0;
     float target_altitude_ = 0;
-    uav_state_machine::candidate target_;
+    //uav_state_machine::candidate target_;
+    uav_state_machine::target_service::Request target_;
+    grvc::hal::Waypoint deploy_waypoint_;
 };
 
 #endif  // _MBZIRC_STATEMACHINE_H_

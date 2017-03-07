@@ -133,10 +133,11 @@ Visualizer::~Visualizer()
 */
 void Visualizer::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
 {
-    if(0 < candidate_list->uav_id && candidate_list->uav_id <= n_uavs_)
+    int uav_id = candidate_list->uav_id;
+    if(0 < uav_id && uav_id <= n_uavs_)
     {
         uav_state_machine::candidate_list candidates = *candidate_list;
-        candidates_[candidate_list->uav_id] = candidates;
+        candidates_[uav_id] = candidates;
     }
 }
 
@@ -169,8 +170,8 @@ void Visualizer::publishMarkers()
     marker.mesh_resource = "package://mbzirc_gcs_view/model/stage_03_gazebo.dae";
     marker.action = visualization_msgs::Marker::ADD;
 
-    marker.pose.position.x = 4;
-    marker.pose.position.y = 7;
+    marker.pose.position.x = 0;
+    marker.pose.position.y = 0;
     marker.pose.position.z = 0;
 
     marker.pose.orientation.x = 0.0;
@@ -253,7 +254,8 @@ void Visualizer::publishMarkers()
     for (int uav_id = 1; uav_id <= n_uavs_; uav_id++)
     {
         // If not empty (never received)
-        if(candidates_.find(uav_id) != candidates_.end())
+        auto it = candidates_.find(uav_id);
+        if(it != candidates_.end())
         {
             for(unsigned int i = 0; i < candidates_[uav_id].candidates.size(); i++)
             {
@@ -263,9 +265,43 @@ void Visualizer::publishMarkers()
                 marker.id = i;
                 marker.ns = "uav_" + to_string(uav_id);
                 marker.type = visualization_msgs::Marker::CUBE;
-                marker.color.r = 0.0;
-                marker.color.g = 0.0;
-                marker.color.b = 1.0;
+                marker.lifetime = ros::Duration(1.0);
+
+                // Set color for the target, default if UNKNOWN
+                switch(candidates_[uav_id].candidates[i].color)
+                {
+                    case uav_state_machine::candidate::COLOR_RED:
+                    marker.color.r = 1.0;
+                    marker.color.g = 0.0;
+                    marker.color.b = 0.0;
+                    break;
+                    case uav_state_machine::candidate::COLOR_BLUE:
+                    marker.color.r = 0.0;
+                    marker.color.g = 0.0;
+                    marker.color.b = 1.0;
+                    break;
+                    case uav_state_machine::candidate::COLOR_GREEN:
+                    marker.color.r = 0.0;
+                    marker.color.g = 1.0;
+                    marker.color.b = 0.0;
+                    break;
+                    case uav_state_machine::candidate::COLOR_YELLOW:
+                    marker.color.r = 1.0;
+                    marker.color.g = 1.0;
+                    marker.color.b = 0.0;
+                    break;
+                    case uav_state_machine::candidate::COLOR_ORANGE:
+                    marker.color.r = 1.0;
+                    marker.color.g = 0.65;
+                    marker.color.b = 0.0;
+                    break;
+                    default:
+                    marker.color.r = 0.0;
+                    marker.color.g = 0.0;
+                    marker.color.b = 0.0;
+                    break;
+                }
+
                 marker.color.a = 1;    
                 marker.action = visualization_msgs::Marker::ADD;
 
@@ -287,6 +323,8 @@ void Visualizer::publishMarkers()
                 
                 candidate_markers.markers.push_back(marker);
             }
+
+            candidates_.erase(it);
         }
     }
 
