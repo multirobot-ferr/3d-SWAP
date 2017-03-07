@@ -30,27 +30,30 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
-#include <SerialPort.h>
+#include <SerialStream.h>
 #include <std_msgs/Bool.h>
 #include <grvc_utils/critical.h>
 
 #define MAGNET_PWM_DEMAGNETIZED 1000
-#define MAGNET_PWM_REST 1500
+#define MAGNET_PWM_REST 1520
 #define MAGNET_PWM_MAGNETIZED 2000
 
 #define PACKET_HEADER 0xFF
 #define RX_PACKET_LENGTH 12
 #define TX_PACKET_LENGTH 12
 #define HEADER_LENGTH 2
+#define RX_BUFFER_LENGTH 128
 // [PACKET_HEADER][PACKET_HEADER][DATA_0][DATA_1]...[DATA_N][CHECKSUM_0][CHECKSUM_1]
 // [    1byte    ][    1byte    ][1 byte][1 byte]...[1 byte][  1 byte  ][  1 byte  ]
 // |--------------------------- PACKET_LENGTH, in bytes ---------------------------|
 
-size_t uint16ToBuf(uint16_t input, SerialPort::DataBuffer& buffer, uint16_t* checksum) {
-    buffer.push_back((unsigned char)input);
-    *checksum += buffer.back();
-    buffer.push_back((unsigned char)(input >> 8));
-    *checksum += buffer.back();
+size_t uint16ToBuf(uint16_t input, char* buffer, uint16_t* checksum) {
+    *buffer = (char)input;
+    *checksum += *buffer;
+    buffer++;
+
+    *buffer = (char)(input >> 8);
+    *checksum += *buffer;
     return 2;
 }
 
@@ -60,7 +63,7 @@ public:
     uint16_t echo[2];
     bool switch_state;
     
-    void setFrom(unsigned char* packet) {
+    void setFrom(char* packet) {
         size_t i = HEADER_LENGTH;  // Skip packet header
         // First comes sequence
         this->sequence = packet[i] | (packet[i+1] << 8);
@@ -80,24 +83,24 @@ public:
     uint16_t sequence = 0;
     uint16_t pwm[2];
 
-    void setTo(SerialPort::DataBuffer& packet) {
-        packet.clear();
+    void setTo(char* packet) {
+        size_t i;
         uint16_t checksum = 0;
         // Header
-        for (size_t i = 0; i < HEADER_LENGTH; i++) {
-            packet.push_back(PACKET_HEADER);
+        for (i = 0; i < HEADER_LENGTH; i++) {
+            packet[i] = PACKET_HEADER;
         }
         // Sequence
-        uint16ToBuf(this->sequence, packet, &checksum);
+        i += uint16ToBuf(this->sequence, &packet[i], &checksum);
         // Servos pwm
-        uint16ToBuf(this->pwm[0], packet, &checksum);
-        uint16ToBuf(this->pwm[1], packet, &checksum);
+        i += uint16ToBuf(this->pwm[0], &packet[i], &checksum);
+        i += uint16ToBuf(this->pwm[1], &packet[i], &checksum);
         // Padding
         uint16_t padding = 0;
-        uint16ToBuf(padding, packet, &checksum);
+        i += uint16ToBuf(padding, &packet[i], &checksum);
         // Checksum
-        packet.push_back((unsigned char)checksum);
-        packet.push_back((unsigned char)(checksum >> 8));
+        packet[i++] = (char)checksum;
+        packet[i++] = (char)(checksum >> 8);
     }
 };
 
@@ -105,28 +108,39 @@ class SerialCatchingDevice: public CatchingDevice {
 public:
     
     SerialCatchingDevice(unsigned int _uav_id, ros::NodeHandle& _nh) {
-        std::string serial_port;
-        std::string param_name = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/serial_port";
-        ros::param::param<std::string>(param_name, serial_port, "/dev/ttyUSB0");
-        serial_ = new SerialPort(serial_port);
-        serial_->Open(SerialPort::BAUD_115200, SerialPort::CHAR_SIZE_8, SerialPort::PARITY_NONE, SerialPort::STOP_BITS_1, SerialPort::FLOW_CONTROL_NONE);
-
         std::string magnetize_advertise = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/magnetize";
         magnetize_service_ = _nh.advertiseService(magnetize_advertise, &SerialCatchingDevice::magnetizeServiceCallback, this);
 
         std::string switch_pub_topic = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/switch";
         switch_publisher_ = _nh.advertise<std_msgs::Bool>(switch_pub_topic, 1);
 
-        serial_thread_ = std::thread([&](){
+        serial_thread_ = std::thread([this, _uav_id](){
+            std::string serial_port;
+            std::string param_name = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/serial_port";
+            ros::param::param<std::string>(param_name, serial_port, "/dev/ttyUSB0");
+            this->serial_.Open(serial_port);
+            this->serial_.SetBaudRate(LibSerial::SerialStreamBuf::BAUD_115200);
+            this->serial_.SetParity(LibSerial::SerialStreamBuf::PARITY_NONE);
+            this->serial_.SetCharSize(LibSerial::SerialStreamBuf::CHAR_SIZE_8);
+            this->serial_.SetFlowControl(LibSerial::SerialStreamBuf::FLOW_CONTROL_NONE);
+            this->serial_.SetNumOfStopBits(1);
+            if(!this->serial_.IsOpen()) {
+                throw std::runtime_error("Couldn't open serial device!");
+            }
+
             PcToDeviceData tx;
-            SerialPort::DataBuffer tx_packet;
-            unsigned char rx = 0;
+            tx.pwm[0] = MAGNET_PWM_REST;
+            tx.pwm[1] = MAGNET_PWM_REST;
+            char tx_packet[TX_PACKET_LENGTH];
+            char rx = 0;
+            char rx_packet[RX_PACKET_LENGTH];
+            char rx_buffer[RX_BUFFER_LENGTH];
             size_t index = 0;
-            unsigned char rx_packet[RX_PACKET_LENGTH];
             uint16_t checksum = 0;
             enum State {INIT, SYNC, LOST, BODY, CHECK};
             
             State state = INIT;
+          //while (this->serial_.IsOpen()) {
             while (ros::ok()) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 // TX
@@ -141,15 +155,18 @@ public:
                 } else {
                     tx.sequence++;
                 }
-                tx.pwm[0] = 999;  // TODO: test!
-                tx.pwm[1] = 1001;  // TODO: test!
                 tx.setTo(tx_packet);
-                this->serial_->Write(tx_packet);  // Always write!
+                this->serial_.write(tx_packet, TX_PACKET_LENGTH);  // Always write!
+                //std::cout << "sequence:" << tx.sequence << \
+                //" pwm[0]:"  << tx.pwm[0] << \
+                //" pwm[1]:"  << tx.pwm[1] << std::endl;
                 // RX
-                SerialPort::DataBuffer serial_buffer;
-                this->serial_->Read(serial_buffer);
-                for (size_t i = 0; i < serial_buffer.size(); i++) {
-                    rx = serial_buffer[i];
+                //size_t buffered = this->serial_.readsome(rx_buffer, RX_BUFFER_LENGTH);
+                this->serial_.read(rx_buffer, RX_BUFFER_LENGTH);
+                //for (size_t i = 0; i < buffered; i++) {
+                for (size_t i = 0; i < RX_BUFFER_LENGTH; i++) {
+                    rx = rx_buffer[i];
+                    std::cout << std::oct << rx << std::endl;
                     switch (state) {
 
                         case INIT:
@@ -208,7 +225,7 @@ public:
             }
         });
 
-        pub_thread_ = std::thread([&](){
+        pub_thread_ = std::thread([this](){
             while (ros::ok()) {
                 if (this->rx_critical_.hasNewData()) {
                     DeviceToPcData rx = this->rx_critical_.get();
@@ -266,7 +283,7 @@ protected:
     MagnetState magnet_state_ = MagnetState::UNKNOWN;
     bool switch_state_ = false;
 
-	SerialPort* serial_;
+    LibSerial::SerialStream serial_;
     std::thread serial_thread_;
     grvc::utils::Critical<DeviceToPcData> rx_critical_;
     grvc::utils::Critical<uint16_t> pwm_magnet_critical_;

@@ -31,5 +31,15 @@ int main(int _argc, char** _argv){
     ros::init(_argc, _argv, "test_node");
     ros::NodeHandle nh;
     SerialCatchingDevice catching_device(1, nh);
+    std::cout << "Wait..."  << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::cout << "...for it!"  << std::endl;
+    catching_device.setMagnetization(true);
     ros::spin();
+    /*while (ros::ok()) {
+        int cmd = getchar();
+        bool magnetize = (cmd == '0') ? false : true;
+        catching_device.setMagnetization(cmd);
+        ros::spinOnce();
+    }*/
 }
