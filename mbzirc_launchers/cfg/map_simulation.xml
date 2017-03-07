@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<frames>
+  <game>
+    <rxx>1</rxx>
+    <rxy>0</rxy>
+    <ryx>0</ryx>
+    <ryy>1</ryy>
+  </game>
+  <!-- Put origin for gazebo frame (simulation only). -->
+  <origin>
+    <lat>37.558542</lat>
+    <lon>-5.931074</lon>
+    <alt>7.89</alt>
+  </origin>
+  <!-- Robots home positions in game coordinates. z and yaw are for simulation only. -->
+	<robothome id='1'>
+		<x>-28.0</x>
+		<y>34.0</y>
+		<z>0.5</z>
+		<yaw>0.0</yaw>
+	</robothome>
+	<robothome id='2'>
+		<x>-20.0</x>
+		<y>30.0</y>
+		<z>0.5</z>
+		<yaw>0.0</yaw>
+	</robothome>
+	<robothome id='3'>
+		<x>-28.0</x>
+		<y>26.0</y>
+		<z>0.5</z>
+		<yaw>0.0</yaw>
+	</robothome>
+</frames>
