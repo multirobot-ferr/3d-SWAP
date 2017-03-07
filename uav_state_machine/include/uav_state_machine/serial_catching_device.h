@@ -166,47 +166,6 @@ public:
             }
         });
 
-/*
-        serial_thread_ = std::thread([this, _uav_id](){
-            PcToDeviceData tx;
-            tx.pwm[0] = MAGNET_PWM_REST;
-            tx.pwm[1] = MAGNET_PWM_REST;
-            char tx_packet[TX_PACKET_LENGTH];
-            char rx = 0;
-            char rx_packet[RX_PACKET_LENGTH];
-            char rx_buffer[RX_BUFFER_LENGTH];
-            size_t index = 0;
-            uint16_t checksum = 0;
-            enum State {INIT, SYNC, LOST, BODY, CHECK};
-            
-            State state = INIT;
-          //while (this->serial_.IsOpen()) {
-            while (ros::ok()) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                // TX
-                if (this->pwm_magnet_critical_.hasNewData()) {
-                    tx.pwm[0] = pwm_magnet_critical_.get();
-                }
-                if (this->pwm_servo_critical_.hasNewData()) {
-                    tx.pwm[1] = pwm_servo_critical_.get();
-                }
-                if (tx.sequence >= 0x0FFF) {
-                    tx.sequence = 0;  // Force reset to keep it in 12 bits
-                } else {
-                    tx.sequence++;
-                }
-                tx.setTo(tx_packet);
-                this->serial_.write(tx_packet, TX_PACKET_LENGTH);  // Always write!
-                //std::cout << "sequence:" << tx.sequence << \
-                //" pwm[0]:"  << tx.pwm[0] << \
-                //" pwm[1]:"  << tx.pwm[1] << std::endl;
-                // RX
-                //size_t buffered = this->serial_.readsome(rx_buffer, RX_BUFFER_LENGTH);
-                this->serial_.read(rx_buffer, RX_BUFFER_LENGTH);
-                //for (size_t i = 0; i < buffered; i++) {
-            }
-        });
-*/
         pub_thread_ = std::thread([this](){
             while (ros::ok()) {
                 if (this->rx_critical_.hasNewData()) {
@@ -226,7 +185,6 @@ public:
                 }
             }
         });
-
     }
 
     // TODO: Destructor closes serial_
@@ -278,8 +236,8 @@ protected:
     std::thread rx_thread_;
     std::thread tx_thread_;
 
-    byte rx_buffer_[RX_BUFFER_LENGTH];
     enum State {INIT, SYNC, LOST, BODY, CHECK} rx_state_;
+    byte rx_buffer_[RX_BUFFER_LENGTH];
     size_t rx_index_;
     uint16_t rx_checksum_;
 
@@ -299,7 +257,7 @@ protected:
             }
             snprintf(error_buffer_, ERROR_BUFFER_LENGTH, \
             "[in function %s]::Failed to open port: %s. %s (errno = %d). %s", \
-            __FUNCTION__, _port_name, strerror(errno), errno, extra_msg.c_str());
+            __FUNCTION__, _port_name.c_str(), strerror(errno), errno, extra_msg.c_str());
             throw std::runtime_error(error_buffer_);
         }
         try {
@@ -311,8 +269,9 @@ protected:
             fl.l_pid = getpid();
             if (fcntl(serial_fd_, F_SETLK, &fl) != 0) {
                 snprintf(error_buffer_, ERROR_BUFFER_LENGTH, \
-                "[in function %s]::Device %s is already locked. Try 'lsof | grep %s' to find other processes that currently have the port open.",\
-                 __FUNCTION__, _port_name, _port_name);
+                "[in function %s]::Device %s is already locked. \
+                Try 'lsof | grep %s' to find other processes that currently have the port open.",\
+                 __FUNCTION__, _port_name.c_str(), _port_name.c_str());
                 throw std::runtime_error(error_buffer_);
             }
             // Settings for USB?
@@ -329,7 +288,7 @@ protected:
             if(tcsetattr(serial_fd_, TCSANOW, &newtio) < 0) {
                 snprintf(error_buffer_, ERROR_BUFFER_LENGTH, \
                 "[in function %s]::Unable to set serial port attributes. \
-                The port you specified (%s) may not be a serial port.", __FUNCTION__, _port_name);
+                The port you specified (%s) may not be a serial port.", __FUNCTION__, _port_name.c_str());
                 throw std::runtime_error(error_buffer_);
                 // TODO: tcsetattr returns true if at least one attribute was set.
                 // Hence, we might not have set everything on success.
@@ -425,7 +384,7 @@ protected:
     int serialWrite(byte *_data, size_t _length) {  
         // IO is currently non-blocking. This is what we want for the more cerealon read case.
         int origflags = fcntl(serial_fd_, F_GETFL, 0);
-        fcntl(serial_fd_, F_SETFL, origflags & ~O_NONBLOCK); // TODO: @todo can we make this all work in non-blocking?
+        fcntl(serial_fd_, F_SETFL, origflags & ~O_NONBLOCK);
         int retval = ::write(serial_fd_, _data, _length);
         fcntl(serial_fd_, F_SETFL, origflags | O_NONBLOCK);
 
