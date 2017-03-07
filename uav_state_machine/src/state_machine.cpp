@@ -134,7 +134,7 @@ void UavStateMachine::onCatching() {
     /// Init subscriber to candidates
     ros::NodeHandle nh;
     ros::Subscriber candidate_subscriber = nh.subscribe<uav_state_machine::candidate_list>("/mbzirc_" + std::to_string(uav_id_) +"/candidateList", 1, &UavStateMachine::candidateCallback, this);
-
+    
     if (!candidate_subscriber) {
         std::cout << "Can't start candidate subscriber." << std::endl;
         state_.state = uav_state::HOVER;
@@ -148,30 +148,41 @@ void UavStateMachine::onCatching() {
 
     while (state_.state == uav_state::CATCHING) {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
-        ros::Duration timeout(1.0);  // TODO: from config, in [s]?
+        ros::Duration timeout(2.0);  // TODO: from config, in [s]?
+        if (current_altitude_ < 0.15){
+            free_fall = false;
+            target_position_[2] = 0.0;
+		}
         if (since_last_candidate < timeout) {
             // x-y-control: in candidateCallback
             // z-control: descend
-            if (current_altitude_ < 1.0) {
+            if (current_altitude_ < 0.40) {
                 double xy_error = sqrt(target_position_[0]*target_position_[0] + target_position_[1]*target_position_[1]);
                 if (xy_error < 0.1) {
-                    target_position_[2] = -0.5;  // TODO: As a function of x-y error?
-                } else {
-                    target_position_[2] = 0.0;
+                    target_position_[2] = -0.22;  // TODO: As a function of x-y error?
+		    free_fall = true;                
+		    } 
+		else {
+                    target_position_[2] = 0.4-current_altitude_;
                 }         
             } else {
                 target_position_[2] = -0.5;  // TODO: As a function of x-y error?
             }
             //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
         } else {
-            // x-y-control slowly goes to 0
-            target_position_[0] = 0.99*target_position_[0];
-            target_position_[1] = 0.99*target_position_[1];
-            // z-control: ascend
-            target_position_[2] = +1.0;  // TODO: As a function of x-y error?
-            //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
-            std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
-        }
+	    if (!free_fall){	
+        	    // x-y-control slowly goes to 0
+       		    target_position_[0] = 0.99*target_position_[0];
+        	    target_position_[1] = 0.99*target_position_[1];
+        	    // z-control: ascend
+        	    target_position_[2] = +1.0;  // TODO: As a function of x-y error?
+        	    //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
+        	    std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
+        	}
+	    else {
+		  target_position_[2] = -0.22;
+		}
+	}
         // TODO: Check max altitude and change state to LOST?
         // Send target_position
         grvc::hal::TaskState ts;
