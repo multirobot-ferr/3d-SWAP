@@ -37,8 +37,8 @@
 #include <iostream>
 
 #define Z_SEARCHING 10.0
-#define NUMBER_OF_UAVS 3
-#define UAVS_SEQUENCE {1, 3, 2}
+#define NUMBER_OF_UAVS 2
+#define UAVS_SEQUENCE {2, 3}
 
 bool GcsStateMachine::init(){
 	state_publisher_thread_ = std::thread([&](){
@@ -124,6 +124,8 @@ void GcsStateMachine::onStateStart(){
 	std::map<int, std::vector<geometry_msgs::Point>> start_path;
 	grvc::utils::frame_transform frameTransform;
 
+	// Official map start path
+	/*
 	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 46.67, Z_SEARCHING)));
 	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 46.67, Z_SEARCHING)));
 	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 53.33, Z_SEARCHING)));
@@ -138,6 +140,18 @@ void GcsStateMachine::onStateStart(){
 	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 13.33, Z_SEARCHING)));
 	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33,  6.67, Z_SEARCHING)));
 	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33,  6.67, Z_SEARCHING)));
+	*/
+
+	// Karting with 2 UAVs start path
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(22.0, 36.0, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-30.0, 36.0, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-30.0, 27.0, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(22.0, 27.0, Z_SEARCHING)));
+
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(22.0, 15.0, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-30.0, 15.0, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-30.0, 8.0, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(22.0, 8.0, Z_SEARCHING)));
 
 	ros::NodeHandle nh;
 	for (size_t i = 0; i < index_to_id_map_.size(); i++) {
