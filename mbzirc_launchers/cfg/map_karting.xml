@@ -13,21 +13,21 @@
     <alt>7.89</alt>
   </origin>
   <!-- Robots home positions in game coordinates. z and yaw are for simulation only. -->
-	<robothome id='1'>
+	<!--<robothome id='1'>
 		<x>-28.0</x>
 		<y>34.0</y>
 		<z>0.5</z>
 		<yaw>0.0</yaw>
-	</robothome>
+	</robothome>-->
 	<robothome id='2'>
-		<x>-20.0</x>
-		<y>30.0</y>
+		<x>1.6</x>
+		<y>23.0</y>
 		<z>0.5</z>
 		<yaw>0.0</yaw>
 	</robothome>
 	<robothome id='3'>
-		<x>-28.0</x>
-		<y>26.0</y>
+		<x>1.6</x>
+		<y>18.3</y>
 		<z>0.5</z>
 		<yaw>0.0</yaw>
 	</robothome>
