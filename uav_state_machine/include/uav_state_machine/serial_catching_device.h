@@ -39,7 +39,8 @@ public:
     uint16_t sequence;
     uint16_t echo[2];
     bool switch_state;
-    
+    CatchingDevice::MagnetState magnet_state;
+
     void setFrom(byte* _packet);
 };
 

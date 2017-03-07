@@ -65,8 +65,24 @@ void DeviceToPcData::setFrom(byte* _packet) {
     this->echo[0] = _packet[i]   | (_packet[i+1] << 8);
     this->echo[1] = _packet[i+2] | (_packet[i+3] << 8);
     i += 4;
-    // Finally switch state
+    // Finally switch and magnet state
     this->switch_state = (_packet[i] & 0x01)? true: false;
+    //this->magnet_state = CatchingDevice::MagnetState::UNKNOWN;
+    uint8_t magnet_int = _packet[i+1];
+    switch (magnet_int) {
+        case 0:
+            this->magnet_state = CatchingDevice::MagnetState::UNKNOWN;
+            break;
+        case 1:
+            this->magnet_state = CatchingDevice::MagnetState::MAGNETIZED;
+            break;
+        case 2:
+            this->magnet_state = CatchingDevice::MagnetState::DEMAGNETIZED;
+            break;
+        default:
+            this->magnet_state = CatchingDevice::MagnetState::UNKNOWN;  // But it's an error
+            break;
+    }
     //i += 2;
 }
 
@@ -147,10 +163,26 @@ SerialCatchingDevice::SerialCatchingDevice(unsigned int _uav_id, ros::NodeHandle
             if (this->rx_critical_.hasNewData()) {
                 DeviceToPcData rx = this->rx_critical_.get();
                 this->switch_state_ = rx.switch_state;
+                this->magnet_state_ = rx.magnet_state;
+                std::string magnet_state = "error";
+                switch (rx.magnet_state) {
+                    case MagnetState::UNKNOWN:
+                        magnet_state = "unknown";
+                        break;
+                    case MagnetState::MAGNETIZED:
+                        magnet_state = "magnetized";
+                        break;
+                    case MagnetState::DEMAGNETIZED:
+                        magnet_state = "demagnetized";
+                        break;
+                    default:
+                        break;
+                }
                 std::cout << "sequence:" << rx.sequence << \
                 " echo[0]:"  << rx.echo[0] << \
                 " echo[1]:"  << rx.echo[1] << \
-                " switch:"  << rx.switch_state << std::endl;
+                " switch:"  << rx.switch_state << \
+                " magnet:" << magnet_state << std::endl;
                 // Publish switch state
                 std_msgs::Bool switch_state;
                 switch_state.data = this->switch_state_;
@@ -174,7 +206,7 @@ void SerialCatchingDevice::setMagnetization(bool _magnetize) {
         // Ensure that the magnet is resting
         pwm_magnet_critical_.set(MAGNET_PWM_REST);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        magnet_state_ = wanted_state;
+        //magnet_state_ = wanted_state;  // Now magnet state comes from serial device!
     }
 }
 
