@@ -44,7 +44,7 @@
 </CameraConfig>
 
 <!--Path to the configuration of the file for segmentation of color-->
-<ccsConfig>../config/ccsRGBYO.json</ccsConfig>
+<ccsConfig>../cfg/vision/ccsRGBYO.json</ccsConfig>
 
 <!--Name of topic with PoseStamped message that contains the rotation of the UAV-->
 <UavPoseTopic>/mavros_2/local_position/pose</UavPoseTopic>

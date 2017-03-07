@@ -34,6 +34,7 @@
 #include <uav_state_machine/waypoint_service.h>
 #include <mbzirc_scheduler/AssignTarget.h>
 #include <grvc_utils/frame_transform.h>
+#include <iostream>
 
 #define Z_SEARCHING 10.0
 
@@ -111,7 +112,7 @@ void GcsStateMachine::onStateRepose(){
 //-------------------------------------------------------------------------------------------------------------
 void GcsStateMachine::onStateStart(){
 	std::array<std::vector<geometry_msgs::Point>, 3> start_path;
-	// TODO: Solve game-map transformation problem... load from file?
+	
 	grvc::utils::frame_transform frameTransform;
 
 	start_path[0].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 46.67, Z_SEARCHING)));
@@ -206,6 +207,8 @@ void GcsStateMachine::onStateCatching(){
 						gcs_state_ = eGcsState::ERROR;
 						state_msg_ = "Error sending targets to UAV_" + std::to_string(i+1);
 					}
+					else
+						std::cout << "Target " << assign_target_call.response.target_id << " assigned to UAV " << (i+1) << std::endl;
 				}
 			}
 		}
