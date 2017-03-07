@@ -155,9 +155,7 @@ Scheduler::Scheduler()
 	ros::Rate r(estimator_rate_);
 	ros::Time prev_time, time_now;
 
-	#ifdef DEBUG_MODE
 	int count = 0;
-	#endif
 
 	while(nh_->ok())
 	{
@@ -176,10 +174,6 @@ Scheduler::Scheduler()
 		{
 			if((it->second).size())
 			{
-				#ifdef DEBUG_MODE
-				cout << "Candidates from UAV " << it->first << endl;
-				#endif 
-
 				estimator_->update(it->second);
 
 				// Remove candidates
@@ -196,8 +190,6 @@ Scheduler::Scheduler()
 
 		publishBelief();
 
-		
-		#ifdef DEBUG_MODE
 		if(count == 5)
 		{
 			estimator_->printTargetsInfo();
@@ -205,7 +197,6 @@ Scheduler::Scheduler()
 		}
 		else
 			count++;
-		#endif
 
 		r.sleep();
 	}

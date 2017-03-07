@@ -11,3 +11,4 @@ install_manifest.txt
 /gcs_core/build
 build
 /vision_node_bin/scripts/Log*
+/mbzirc_launchers/scripts/Log*

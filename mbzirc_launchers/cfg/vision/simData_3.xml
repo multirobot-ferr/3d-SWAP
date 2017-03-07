@@ -9,7 +9,7 @@
 
 	<CameraType>ros</CameraType> <!--CameraTypes: ros, real, video-->
 	<CameraIndex>1</CameraIndex> <!--Index of the camera, only if CameraType is real-->
-	<CameraTopic>/mbzirc_2/camera_0/image_raw</CameraTopic> <!--ROS topic for the image stream, only if CameraType is ros-->
+	<CameraTopic>/mbzirc_3/camera_0/image_raw</CameraTopic> <!--ROS topic for the image stream, only if CameraType is ros-->
 	<VideoPath>/home/user/video.avi</VideoPath> <!--Path to a video, only if CameraType is video-->
 
 	<!--Intrinsic matrix from camera calibration-->
@@ -44,28 +44,28 @@
 </CameraConfig>
 
 <!--Path to the configuration of the file for segmentation of color-->
-<ccsConfig>../config/ccsRGBYO.json</ccsConfig>
+<ccsConfig>../cfg/vision/ccsRGBYO.json</ccsConfig>
 
 <!--Name of topic with PoseStamped message that contains the rotation of the UAV-->
-<UavPoseTopic>/mavros_2/local_position/pose</UavPoseTopic>
+<UavPoseTopic>/mavros_3/local_position/pose</UavPoseTopic>
 
 <!--Name of topic with Float64 with the altitude of the drone, desiderable Z distance of the floor in the camera CS-->
-<UavAltitudeTopic>/mavros_2/global_position/rel_alt</UavAltitudeTopic>
+<UavAltitudeTopic>/mavros_3/global_position/rel_alt</UavAltitudeTopic>
 
 <!--Topic to position of UAV in map coordinates-->
-<UavMapCoordinatesTopic>/mbzirc_2/hal/pose</UavMapCoordinatesTopic>
+<UavMapCoordinatesTopic>/mbzirc_3/hal/pose</UavMapCoordinatesTopic>
 
 <!--Set to 1 if candidate lists needs to be published-->
 <PublishData>1</PublishData>
 
 <!--Name of topic in which the list of candidate is going to be published-->
-<CandidateTopic>/mbzirc_2/candidateList</CandidateTopic>
+<CandidateTopic>/mbzirc_3/candidateList</CandidateTopic>
 
 <!--Set to 1 to see result of the algorithm in a screen, disable in a console environment-->
 <VisualizeResults>0</VisualizeResults>
 
 <!--UAV id-->
-<UavId>2</UavId>
+<UavId>3</UavId>
 
 <!--Max and min side of the bounding box allowed for the candidates from the segmentation-->
 <MinObjectSize>0.15</MinObjectSize>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="frames" default="$(find mbzirc_launchers)/cfg/map_karting.xml"/>
+
+    <!-- Launch robot id=2 -->
+    <include file="$(find px4_bringup)/launch/spawn_robot.launch">
+        <arg name="id" value="2"/>
+	    <arg name="mode" value="real"/>
+        <arg name="material" value="Indigo"/>
+	    <arg name="frames" value="$(arg frames)"/>
+    </include>
+
+</launch>
