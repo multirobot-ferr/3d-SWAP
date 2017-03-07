@@ -101,7 +101,7 @@ Visualizer::Visualizer()
 	{
 		string uav_topic_name = "/mbzirc_" + to_string(i+1) + "/hal/pose";
 		string candidate_topic_name = "mbzirc_" + to_string(i+1) + "/candidateList";
-        string uav_state_topic_name = "mbzirc_" + to_string(i+1) + "/uav_state_macnine/state" ;
+        string uav_state_topic_name = "mbzirc_" + to_string(i+1) + "/uav_state_machine/state" ;
 
 		ros::Subscriber* candidate_sub = new ros::Subscriber();
 		*candidate_sub = nh_->subscribe<uav_state_machine::candidate_list>(candidate_topic_name.c_str(), 1, &Visualizer::candidatesReceived, this);
@@ -270,7 +270,7 @@ void Visualizer::publishMarkers()
 
             marker.ns = "uavs_state";
             marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-            
+            marker.text = uavs_states_[uav_id];
             marker.pose.position.z += 2.0;
             
             marker.scale.x = 1;
