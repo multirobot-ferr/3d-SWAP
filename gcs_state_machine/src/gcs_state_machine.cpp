@@ -36,6 +36,8 @@
 #include <grvc_utils/frame_transform.h>
 
 #define Z_SEARCHING 10.0
+#define NUMBER_OF_UAVS 3
+#define UAVS_SEQUENCE {1, 3, 2}
 
 bool GcsStateMachine::init(){
 	state_publisher_thread_ = std::thread([&](){
@@ -59,13 +61,21 @@ bool GcsStateMachine::init(){
 
 	state_machine_thread_ = std::thread(&GcsStateMachine::onStateMachine, this);
 
+	// TODO: from param!
+	int uavs_sequence[NUMBER_OF_UAVS] = UAVS_SEQUENCE;
+	for (size_t i = 0; i < NUMBER_OF_UAVS; i++) {
+		index_to_id_map_[i] = uavs_sequence[i];
+	}
+	uav_state_subscriber_.resize(NUMBER_OF_UAVS);
+	uav_state_.resize(NUMBER_OF_UAVS);
+
 	ros::NodeHandle nh;
-	for (int i = 0; i <3; i++) {
-		std::string state_url = "/mbzirc_" + std::to_string(i+1) + "/uav_state_machine/state";
+	for (size_t i = 0; i <index_to_id_map_.size(); i++) {
+		std::string state_url = "/mbzirc_" + std::to_string(index_to_id_map_[i]) + "/uav_state_machine/state";
 		uav_state_subscriber_[i] = nh.subscribe<uav_state_machine::uav_state>(
 			state_url, 10,
 			[this, i](const uav_state_machine::uav_state::ConstPtr& _msg) {
-				uav_state_[i] = *_msg;  // WATCHOUT! 0-indexing with ids!
+				uav_state_[i] = *_msg;
 		});
 	}
 
@@ -110,29 +120,28 @@ void GcsStateMachine::onStateRepose(){
 
 //-------------------------------------------------------------------------------------------------------------
 void GcsStateMachine::onStateStart(){
-	std::array<std::vector<geometry_msgs::Point>, 3> start_path;
+	std::map<int, std::vector<geometry_msgs::Point>> start_path;
 	// TODO: Solve game-map transformation problem... load from file?
 	grvc::utils::frame_transform frameTransform;
 
-	start_path[0].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 46.67, Z_SEARCHING)));
-	start_path[0].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 46.67, Z_SEARCHING)));
-	start_path[0].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 53.33, Z_SEARCHING)));
-	start_path[0].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 53.33, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 46.67, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 46.67, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 53.33, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 53.33, Z_SEARCHING)));
 
-	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 33.33, Z_SEARCHING)));
-	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 33.33, Z_SEARCHING)));
-	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 26.67, Z_SEARCHING)));
-	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 26.67, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 33.33, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 33.33, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 26.67, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 26.67, Z_SEARCHING)));
 
-	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 13.33, Z_SEARCHING)));
-	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 13.33, Z_SEARCHING)));
-	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33,  6.67, Z_SEARCHING)));
-	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33,  6.67, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 13.33, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 13.33, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33,  6.67, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33,  6.67, Z_SEARCHING)));
 
 	ros::NodeHandle nh;
-	std::array<int, 3> sequence = {1, 3, 2};  // Launching order
-	for (int j = 0; j < 3; j++) {
-		int id = sequence[j];
+	for (size_t i = 0; i < index_to_id_map_.size(); i++) {
+		int id = index_to_id_map_[i];
 		std::string takeoff_url = "/mbzirc_" + std::to_string(id) + "/uav_state_machine/takeoff";
 		ros::ServiceClient takeoff_client = nh.serviceClient<uav_state_machine::takeoff_service>(takeoff_url);
 		uav_state_machine::takeoff_service takeoff_call;
@@ -142,7 +151,7 @@ void GcsStateMachine::onStateStart(){
 			state_msg_ = "Error taking off UAV_" + std::to_string(id);
 			return;
 		}
-		while (uav_state_[id-1].state != uav_state_machine::uav_state::HOVER) {
+		while (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
 			// Wait until takeoff finishes
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
@@ -150,7 +159,7 @@ void GcsStateMachine::onStateStart(){
 		ros::ServiceClient waypoint_client = nh.serviceClient<uav_state_machine::waypoint_service>(waypoint_url);
 		uav_state_machine::waypoint_service waypoint_call;
 		waypoint_call.request.action = uav_state_machine::waypoint_serviceRequest::START;
-		for (auto wp: start_path[id-1]) {
+		for (auto wp: start_path[id]) {
 			waypoint_call.request.waypoint_track.push_back(wp);
 		}
 		if (!waypoint_client.call(waypoint_call)) {
@@ -165,7 +174,7 @@ void GcsStateMachine::onStateStart(){
 
 //-------------------------------------------------------------------------------------------------------------
 void GcsStateMachine::onStateSearching(){
-	for (int i = 0; i < 3; i++) {
+	for (size_t i = 0; i < index_to_id_map_.size(); i++) {
 		while (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
 			// Wait all UAV to finish starting path
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -181,20 +190,21 @@ void GcsStateMachine::onStateSearching(){
 void GcsStateMachine::onStateCatching(){
 	ros::NodeHandle nh;
 	ros::ServiceClient assign_target_client = nh.serviceClient<mbzirc_scheduler::AssignTarget>("/scheduler/assign_target");
-	std::array<ros::ServiceClient, 3> catch_target_client;
-	for (int i = 0; i < 3; i++) {
-		std::string catch_target_url = "/mbzirc_" + std::to_string(i+1) + "/uav_state_machine/enabled";
+	std::vector<ros::ServiceClient> catch_target_client;
+	catch_target_client.resize(index_to_id_map_.size());
+	for (size_t i = 0; i < index_to_id_map_.size(); i++) {
+		std::string catch_target_url = "/mbzirc_" + std::to_string(index_to_id_map_[i]) + "/uav_state_machine/enabled";
 		catch_target_client[i] = nh.serviceClient<uav_state_machine::target_service>(catch_target_url);
 	}
 	bool finished = false;
 	while (!finished) {
-		for (int i = 0; i < 3; i++) {
+		for (size_t i = 0; i < index_to_id_map_.size(); i++) {
 			if (uav_state_[i].state == uav_state_machine::uav_state::HOVER) {
 				mbzirc_scheduler::AssignTarget assign_target_call;
-				assign_target_call.request.uav_id = i+1;
+				assign_target_call.request.uav_id = index_to_id_map_[i];
 				if (!assign_target_client.call(assign_target_call)) {
 					//gcs_state_ = eGcsState::ERROR;  // No, retry!
-					state_msg_ = "Error calling assign target service in UAV_" + std::to_string(i+1);
+					state_msg_ = "Error calling assign target service in UAV_" + std::to_string(index_to_id_map_[i]);
 				} else {
 					uav_state_machine::target_service catch_target_call;
 					catch_target_call.request.enabled = true;
@@ -204,7 +214,7 @@ void GcsStateMachine::onStateCatching(){
 					catch_target_call.request.global_position = assign_target_call.response.global_position;
 					if (!catch_target_client[i].call(catch_target_call)) {
 						gcs_state_ = eGcsState::ERROR;
-						state_msg_ = "Error sending targets to UAV_" + std::to_string(i+1);
+						state_msg_ = "Error sending targets to UAV_" + std::to_string(index_to_id_map_[i]);
 					}
 				}
 			}

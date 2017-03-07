@@ -57,8 +57,9 @@ class GcsStateMachine{
 
 		std::thread state_machine_thread_;
 
-		std::array<uav_state_machine::uav_state, 3> uav_state_;
-		std::array<ros::Subscriber, 3> uav_state_subscriber_;
+		std::vector<uav_state_machine::uav_state> uav_state_;
+		std::vector<ros::Subscriber> uav_state_subscriber_;
+		std::map<int, int> index_to_id_map_;
 
 };	// class GcsStateMachine
 
