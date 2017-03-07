@@ -81,14 +81,14 @@
 <CandidateTopic>/mbzirc_1/candidateList</CandidateTopic>
 
 <!--Set to 1 to see result of the algorithm in a screen, disable in a console environment-->
-<VisualizeResults>0</VisualizeResults>
+<VisualizeResults>1</VisualizeResults>
 
 <!--UAV id-->
 <UavId>1</UavId>
 
 <!--Max and min side of the bounding box allowed for the candidates from the segmentation-->
 <MinObjectSize>0.05</MinObjectSize>
-<MaxObjectSize>1.0</MaxObjectSize>
+<MaxObjectSize>2.0</MaxObjectSize>
 
 <!--Path to a image file with a mask for the input image. Pixels with value 1 are processed and with 0 not-->
 <MaskImagePath>/home/user/mask.png</MaskImagePath>

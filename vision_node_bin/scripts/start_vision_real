@@ -2,5 +2,5 @@
 # This scripts launches vision nodes 
 
 ./vision_node ../config/realData_1.xml
-#/vision_node ../config/simData2.xml
+#/vision_node ../config/simData1.xml
 #/vision_node ../config/simData3.xml
