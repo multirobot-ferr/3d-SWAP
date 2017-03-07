@@ -24,7 +24,7 @@
 // SOFTWARE.
 //----------
 #include <uav_state_machine/catching_device.h>
-#include <uav_state_machine/mavros_catching_device.h>
+#include <uav_state_machine/serial_catching_device.h>
 #include <uav_state_machine/gazebo_catching_device.h>
 
 CatchingDevice* CatchingDevice::createCatchingDevice(unsigned int _uav_id, ros::NodeHandle& _nh) {
@@ -34,7 +34,7 @@ CatchingDevice* CatchingDevice::createCatchingDevice(unsigned int _uav_id, ros::
     std::string mode;
     _nh.param<std::string>(param_name, mode, "real");  // Get param, default is 'real' mode
     if (mode == "real") {
-        implementation = new MavRosCatchingDevice(_uav_id, _nh);
+        implementation = new SerialCatchingDevice(_uav_id, _nh);
     } else if (mode == "sitl") {
         implementation = new GazeboCatchingDevice(_uav_id, _nh);
     }
