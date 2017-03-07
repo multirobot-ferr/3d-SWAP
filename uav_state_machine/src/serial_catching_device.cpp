@@ -164,7 +164,7 @@ SerialCatchingDevice::SerialCatchingDevice(unsigned int _uav_id, ros::NodeHandle
                 DeviceToPcData rx = this->rx_critical_.get();
                 this->switch_state_ = rx.switch_state;
                 this->magnet_state_ = rx.magnet_state;
-                std::string magnet_state = "error";
+                /*std::string magnet_state = "error";
                 switch (rx.magnet_state) {
                     case MagnetState::UNKNOWN:
                         magnet_state = "unknown";
@@ -182,7 +182,7 @@ SerialCatchingDevice::SerialCatchingDevice(unsigned int _uav_id, ros::NodeHandle
                 " echo[0]:"  << rx.echo[0] << \
                 " echo[1]:"  << rx.echo[1] << \
                 " switch:"  << rx.switch_state << \
-                " magnet:" << magnet_state << std::endl;
+                " magnet:" << magnet_state << std::endl;*/
                 // Publish switch state
                 std_msgs::Bool switch_state;
                 switch_state.data = this->switch_state_;
