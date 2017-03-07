@@ -103,14 +103,14 @@ void UavStateMachine::step() {
             break;
 
         case uav_state::GOTO_CATCH:
-            waypoint_srv_->send({{target_.global_position.x,
-                                  target_.global_position.y,
-                                  target_.global_position.z}, 0.0}, ts);
-            if (ts == grvc::hal::TaskState::finished) {
+            //waypoint_srv_->send({{target_.global_position.x,
+            //                      target_.global_position.y,
+            //                      target_.global_position.z}, 0.0}, ts);
+            //if (ts == grvc::hal::TaskState::finished) {
                 state_.state = uav_state::CATCHING;
-            } else {
-                state_.state = uav_state::HOVER;
-            }
+            //} else {
+            //    state_.state = uav_state::HOVER;
+            //}
             break;
 
         case uav_state::CATCHING:
@@ -166,29 +166,38 @@ void UavStateMachine::onCatching() {
 
     while (state_.state == uav_state::CATCHING) {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
-        ros::Duration timeout(2.0);  // TODO: from config, in [s]?
+        ros::Duration timeout(1.0);  // TODO: from config, in [s]?
         if (current_altitude_ < 0.15){
             free_fall = false;
             target_position_[2] = 0.0;
 		}
-        if (since_last_candidate < timeout) {
+
+
+        if (since_last_candidate < timeout)  {
             // x-y-control: in candidateCallback
             // z-control: descend
-            if (current_altitude_ < 0.40) {
+            if (current_altitude_ < 1.0) {
                 double xy_error = sqrt(target_position_[0]*target_position_[0] + target_position_[1]*target_position_[1]);
                 if (xy_error < 0.1) {
                     target_position_[2] = -0.22;  // TODO: As a function of x-y error?
-		    free_fall = true;                
-		    } 
-		else {
-                    target_position_[2] = 0.4-current_altitude_;
-                }         
-            } else {
+		            free_fall = true;                
+		            } 
+		        else {
+		            if (!free_fall){
+                        target_position_[2] = 1.0-current_altitude_;
+			            }
+		            else {
+		            	target_position_[2] = -0.22;
+			            }
+                    }         
+            } 
+            else {
                 target_position_[2] = -0.5;  // TODO: As a function of x-y error?
-            }
+                }
             //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
-        } else {
-	    if (!free_fall){	
+        } 
+        else {   // SI NO HAY CANDIDATOS
+	        if (!free_fall){	
         	    // x-y-control slowly goes to 0
        		    target_position_[0] = 0.99*target_position_[0];
         	    target_position_[1] = 0.99*target_position_[1];
@@ -346,12 +355,14 @@ bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::R
 
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::altitudeCallback(const std_msgs::Float64::ConstPtr& _msg){
-    current_altitude_ = _msg->data;
+    //current_altitude_ = _msg->data;
+    
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg){
     std_msgs::Float64 altitude;
     altitude.data = _msg->range;
+    current_altitude_ = altitude.data;    
     lidar_altitude_remapped_pub_.publish(altitude);
 }
 
