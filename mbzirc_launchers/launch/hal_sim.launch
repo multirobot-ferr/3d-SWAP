@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <node name="grvc_hal_quad1" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
+		  args="-hal_ns=/mbzirc_1/hal -mavros_ns=/mavros_1 -uavId=1"/>
+
+    <node name="grvc_hal_quad2" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
+          args="-hal_ns=/mbzirc_2/hal -mavros_ns=/mavros_2 -uavId=2" />
+
+    <node name="grvc_hal_quad3" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
+          args="-hal_ns=/mbzirc_3/hal -mavros_ns=/mavros_3 -uavId=3" />
+
+    <node name="uav_state_machine_1" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
+      args="-uavId=1"/>
+    
+    <node name="uav_state_machine_2" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
+          args="-uavId=2"/>
+
+    <node name="uav_state_machine_3" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
+          args="-uavId=3"/>
+
+</launch>

@@ -28,6 +28,8 @@
 
 #include <mbzirc_scheduler/centralized_estimator.h>
 
+// #define DEBUG_MODE
+
 using namespace std;
 
 namespace mbzirc {
@@ -116,7 +118,7 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 	n_valid_candidates = z_list.size();
 
 	#ifdef DEBUG_MODE
-
+	cout << "Candidates from UAV " << endl;
 	cout << "Distances: " << endl;
 	for(int i = 0; i < distances.size(); i++)
 	{
@@ -125,7 +127,7 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 		cout << endl;
 	}
 	cout << endl;	
-
+	
 	#endif
 
 	// Look for best pairs until running out of candidates or targets

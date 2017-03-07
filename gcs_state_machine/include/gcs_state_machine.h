@@ -30,6 +30,8 @@
 #include <thread>
 
 #include <ros/ros.h>
+#include <geometry_msgs/Point.h>
+#include <uav_state_machine/uav_state.h>
 
 class GcsStateMachine{
 	public: // Public interface
@@ -55,7 +57,9 @@ class GcsStateMachine{
 
 		std::thread state_machine_thread_;
 
-
+		std::vector<uav_state_machine::uav_state> uav_state_;
+		std::vector<ros::Subscriber> uav_state_subscriber_;
+		std::map<int, int> index_to_id_map_;
 
 };	// class GcsStateMachine
 

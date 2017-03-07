@@ -97,6 +97,7 @@ protected:
 	
 	/// Task allocator
 	TaskAllocator* allocator_;
+
 };
 
 /** \brief Constructor
@@ -154,9 +155,7 @@ Scheduler::Scheduler()
 	ros::Rate r(estimator_rate_);
 	ros::Time prev_time, time_now;
 
-	#ifdef DEBUG_MODE
 	int count = 0;
-	#endif
 
 	while(nh_->ok())
 	{
@@ -175,10 +174,6 @@ Scheduler::Scheduler()
 		{
 			if((it->second).size())
 			{
-				#ifdef DEBUG_MODE
-				cout << "Candidates from UAV " << it->first << endl;
-				#endif 
-
 				estimator_->update(it->second);
 
 				// Remove candidates
@@ -195,8 +190,6 @@ Scheduler::Scheduler()
 
 		publishBelief();
 
-		
-		#ifdef DEBUG_MODE
 		if(count == 5)
 		{
 			estimator_->printTargetsInfo();
@@ -204,7 +197,6 @@ Scheduler::Scheduler()
 		}
 		else
 			count++;
-		#endif
 
 		r.sleep();
 	}
@@ -290,7 +282,7 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 
 			cand_p->location(0) = candidate_list->candidates[j].global_position.x;
 			cand_p->location(1) = candidate_list->candidates[j].global_position.y;
-			cand_p->location(1) = candidate_list->candidates[j].global_position.z;
+			cand_p->location(2) = candidate_list->candidates[j].global_position.z;
 
 			for(int i = 0; i < 3; i++)
 			{
@@ -334,32 +326,38 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 	{
 		res.target_id = allocator_->getOptimalTarget(req.uav_id);
 
-		estimator_->getTargetInfo(res.target_id, x, y, target_status, target_color);
-
-		res.global_position.x = x;
-		res.global_position.y = y;
-		res.global_position.z = 0.0;
-
-		switch(target_color)
+		if(res.target_id != -1)
 		{
-			case UNKNOWN:
-			res.color = uav_state_machine::candidate::COLOR_UNKNOWN;
-			break;
-			case RED:
-			res.color = uav_state_machine::candidate::COLOR_RED;
-			break;
-			case BLUE:
-			res.color = uav_state_machine::candidate::COLOR_BLUE;
-			break;
-			case GREEN:
-			res.color = uav_state_machine::candidate::COLOR_GREEN;
-			break;
-			case YELLOW:
-			res.color = uav_state_machine::candidate::COLOR_YELLOW;
-			break;
-			case ORANGE:
-			res.color = uav_state_machine::candidate::COLOR_ORANGE;
-			break;
+			estimator_->getTargetInfo(res.target_id, x, y, target_status, target_color);
+
+			res.global_position.x = x;
+			res.global_position.y = y;
+			res.global_position.z = 0.0;
+
+			switch(target_color)
+			{
+				case UNKNOWN:
+				res.color = uav_state_machine::candidate::COLOR_UNKNOWN;
+				break;
+				case RED:
+				res.color = uav_state_machine::candidate::COLOR_RED;
+				break;
+				case BLUE:
+				res.color = uav_state_machine::candidate::COLOR_BLUE;
+				break;
+				case GREEN:
+				res.color = uav_state_machine::candidate::COLOR_GREEN;
+				break;
+				case YELLOW:
+				res.color = uav_state_machine::candidate::COLOR_YELLOW;
+				break;
+				case ORANGE:
+				res.color = uav_state_machine::candidate::COLOR_ORANGE;
+				break;
+			}
+
+			// Set target to assigned
+			estimator_->setTargetStatus(res.target_id, ASSIGNED);
 		}
 
 		result = true;
@@ -518,8 +516,10 @@ void Scheduler::publishBelief()
 			// Plot target ID
 			marker.ns = "target_id";
 			marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-			marker.text = to_string(active_targets[i]);    
-			marker.scale.z = 0.25;
+			marker.text = to_string(active_targets[i]);
+			marker.pose.position.x += 1.0;
+			marker.pose.position.y += 1.0;    
+			marker.scale.z = 1.0;
 			
 			marker_array.markers.push_back(marker);
 		}
