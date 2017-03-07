@@ -9,4 +9,8 @@ uint8 GOTO_DEPLOY=6
 uint8 GOTO_CATCH=7
 
 # And here message itself:
+uint8 uav_id
 uint8 state
+std_msgs/String 	state_str
+std_msgs/String 	state_msg
+

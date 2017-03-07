@@ -56,7 +56,39 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     state_publisher_ = nh.advertise<uav_state_machine::uav_state>("/mbzirc_" + uav_id + "/uav_state_machine/state", 1);
 	    
     state_pub_thread_ = std::thread([&](){
-        while(ros::ok()){	
+        while(ros::ok()){
+
+            switch(this->state_.state)
+            {
+                case uav_state::REPOSE:
+                this->state_.state_str.data = std::string("REPOSE");
+                break;
+                case uav_state::TAKINGOFF:
+                this->state_.state_str.data = std::string("TAKINGOFF");
+                break;
+                case uav_state::HOVER:
+                this->state_.state_str.data = std::string("HOVER");
+                this->state_.state_msg.data = std::string("");
+                break;
+                case uav_state::SEARCHING:
+                this->state_.state_str.data = std::string("SEARCHING");
+                break;
+                case uav_state::CATCHING:
+                this->state_.state_str.data = std::string("CATCHING");
+                break;
+                case uav_state::LANDING:
+                this->state_.state_str.data = std::string("LANDING");
+                break;
+                case uav_state::GOTO_DEPLOY:
+                this->state_.state_str.data = std::string("GOTO_DEPLOY");
+                break;
+                case uav_state::GOTO_CATCH:
+                this->state_.state_str.data = std::string("GOTO_CATCH");
+                this->state_.state_msg.data = std::to_string(target_.target_id);
+                break;
+            }	
+            this->state_.uav_id = uav_id_;
+
             state_publisher_.publish(this->state_);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }

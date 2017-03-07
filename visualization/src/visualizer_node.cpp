@@ -32,6 +32,7 @@
 #include <std_msgs/String.h>
 #include <uav_state_machine/candidate_list.h>
 #include <grvc_quadrotor_hal/types.h>
+#include <uav_state_machine/uav_state.h>
 
 #include<string>
 #include<vector>
@@ -58,6 +59,7 @@ protected:
 	/// Callbacks
 	void candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list);
 	void uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose);
+    void uavStateReceived(const uav_state_machine::uav_state::ConstPtr& uav_state);
 
 	/// Node handlers
 	ros::NodeHandle* nh_; 
@@ -66,15 +68,18 @@ protected:
 	/// Subscribers
 	vector<ros::Subscriber *> uav_subs_;
 	vector<ros::Subscriber *> candidate_subs_;
+    vector<ros::Subscriber *> uav_state_subs_;
 
 	/// Publishers
 	ros::Publisher scenario_pub_;
     ros::Publisher uavs_pub_;
+    ros::Publisher uavs_state_pub_;
     ros::Publisher candidates_pub_;
 
 	/// Last data received
 	map<int, uav_state_machine::candidate_list> candidates_;
     map<int, grvc::hal::Pose> uavs_poses_;
+    map<int, std::string> uavs_states_;
 
 	/// Number of UAVs
 	int n_uavs_;
@@ -95,7 +100,8 @@ Visualizer::Visualizer()
 	for(int i = 0; i < n_uavs_; i++)
 	{
 		string uav_topic_name = "/mbzirc_" + to_string(i+1) + "/hal/pose";
-		string candidate_topic_name = "mbzirc_" + to_string(i+1) + "/candidateList" ;
+		string candidate_topic_name = "mbzirc_" + to_string(i+1) + "/candidateList";
+        string uav_state_topic_name = "mbzirc_" + to_string(i+1) + "/uav_state_macnine/state" ;
 
 		ros::Subscriber* candidate_sub = new ros::Subscriber();
 		*candidate_sub = nh_->subscribe<uav_state_machine::candidate_list>(candidate_topic_name.c_str(), 1, &Visualizer::candidatesReceived, this);
@@ -104,10 +110,15 @@ Visualizer::Visualizer()
 		ros::Subscriber* uav_sub = new ros::Subscriber();
 		*uav_sub = nh_->subscribe<std_msgs::String>(uav_topic_name.c_str(), 1, &Visualizer::uavPoseReceived, this);
 		uav_subs_.push_back(uav_sub);
+
+        ros::Subscriber* uav_state_sub = new ros::Subscriber();
+		*uav_state_sub = nh_->subscribe<uav_state_machine::uav_state>(uav_state_topic_name.c_str(), 1, &Visualizer::uavStateReceived, this);
+		uav_state_subs_.push_back(uav_state_sub);
 	}
 	
     scenario_pub_ = nh_->advertise<visualization_msgs::Marker>("/mbzirc_markers/scenario", 0);
     uavs_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/mbzirc_markers/uavs", 0);
+    uavs_state_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/mbzirc_markers/uavs_states", 0);
     candidates_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/mbzirc_markers/candidates", 1);
 }
 
@@ -122,11 +133,13 @@ Visualizer::~Visualizer()
 	{
 		delete candidate_subs_[i];
 		delete uav_subs_[i];
+        delete uav_state_subs_[i];
 	}
 	candidates_.clear();
     uavs_poses_.clear();
 	candidate_subs_.clear();
 	uav_subs_.clear();
+    uav_state_subs_.clear();
 }
 
 /** \brief Callback to receive observations from vision module
@@ -154,6 +167,16 @@ void Visualizer::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
 
 	if(0 < uav_id && uav_id <= n_uavs_)
         uavs_poses_[uav_id] = pose;
+}
+
+/** \brief Callback to receive UAVs states
+*/
+void Visualizer::uavStateReceived(const uav_state_machine::uav_state::ConstPtr& uav_state)
+{
+	if(0 < uav_state->uav_id && uav_state->uav_id <= n_uavs_)
+    {
+        uavs_states_[uav_state->uav_id] = uav_state->state_str.data + std::string(" ") + uav_state->state_msg.data;
+    }
 }
 
 /** Publish markers
@@ -189,8 +212,9 @@ void Visualizer::publishMarkers()
 
     scenario_pub_.publish(marker);
 
-    // Publish UAVs
+    // Publish UAVs and states
     visualization_msgs::MarkerArray uav_markers;
+    visualization_msgs::MarkerArray uav_state_markers;
 
     for (int uav_id = 1; uav_id <= n_uavs_; uav_id++)
     {
@@ -243,10 +267,26 @@ void Visualizer::publishMarkers()
             }
 
             uav_markers.markers.push_back(marker);
+
+            marker.ns = "uavs_state";
+            marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+            
+            marker.pose.position.z += 2.0;
+            
+            marker.scale.x = 1;
+            marker.scale.y = 1;
+            marker.scale.z = 1;
+            
+            marker.color.r = 1.0;
+            marker.color.g = 0.0;
+            marker.color.b = 0.0;
+
+            uav_state_markers.markers.push_back(marker);
         }
     }
 
     uavs_pub_.publish(uav_markers);
+    uavs_state_pub_.publish(uav_state_markers);
 
     // Publish candidates
     visualization_msgs::MarkerArray candidate_markers;
