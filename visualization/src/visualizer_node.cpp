@@ -133,10 +133,11 @@ Visualizer::~Visualizer()
 */
 void Visualizer::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
 {
-    if(0 < candidate_list->uav_id && candidate_list->uav_id <= n_uavs_)
+    int uav_id = candidate_list->uav_id;
+    if(0 < uav_id && uav_id <= n_uavs_)
     {
         uav_state_machine::candidate_list candidates = *candidate_list;
-        candidates_[candidate_list->uav_id] = candidates;
+        candidates_[uav_id] = candidates;
     }
 }
 
@@ -148,6 +149,7 @@ void Visualizer::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
 	msg << uav_pose->data;
 	grvc::hal::Pose pose;
 	msg >> pose;
+
 	int uav_id = stoi(pose.id);
 
 	if(0 < uav_id && uav_id <= n_uavs_)
@@ -165,11 +167,11 @@ void Visualizer::publishMarkers()
     marker.ns = "scenario";
     marker.id = 0;
     marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-    marker.mesh_resource = "package://mbzirc_gcs_view/model/stage_02_gazebo.dae";
+    marker.mesh_resource = "package://mbzirc_gcs_view/model/stage_03_gazebo.dae";
     marker.action = visualization_msgs::Marker::ADD;
 
-    marker.pose.position.x = 4;
-    marker.pose.position.y = 7;
+    marker.pose.position.x = 0;
+    marker.pose.position.y = 0;
     marker.pose.position.z = 0;
 
     marker.pose.orientation.x = 0.0;
@@ -182,7 +184,7 @@ void Visualizer::publishMarkers()
     marker.scale.z = 1;
 
     marker.mesh_use_embedded_materials = true;
-    marker.color.a = 1.0;
+    marker.color.a = 0.5;
     marker.lifetime = ros::Duration();
 
     scenario_pub_.publish(marker);
@@ -201,7 +203,7 @@ void Visualizer::publishMarkers()
             marker.id = uav_id;
             marker.ns = "uavs";
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            marker.mesh_resource = "package://grvc_quadrotor_gazebo/model/grvc_quad.dae";
+            marker.mesh_resource = "package://robots_description/models/mbzirc/meshes/multirotor.dae";
             marker.color.a = 1;    
             marker.action = visualization_msgs::Marker::ADD;
 
@@ -213,10 +215,32 @@ void Visualizer::publishMarkers()
             marker.pose.orientation.z = uavs_poses_[uav_id].orientation[2];
             marker.pose.orientation.w = uavs_poses_[uav_id].orientation[3];
 
-            marker.scale.x = 1.0;
-            marker.scale.y = 1.0;
-            marker.scale.z = 1.0;
+            marker.scale.x = 0.001;
+            marker.scale.y = 0.001;
+            marker.scale.z = 0.001;
             marker.mesh_use_embedded_materials = true;
+
+            switch(uav_id)
+            {
+                case 1:
+                // orange
+                marker.color.r = 1.0;
+                marker.color.g = 0.647;
+                marker.color.b = 0.0;
+                break;
+                case 2:
+                // ingigo
+                marker.color.r = 0.294;
+                marker.color.g = 0.0;
+                marker.color.b = 0.510; 
+                break;
+                case 3:
+                // zinc yellow
+                marker.color.r = 0.945;
+                marker.color.g = 0.812;
+                marker.color.b = 0.267;
+                break;
+            }
 
             uav_markers.markers.push_back(marker);
         }
@@ -230,7 +254,8 @@ void Visualizer::publishMarkers()
     for (int uav_id = 1; uav_id <= n_uavs_; uav_id++)
     {
         // If not empty (never received)
-        if(candidates_.find(uav_id) != candidates_.end())
+        auto it = candidates_.find(uav_id);
+        if(it != candidates_.end())
         {
             for(unsigned int i = 0; i < candidates_[uav_id].candidates.size(); i++)
             {
@@ -240,9 +265,43 @@ void Visualizer::publishMarkers()
                 marker.id = i;
                 marker.ns = "uav_" + to_string(uav_id);
                 marker.type = visualization_msgs::Marker::CUBE;
-                marker.color.r = 0.0;
-                marker.color.g = 0.0;
-                marker.color.b = 1.0;
+                marker.lifetime = ros::Duration(1.0);
+
+                // Set color for the target, default if UNKNOWN
+                switch(candidates_[uav_id].candidates[i].color)
+                {
+                    case uav_state_machine::candidate::COLOR_RED:
+                    marker.color.r = 1.0;
+                    marker.color.g = 0.0;
+                    marker.color.b = 0.0;
+                    break;
+                    case uav_state_machine::candidate::COLOR_BLUE:
+                    marker.color.r = 0.0;
+                    marker.color.g = 0.0;
+                    marker.color.b = 1.0;
+                    break;
+                    case uav_state_machine::candidate::COLOR_GREEN:
+                    marker.color.r = 0.0;
+                    marker.color.g = 1.0;
+                    marker.color.b = 0.0;
+                    break;
+                    case uav_state_machine::candidate::COLOR_YELLOW:
+                    marker.color.r = 1.0;
+                    marker.color.g = 1.0;
+                    marker.color.b = 0.0;
+                    break;
+                    case uav_state_machine::candidate::COLOR_ORANGE:
+                    marker.color.r = 1.0;
+                    marker.color.g = 0.65;
+                    marker.color.b = 0.0;
+                    break;
+                    default:
+                    marker.color.r = 0.0;
+                    marker.color.g = 0.0;
+                    marker.color.b = 0.0;
+                    break;
+                }
+
                 marker.color.a = 1;    
                 marker.action = visualization_msgs::Marker::ADD;
 
@@ -264,6 +323,8 @@ void Visualizer::publishMarkers()
                 
                 candidate_markers.markers.push_back(marker);
             }
+
+            candidates_.erase(it);
         }
     }
 
