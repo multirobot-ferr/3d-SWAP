@@ -29,10 +29,12 @@
 #include <grvc_utils/frame_transform.h>
 
 #define Z_GIVE_UP_CATCHING 15.0  // TODO: From config file?
+#define Z_RETRY_CATCH 1.0
 
 using namespace uav_state_machine;
 
 UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(_args) {
+    flying_level_ = _args.getArgument<float>("flying_level", 10.0);
     std::string uav_id = _args.getArgument<std::string>("uavId", "1");
     uav_id_ = atoi(uav_id.c_str());
     ros::NodeHandle nh;
@@ -88,6 +90,9 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
                 this->state_.state_str.data = std::string("GOTO_CATCH");
                 this->state_.state_msg.data = std::to_string(target_.target_id);
                 break;
+                case uav_state::RETRY_CATCH:
+                this->state_.state_str.data = std::string("RETRY_CATCH");
+                break;
             }	
             this->state_.uav_id = uav_id_;
 
@@ -139,7 +144,7 @@ void UavStateMachine::step() {
         case uav_state::GOTO_CATCH:
             waypoint_srv_->send({{target_.global_position.x,
                                   target_.global_position.y,
-                                  target_.global_position.z}, 0.0}, ts);
+                                  flying_level_}, 0.0}, ts);
             if (ts == grvc::hal::TaskState::finished) {
                 state_.state = uav_state::CATCHING;
             } else {
@@ -149,6 +154,17 @@ void UavStateMachine::step() {
 
         case uav_state::CATCHING:
             onCatching();
+            break;
+
+        case uav_state::RETRY_CATCH:
+            waypoint_srv_->send({{target_.global_position.x,
+                                  target_.global_position.y,
+                                  Z_RETRY_CATCH}, 0.0}, ts);
+            if (ts == grvc::hal::TaskState::finished) {
+                state_.state = uav_state::CATCHING;
+            } else {
+                state_.state = uav_state::HOVER;
+            }
             break;
 
         case uav_state::GOTO_DEPLOY:

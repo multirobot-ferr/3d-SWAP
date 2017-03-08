@@ -11,12 +11,12 @@
           args="-hal_ns=/mbzirc_3/hal -mavros_ns=/mavros_3 -uavId=3" />
 
     <node name="uav_state_machine_1" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
-      args="-uavId=1"/>
+      args="-uavId=1 -flying_level=3.0"/>
     
     <node name="uav_state_machine_2" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
-          args="-uavId=2"/>
+          args="-uavId=2 -flying_level=7.0"/>
 
     <node name="uav_state_machine_3" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
-          args="-uavId=3"/>
+          args="-uavId=3 -flying_level=11.0"/>
 
 </launch>

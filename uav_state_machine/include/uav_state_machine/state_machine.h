@@ -103,6 +103,7 @@ private:
     unsigned int waypoint_index_ = 0;
     float current_altitude_ = 0;
     float target_altitude_ = 0;
+    float flying_level_;
     //uav_state_machine::candidate target_;
     uav_state_machine::target_service::Request target_;
     grvc::hal::Waypoint deploy_waypoint_;
