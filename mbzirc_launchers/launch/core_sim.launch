@@ -13,7 +13,7 @@
 
 <!--******************************UAVs****************************************-->
 
-    <arg name="frames" default="$(find mbzirc_launchers)/cfg/map_simulation.xml"/>
+    <arg name="frames" default="~/catkin_ws/src/mbzirc/mbzirc_launchers/cfg/map_simulation.xml"/>
 
     <!-- Launch robot id=1 -->
     <include file="$(find px4_bringup)/launch/spawn_robot.launch">
