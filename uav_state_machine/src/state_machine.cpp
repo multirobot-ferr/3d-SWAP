@@ -28,6 +28,8 @@
 #include <math.h>
 #include <grvc_utils/frame_transform.h>
 
+#define Z_GIVE_UP_CATCHING 15.0  // TODO: From config file?
+
 using namespace uav_state_machine;
 
 UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(_args) {
@@ -237,7 +239,6 @@ void UavStateMachine::onCatching() {
                 target_position_[2] = -0.22;
 		    }
 	    }
-        // TODO: Check max altitude and change state to LOST?
         // Send target_position
         grvc::hal::TaskState ts;
         pos_error_srv_->send(target_position_, ts);
@@ -245,6 +246,18 @@ void UavStateMachine::onCatching() {
         if (catching_device_->switchIsPressed()) {
             state_.state = uav_state::GOTO_DEPLOY;
         }
+
+        // If we're too high, give up
+        if (current_altitude_ > Z_GIVE_UP_CATCHING) {
+            mbzirc_scheduler::SetTargetStatus target_status_call;
+            target_status_call.request.target_id = target_.target_id;
+            target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::LOST;
+            if (!target_status_client_.call(target_status_call)) {
+                ROS_ERROR("Error setting target status to LOST in UAV_%d", uav_id_);
+            }
+            state_.state = uav_state::HOVER;
+        }
+
         // TODO: Review this frequency!
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
