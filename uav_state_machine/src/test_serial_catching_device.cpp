@@ -22,21 +22,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//----------
-#include <uav_state_machine/catching_device.h>
+//------------------------------------------------------------------------------
+#include <ros/ros.h>
 #include <uav_state_machine/serial_catching_device.h>
-#include <uav_state_machine/gazebo_catching_device.h>
 
-CatchingDevice* CatchingDevice::createCatchingDevice(unsigned int _uav_id, ros::NodeHandle& _nh) {
-    CatchingDevice* implementation = nullptr;
-    // Return an implementation based on rosparam 'mavros_spawn/(_uav_id)/mode'
-    std::string param_name = "mavros_spawn/" + std::to_string(_uav_id) + "/mode";
-    std::string mode;
-    _nh.param<std::string>(param_name, mode, "real");  // Get param, default is 'real' mode
-    if (mode == "real") {
-        implementation = new SerialCatchingDevice(_uav_id, _nh);
-    } else if (mode == "sitl") {
-        implementation = new GazeboCatchingDevice(_uav_id, _nh);
-    }
-    return implementation;
+int main(int _argc, char** _argv){
+    std::cout << "Testing SerialCatchingDevice" << std::endl;
+    ros::init(_argc, _argv, "test_node");
+    ros::NodeHandle nh;
+    SerialCatchingDevice catching_device(1, nh);
+    ros::spin();
 }

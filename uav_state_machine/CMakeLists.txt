@@ -67,13 +67,18 @@ if(GRVCQUAD_USE_ROS)
 		${catkin_INCLUDE_DIRS})
 	link_libraries(${catkin_LIBRARIES})
 
-	add_library(catching_device src/catching_device.cpp)
+	add_library(catching_device src/catching_device.cpp src/serial_catching_device.cpp)
 
 endif(GRVCQUAD_USE_ROS)
 
+## Test SerialCatchingDevice
+add_executable(test_serial_catching_device src/test_serial_catching_device.cpp)
+target_include_directories(test_serial_catching_device PUBLIC "include")
+target_link_libraries(test_serial_catching_device catching_device)
+
 ## Declare a C++ executable
-file(GLOB_RECURSE UAV_STATE_MACHINE_SOURCE_FILES "src/*.cpp" "include/*.h" "include/*.inl")
+file(GLOB_RECURSE UAV_STATE_MACHINE_SOURCE_FILES "src/main.cpp" "src/state_machine.cpp" "include/*.h" )
 add_executable(uav_state_machine ${UAV_STATE_MACHINE_SOURCE_FILES})
 target_include_directories(uav_state_machine PUBLIC "include")
-target_link_libraries(uav_state_machine LINK_PUBLIC uav_server)
+target_link_libraries(uav_state_machine LINK_PUBLIC catching_device uav_server)
 link_libraries(uav_state_machine LINK ${GRVCQUADROTOR_LIBRARIES})
