@@ -510,6 +510,10 @@ void Scheduler::publishBelief()
 			marker.scale.x = sqrt(vx*vx+vy*vy);
 			marker.scale.y = 0.1;    
 			marker.scale.z = 0.1;
+			if(marker.scale.x != 0.0)
+			{
+				marker.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(vy,vx));
+			}
 			
 			marker_array.markers.push_back(marker);
 
