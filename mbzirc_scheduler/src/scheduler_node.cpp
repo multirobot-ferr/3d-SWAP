@@ -494,7 +494,7 @@ void Scheduler::publishBelief()
 			marker.scale.y = b;    
 			marker.scale.z = 0.1;
 
-			marker.lifetime = ros::Duration();
+			marker.lifetime = ros::Duration(1.0);
 
 			// Set the central pose of the marker. This is a full 6DOF pose relative to the frame/time specified in the header    
 			marker.pose.position.x = x;
