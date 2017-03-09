@@ -49,12 +49,13 @@ if(GRVCQUAD_USE_ROS)
 	add_definitions(-DGRVC_USE_ROS)
 	
 	find_package(catkin REQUIRED COMPONENTS 
-        grvc_quadrotor_com roscpp sensor_msgs grvc_quadrotor_hal
-        image_transport std_msgs cv_bridge visualization_msgs tf geometry_msgs gazebo_ros)
+        grvc_quadrotor_com grvc_quadrotor_hal roscpp geometry_msgs visualization_msgs
+        image_transport std_msgs cv_bridge uav_state_machine tf gazebo_ros)
 
     find_package(OpenCV REQUIRED COMPONENTS)
 
-    catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com grvc_quadrotor_hal)
+    catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com grvc_quadrotor_hal roscpp geometry_msgs visualization_msgs
+        image_transport std_msgs cv_bridge uav_state_machine tf gazebo_ros)
 
 	include_directories(${catkin_INCLUDE_DIRS})
 endif(GRVCQUAD_USE_ROS)
@@ -62,9 +63,6 @@ endif(GRVCQUAD_USE_ROS)
 #set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../../cmake/modules")
 #FIND_PACKAGE(Eigen3 REQUIRED)
 #INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
-
-#add_executable(createfileworld src/createfileworld.cpp)
-#target_link_libraries(createfileworld LINK_PUBLIC grvc_com)
 
 add_executable(createfileworld src/createfileworld_urdf.cpp)
 target_link_libraries(createfileworld LINK_PUBLIC grvc_com)
@@ -91,3 +89,8 @@ target_link_libraries(take_object ${catkin_LIBRARIES})
 add_executable(moving_object src/moving_object.cpp)
 target_link_libraries(moving_object ${catkin_LIBRARIES})
 
+add_executable(visualizer_node src/visualizer_node.cpp)
+target_link_libraries(visualizer_node ${catkin_LIBRARIES})
+
+add_executable(gazebo_move src/gazebo_move.cpp)
+target_link_libraries(gazebo_move ${catkin_LIBRARIES})

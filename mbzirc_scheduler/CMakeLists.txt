@@ -11,7 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   visualization_msgs
   std_msgs
+  geometry_msgs
   grvc_quadrotor_hal
+  grvc_quadrotor_utils
   uav_state_machine
 )
 
@@ -67,6 +69,7 @@ find_package(Eigen3 REQUIRED)
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
+   geometry_msgs
    std_msgs  # Or other packages containing msgs
  )
 
@@ -102,7 +105,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES mbzirc_target_estimator
-  CATKIN_DEPENDS message_runtime roscpp visualization_msgs grvc_quadrotor_hal std_msgs uav_state_machine tf
+  CATKIN_DEPENDS message_runtime roscpp visualization_msgs grvc_quadrotor_hal grvc_quadrotor_utils std_msgs geometry_msgs uav_state_machine tf
   DEPENDS eigen 
 )
 

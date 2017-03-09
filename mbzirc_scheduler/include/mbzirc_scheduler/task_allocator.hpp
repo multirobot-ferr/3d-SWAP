@@ -37,7 +37,7 @@
 #define ALT_ARENA	60.0
 
 
-enum TargetSelectionMode {NEAREST = 1, LOWER_SCORE_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3};
+enum TargetSelectionMode {NEAREST = 1, HIGHER_PRIORITY_NEAREST = 2, WEIGHTED_SCORE_AND_DISTANCE = 3};
 // NEAREST: get the closest target to the UAV
 // LOWER_SCORE_NEAREST: get the easiest target closest to the UAV
 // WEIGHTED_SCORE_AND_DISTANCE: weight distance and score with a factor
@@ -47,6 +47,7 @@ using namespace std;
 namespace mbzirc {
 
 enum Score {UNKNOWN_S = -1, RED_S = 1, GREEN_S = 2, BLUE_S = 3, YELLOW_S = 5, ORANGE_DOUBLE_S = 10};
+enum Priority {LOW_PRIORITY = -1, BIG_PRIORITY = 1, MOVING_PRIORITY = 2, STATIC_PRIORITY = 3};
 
 // Simple UAV data info
 class Uav
@@ -62,7 +63,8 @@ class Target
 	public:
 	   int id;		// Unique identifier
 	   TargetStatus status;	// Possible status: UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST
-	   Score score;		// Score/Difficulty according to the color 
+	   Score score;		// Score according to the color
+	   double priority; 
 	   double x,y;		// Global Position
 };
 
@@ -95,8 +97,8 @@ class TaskAllocator
 		// Return module of [dx,dy]
 		double getModule(double dx, double dy);
 		
-		// Return the minimum score inside the 'targets' vect
-		Score getMinScore(std::vector<Target> targets_);
+		// Return the maximum priority inside the 'targets' vect
+		double getMaxPriority(std::vector<Target> targets_);
 	
 		// Pointer to the targets interface
 		CentralizedEstimator* targets_estimation_ptr;

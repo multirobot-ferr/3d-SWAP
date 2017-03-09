@@ -27,6 +27,7 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <std_msgs/String.h>
 
 #include <marble/MarbleWidget.h>
 #include <thread>
@@ -55,6 +56,7 @@ private slots:
 private:
     void altitudeCallback(const std_msgs::Float64ConstPtr &_msg);
     void geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg);
+    void halPoseCallback(const std_msgs::String::ConstPtr& _msg);
     void rcMagnetInterruptorCallback(const std_msgs::BoolConstPtr &_msg);
 
     void updateGui();
@@ -71,6 +73,8 @@ private:
     QLCDNumber *mLongitudeBox;
     ros::Subscriber mGeodesicSubscriber;
     double mAltitude, mLongitude, mLatitude;
+    ros::Subscriber mHalPoseSubscriber;
+    grvc::hal::Pose mHalPose;
 
     // Action items --------
     QVBoxLayout *mActionsLayoutUav;
@@ -90,7 +94,7 @@ private:
     QPushButton *mTargetButton;
     QRadioButton *mTargetEnable;
     QSpinBox *mColorSpin;
-    QSpinBox *mShapeSpin;
+    //QSpinBox *mShapeSpin;
 
     // Magnet
     QPushButton *mToggleMagnet;

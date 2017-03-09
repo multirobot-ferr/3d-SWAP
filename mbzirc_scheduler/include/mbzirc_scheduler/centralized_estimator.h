@@ -28,8 +28,6 @@
 #ifndef CENTRALIZED_ESTIMATOR_H_
 #define CENTRALIZED_ESTIMATOR_H_
 
-#define DEBUG_MODE
-
 #include <map>
 #include <vector>
 #include <iostream>
