@@ -5,6 +5,6 @@
 		  args="-hal_ns=/mbzirc_1/hal -mavros_ns=/mavros_1 -uavId=1"/>
 
     <node name="uav_state_machine_1" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
-      args="-uavId=1 -flying_level=11.0"/>
+      args="-uavId=1 -flying_level=3.0"/>
     
 </launch>
