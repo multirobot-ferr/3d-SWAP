@@ -11,6 +11,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include<sstream>
 
 #include <grvc_utils/argument_parser.h>
 
@@ -20,6 +21,7 @@
 #include <uav_state_machine/magnetize_service.h>
 
 #include <ros/ros.h>
+#include <geometry_msgs/Vector3.h>
 
 #include <qt_gcs/LogManager.h>
 
@@ -78,6 +80,17 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
                                        1,
                                        &UavInterface::geodesicCallback,this);
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized subscription to geodesic position.");
+
+    grvc::hal::Pose mHalPose;
+    geometry_msgs::Vector3 mHalPosition;global_position
+
+    mHalPoseSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/hal/pose",
+                                       1,
+                                       [](const std_msgs::String::ConstPtr& _msg) {
+                                            std::stringstream msg;
+                                            msg << _msg->data;
+                                            msg >> mHalPose; });
+    LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized subscription to hal pose.");
 
     // Actions
     mActionsLayoutUav = new QVBoxLayout();
@@ -235,6 +248,11 @@ void UavInterface::targetCallback(){
     call.request.enabled = mTargetEnable->isChecked();
     call.request.color = mColorSpin->value();
     //call.request.shape = mShapeSpin->value();
+    call.global_position.x =  mHalPose.position[0];
+    call.global_position.y =  mHalPose.position[1];
+    call.global_position.z =  mHalPose.position[2];  // Fixed z? 0.0m?
+    call.request.target_id = 1;
+
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending new target to UAV. Color: "+std::to_string(mColorSpin->value()));
     auto res = client.call(call);
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Returned call with result: "+std::to_string(res));

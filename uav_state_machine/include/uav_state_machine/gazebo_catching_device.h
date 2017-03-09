@@ -32,6 +32,8 @@
 #include <std_msgs/Bool.h>
 #include <gazebo_msgs/LinkStates.h>
 #include <gazebo_msgs/LinkState.h>
+#include <sensor_msgs/Range.h>
+#include <std_msgs/Float64.h>
 
 class GazeboCatchingDevice: public CatchingDevice {
 public:
@@ -50,6 +52,16 @@ public:
 
         std::string link_state_pub_topic = "/gazebo/set_link_state";
         link_state_publisher_ = _nh.advertise<gazebo_msgs::LinkState>(link_state_pub_topic, 1);
+
+        std::string lidar_altitude_pub_topic = "/mavros_" + std::to_string(_uav_id) + "/distance_sensor/lidarlite_pub";
+        lidar_altitude_pub_ = _nh.advertise<sensor_msgs::Range>(lidar_altitude_pub_topic, 1);
+
+        std::string altitude_sub_topic = "/mavros_" + std::to_string(_uav_id) + "/global_position/rel_alt";
+        altitude_sub_ = _nh.subscribe<std_msgs::Float64>(altitude_sub_topic, 10, [this](const std_msgs::Float64::ConstPtr& _msg){
+            sensor_msgs::Range fake_lidar;
+            fake_lidar.range = _msg->data;
+            this->lidar_altitude_pub_.publish(fake_lidar);
+        });
 
         pub_thread_ = std::thread([&](){
             while (ros::ok()) {
@@ -103,6 +115,8 @@ protected:
     ros::ServiceServer magnetize_service_;
     ros::Subscriber link_states_subscriber_;
     ros::Publisher link_state_publisher_;
+    ros::Publisher lidar_altitude_pub_;
+    ros::Subscriber altitude_sub_;
     std::thread pub_thread_;
 
     std::string robot_link_name_;
