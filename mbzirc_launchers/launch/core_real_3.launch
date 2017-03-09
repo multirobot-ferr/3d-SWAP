@@ -6,7 +6,7 @@
     <!-- Launch robot id=3 -->
     <include file="$(find px4_bringup)/launch/spawn_robot.launch">
         <arg name="id" value="3"/>
-	    <arg name="mode" value="3"/>
+	    <arg name="mode" value="real"/>
         <arg name="material" value="ZincYellow"/>
 	    <arg name="frames" value="$(arg frames)"/>
     </include>
