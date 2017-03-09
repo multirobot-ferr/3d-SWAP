@@ -304,11 +304,16 @@ void UavStateMachine::onGoToDeploy() {
         waypoint_srv_->send(down_waypoint, ts);  // Blocking!
         // Demagnetize catching device
         catching_device_->setMagnetization(false);
+        // TODO Check !catching_device_->switchIsPressed()
         // Update target status to DEPLOYED
         target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::DEPLOYED;
 		if (!target_status_client_.call(target_status_call)) {
 		    ROS_ERROR("Error setting target status to DEPLOYED in UAV_%d", uav_id_);
 		}
+        up_waypoint = current_position_waypoint_;
+        up_waypoint.pos.z() = flying_level_;
+        waypoint_srv_->send(up_waypoint, ts);  // Blocking!
+        state_.state = uav_state::HOVER;
     } else {
         std::cout << "Miss the catch, try again!" << std::endl;
         state_.state = uav_state::CATCHING;
