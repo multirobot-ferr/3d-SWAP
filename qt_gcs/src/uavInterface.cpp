@@ -81,15 +81,9 @@ UavInterface::UavInterface(int _argc, char** _argv, int _index, Marble::MarbleWi
                                        &UavInterface::geodesicCallback,this);
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized subscription to geodesic position.");
 
-    grvc::hal::Pose mHalPose;
-    geometry_msgs::Vector3 mHalPosition;global_position
-
-    mHalPoseSubscriber = nh.subscribe("/mavros_"+std::to_string(_index)+"/hal/pose",
+    mHalPoseSubscriber = nh.subscribe("/mbzirc_"+std::to_string(_index)+"/hal/pose",
                                        1,
-                                       [](const std_msgs::String::ConstPtr& _msg) {
-                                            std::stringstream msg;
-                                            msg << _msg->data;
-                                            msg >> mHalPose; });
+                                       &UavInterface::halPoseCallback,this);
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Initialized subscription to hal pose.");
 
     // Actions
@@ -248,9 +242,9 @@ void UavInterface::targetCallback(){
     call.request.enabled = mTargetEnable->isChecked();
     call.request.color = mColorSpin->value();
     //call.request.shape = mShapeSpin->value();
-    call.global_position.x =  mHalPose.position[0];
-    call.global_position.y =  mHalPose.position[1];
-    call.global_position.z =  mHalPose.position[2];  // Fixed z? 0.0m?
+    call.request.global_position.x =  mHalPose.position[0];
+    call.request.global_position.y =  mHalPose.position[1];
+    call.request.global_position.z =  mHalPose.position[2];  // Fixed z? 0.0m?
     call.request.target_id = 1;
 
     LogManager::get()->status("UAV_"+std::to_string(mUavId), "Sending new target to UAV. Color: "+std::to_string(mColorSpin->value()));
@@ -339,6 +333,14 @@ void UavInterface::altitudeCallback(const std_msgs::Float64ConstPtr &_msg) {
 void UavInterface::geodesicCallback(const sensor_msgs::NavSatFixConstPtr &_msg) {
     mLatitude = _msg->latitude;
     mLongitude = _msg->longitude;
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+void UavInterface::halPoseCallback(const std_msgs::String::ConstPtr& _msg) {
+    std::stringstream msg;
+    msg << _msg->data;
+    msg >> mHalPose;
+    //std::cout << "mHalPose: " << mHalPose.position[0] << ", " << mHalPose.position[1] << ", " << mHalPose.position[2] << std::endl;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
