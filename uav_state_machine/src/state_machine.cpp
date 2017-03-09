@@ -299,7 +299,7 @@ void UavStateMachine::onGoToDeploy() {
 		}
         // TODO: Go to closest deploy point and check dropping zone is free
         waypoint_srv_->send(deploy_waypoint_, ts);  // Blocking!
-        grvc::hal::Waypoint down_waypoint = current_position_waypoint_;
+        grvc::hal::Waypoint down_waypoint = deploy_waypoint_;
         down_waypoint.pos.z() = 3.0;  // TODO: Altitude as a parameter
         waypoint_srv_->send(down_waypoint, ts);  // Blocking!
         // Demagnetize catching device
