@@ -71,6 +71,8 @@ private:
     QLCDNumber *mLongitudeBox;
     ros::Subscriber mGeodesicSubscriber;
     double mAltitude, mLongitude, mLatitude;
+    ros::Subscriber mHalPoseSubscriber;
+    grvc::hal::Pose mHalPose;
 
     // Action items --------
     QVBoxLayout *mActionsLayoutUav;
