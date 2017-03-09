@@ -31,4 +31,11 @@
 		<z>0.5</z>
 		<yaw>0.0</yaw>
 	</robothome>
+	<!-- Game limits -->
+	<game_limits>
+			<x_min>-35</x_min>
+			<x_max>22</x_max>
+			<y_min>3</y_min>
+			<y_max>40</y_max>
+	</game_limits>
 </frames>

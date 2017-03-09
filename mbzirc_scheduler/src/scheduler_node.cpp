@@ -38,6 +38,7 @@
 #include <uav_state_machine/candidate_list.h>
 #include <grvc_quadrotor_hal/types.h>
 #include <tf/transform_datatypes.h>
+#include <grvc_utils/frame_transform.h>
 
 #include<string>
 #include<vector>
@@ -232,6 +233,7 @@ Scheduler::~Scheduler()
 void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
 {
 	double delay = (ros::Time::now() - candidate_list->stamp).toSec();
+	grvc::utils::frame_transform frameTransform;
 
 	if(candidate_list->candidates.size() && delay < delay_max_)
 	{
@@ -250,49 +252,53 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 		// Store received candidates
 		for(int j = 0; j < candidate_list->candidates.size(); j++)
 		{
-			Candidate* cand_p = new Candidate;
-
-			switch(candidate_list->candidates[j].color)
+			// Check if candidate pose is in the game field
+			if( frameTransform.isInGameField( grvc::utils::constructPoint(candidate_list->candidates[j].global_position.x,candidate_list->candidates[j].global_position.y,candidate_list->candidates[j].global_position.z) ) )
 			{
-				case uav_state_machine::candidate::COLOR_UNKNOWN:
-				cand_p->color = UNKNOWN;
-				break;
-				case uav_state_machine::candidate::COLOR_RED:
-				cand_p->color = RED;
-				break;
-				case uav_state_machine::candidate::COLOR_BLUE:
-				cand_p->color = BLUE;
-				break;
-				case uav_state_machine::candidate::COLOR_GREEN:
-				cand_p->color = GREEN;
-				break;
-				case uav_state_machine::candidate::COLOR_YELLOW:
-				cand_p->color = YELLOW;
-				break;
-				case uav_state_machine::candidate::COLOR_ORANGE:
-				cand_p->color = ORANGE;
-				break;
-				default:
-				ROS_ERROR("Invalid candidate color received.");
-			}
+				Candidate* cand_p = new Candidate;
 
-			cand_p->shape = candidate_list->candidates[j].shape;
-			cand_p->height = candidate_list->candidates[j].height;
-			cand_p->width = candidate_list->candidates[j].width;
-
-			cand_p->location(0) = candidate_list->candidates[j].global_position.x;
-			cand_p->location(1) = candidate_list->candidates[j].global_position.y;
-			cand_p->location(2) = candidate_list->candidates[j].global_position.z;
-
-			for(int i = 0; i < 3; i++)
-			{
-				for(int k = 0; k < 3; k++)
+				switch(candidate_list->candidates[j].color)
 				{
-					cand_p->locationCovariance(i,k) = candidate_list->candidates[j].position_covariance[i*3+k];
-				}	
-			}			
+					case uav_state_machine::candidate::COLOR_UNKNOWN:
+					cand_p->color = UNKNOWN;
+					break;
+					case uav_state_machine::candidate::COLOR_RED:
+					cand_p->color = RED;
+					break;
+					case uav_state_machine::candidate::COLOR_BLUE:
+					cand_p->color = BLUE;
+					break;
+					case uav_state_machine::candidate::COLOR_GREEN:
+					cand_p->color = GREEN;
+					break;
+					case uav_state_machine::candidate::COLOR_YELLOW:
+					cand_p->color = YELLOW;
+					break;
+					case uav_state_machine::candidate::COLOR_ORANGE:
+					cand_p->color = ORANGE;
+					break;
+					default:
+					ROS_ERROR("Invalid candidate color received.");
+				}
 
-			candidates_[uav].push_back(cand_p); 
+				cand_p->shape = candidate_list->candidates[j].shape;
+				cand_p->height = candidate_list->candidates[j].height;
+				cand_p->width = candidate_list->candidates[j].width;
+
+				cand_p->location(0) = candidate_list->candidates[j].global_position.x;
+				cand_p->location(1) = candidate_list->candidates[j].global_position.y;
+				cand_p->location(2) = candidate_list->candidates[j].global_position.z;
+
+				for(int i = 0; i < 3; i++)
+				{
+					for(int k = 0; k < 3; k++)
+					{
+						cand_p->locationCovariance(i,k) = candidate_list->candidates[j].position_covariance[i*3+k];
+					}	
+				}			
+
+				candidates_[uav].push_back(cand_p);
+			}
 		}
 	}
 	else
