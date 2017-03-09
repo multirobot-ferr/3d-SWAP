@@ -86,6 +86,9 @@
 <!--UAV id-->
 <UavId>3</UavId>
 
+<!-- Covariance of candidates -->
+<CovarianceCandidates> 5.0 </CovarianceCandidates>
+
 <!--Max and min side of the bounding box allowed for the candidates from the segmentation-->
 <MinObjectSize>0.05</MinObjectSize>
 <MaxObjectSize>1.5</MaxObjectSize>
