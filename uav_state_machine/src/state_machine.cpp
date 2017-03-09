@@ -24,6 +24,7 @@
 // SOFTWARE.
 //----------
 #include <uav_state_machine/state_machine.h>
+#include<sstream>
 #include <thread>
 #include <math.h>
 #include <grvc_utils/frame_transform.h>
@@ -45,7 +46,8 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     target_service_    = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/enabled",  &UavStateMachine::targetServiceCallback, this);
     target_status_client_ = nh.serviceClient<mbzirc_scheduler::SetTargetStatus>("/scheduler/set_target_status");
 
-    position_sub_ = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_" + uav_id + "/local_position/pose", 10, &UavStateMachine::positionCallback, this);
+    //position_sub_ = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_" + uav_id + "/local_position/pose", 10, &UavStateMachine::positionCallback, this);
+	position_sub_ = nh.subscribe<std_msgs::String>("/mbzirc_" + uav_id + "/hal/pose", 10, &UavStateMachine::positionCallback, this);
     altitude_sub_ = nh.subscribe<std_msgs::Float64>("/mavros_" + uav_id + "/global_position/rel_alt", 10, &UavStateMachine::altitudeCallback, this);
     lidar_altitude_sub_ = nh.subscribe<sensor_msgs::Range>("/mavros_" + uav_id + "/distance_sensor/lidarlite_pub", 10, &UavStateMachine::lidarAltitudeCallback, this);
     lidar_altitude_remapped_pub_ = nh.advertise<std_msgs::Float64>("/mbzirc_" + uav_id + "/uav_state_machine/lidar_altitude", 1);
@@ -421,14 +423,28 @@ void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& 
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
-void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg) {
+/*void UavStateMachine::positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg) {
     // TODO: Make an util for quaternion to euler conversion? Eigen?
     double yaw = 2*atan2(_msg->pose.orientation.z, _msg->pose.orientation.w);
     // Move yaw to [-pi, pi]; as atan2 output is in [-pi, pi], yaw is initially in [-2*pi, 2*pi]
     if (yaw < -M_PI) yaw += 2*M_PI;
     if (yaw >  M_PI) yaw -= 2*M_PI;
     current_position_waypoint_ = {{_msg->pose.position.x, _msg->pose.position.y, _msg->pose.position.z}, yaw};
+}*/
+
+void UavStateMachine::positionCallback(const std_msgs::String::ConstPtr& _msg) {
+	std::stringstream msg;
+	msg << _msg->data;
+	grvc::hal::Pose pose;
+	msg >> pose;
+    // TODO: Make an util for quaternion to euler conversion? Eigen?
+    double yaw = 2*atan2(pose.orientation[2], pose.orientation[3]);
+    // Move yaw to [-pi, pi]; as atan2 output is in [-pi, pi], yaw is initially in [-2*pi, 2*pi]
+    if (yaw < -M_PI) yaw += 2*M_PI;
+    if (yaw >  M_PI) yaw -= 2*M_PI;
+    current_position_waypoint_ = {{pose.position[0], pose.position[1], pose.position[2]}, yaw};
 }
+
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::joyCallback(const sensor_msgs::Joy::ConstPtr& _joy) {
     target_altitude_ = current_altitude_ + _joy->axes[1];
