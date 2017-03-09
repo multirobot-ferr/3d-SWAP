@@ -117,7 +117,7 @@ Scheduler::Scheduler()
 	pnh_->param<double>("lost_time_th", lost_time_th, 20.0); 
 	pnh_->param<double>("association_th", association_th, 6.0);
 	pnh_->param<double>("delay_max", delay_max_, 2.0);
-	pnh_->param<int>("task_alloc_mode",task_alloc_mode, LOWER_SCORE_NEAREST);
+	pnh_->param<int>("task_alloc_mode",task_alloc_mode, HIGHER_PRIORITY_NEAREST);
 	pnh_->param<double>("task_alloc_alpha",task_alloc_alpha, 0.8);
 	pnh_->param<int>("n_uavs",n_uavs_, 3);
 

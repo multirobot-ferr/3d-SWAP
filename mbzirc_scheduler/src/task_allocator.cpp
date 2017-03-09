@@ -118,21 +118,27 @@ int TaskAllocator::getOptimalTarget(int id)
 			{
 				case UNKNOWN: 
 				tmp_target.score = UNKNOWN_S;
+				tmp_target.priority = LOW_PRIORITY;
 				break;
 				case RED:
 				tmp_target.score = RED_S;
+				tmp_target.priority = STATIC_PRIORITY + tmp_target.score;
 				break;
 				case GREEN:
 				tmp_target.score = GREEN_S;
+				tmp_target.priority = STATIC_PRIORITY + tmp_target.score;
 				break;
 				case BLUE:
 				tmp_target.score = BLUE_S;
+				tmp_target.priority = STATIC_PRIORITY + tmp_target.score;
 				break;
 				case YELLOW:
 				tmp_target.score = YELLOW_S;
+				tmp_target.priority = MOVING_PRIORITY;
 				break;
 				case ORANGE:
 				tmp_target.score = YELLOW_S;
+				tmp_target.priority = BIG_PRIORITY;
 				break;
 			}
 			targets.push_back(tmp_target);
@@ -141,8 +147,8 @@ int TaskAllocator::getOptimalTarget(int id)
 	
 	// Get optimal target: lower difficulty and/or nearest target in 'targets', according to selected mode
 	int optimal_target_id = -1; 					// Optimal target result
+	double max_priority = getMaxPriority(targets);
 	double minimum_distance = std::numeric_limits<double>::max();	// Minimum distance in all or a group of estimated targets
-	Score minimum_difficult = getMinScore(targets);			// Minimum score (difficult) in estimated targets
 	double distance = std::numeric_limits<double>::max(); 		// Distance from UAV to targets
 	double norm_distance = std::numeric_limits<double>::max();	// Normalized distance from UAV to targets according to the Arena field dimensions
 	double norm_score = ORANGE_DOUBLE_S;					// Normalized score according to the maximum difficult
@@ -150,8 +156,6 @@ int TaskAllocator::getOptimalTarget(int id)
 	double Jmin = std::numeric_limits<double>::max();		// Minimum ratio between distance and difficult
 	
 	TargetSelectionMode tmp_mode = mode;
-	if(minimum_difficult == UNKNOWN_S)	// if all targets difficult are unknown, set NEAREST mode by default
-		tmp_mode = NEAREST;
 	
 	for(int i = 0; i < targets.size(); i++)
 	{
@@ -160,7 +164,8 @@ int TaskAllocator::getOptimalTarget(int id)
 			case NEAREST:
 				
 				// Only by distance (lower)
-				distance = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y);
+				distance = getModule(targets[i].x - uav[id-1].x, targets[i].y - uav[id-1].y);
+				
 				if(distance < minimum_distance)
 				{
 					minimum_distance = distance;
@@ -168,12 +173,13 @@ int TaskAllocator::getOptimalTarget(int id)
 				}
 				break;
 			
-			case LOWER_SCORE_NEAREST:
+			case HIGHER_PRIORITY_NEAREST:
 				
-				// By difficulty (lower) and after distance (lower)
-				if(targets[i].score == minimum_difficult)
+				// By priority (higher) and after distance (lower)
+				
+				if(targets[i].priority == max_priority) 
 				{
-					distance = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y);
+					distance = getModule(targets[i].x - uav[id-1].x, targets[i].y - uav[id-1].y);
 					if(distance < minimum_distance)
 					{
 						minimum_distance = distance;
@@ -186,10 +192,10 @@ int TaskAllocator::getOptimalTarget(int id)
 			case WEIGHTED_SCORE_AND_DISTANCE:
 				
 				// Weighted Selection
-				norm_distance = getModule(targets[i].x - uav[id].x, targets[i].y - uav[id].y)/maximum_distance;
+				norm_distance = getModule(targets[i].x - uav[id-1].x, targets[i].y - uav[id-1].y)/maximum_distance;
 				norm_score = (double)targets[i].score/(double)ORANGE_DOUBLE_S;
 				
-				J = alpha * norm_distance + (1.0-alpha) * norm_score;
+				J = alpha * norm_distance - (1.0-alpha) * norm_score;
 				
 				if(J < Jmin)
 				{
@@ -204,7 +210,6 @@ int TaskAllocator::getOptimalTarget(int id)
 				exit(0);
 		}
 	}
-	
 	
 	// Clean vars
 	targets.clear();
@@ -222,27 +227,20 @@ double TaskAllocator::getModule(double dx, double dy)
 	return sqrtf(dx*dx+dy*dy);
 }
 
-// Auxiliar function that returns the minimum score inside the 'targets' vect
-Score TaskAllocator::getMinScore(std::vector<Target> targets_)
+// Auxiliar function that returns the maximum priority inside the 'targets' vect
+double TaskAllocator::getMaxPriority(std::vector<Target> targets_)
 {
-	Score min_score = ORANGE_DOUBLE_S; // maximum 
-	bool one_known_at_least = false;
+	double max_priority = LOW_PRIORITY; // minimum 
+
 	for(int i = 0; i < targets_.size(); i++)
 	{
-		if(targets_[i].score != UNKNOWN_S)
+		if(targets_[i].priority > max_priority)
 		{
-			one_known_at_least = true;
-			if(targets_[i].score < min_score)
-				min_score = targets_[i].score;
+			max_priority = targets_[i].priority;
 		}
-		
 	}
 	
-	if(one_known_at_least)
-		return min_score;
-	else
-		return UNKNOWN_S;
+	return max_priority;
 }
-
 
 }

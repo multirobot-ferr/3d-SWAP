@@ -7,7 +7,7 @@
 	<param name="lost_time_th" value="20.0" />      <!-- in seconds -->
 	<param name="association_th" value="6.0" />
 	<param name="delay_max" value="2.0" />          <!-- in seconds -->
-	<param name="task_alloc_mode" value="1" />	<!-- NEAREST -->
+	<param name="task_alloc_mode" value="2" />	<!-- HIGHER_PRIORITY_NEAREST -->
 	<param name="task_alloc_alpha" value="0.8" />   
 	<param name="n_uavs" value="3" />
    </node>
