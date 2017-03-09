@@ -65,7 +65,8 @@ private:
     bool targetServiceCallback(uav_state_machine::target_service::Request  &req,
          uav_state_machine::target_service::Response &res);
 
-    void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
+    //void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
+    void positionCallback(const std_msgs::String::ConstPtr& uav_pose);
     void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
     void lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg);
     void joyCallback(const sensor_msgs::Joy::ConstPtr& _joy);

@@ -40,7 +40,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 <!--******************************UAVs****************************************-->
 
-    <arg name="frames" default="$(find mbzirc_launchers)/cfg/map_simulation.xml"/>
+    <arg name="frames" default="/cfg/map_simulation.xml"/>
     <param name="frames_file" type="str" value="$(arg frames)" />
 
     <!-- Launch robot id=1 -->
