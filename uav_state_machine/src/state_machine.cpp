@@ -112,7 +112,7 @@ bool UavStateMachine::init() {
     std::cout << "Connected to hal" << std::endl;
 
     grvc::utils::frame_transform frameTransform;
-    geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(-24.0,30.0,3.0));
+    geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(5.6,20.7,3.0));
     deploy_waypoint_.pos.x() = deploy_point.x;
     deploy_waypoint_.pos.y() = deploy_point.y;
     deploy_waypoint_.pos.z() = deploy_point.z;

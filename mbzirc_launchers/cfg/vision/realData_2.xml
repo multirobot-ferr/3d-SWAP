@@ -57,14 +57,14 @@
 	  <data>
 	    <!-- Rotation is composed (by cols) for the vectors of the Camera CS in Drone CS-->
             <!-- Translation is composed by the postion of the desired center in Camera CS-->
-	    -1.0 0.0 0 0.0
-	    0.0 1.0 0.0 0.0
+	    -1.0 0.0 0 0.05
+	    0.0 1.0 0.0 -0.05
 	    0 0.0 -1.0 0.0
 	    0.0 0.0 0.0 1.0 </data></CameraTransformation>
 </CameraConfig>
 
 <!--Path to the configuration of the file for segmentation of color-->
-<ccsConfig>../config/ccsRGBYO.json</ccsConfig>
+<ccsConfig>../cfg/vision/ccsRGBYO.json</ccsConfig>
 
 <!--Name of topic with PoseStamped message that contains the rotation of the UAV-->
 <UavPoseTopic>/mavros_2/local_position/pose</UavPoseTopic>
