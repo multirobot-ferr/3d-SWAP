@@ -112,10 +112,10 @@ bool UavStateMachine::init() {
     std::cout << "Connected to hal" << std::endl;
 
     grvc::utils::frame_transform frameTransform;
-    geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(-24.0,30.0,3.0));
+    geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(5.6,20.7,3.0));
     deploy_waypoint_.pos.x() = deploy_point.x;
     deploy_waypoint_.pos.y() = deploy_point.y;
-    deploy_waypoint_.pos.z() = deploy_point.z;
+    deploy_waypoint_.pos.z() = flying_level_;
     //deploy_waypoint_.yaw = current_position_waypoint_.yaw;
 
     return true;
@@ -297,6 +297,9 @@ void UavStateMachine::onGoToDeploy() {
 		}
         // TODO: Go to closest deploy point and check dropping zone is free
         waypoint_srv_->send(deploy_waypoint_, ts);  // Blocking!
+        grvc::hal::Waypoint down_waypoint = current_position_waypoint_;
+        down_waypoint.pos.z() = 3.0;  // TODO: Altitude as a parameter
+        waypoint_srv_->send(down_waypoint, ts);  // Blocking!
         // Demagnetize catching device
         catching_device_->setMagnetization(false);
         // Update target status to DEPLOYED
