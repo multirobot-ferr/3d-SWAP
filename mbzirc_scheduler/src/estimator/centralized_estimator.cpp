@@ -166,15 +166,32 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 			#ifdef DEBUG_MODE
 			cout << "Candidate " << z_list[best_pair.second]->location(0) << "," << z_list[best_pair.second]->location(1) << ". New target " << track_id_count_ << ", with distance " << min_dist << endl;
 			#endif
+			int new_target_id = track_id_count_++;
+			targets_[new_target_id] = new TargetTracker(new_target_id);
+			targets_[new_target_id]->initialize(z_list[best_pair.second]);
 
-			targets_[track_id_count_] = new TargetTracker(track_id_count_);
-			targets_[track_id_count_++]->initialize(z_list[best_pair.second]);		
+			// Include new target's distances
+			valid_targets.push_back(new_target_id);
+			n_valid_targets++;
+
+			vector<double> t_distances;
+			double likelihood;
+
+			for(int i = 0; i < z_list.size(); i++)
+			{
+				if(valid_candidates[i] != -1)
+				{		
+					likelihood = targets_[new_target_id]->getLikelihood(z_list[i]);
+					t_distances.push_back(likelihood);
+				}
+				else
+					t_distances.push_back(-1.0);
+			}
+
+			distances.push_back(t_distances);			
 		}
 
-		// Update with best pair and remove it
-		valid_targets[best_pair.first] = -1;
 		valid_candidates[best_pair.second] = -1;
-		n_valid_targets--;
 		n_valid_candidates--;
 	}
 
