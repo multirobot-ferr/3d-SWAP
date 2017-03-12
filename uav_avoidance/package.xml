@@ -8,6 +8,22 @@
   avoid the conflict creating a virtual roundabout.
   
   The system was created only for colaborative uavs.
+  Since the system is designed to work in parallel to a state machine, and not
+  under it, the state machine can decide to not take the orders from swap, risking
+  the uav to a collision.
+
+  Based in the work:
+     http://dx.doi.org/10.1016/j.robot.2017.01.008
+
+     @article{ferrera2017decentralized,
+      title={Decentralized safe conflict resolution for multiple robots in dense scenarios},
+      author={Ferrera, Eduardo and Capit{\'a}n, Jesus and Casta{\~n}o, Angel R and Marr{\'o}n, Pedro J},
+      journal={Robotics and Autonomous Systems},
+      year={2017},
+     publisher={Elsevier}
+     }
+
+  Please cite.
   </description>
 
   <author email="eduardo.ferrera@uni-due.de">		Eduardo Ferrera	</author>
@@ -16,16 +32,19 @@
 
   <license>BSD</license>
 
-
   <buildtool_depend>catkin</buildtool_depend>
 
+  <!-- Build dependencies -->
   <build_depend>roscpp</build_depend>
   <build_depend>grvc_quadrotor_hal</build_depend>
+  <build_depend>grvc_utils</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>armadillo</build_depend>
 
+  <!-- Run dependencies -->
   <run_depend>roscpp</run_depend>
   <run_depend>grvc_quadrotor_hal</run_depend>
+  <run_depend>grvc_utils</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>armadillo</run_depend>
   

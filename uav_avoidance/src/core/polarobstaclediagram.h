@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, swap-ferr
+ * Copyright (c) 2017, University of Duisburg-Essen, swap-ferr
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -92,15 +92,15 @@ namespace avoid
     class PolarObstacleDiagram
     {
         public:
-//            /**
-//             * @brief Default constructor
-//             */
-//            PolarObstacleDiagram();
-//
-//            /**
-//             * @brief Default destructor
-//             */
-//            virtual ~PolarObstacleDiagram();
+            /**
+             * @brief Default constructor
+             */
+            PolarObstacleDiagram();
+
+            /**
+             * @brief Default destructor
+             */
+            virtual ~PolarObstacleDiagram();
 
             /**
              * @brief Structure that helps to print the full POD
@@ -219,13 +219,26 @@ namespace avoid
             void SetBrackingDistance( const double bracking_distance);
 
             /**
-             * @brief Sets the Ranger Error inside the POD
+             * @brief Sets the Local Measurement Error inside the POD
              *
-             * The Ranger Error is the maximum error that a single measurement of your ranger
+             * The Local Measurement Error is the maximum error that a single measurement a local device (like your ranger)
              * could have.
-             * @param Value of the ranger_error
+             * @param Value of the local_measurement_error
+             * @note This value inflates even more the obstacles
              */
-            void SetRangerError( const double error);
+            void SetLocalMeasurementError( const double error);
+
+            /**
+             * @brief Sets the Global Measurement Error inside the POD
+             *
+             * The Global Measurement Error is the maximum error that a single measurement in a global measurement
+             * device (like the positioning error when you share your position) can have.
+             * @param Value of the global_measurement_error
+             * @return Success of the operation
+             * @note This value inflates even more the obstacles
+             * @note The local_measurement_error should be set first.
+             */
+            bool SetGlobalMeasurementError( const double error);
 
             /**
              * @brief Sets the GammaOffset inside the POD
@@ -295,10 +308,10 @@ namespace avoid
             int CircularIndex( int idx, int idx_max);
 
             /**
-             * @brief The function returns the difference between the desited avoidance distance and the real distance
+             * @brief The function returns the difference between the desited avoidance distance and the real distance in a normalized way
              *
              * Swap tryes to keep a distance between obstacles. In order to keep this distance, the error of distance
-             * should be measured.
+             * should be measured. This error is returned normalized.
              * @param angle_conflict Angle where a conflict was previously located
              * @return Error in distance.
              */
@@ -317,7 +330,8 @@ namespace avoid
             double   multi_input_pond_  = -1.0; //<[#] Ponderation between measurements [0.0,1.0]
             bool     r_safety_set_ = false;     //!< Tracks if r_safety_region was set or not
             double   bracking_distance_ = +0.0; //<[m] Distance to fully stop a robot (larger than zero)
-            double   ranger_error_ = -1.0;      //<[m] Maximum possible error of a ranger measurement
+            double   local_measurement_error_ = -1.0;  //<[m] Maximum possible error of a local measurement (like a ranger measurement)
+            double   global_measurement_error_ = -1.0; //<[m] Maximum possible error of a global measurement (like the one comming from a communication system)
             double   gamma_offset_ = -1.0;      //<[m] Offset to take into account other potential errors
 
             // Smoothing variables

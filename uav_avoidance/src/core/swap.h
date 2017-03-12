@@ -68,7 +68,7 @@
  * measurements that a laser-ranger reader with noise sends to swap and
  * able to filter out some of the noise using a filtering system.
  */
-#include <polarobstaclediagram.h>
+#include "polarobstaclediagram.h"
 
 namespace avoid
 {
@@ -76,15 +76,15 @@ namespace avoid
     class Swap: public PolarObstacleDiagram
     {
         public:
-//            /**
-//             * @brief Constructor of the class
-//             *
-//             * Initializes all the variables
-//             */
-//            Swap();
-//
-//            /** Default destructor */
-//            virtual ~Swap();
+            /**
+             * @brief Constructor of the class
+             *
+             * Initializes all the variables
+             */
+            Swap();
+
+            /** Default destructor */
+            virtual ~Swap();
 
             /**
              * @brief IsReady returns if swap is well configurated or not. And if not, explains why.
@@ -133,6 +133,26 @@ namespace avoid
               * @param goal_lateral_vision value
               */
              void SetGoalLateralVision( double goal_lateral_vision);
+
+             /**
+              * @brief Informs to swap if the robot is holonomic (false configured as default)
+              *
+              * Swap tryes to reduce the speed if the robot is not well oriented to the desired
+              * direction. This does not happens if holonomic is set to true
+              * @param holonomic_robot value
+              */
+             void SetHolonomicRobot( bool holonomic_robot);
+
+             /**
+              * @brief Configures the value of the rotation control proportional
+              *
+              * This value is used to make the robots remain at certain distance of
+              * the obstacles arround while avoiding. This means that can drive away
+              * if they are too close, but also drive to the obstacle if is too far.
+              * Acts like the P of a PID
+              * @brief rotation control proportional value
+              */
+             void SetRotCtrlP( double rot_ctrl_P);
 
              /* ****************************************************************************
               * GETTER                                                                     *
@@ -199,7 +219,7 @@ namespace avoid
 
             // Conflict dealing
             double goal_lateral_vision_ = 0.0;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
-            double rot_ctrl_P_ = 0.5;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
+            double rot_ctrl_P_ = 0.0;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
             double yaw_max_err_ = 10*M_PI/180.0;    //!< Maximal error allowed in RENCONTRE state
             double lin_v_rendezvous_ = 1.0;         //!< Maximal speed in the rendezvous state
             rot_behaviour rot_behaviour_ = COUNTERCLOCKWISE;           //!< +1: Always rotate counter-clockwise, 0: not defined; -1: Always rotate clockwise
@@ -207,6 +227,13 @@ namespace avoid
             // Goal dealing
             double d_goal_ = 0.1;                   //!< Distance where swap assumes that you are on the goal
             double d_approach_ = 0.3;               //!< Distance close to the goal where the robot should start braking.
+
+            // Other variables
+            /**
+             * The robot will try to stop if his orientation is too far away from the desired one
+             * unless the robot is holonomic
+             */
+            bool holonomic_robot_ = false;
 
             /**
              * @brief Utility function Manages the conflicts and if a solution exists fills the references

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, swap-ferr
+ * Copyright (c) 2017, University of Duisburg-Essen, swap-ferr
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@
  *
  */
 
-#include <swap.h>
+#include "swap.h"
 
 namespace avoid
 {
@@ -64,19 +64,19 @@ namespace avoid
      *         Methods of the Swap class               *
      * *************************************************/
 
-//    /**
-//     * Constructor of the class
-//     */
-//    Swap::Swap()
-//    {
-//        //ctor
-//    }
-//
-//    /* Default destructor */
-//    Swap::~Swap()
-//    {
-//        //dtor
-//    }
+    /**
+     * Constructor of the class
+     */
+    Swap::Swap()
+    {
+        //ctor
+    }
+
+    /* Default destructor */
+    Swap::~Swap()
+    {
+        //dtor
+    }
 
     /**
      * IsReady returns if swap is well configurated or not. And if not, explains why.
@@ -90,10 +90,13 @@ namespace avoid
 
         // The parameters that has to be tuned are listed in order of tunning.
 
-
-
-
-
+        // TODO:
+        // rotation_control_p_
+        // d_goal_
+        // d_approach_
+        // holonomic_robot_
+        // lin_v_rendezvous
+        // yaw_max_err
 
 
 //        if (goal_lateral_vision_ == 0.0)
@@ -181,6 +184,22 @@ namespace avoid
              goal_lateral_vision_ = goal_lateral_vision*M_PI/ (2.0 * 180.0);
          }
      }
+
+     /**
+      * Informs to swap if the robot is holonomic (false configured as default)
+      */
+     void Swap::SetHolonomicRobot(bool holonomic_robot)
+     {
+         holonomic_robot_ = holonomic_robot;
+     }
+
+    /**
+     * Configures the value of the rotation control proportional
+     */
+    void Swap::SetRotCtrlP( double rot_ctrl_P)
+    {
+        rot_ctrl_P_ = rot_ctrl_P;
+    }
 
      /**
       * Returns the state of the state machine
@@ -361,20 +380,25 @@ namespace avoid
              case CLOCKWISE:
                  yaw_avoidance_ = +M_PI_2;
                  conflict2avoid_phi = conflict_left_phi;
-                 rot_ctrl_P_      = -fabs(rot_ctrl_P_);
+                 rot_ctrl_P_      = -fabs(rot_ctrl_P_);         //-
                  break;
 
              case COUNTERCLOCKWISE:
                  yaw_avoidance_ = -M_PI_2;
                  conflict2avoid_phi = conflict_right_phi;
-                 rot_ctrl_P_      = +fabs(rot_ctrl_P_);
+                 rot_ctrl_P_      = +fabs(rot_ctrl_P_);         //+
                  break;
          }
 
          yaw_avoidance_ += conflict2avoid_phi;
 
          // The system tries to keep a certain rotation distance.
-         yaw_avoidance_ += rot_ctrl_P_ * GetYawAvoidanceDistanceError( conflict2avoid_phi );
+         double yaw_dist_keeper = rot_ctrl_P_ * GetYawAvoidanceDistanceError( conflict2avoid_phi );
+         // We have to saturate the output
+         yaw_dist_keeper = std::min(yaw_dist_keeper, +M_PI_2);
+         yaw_dist_keeper = std::max(-M_PI_2, yaw_dist_keeper );
+
+         yaw_avoidance_ += yaw_dist_keeper;
 
          // Depending on how far the system is from the desired orientation, the robot moves
          // slower or faster.
@@ -399,6 +423,7 @@ namespace avoid
      double Swap::GetDesiredVelocity()
      {
         /* As close the angle is to the desiredAngle, as faster we can go.
+         * (does not apply for holonomic robots)
 
                1.0  +          +
                     |         / \
@@ -408,8 +433,12 @@ namespace avoid
                0.0  +--+-------+-------+----->
                        -PI/2   0    PI/2
          */
+        double pond_angle = 1.0;
 
-        double pond_angle = std::max( 0.0, LinSpace(0, M_PI_2, 1.0, 0.0, fabs(goal_angle_)) );  // Value between 0 and 1
+        if (!holonomic_robot_)
+        {
+            pond_angle = std::max( 0.0, LinSpace(0, M_PI_2, 1.0, 0.0, fabs(goal_angle_)) );  // Value between 0 and 1
+        }
 
         /* As close the robot is to the goal, as slower we should go
 
@@ -422,7 +451,7 @@ namespace avoid
                          d_goal_  d_approach_
          */
 
-        double pond_d_goal = 1.0;
+         double pond_d_goal = 1.0;
 
         if (goal_dist_ < d_goal_)
         {

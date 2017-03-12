@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, swap-ferr
+ * Copyright (c) 2017, University of Duisburg-Essen, swap-ferr
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@
  *
  */
 
-#include <polarobstaclediagram.h>
+#include "polarobstaclediagram.h"
 
 namespace avoid
 {
@@ -62,19 +62,19 @@ namespace avoid
      *   Methods of the Polar Obstacle Diagram class   *
      * *************************************************/
 
-//    /**
-//     * Initializes the class in an empty way
-//     */
-//    PolarObstacleDiagram::PolarObstacleDiagram()
-//    {
-//        //ctor
-//    }
-//
-//    /* Default destructor */
-//    PolarObstacleDiagram::~PolarObstacleDiagram()
-//    {
-//        //dtor
-//    }
+    /**
+     * Initializes the class in an empty way
+     */
+    PolarObstacleDiagram::PolarObstacleDiagram()
+    {
+        //ctor
+    }
+
+    /* Default destructor */
+    PolarObstacleDiagram::~PolarObstacleDiagram()
+    {
+        //dtor
+    }
 
     /* ****************************************************************************
      *   MAIN METHODS (Intended to control the behaviour of the POD)              *
@@ -87,7 +87,7 @@ namespace avoid
     {
         if ( !id_phi_max_ )
         {
-            why_not = "The Polar Obstacle dyagram is not ready:\n";
+            why_not = "The Polar Obstacle diagram is not ready:\n";
             why_not += "\"granularity\" is not defined. \"granularity\" defines the ammount ";
             why_not += "of directions that will track measurements between -PI and PI.\n";
             why_not += "Use high granularities if you plan to track objects far away from you\n";
@@ -109,15 +109,20 @@ namespace avoid
         {
             why_not = "The Polar Obstacle dyagram is not ready:\n";
             why_not += "\"multi_input_pond\" is not defined. \"multi_input_pond\" defines the way that ";
-            why_not += "swap ponderates the measurements on each direction.\n";
+            why_not += "swap ponder the measurements on each direction.\n";
             why_not += "Values close to 1.0 makes ponderation tend to take all measurements in one direction with the same weight\n";
-            why_not += "Values close to 0.0 makes the system ponderate more values closer to the robot (even if are older values)\n";
+            why_not += "Values close to 0.0 makes the system ponders more values closer to the robot (even if are older values)\n";
             why_not += "The closer to 0.0, the safer, but assumes larger dangerous zones.";
+            why_not += "If you have a radio communication system, it is recommended to turn this value to zero.\n";
+            why_not += "Eg: RobotX = 0, Object1 = 3, Object2 = 30\n";
+            why_not += "A multi_input_pond = 0.1 will create a missmeasurement\n";
+            why_not += " d = (1.0 - 0.1/2) * 3.0 + (0.1/2) * 30.0\n";
+            why_not += "   =     0.95      * 3.0 +  0.05   * 30.0 = 4.35";
             return false;
         }
         if ( !r_safety_set_ )
         {
-            why_not = "The value of the \"Safety Region\" is not set\n";
+            why_not = "The value of the \"Safety Region\" is not set.\n";
             why_not += "The Safety Region is a circular region arround the robot that ";
             why_not += "should be able to overcome his full shape.\n";
             why_not += "Measure your robot and set this parameter accordy.";
@@ -125,22 +130,34 @@ namespace avoid
         }
         if (bracking_distance_ <= 0.0)
         {
-            why_not = "The value of the \"Braking Distance\" is not set\n";
+            why_not = "The value of the \"Braking Distance\" is not set.\n";
             why_not += "The Braking Distance is the maximum distance required by any robot of the team ";
             why_not += "to fully stop themselves when moving at full speed.\n";
             why_not += "Measure this distance and set this parameter accordy.";
             return false;
         }
-        if (ranger_error_ <= 0.0)
+        if (local_measurement_error_ < 0.0)
         {
-            why_not = "The value of the \"Ranger Error\" is not set\n";
-            why_not += "The Ranger Error is the maximum expected error in [m] from a laser ranger placed on the robot";
+            why_not = "The value of the \"Local Measurement Error\" is not set.\n";
+            why_not += "The Local Measurement Error is the maximum expected error in [m] from a local measurement ";
+            why_not += "(like the laser ranger placed on the robot)";
             why_not += "Set this parameter according to the specifications of your laser.";
+            why_not += "Set it to 0.0 if you do not have local measurements";
+            return false;
+        }
+        if (global_measurement_error_ < 0.0)
+        {
+            why_not = "The value of the \"Global Measurement Error\" is not set.\n";
+            why_not += "The Global Measurement Error is the maximum expected error in [m] from a global measurement ";
+            why_not += "(like the the one comming from a shared position in a communication system)";
+            why_not += "Set this parameter according to the reliability of the common positionning system.\n";
+            why_not += "Set it to 0.0 if you do not have global measurements\n";
+            why_not += "The \"Local Measurement Error\" should be set in advance.";
             return false;
         }
         if (gamma_offset_ < 0.0)
         {
-            why_not = "The value of the \"Gamma Offset\" is not set\n";
+            why_not = "The value of the \"Gamma Offset\" is not set.\n";
             why_not += "Gamma offset introduces an offset designated to take into account potential errors, ";
             why_not += "communication delays, etc.";
             why_not += "If your laser is mounted in the top of your robot, and is able only to see the shape of ";
@@ -149,9 +166,10 @@ namespace avoid
         }
         if (smooth_factor_ < 0)
         {
-            why_not = "The value of the \"Smooth factor\" is not set\n";
-            why_not += "The smooth factor reduces the noise between different measurements of your ranger";
-            why_not += "If your laser is not noisy, you can set it to zero and save computational power";
+            why_not = "The value of the \"Smooth factor\" is not set.\n";
+            why_not += "The smooth factor reduces the noise between different measurements of your ranger.\n";
+            why_not += "If your laser is not noisy or you have no laser, you can set it to zero and save computational power.\n";
+            return false;
         }
         return true;
     }
@@ -218,6 +236,9 @@ namespace avoid
                                                         double x_object, double y_object, double r_object,
                                                         bool dynamic)
     {
+        // Inflating the radious of the object before anything happens
+        r_object += global_measurement_error_;
+
         // Centering the object in the position of the robot
         arma::colvec2 position;
         position(0,0) = x_object - x_robot;
@@ -462,15 +483,50 @@ namespace avoid
     }
 
     /**
-     * Sets the Ranger Error inside the POD
+     * Sets the Local Measurement Error inside the POD
      */
-    void PolarObstacleDiagram::SetRangerError( const double error)
+    void PolarObstacleDiagram::SetLocalMeasurementError( const double error)
     {
         if (error >= 0.0)
         {
-            ranger_error_ = error;
+            local_measurement_error_ = error;
         }
     }
+
+    /**
+     * Sets the Global Measurement Error inside the POD
+     */
+    bool PolarObstacleDiagram::SetGlobalMeasurementError( const double error)
+    {
+        /*
+         * This function uses 2*error instead of error. A global localization system not only
+         * introduces error in the sender but also on the receiver.
+         */
+        if (error >= 0.0 && local_measurement_error_ >= 0.0)
+        {
+            if (local_measurement_error_ > 2*error)
+            {
+                /*
+                 * This thing should never happen. Global communication systems are
+                 * allways less reliables than local ones. In case that this happens,
+                 * we approximate the global_measurement_error with the local one.
+                 */
+                global_measurement_error_ = 0.0;
+            }
+            else
+            {
+                /*
+                 * The local measurement error is going to be taken into account always,
+                 * therefore, we are substracting it here
+                 */
+                global_measurement_error_ = 2*error - local_measurement_error_;
+            }
+            return true;
+        }
+        return false;
+    }
+
+
 
     /**
      * Sets the GammaOffset inside the POD
@@ -498,6 +554,10 @@ namespace avoid
             {
                 X_(row, 0) = 1.0;
             }
+        }
+        else if (num_measurements >= 0)
+        {
+            smooth_factor_ = 0;
         }
     }
 
@@ -648,29 +708,33 @@ namespace avoid
     {
         unsigned id_phi = Angle2Sector(angle_conflict);
         /*  Tryes to remain at bracking_distance_/2 if the object is static
-         * or at bracking_distance if the object is dyamic
+         * or at bracking_distance if the object is dynamic
          *
          *      |Robot|             |Objet|
          *             <----------->
          *          This is the distance to keep
          */
-        double pond = 1.0;  // For static obstalces we only take one time the bracking distance
+        double pond = 1.0;  // For static obstacles we only take one time the bracking distance
         if (GetDynMeasurement(id_phi))
         {
-            pond = 2.0;     // For dynamic obstalces we take two times the bracking distance
+            pond = 2.0;     // For dynamic obstacles we take two times the bracking distance
         }
-        double desired_dist = 0.5 * pond * (bracking_distance_ + gamma_offset_ + ranger_error_);
+        double desired_dist = 0.5 * pond * (bracking_distance_ + gamma_offset_ + local_measurement_error_);
 
-        // Computing current distance robot-object
-        double current_dist = double_inf;
-        for (unsigned id_r = 0; id_r < id_r_max_; ++id_r)
+        double current_dist = GetDistMeasurement( id_phi) + safety_region_[id_phi];
+
+        // Returns positive values to request an atraction and
+        // negative values to request a repulsion
+        double error = (current_dist - desired_dist)/desired_dist;
+
+        bool do_not_glue = true;
+
+        if (do_not_glue)
         {
-            current_dist = std::min(current_dist, GetDistMeasurement( id_phi, id_r));
+            error = std::max(error, 0.0);
         }
-        // Eliminating the shape of the robot
-        current_dist -= safety_region_[id_phi];
 
-        return current_dist - desired_dist;
+        return error;
     }
 
     /* ****************************************************************************
@@ -790,7 +854,7 @@ namespace avoid
             pond = 2.0;
         }
         measurement -= pond*bracking_distance_;
-        measurement -= pond*ranger_error_;      // Includes even more safety
+        measurement -= pond*local_measurement_error_;      // Includes even more safety
         measurement -= pond*gamma_offset_;
 
         return measurement;

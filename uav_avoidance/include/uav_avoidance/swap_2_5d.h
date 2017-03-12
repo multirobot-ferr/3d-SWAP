@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, swap-ferr
+ * Copyright (c) 2017, University of Duisburg-Essen, swap-ferr
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,145 +26,180 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
  */
 
-
+/**
+ * @file swap_2_5.h
+ * @author Eduardo Ferrera
+ * @version 0.4
+ * @date    12/3/17
+ *
+ * @short: Adapts the avoidace code "SWAP" to the GRVC enviroment for the mbzirc challenge.
+ *
+ * This node is designed to work in parallel with a state_machine. It communicates with the state machine throw the
+ * "collision_warning", the "wished_movement_direction" and the "avoid_movement_direction" topics.
+ * Swap_2_5d will connect to all the robots of the system and warns through "collision_warning" to the state machine
+ * when two or more uavs are too close and can collide. When that happens, Swap_2_5d will publish over
+ * "avoid_movement_direction" an avoidance direction for the uav.
+ * It also receives from the state machine "wished_movement_direction", a vector that indicates where does the uav wants
+ * to go (e.g: where is placed the next goal, or in wich direction does it wants to move).
+ *
+ */
 
 #ifndef SWAP_2_5D_H
 #define SWAP_2_5D_H
 
-#include <ros/ros.h>
 #include <swap.h>                    // base class
+#include <vector>
+#include <sstream>
+#include <armadillo>
+#include <fstream>
+#include <iostream>
+
+#include <ros/ros.h>
+#include <tf/transform_datatypes.h>     // to convert quaternion to roll-pitch-yaw
 
 // message need
+#include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
+#include <geometry_msgs/Quaternion.h>
 #include <grvc_quadrotor_hal/types.h>
 
-//
-//// messages need
-//#include "sensor_msgs/LaserScan.h"      // laser ranger
-//#include <pcl_ros/point_cloud.h>        // for debug visualisation
-//#include "geometry_msgs/PoseStamped.h"  // receives goals
-//#include "tf/transform_datatypes.h"     // to convert quaternion to roll-pitch-yaw
-//#include "geometry_msgs/PoseWithCovarianceStamped.h"    // receives positions
-//#include "geometry_msgs/Twist.h"        // publishes movements
-//
-//namespace PLCDebug
-//{
-//    typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
-//
-//    // Color definitions for the PLC
-//    struct PLC_COLOR {unsigned R; unsigned G; unsigned B;};
-//    const  PLC_COLOR LIGHT_BLUE {  0, 255, 255};
-//    const  PLC_COLOR DARK_BLUE  {  0,   0, 255};
-//    const  PLC_COLOR GREEN      {  0, 255,   0};
-//    const  PLC_COLOR ORANGE     {255, 159,   0};
-//    const  PLC_COLOR RED        {255,   0,   0};
-//    const  PLC_COLOR BLACK      {  0,   0,   0};
-//    const  PLC_COLOR YELLOW     {255, 255,   0};
-//
-//}   // namespace PLCDebug
-//
-//
-class Swap_2_5d//:  public avoid::Swap
+// Fixing some problems
+// If the simulator makes all uavs start in (0,0), this define should be uncommented
+//#define UAV_NOT_IN_ZERO_ZERO 1
+
+#ifdef UAV_NOT_IN_ZERO_ZERO
+// values extracted from the simulator:
+                        //   x      y   yaw
+const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
+                           {-20.0, 30.0, 0.0 },
+                           {-28.0, 26.0, 0.0 } };
+#endif
+
+// Constant values
+const std::string pose_uav_topic = "/hal/pose";
+
+class Swap_2_5d:  public avoid::Swap
 {
     public:
-//
-//        /**
-//         * @brief Default constructor of the class
-//         *
-//         * Request to ROS the necessary variables from the parameters and connects the necessary
-//         * publishers and subscribers.
-//         */
-//        SwapROS();
-//
-//        /**
-//         * @brief Performs all necessary publications
-//         */
-//        void Publish();
-//
-    private:
-        ros::NodeHandle _nh;            //< ROS Node handler
-//
-//        // Subscribers
-//        ros::Subscriber laser_sub_;     //!< Receives laser scans and fills the polar obstacle diagram
-//        ros::Subscriber goal_sub_;      //!< Receives single goal poses
-//        ros::Subscriber pose_sub_;      //!< Receives pose (position and orientation) estimates
-//
-//        // Publishers
-//        ros::Publisher cmd_vel_pub_;    //!< Publishes new command velocity after collision avoidance calculations
-//
-//        // Variables required for the debuging process
-//        bool debug_;                            //!< Activates debug output of the system
-//        ros::Publisher debug_pub_;              //!< If debug: Publishes a point cloud for debug visualisation purposes
-//        std::string debug_frame_id_;            //!< Stores the frame_id where for the debuging point cloud
-//
-//        // Ranger related variables
-//        bool laser_asume_dynamic_ = true;       //!< Assumes laser measurements dynamics or not
-//
-//        // Localization and navigation variables
-//        bool    pose_received_ = false;         //!< Boolean to track the first position detection
-//        double  robot_x_, robot_y_, robot_yaw_; //!< Current position of the robot with respect to the map
-//
-//        bool    goal_map_received_ = false;     //!< The last coal depends on the frame of the map
-//        bool    goal_robot_received_ = false;   //!< The last coal depends on the frame of the robot
-//        double  goal_x_, goal_y_, goal_yaw_;    //!< Current position of the goal with respect to the map
-//
-//        double  v_ref_, yaw_ref_;               //!< References for the robot
-//
-//
-//        /* Callbacks for ROS */
-//
-//        /**
-//         * @brief Callback for a laser ranger message
-//         *
-//         * @param laser_scan_msg A laser scann meassage.
-//         */
-//        void LaserReceived(const sensor_msgs::LaserScanConstPtr& laser_scan_msg);
-//
-//        /**
-//         * @brief Callback for goals.
-//         *
-//         * @param msg Goal message, typically comming from topic "move_base_simple/goal"
-//         */
-//        void GoalReceived(const geometry_msgs::PoseStamped& goal_msg);
-//
-//        /**
-//         * @brief Callback for own pose estimates
-//         *
-//         * @param msg Position message, typically comming from topic "amcl_pose"
-//         */
-//        void PoseReceived(const geometry_msgs::PoseWithCovarianceStamped& pose_msg);
-//
-//        /* Internal publishers */
-//
-//        /**
-//         * @brief Computes the necessary control actions for the robot and publishes them
-//         */
-//        void PublishCmdVel();
-//
-//        /**
-//         * @brief Publish a debuging PointCloud
-//         *
-//         * Publishes a PointCloud that helps the user to understand what is happening
-//         */
-//        void PublishDebugPCL();
-//
-//        /* Internal functions */
-//        /**
-//         *  @brief Converts from different frame id to submit the necessary goal position and orientation
-//         */
-//        void CommandGoals();
-//
-//        /**
-//         * @brief Utility function. Set the color of the specified point cloud
-//         *
-//         * \param[in]  color Specified color
-//         * \param[out] point Point cloud variable
-//         */
-//        void SetPCLcolor(pcl::PointXYZRGB& point, PLCDebug::PLC_COLOR color);
-//
-}; // class SwapRos
 
+        /**
+         * @brief Default constructor of the class
+         *
+         * Request to ROS the necessary variables from the parameters and connects
+         * the necessary publishers and subscribers.
+         */
+        Swap_2_5d();
+
+        /**
+         * @brief Destructor to release the memory
+         */
+        virtual ~Swap_2_5d();
+
+        /**
+         * @brief Controls if all parameters are well initialized
+         *
+         * @param[out] why_not returns why the system is not well initialized.
+         * @return Whether the system is ready or not.
+         */
+        bool IsReady(std::string& why);
+
+        /**
+         * @brief Executes the main loop of swap
+         */
+        void Spin();
+
+        /**
+         * @brief Executes the main loop of swap once
+         */
+        void SpinOnce();
+
+    private:
+        ros::NodeHandle nh_;            //!< ROS Node handler
+        ros::NodeHandle* pnh_;          //!< Private node handler
+
+        // Subscribers
+        std::vector<ros::Subscriber> pos_all_uav_sub_;  //!< Receives the positions of all UAVs
+        ros::Subscriber wished_mov_dir_sub_;            //!< Receives the direction where the uav whants to go
+
+        // Publishers
+        ros::Publisher confl_warning_pub_;              //!< Publisher to determine if there is a possible collision or not
+        ros::Publisher  avoid_mov_dir_pub_;             //!< Publish the direction where the uav has to go to avoid a conflict
+
+        // System variables
+        bool initialization_error_ = false;             //!< Flags to track possible errors in initialization
+        double spin_sleep_ = 0.1;                       //!< Time that the system will sleep between iterations of the main loop
+        int uav_id_ = -1;                               //!< Identification number of the current uav
+        int n_uavs_ =  3;                               //!< Number of UAV involved
+        double uav_vector_speed_;                       //!< Modulus of the vector sent to the uav for avoidance
+        double uav_safety_radius_ = -1.0;               //!< Safety radius of each uav
+
+        // Position of the UAV
+        bool   pose_received_ = false;                  //!< Tracks if the uav knows its position
+        double uav_x_, uav_y_, uav_z_, uav_yaw_;        //!< Position of the current uav
+
+        // START ----- IMPORTANT ----- START
+        // uav_yaw_ is the direction where the robot wants to go
+        // with respect to the x axis, not his orientation
+        double uav_wished_yaw_map_;
+        // END ------- IMPORTANT ------- END
+
+
+        // Swap variables
+        double v_ref_;      //!< Since swap has no control of the speed, it can be ignored
+        double yaw_ref_;    //!< Orientation with respect to the nord that the uav should take to avoid a conflict
+        geometry_msgs::Vector3 avoid_mov_direction_;    //!< Message where the avoidance direction will be published
+
+        // Debuging parameters
+        std::ofstream log2mat_;
+        std::vector<double> values2log_;    // Defined here to avoid multiple allocations of memory
+        double bracking_distance_, positioning_error_, gamma_offset_;
+        double* pos_all;
+
+
+        /* Callbacks for ROS */
+        /**
+         * @brief Callback for own pose estimatimation
+         *
+         * @param msg Position message from the grvc
+         */
+        void PoseReceived(const std_msgs::String::ConstPtr& uav_pose);
+
+        /**
+         * @brief Callback for the direction of movement of the uav
+         *
+         * @param movement_direction_uav with respect to the map
+         */
+        void WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPtr& movement_direction_uav);
+
+        /* Internal publishers */
+        /**
+         * @brief Publishes if there is a possible collision to avoid and the direction to take
+         */
+        void RequestControlPub(bool request_control);
+
+        /**
+         * @brief Saves a single line of a log file from the simulation that can be read in matlab
+         *
+         * Does not activate if the parameter "debug/file_path" is not set
+         */
+        void FillLogFile();
+
+        /**
+         * @brief Prepares a logger for matlab
+         */
+        void Log2MatlabInit( const std::string file_path);
+
+        /**
+         * @brief Creates a log file that can be read in matlab
+         * @param vector of values that will be saved
+         */
+        void Log2Matlab( std::vector<double>& values);
+
+}; // class SwapRos
 
 
 #endif // SWAP_2_5D_H

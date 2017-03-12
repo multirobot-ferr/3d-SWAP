@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, swap-ferr
+ * Copyright (c) 2017, University of Duisburg-Essen, swap-ferr
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,340 +26,428 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
  */
 
-//#include "swap_2_5d.h"
+/**
+ * @file swap_2_5.cpp
+ * @author Eduardo Ferrera
+ * @version 0.4
+ * @date    12/3/17
+ *
+ * @short: Adapts the avoidace code "SWAP" to the GRVC enviroment for the mbzirc challenge.
+ *
+ * This node is designed to work in parallel with a state_machine. It communicates with the state machine throw the
+ * "collision_warning", the "wished_movement_direction" and the "avoid_movement_direction" topics.
+ * Swap_2_5d will connect to all the robots of the system and warns through "collision_warning" to the state machine
+ * when two or more uavs are too close and can collide. When that happens, Swap_2_5d will publish over
+ * "avoid_movement_direction" an avoidance direction for the uav.
+ * It also receives from the state machine "wished_movement_direction", a vector that indicates where does the uav wants
+ * to go (e.g: where is placed the next goal, or in wich direction does it wants to move).
+ *
+ */
+
 #include <uav_avoidance/swap_2_5d.h>
 
-#include <iostream>
+
 
 int main(int argc, char **argv) {
     // name remapping
     ros::init(argc, argv, "swap_2_d");
 
-    avoid::Swap s;
-    int a = 3;
-
     Swap_2_5d swap;
 
-//    SwapROS swap;
-//
-//    swap.SetGranularity(180);
-//    swap.SetMeasurementsPerDirection(5);
-//    swap.SetMultiInputPond(0.5);
-//
-//    swap.SetSafetyRegion(0.26);
-//    swap.SetBrackingDistance(0.2);
-//    swap.SetRangerError(0.01);
-//    swap.SetGammaOffset(0.0);
-//    swap.SetSmoothFactor(5);
-////    swap.SetGoalLateralVision(90.0);
-//
     std::string why;
-    if (true)//!swap.IsReady(why))
+    if (!swap.IsReady(why))
     {
         ROS_FATAL("%s", why.c_str());
+        ROS_FATAL("SWAP: Parameters are not properly configured, closing swap");
     }
     else
     {
-        while (ros::ok()){
-//            std::string state;
-//            if (swap.GetMachineStateChanges(state))
-//                ROS_INFO("Swap: %s", state.c_str());
-//
-//            ros::spinOnce();
-//
-//            // Performs all necessary publications
-//            swap.Publish();
-//
-//
-//            // Sleeping to save time (it should wait at least for 3 laser scans)
-//            ros::Duration(0.3).sleep();
-        }
+        swap.Spin();
     }
-
 
     return 0;
 }
 
-///**
-// * Default constructor of the class
-// */
-//SwapROS::SwapROS()
-//{
-//    // Preparing the laser (if available)
-//    std::string laser_topic = "base_scan";
-//    int         laser_topic_queue = 3;
-//    if (nh_.getParam("swap/laser_topic", laser_topic)){
-//        nh_.param("swap/laser_topic_queue", laser_topic_queue, 3);
-//        nh_.param("swap/laser_asume_dynamic", laser_asume_dynamic_, true);
-//        laser_sub_ = nh_.subscribe(laser_topic.c_str(), laser_topic_queue, &SwapROS::LaserReceived, this);
-//        ROS_INFO("SwapROS: Connected to %s, queue %d, assuming %s measurements",
-//                 laser_topic.c_str(), laser_topic_queue, laser_asume_dynamic_ ? "dynamic" : "static");
-//    }else{
-//        ROS_WARN("SwapROS: No laser connected");
-//    }
-//
-//    // Subscribing to a goal
-//    std::string goal_topic = "move_base_simple/goal";
-//    nh_.param("swap/goal_topic", goal_topic, std::string("move_base_simple/goal"));
-//    goal_sub_ = nh_.subscribe( goal_topic.c_str(), 1, &SwapROS::GoalReceived, this);
-//    ROS_INFO("SwapROS: Connected to %s to receive goals", goal_topic.c_str());
-//
-//    // Subscribing to the position
-//    std::string pose_topic = "amcl_pose";
-//    nh_.param("swap/position_topic", pose_topic, std::string("amcl_pose"));
-//    pose_sub_ = nh_.subscribe( pose_topic.c_str(), 1, &SwapROS::PoseReceived, this);
-//    ROS_INFO("SwapROS: Connected to %s to receive positions", pose_topic.c_str());
-//
-//    nh_.param( "swap/debug", debug_, false);
-//    if (debug_){
-//        ROS_WARN("SwapROS: Debug modus activated. The computational efficiency could be compromised");
-//        debug_pub_ = nh_.advertise<PLCDebug::PointCloud>("swap/debug",1);
-//
-//        if (!ros::param::get( "swap/debug_frame_id", debug_frame_id_))
-//        {
-//            debug_frame_id_ = "/";
-//        }
-//
-//        ROS_WARN("%s", debug_frame_id_.c_str());
-//    }
-//
-//    // Neccesary information to command the robot
-//    cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel",2 , false);
-//
-//    ROS_INFO("SwapROS: Init complete");
-//}
-//
-///**
-// * Performs all necessary publications
-// */
-//void SwapROS::Publish()
-//{
-//    PublishCmdVel();
-//
-//    if (debug_)
-//    {
-//        PublishDebugPCL();
-//    }
-//}
-//
-///**
-// * Callback for a laser ranger message
-// */
-//void SwapROS::LaserReceived(const sensor_msgs::LaserScanConstPtr& laser_scan_msg)
-//{
-//    NewMeasurementSetReceived();
-//    for (unsigned id_laser = 0; id_laser < laser_scan_msg->ranges.size(); ++id_laser)
-//    {
-//        double angle = laser_scan_msg->angle_min + double(id_laser)*laser_scan_msg->angle_increment;
-//        SetNewLocalMeasurement( laser_scan_msg->ranges[id_laser], angle, false); //TODO laser_asume_dynamic_);
-//    }
-//}
-//
-//void SwapROS::GoalReceived(const geometry_msgs::PoseStamped& goal_msg)
-//{
-//    goal_x_   = goal_msg.pose.position.x;
-//    goal_y_   = goal_msg.pose.position.y;
-//    goal_yaw_ = tf::getYaw(goal_msg.pose.orientation);
-//
-//    if ( !goal_msg.header.frame_id.find("map") ){
-//        // Goal received with respect to the map
-//        goal_map_received_   = true;
-//        goal_robot_received_ = false;
-//
-//        ROS_INFO("SwapROS: Goal (respect to map): %f,%f,%f", goal_x_ , goal_y_ , goal_yaw_*180/M_PI);
-//    }
-//    else if ( !goal_msg.header.frame_id.find( "base_link") )
-//    {
-//        // Goal received with respect to the robot
-//        goal_map_received_   = false;
-//        goal_robot_received_ = true;
-//
-//        ROS_INFO("SwapROS: Goal (respect to robot): %f,%f,%f", goal_x_ , goal_y_, goal_yaw_*180/M_PI);
-//    }
-//    else
-//    {
-//        ROS_WARN("SwapROS: Goal not recognized. Change your frame_id");
-//        goal_map_received_   = false;
-//        goal_robot_received_ = false;
-//    }
-//
-//    CommandGoals();
-//}
-//
-//void SwapROS::PoseReceived(const geometry_msgs::PoseWithCovarianceStamped& pose_msg)
-//{
-//    if ( !pose_msg.header.frame_id.find( "map" ) ||
-//         !pose_msg.header.frame_id.find( "base_link" )){
-//        // Pose received with respect to the map or the robot.
-//
-//        robot_x_   = pose_msg.pose.pose.position.x;
-//        robot_y_   = pose_msg.pose.pose.position.y;
-//        robot_yaw_ = tf::getYaw(pose_msg.pose.pose.orientation);
-//
-//        // // Convert quaternion to roll-pitch-yaw
-//        // double roll, pitch, yaw;
-//        // tf::Quaternion q(msg->pose.pose.orientation.x,
-//        //                  msg->pose.pose.orientation.y,
-//        //                  msg->pose.pose.orientation.z,
-//        //                  msg->pose.pose.orientation.w);
-//        // tf::Matrix3x3 m(q);
-//        // m.getRPY(roll, pitch, yaw);
-//
-//        pose_received_ = true;
-//    }
-//
-//    CommandGoals();
-//}
-//
-//
-///**
-// * Computes the necessary control actions for the robot and publishes them
-// */
-//void SwapROS::PublishCmdVel()
-//{
-//    // Computing the necessary references
-//    CollisionAvoidance(v_ref_, yaw_ref_);
-//
-//    // prepare the cmd_vel message according to the commanded accelerations
-//    geometry_msgs::Twist cmd_vel;
-//
-//    //    ros::Duration t_incr = ros::Time::now() - RefCmdTime_;
-//    //    if (vRef_ > vRefCmd_){
-//    //        vRefCmd_ = std::min(vRef_, vRefCmd_ + accelCmd_*t_incr.toSec());
-//    //    }else if (vRef_ < vRefCmd_){
-//    //        vRefCmd_ = std::max(vRef_, vRefCmd_ - decelCmd_*t_incr.toSec());  // TODO: Tose values has to be used by the user
-//    //                                                                          // TODO: We need a forced version of the cmdvel
-//    //    }
-//
-//    //    cmd_vel.linear.x = vRefCmd_;
-//    cmd_vel.linear.x = v_ref_;
-//    cmd_vel.linear.y = 0.0;
-//    cmd_vel.linear.z = 0.0;
-//    cmd_vel.angular.x = 0.0;
-//    cmd_vel.angular.y = 0.0;
-//    cmd_vel.angular.z = yaw_ref_;
-//    //    cmd_vel.angular.z = yawPcmd_*yawRef_;      // TODO: PID controler
-//
-//    // publish new command velocity
-//    cmd_vel_pub_.publish(cmd_vel);
-//    //    RefCmdTime_ = ros::Time::now();
-//}
-//
-///**
-// * Publish a debuging PointCloud
-// */
-//void SwapROS::PublishDebugPCL()
-//{
-//    using namespace PLCDebug;
-//
-//    // Preparing the message and the header
-//    static PointCloud::Ptr pointCloud_msg (new PointCloud);        // msg definition (static to avoid multiple-allocations)
-//    pcl_conversions::toPCL(ros::Time::now(), pointCloud_msg->header.stamp);
-//    pointCloud_msg->header.frame_id = debug_frame_id_;
-//    pointCloud_msg->points.clear();
-//
-//    // Add points for the reserved disk and the polar obstacle diagram
-//    pcl::PointXYZRGB measurement_po     = {0,0,0};
-//    pcl::PointXYZRGB safety_region_po   = {0,0,0};
-//    pcl::PointXYZRGB conflicts_po       = {0,0,0};
-//    pcl::PointXYZRGB reference_po       = {0,0,0};
-//    PolarObstacleDiagram::measurements info;
-//
-//    // Setting fixed colors
-//    SetPCLcolor(measurement_po,     DARK_BLUE);
-//    SetPCLcolor(safety_region_po,   GREEN);
-//    SetPCLcolor(conflicts_po,       RED);
-//    SetPCLcolor(reference_po,       BLACK);
-//
-//    // Setting the measurements and the safety_region around the robot
-//    for (unsigned id_phi = 0; id_phi < id_phi_max_; ++id_phi)
-//    {
-//        info = GetMeasurement( id_phi );
-//
-//        measurement_po.x = info.dist * cos( info.angle );
-//        measurement_po.y = info.dist * sin( info.angle );
-//
-//        safety_region_po.x = info.safety_region * cos( info.angle );
-//        safety_region_po.y = info.safety_region * sin( info.angle );
-//
-//        pointCloud_msg->points.push_back (measurement_po);
-//        pointCloud_msg->points.push_back (safety_region_po);
-//    }
-//
-//    // Showing the conflicts (if any)
-//    for (unsigned id_conf = 0; id_conf < conflictive_angles_.size(); ++id_conf)
-//    {
-//        for (double d = 0.0; d < 1.0; d+=0.1)
-//        {
-//            conflicts_po.x = d*cos( conflictive_angles_[id_conf]);
-//            conflicts_po.y = d*sin( conflictive_angles_[id_conf]);
-//
-//            pointCloud_msg->points.push_back (conflicts_po);
-//        }
-//    }
-//
-//    // Showing the commanded direction
-//    for (double d = 0.0; d < 1.0; d+=0.1)
-//    {
-//        reference_po.x = d*cos( yaw_ref_ );
-//        reference_po.y = d*sin( yaw_ref_ );
-//
-//        pointCloud_msg->points.push_back (reference_po);
-//    }
-//
-//
-//    pointCloud_msg->height = 1;
-//    pointCloud_msg->width  = pointCloud_msg->points.size();
-//
-//    debug_pub_.publish(pointCloud_msg);
-//}
-//
-///**
-// *  Converts from different frame id to submit the necessary goal position and orientation
-// */
-//void SwapROS::CommandGoals()
-//{
-//    double x_robot2goal, y_robot2goal;
-//    double dist2goal = 0.0,  ang2goal = 0.0;  // If somethings goes wrong, robot does not move
-//
-//    if ( goal_map_received_ && pose_received_ )
-//    {
-//        // Computing goal with respect to the current position
-//        double diff_x = goal_x_ - robot_x_;
-//        double diff_y = goal_y_ - robot_y_;
-//
-//        // Rotate from global coordinate system to local
-//        x_robot2goal = diff_x*cos(-robot_yaw_) - diff_y*sin(-robot_yaw_);
-//        y_robot2goal = diff_x*sin(-robot_yaw_) + diff_y*cos(-robot_yaw_);
-//
-//        dist2goal = sqrt( powf(x_robot2goal,2) + powf(y_robot2goal,2) );
-//        ang2goal  = atan2(y_robot2goal, x_robot2goal);
-//        SetGoal(dist2goal, ang2goal);
-//    }
-//    else if ( goal_robot_received_ )
-//    {
-//        x_robot2goal = goal_x_;
-//        y_robot2goal = goal_y_;
-//
-//        dist2goal = sqrt( powf(x_robot2goal,2) + powf(y_robot2goal,2) );
-//        ang2goal  = atan2(y_robot2goal, x_robot2goal);
-//        SetGoal(dist2goal, ang2goal);
-//    }
-//    else
-//    {
-//        SetGoal( 0.0, 0.0);
-//    }
-//
-//}
-//
-///**
-// * Utility function. Set the color of the specified point cloud
-// */
-//void SwapROS::SetPCLcolor(pcl::PointXYZRGB& point, PLCDebug::PLC_COLOR color)
-//{
-//    point.r = color.R;
-//    point.g = color.G;
-//    point.b = color.B;
-//}
+/**
+ * Default constructor of the class
+ */
+Swap_2_5d::Swap_2_5d()
+{
+    // Preparing private acquisition of parameters
+    pnh_ = new ros::NodeHandle("~");
+
+    // Sleeping some random time to not collapse the system due to a big wake up
+    // Waiting a time between 1 and 2 seconds
+    // TODO Seems to have allways the same number -> 1.4
+    double sleep_time = 1.0 + (rand() % 10 + 1)/10.0;
+    ROS_INFO("SWAP: Waiting %f seconds before start", sleep_time);
+    ros::Duration( sleep_time).sleep();
+
+    // Getting the uav_id
+    if (!pnh_->getParam("uav_id", uav_id_)) {
+        initialization_error_ = true;
+        ROS_FATAL("SWAP: uav_id is not set. Closing the avoidance system");
+    }
+
+    // Getting the number of uavs
+    pnh_->param<int>("n_uavs", n_uavs_, 3);
+
+    // Getting the sleeping time of the loop
+    pnh_->param<double>("spin_sleep", spin_sleep_, 0.2);
+
+    // Getting the normal speed of an uav
+    pnh_->param<double>("uav_vector_speed", uav_vector_speed_, 1.0);
+
+    // Getting swap parameters
+    int granularity;
+    if (pnh_->getParam("swap/granularity", granularity))
+    {
+        SetGranularity(granularity);
+    }
+
+    int num_measurements;
+    if (pnh_->getParam("swap/num_measurements", num_measurements))
+    {
+        SetMeasurementsPerDirection(num_measurements);
+    }
+
+    double multi_input_pond;
+    if (pnh_->getParam("swap/multi_input_pond", multi_input_pond))
+    {
+        SetMultiInputPond(multi_input_pond);
+    }
+
+    if (pnh_->getParam("swap/safety_radius", uav_safety_radius_))
+    {
+        SetSafetyRegion(uav_safety_radius_);         // All UAV are equal right now
+    }
+
+    if (pnh_->getParam("swap/braking_distance", bracking_distance_))
+    {
+        SetBrackingDistance(bracking_distance_);
+    }
+
+    SetLocalMeasurementError(0.0);     // The system has not a laser ranger
+    if (pnh_->getParam("swap/positioning_error", positioning_error_))
+    {
+        SetGlobalMeasurementError(positioning_error_);
+    }
+
+    if (pnh_->getParam("swap/gamma_offset", gamma_offset_))
+    {
+        SetGammaOffset(gamma_offset_);
+    }
+
+    SetSmoothFactor(0); // The system has no laser ranger. It makes no sense to smooth the measurements
+    SetHolonomicRobot(true);
+
+    double rotation_ctrl_p;
+    if (pnh_->getParam("swap/rotation_ctrl_p", rotation_ctrl_p))
+    {
+        SetRotCtrlP(rotation_ctrl_p);
+    }
+
+
+    // Subscribing to the position of all UAVs
+    for (int n_uav = n_uavs_; n_uav > 0; --n_uav) {
+        std::string uav_topic_name = "/mbzirc_" + std::to_string(n_uav) + pose_uav_topic.c_str();
+        pos_all_uav_sub_.push_back(nh_.subscribe(uav_topic_name.c_str(), 1, &Swap_2_5d::PoseReceived, this));
+    }
+
+    // Information for the state machine
+    confl_warning_pub_  = nh_.advertise<std_msgs::Bool>("collision_warning", 1, true);
+    wished_mov_dir_sub_ = nh_.subscribe( "wished_movement_direction",1 , &Swap_2_5d::WishedMovDirectionCallback, this);
+    avoid_mov_dir_pub_  = nh_.advertise<geometry_msgs::Vector3>("avoid_movement_direction", 1, true);
+
+    // Meant to debug the system
+    std::string file_path;
+    if (pnh_->getParam("debug/file_path", file_path))
+    {
+        Log2MatlabInit( file_path);
+    }
+
+    if (!initialization_error_)
+    {
+        ROS_INFO("SwapROS: Init complete");
+    }
+}
+
+/**
+ * Destructor to release the memory
+ */
+Swap_2_5d::~Swap_2_5d()
+{
+    // Closing debug log
+    if (log2mat_)
+    {
+        log2mat_.close();
+        delete pos_all;
+    }
+
+    // Releasing the memory
+    delete pnh_;
+}
+
+/**
+ * Controls if all parameters are well initialized
+ */
+bool Swap_2_5d::IsReady(  std::string& why_not)
+{
+    if (!Swap::IsReady(why_not))
+    {
+        return false;
+    }
+    if (initialization_error_)
+    {
+        why_not = "There was an initialization error on SWAP";
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Executes the main loop of swap
+ */
+void Swap_2_5d::Spin()
+{
+    while (ros::ok())
+    {
+        SpinOnce();
+
+        // Sleeping to save time
+        ros::Duration(spin_sleep_).sleep();
+    }
+}
+
+/**
+ * Executes the main loop of swap once
+ */
+void Swap_2_5d::SpinOnce()
+{
+    // Forgetting old information
+    //TODO Create a watchdog here to see if the information is comming or not
+    NewMeasurementSetReceived();    //This forgets old information (slowly)
+
+    // Getting fresh information (updating positions and so on)
+    ros::spinOnce();
+
+    // Checking for conflicts and finding solutions
+    CollisionAvoidance(v_ref_, yaw_ref_);
+
+    // If active, save in a log all information
+    FillLogFile();
+
+    // Communicating with the state machine
+    std::string state;
+    switch (GetMachineState(state))
+    {
+        case state_orientation::FREE:
+            RequestControlPub(false);
+            break;
+
+        default:
+            // Requesting the control of the uav and commanding it
+            RequestControlPub(true);
+    }
+
+    // Showing to the user what is happening
+    if (GetMachineStateChanges(state))
+    {
+        ROS_INFO("Swap: %s", state.c_str());
+    }
+}
+
+/**
+ * Callback for own pose estimatimation
+ */
+void Swap_2_5d::PoseReceived(const std_msgs::String::ConstPtr& uav_pose)
+{
+    std::stringstream msg;
+    msg << uav_pose->data;
+    grvc::hal::Pose pose;
+    msg >> pose;
+
+    tf::Quaternion q3( pose.orientation[0],
+                       pose.orientation[1],
+                       pose.orientation[2],
+                       pose.orientation[3]);
+    q3.normalize();     //Avoids a warning
+
+    int uav_id = stoi(pose.id);
+    #ifdef UAV_NOT_IN_ZERO_ZERO
+    for (int coordinate = 0; coordinate < 3; ++coordinate)
+    {
+        pose.position[coordinate] += UAV_ZZ( uav_id-1, coordinate );
+    }
+    #endif
+    double x   = pose.position[0];
+    double y   = pose.position[1];
+    double z   = pose.position[2];
+    double yaw = tf::getYaw(q3);
+
+    if (uav_id == uav_id_)
+    {
+        // We are reading the position of the robot that owns the avoidance system
+        pose_received_ = true;
+        uav_x_   = x;
+        uav_y_   = y;
+        uav_z_   = z;
+        uav_yaw_ = yaw;
+
+        //ROS_INFO("Pose of uav %d %.2f, %.2f, %.2f, ||  %.2f", uav_id, x, y, z, yaw);
+    }
+    else if (pose_received_)
+    {
+        // The robot knows where it is and where an other robot is located.
+        SetNewGlobalMeasurement(uav_x_, uav_y_, 0.0,  // The 0.0 makes it always look to the nord (even if not)
+                                x, y, uav_safety_radius_, true);
+    }
+
+    // If necessary, save the positions on the log
+    if (pos_all)
+    {
+        pos_all[(uav_id - 1)*3 + 0] = x;
+        pos_all[(uav_id - 1)*3 + 1] = y;
+        pos_all[(uav_id - 1)*3 + 2] = z;
+    }
+}
+
+/**
+ * Callback for the direction of movement of the uav
+ */
+void Swap_2_5d::WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPtr& wished_movement_direction_uav)
+{
+    uav_wished_yaw_map_ = atan2(wished_movement_direction_uav->y,
+                                wished_movement_direction_uav->x);
+    // The goal is far away to avoid swap to think that is close .
+    // If that happens, swap will command to the system to brake
+    SetGoal( 100.00, uav_wished_yaw_map_);
+}
+
+/**
+ * Publishes if there is a possible collision to avoid and the direction to take
+ */
+void Swap_2_5d::RequestControlPub(bool request_control)
+{
+    std_msgs::Bool request_ctrl;
+    request_ctrl.data = request_control;
+    confl_warning_pub_.publish(request_ctrl);
+
+    if (request_control)
+    {
+        avoid_mov_direction_.x = uav_vector_speed_*sin(yaw_ref_);
+        avoid_mov_direction_.y = uav_vector_speed_*cos(yaw_ref_);
+        avoid_mov_direction_.z = 0.0;   // The state machine should ignore this value.
+        avoid_mov_dir_pub_.publish(avoid_mov_direction_);
+    }
+}
+
+/**
+ * Saves a single line of a log file from the simulation that can be read in matlab
+ */
+void Swap_2_5d::FillLogFile()
+{
+    if (log2mat_)
+    {
+        values2log_.clear();
+
+        //TODO: Add the ros time
+
+        for (auto uav_id = 1; uav_id <= n_uavs_; ++uav_id )
+        {
+            values2log_.push_back( pos_all[(uav_id - 1)*3 + 0] );    //x
+            values2log_.push_back( pos_all[(uav_id - 1)*3 + 1] );    //y
+            values2log_.push_back( pos_all[(uav_id - 1)*3 + 2] );    //z
+        }
+
+        // Showing the orientation of movement of the robot
+        for (double d : {0.0,1.0})
+        {
+            double x_dir = d*cos( uav_wished_yaw_map_ );
+            double y_dir = d*sin( uav_wished_yaw_map_ );
+
+            values2log_.push_back (x_dir);
+            values2log_.push_back (y_dir);
+        }
+
+        // Showing the orientation requested from the system
+        for (double d : {0.0,1.0})
+        {
+            double x_dir = d*cos( yaw_ref_ );
+            double y_dir = d*sin( yaw_ref_ );
+
+            values2log_.push_back (x_dir);
+            values2log_.push_back (y_dir);
+        }
+
+        measurements info;
+        // Saving the safety_region around the robot it is not necessary anymore
+
+        // Saving the measurements around the robot
+        for (unsigned id_phi = 0; id_phi < id_phi_max_; ++id_phi)
+        {
+            info = GetMeasurement( id_phi );
+
+            double x_m = info.dist * cos( info.angle );
+            double y_m = info.dist * sin( info.angle );
+
+            values2log_.push_back (x_m);
+            values2log_.push_back (y_m);
+        }
+
+
+        Log2Matlab(values2log_);
+    }
+
+}
+
+/**
+ * Prepares a logger for matlab
+ */
+void Swap_2_5d::Log2MatlabInit( const std::string file_path)
+{
+    // Loging first the parameters of the uav
+    std::string log_var = file_path + "uav" + std::to_string(uav_id_) + "vars.txt";
+    log2mat_.open(log_var.c_str(), std::ofstream::binary);
+
+    values2log_.clear();
+
+    values2log_.push_back(uav_safety_radius_);
+    values2log_.push_back(bracking_distance_);
+    values2log_.push_back(positioning_error_);
+
+    Log2Matlab(values2log_);
+    log2mat_.close();
+
+    // Preparing to save the rest
+    pos_all = new double[std::max(n_uavs_ * 3, 20)];
+    std::string log_all = file_path + "uav" + std::to_string(uav_id_) + ".txt";
+    log2mat_.open(log_all.c_str(), std::ofstream::binary);
+}
+
+/**
+ * Creates a log file that can be read in matlab
+ */
+void Swap_2_5d::Log2Matlab( std::vector<double>& values )
+{
+    if (log2mat_)
+    {
+        log2mat_ << std::setprecision(20);
+        for (unsigned idx = 0; idx < values.size(); ++idx)
+        {
+            if (values[idx] < -10000 || values[idx] > 10000)
+            {
+                log2mat_ << " inf ";
+            }
+            else
+            {
+                log2mat_ << values[idx] << " ";
+            }
+        }
+        log2mat_ << std::endl;
+    }
+}
