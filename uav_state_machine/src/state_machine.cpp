@@ -24,10 +24,9 @@
 // SOFTWARE.
 //----------
 #include <uav_state_machine/state_machine.h>
-#include<sstream>
+#include <sstream>
 #include <thread>
 #include <math.h>
-#include <grvc_utils/frame_transform.h>
 
 #define Z_GIVE_UP_CATCHING 15.0  // TODO: From config file?
 #define Z_RETRY_CATCH 1.0
@@ -230,8 +229,8 @@ void UavStateMachine::onCatching() {
             // x-y-control: in candidateCallback
             // z-control: descend
             if (current_altitude_ < 1.0) {
-                double xy_error = sqrt(target_position_[0]*target_position_[0] + \
-                target_position_[1]*target_position_[1]);
+                double xy_error = sqrt(target_position_[0]*target_position_[0] + target_position_[1]*target_position_[1]);
+
                 if (xy_error < 0.1) {
                     target_position_[2] = -0.22;  // TODO: As a function of x-y error?
 		            free_fall = true;
@@ -502,11 +501,17 @@ bool UavStateMachine::bestCandidateMatch(const uav_state_machine::candidate_list
         //if((candidate.location - _specs.location).norm() < (_result.location - _specs.location).norm()){
         //    score +=1;
         //}
-
+        
         if (score > bestScore) {
-            _result = candidate;
-            foundMatch = true;
+            bool isInField = frame_transform_.isInGameField( grvc::utils::constructPoint(   candidate.global_position.x,
+                                                                                            candidate.global_position.y,
+                                                                                            candidate.global_position.z) );
+            if(isInField){
+                _result = candidate;
+                foundMatch = true;
+            }
         }
     }
+
     return foundMatch;
 }
