@@ -38,6 +38,7 @@
 #include <uav_state_machine/candidate_list.h>
 #include <grvc_quadrotor_hal/types.h>
 #include <tf/transform_datatypes.h>
+#include <grvc_utils/frame_transform.h>
 
 #include<string>
 #include<vector>
@@ -97,6 +98,7 @@ protected:
 	
 	/// Task allocator
 	TaskAllocator* allocator_;
+
 };
 
 /** \brief Constructor
@@ -116,7 +118,7 @@ Scheduler::Scheduler()
 	pnh_->param<double>("lost_time_th", lost_time_th, 20.0); 
 	pnh_->param<double>("association_th", association_th, 6.0);
 	pnh_->param<double>("delay_max", delay_max_, 2.0);
-	pnh_->param<int>("task_alloc_mode",task_alloc_mode, LOWER_SCORE_NEAREST);
+	pnh_->param<int>("task_alloc_mode",task_alloc_mode, HIGHER_PRIORITY_NEAREST);
 	pnh_->param<double>("task_alloc_alpha",task_alloc_alpha, 0.8);
 	pnh_->param<int>("n_uavs",n_uavs_, 3);
 
@@ -154,9 +156,7 @@ Scheduler::Scheduler()
 	ros::Rate r(estimator_rate_);
 	ros::Time prev_time, time_now;
 
-	#ifdef DEBUG_MODE
 	int count = 0;
-	#endif
 
 	while(nh_->ok())
 	{
@@ -175,10 +175,6 @@ Scheduler::Scheduler()
 		{
 			if((it->second).size())
 			{
-				#ifdef DEBUG_MODE
-				cout << "Candidates from UAV " << it->first << endl;
-				#endif 
-
 				estimator_->update(it->second);
 
 				// Remove candidates
@@ -195,8 +191,6 @@ Scheduler::Scheduler()
 
 		publishBelief();
 
-		
-		#ifdef DEBUG_MODE
 		if(count == 5)
 		{
 			estimator_->printTargetsInfo();
@@ -204,7 +198,6 @@ Scheduler::Scheduler()
 		}
 		else
 			count++;
-		#endif
 
 		r.sleep();
 	}
@@ -240,6 +233,7 @@ Scheduler::~Scheduler()
 void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
 {
 	double delay = (ros::Time::now() - candidate_list->stamp).toSec();
+	grvc::utils::frame_transform frameTransform;
 
 	if(candidate_list->candidates.size() && delay < delay_max_)
 	{
@@ -258,26 +252,53 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 		// Store received candidates
 		for(int j = 0; j < candidate_list->candidates.size(); j++)
 		{
-			Candidate* cand_p = new Candidate;
-
-			cand_p->color = candidate_list->candidates[j].color;
-			cand_p->shape = candidate_list->candidates[j].shape;
-			cand_p->height = candidate_list->candidates[j].height;
-			cand_p->width = candidate_list->candidates[j].width;
-
-			cand_p->location(0) = candidate_list->candidates[j].position.x;
-			cand_p->location(1) = candidate_list->candidates[j].position.y;
-			cand_p->location(1) = candidate_list->candidates[j].position.z;
-
-			for(int i = 0; i < 3; i++)
+			// Check if candidate pose is in the game field
+			if( frameTransform.isInGameField( grvc::utils::constructPoint(candidate_list->candidates[j].global_position.x,candidate_list->candidates[j].global_position.y,candidate_list->candidates[j].global_position.z) ) )
 			{
-				for(int k = 0; k < 3; k++)
-				{
-					cand_p->locationCovariance(i,k) = candidate_list->candidates[j].position_covariance[i*3+k];
-				}	
-			}			
+				Candidate* cand_p = new Candidate;
 
-			candidates_[uav].push_back(cand_p); 
+				switch(candidate_list->candidates[j].color)
+				{
+					case uav_state_machine::candidate::COLOR_UNKNOWN:
+					cand_p->color = UNKNOWN;
+					break;
+					case uav_state_machine::candidate::COLOR_RED:
+					cand_p->color = RED;
+					break;
+					case uav_state_machine::candidate::COLOR_BLUE:
+					cand_p->color = BLUE;
+					break;
+					case uav_state_machine::candidate::COLOR_GREEN:
+					cand_p->color = GREEN;
+					break;
+					case uav_state_machine::candidate::COLOR_YELLOW:
+					cand_p->color = YELLOW;
+					break;
+					case uav_state_machine::candidate::COLOR_ORANGE:
+					cand_p->color = ORANGE;
+					break;
+					default:
+					ROS_ERROR("Invalid candidate color received.");
+				}
+
+				cand_p->shape = candidate_list->candidates[j].shape;
+				cand_p->height = candidate_list->candidates[j].height;
+				cand_p->width = candidate_list->candidates[j].width;
+
+				cand_p->location(0) = candidate_list->candidates[j].global_position.x;
+				cand_p->location(1) = candidate_list->candidates[j].global_position.y;
+				cand_p->location(2) = candidate_list->candidates[j].global_position.z;
+
+				for(int i = 0; i < 3; i++)
+				{
+					for(int k = 0; k < 3; k++)
+					{
+						cand_p->locationCovariance(i,k) = candidate_list->candidates[j].position_covariance[i*3+k];
+					}	
+				}			
+
+				candidates_[uav].push_back(cand_p);
+			}
 		}
 	}
 	else
@@ -303,9 +324,48 @@ void Scheduler::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
 bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzirc_scheduler::AssignTarget::Response &res)
 {	
 	bool result;
+	double x, y;
+	TargetStatus target_status;
+	Color target_color;
+
 	if(0 < req.uav_id && req.uav_id <= n_uavs_)
 	{
 		res.target_id = allocator_->getOptimalTarget(req.uav_id);
+
+		if(res.target_id != -1)
+		{
+			estimator_->getTargetInfo(res.target_id, x, y, target_status, target_color);
+
+			res.global_position.x = x;
+			res.global_position.y = y;
+			res.global_position.z = 0.0;
+
+			switch(target_color)
+			{
+				case UNKNOWN:
+				res.color = uav_state_machine::candidate::COLOR_UNKNOWN;
+				break;
+				case RED:
+				res.color = uav_state_machine::candidate::COLOR_RED;
+				break;
+				case BLUE:
+				res.color = uav_state_machine::candidate::COLOR_BLUE;
+				break;
+				case GREEN:
+				res.color = uav_state_machine::candidate::COLOR_GREEN;
+				break;
+				case YELLOW:
+				res.color = uav_state_machine::candidate::COLOR_YELLOW;
+				break;
+				case ORANGE:
+				res.color = uav_state_machine::candidate::COLOR_ORANGE;
+				break;
+			}
+
+			// Set target to assigned
+			estimator_->setTargetStatus(res.target_id, ASSIGNED);
+		}
+
 		result = true;
 	}
 	else
@@ -317,8 +377,31 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 /** \brief Callback for service. Set the status of a target
 */
 bool Scheduler::setTargetStatus(mbzirc_scheduler::SetTargetStatus::Request &req, mbzirc_scheduler::SetTargetStatus::Response &res)
-{	
-	return estimator_->setTargetStatus(req.target_id, (TargetStatus)req.target_status);
+{
+	TargetStatus target_status;
+
+	switch(req.target_status)
+	{
+		case mbzirc_scheduler::SetTargetStatus::Request::UNASSIGNED:
+		target_status = UNASSIGNED;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::ASSIGNED:
+		target_status = ASSIGNED;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::CAUGHT:
+		target_status = CAUGHT;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::DEPLOYED:
+		target_status = DEPLOYED;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::LOST:
+		target_status = LOST;
+		break;
+		default:
+		ROS_ERROR("Not valid target status for assignment.");
+	}	
+
+	return estimator_->setTargetStatus(req.target_id, target_status);
 }
 
 /** \brief Publish markers to represent targets beliefs
@@ -332,6 +415,8 @@ void Scheduler::publishBelief()
 	vector<double> v(4);
 	vector<vector<double> > covariances;
 	double a, b, yaw, x, y, vx, vy;
+	TargetStatus target_status;
+	Color target_color;
 
 	// Get ids to plot active targets
 	vector<int> active_targets = estimator_->getActiveTargets();
@@ -340,6 +425,7 @@ void Scheduler::publishBelief()
 	{
 		if(estimator_->getTargetInfo(active_targets[i], x, y, covariances, vx, vy))
 		{
+			estimator_->getTargetInfo(active_targets[i], x, y, target_status, target_color);
 
 			// Compute SVD of cholesky. The singular values are the square roots of the eigenvalues of
 			// the covariance matrix 
@@ -352,6 +438,47 @@ void Scheduler::publishBelief()
 			
 			// Fill in marker
 			visualization_msgs::Marker marker;
+
+			// Set color for the target, default if UNKNOWN
+			switch(target_color)
+			{
+				case RED:
+				marker.color.r = 1.0;
+				marker.color.g = 0.0;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+				case BLUE:
+				marker.color.r = 0.0;
+				marker.color.g = 0.0;
+				marker.color.b = 1.0;
+				marker.color.a = 1;
+				break;
+				case GREEN:
+				marker.color.r = 0.0;
+				marker.color.g = 1.0;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+				case YELLOW:
+				marker.color.r = 1.0;
+				marker.color.g = 1.0;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+				case ORANGE:
+				marker.color.r = 1.0;
+				marker.color.g = 0.65;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+				default:
+				marker.color.r = 0.0;
+				marker.color.g = 0.0;
+				marker.color.b = 0.0;
+				marker.color.a = 1;
+				break;
+			}
 		
 			// Set the frame ID and timestamp
 			marker.header.frame_id = "/map";    
@@ -373,11 +500,7 @@ void Scheduler::publishBelief()
 			marker.scale.y = b;    
 			marker.scale.z = 0.1;
 
-			marker.lifetime = ros::Duration();
-			marker.color.r = 1.0;
-			marker.color.g = 0.0;
-			marker.color.b = 0.0;
-			marker.color.a = 1;
+			marker.lifetime = ros::Duration(1.0);
 
 			// Set the central pose of the marker. This is a full 6DOF pose relative to the frame/time specified in the header    
 			marker.pose.position.x = x;
@@ -393,14 +516,20 @@ void Scheduler::publishBelief()
 			marker.scale.x = sqrt(vx*vx+vy*vy);
 			marker.scale.y = 0.1;    
 			marker.scale.z = 0.1;
+			if(marker.scale.x != 0.0)
+			{
+				marker.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(vy,vx));
+			}
 			
 			marker_array.markers.push_back(marker);
 
 			// Plot target ID
 			marker.ns = "target_id";
 			marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-			marker.text = to_string(active_targets[i]);    
-			marker.scale.z = 0.25;
+			marker.text = to_string(active_targets[i]);
+			marker.pose.position.x += 1.0;
+			marker.pose.position.y += 1.0;    
+			marker.scale.z = 1.0;
 			
 			marker_array.markers.push_back(marker);
 		}

@@ -74,10 +74,10 @@ void TargetTracker::initialize(Candidate* z)
 		
 	// Setup cov matrix
 	pose_cov_.setIdentity(4, 4);
-	pose_cov_(0,0) = z->locationCovariance(0,0);
-	pose_cov_(0,1) = z->locationCovariance(0,1);
-	pose_cov_(1,0) = z->locationCovariance(1,0);
-	pose_cov_(1,1) = z->locationCovariance(1,1);
+	pose_cov_(0,0) = 2*z->locationCovariance(0,0);
+	pose_cov_(0,1) = 2*z->locationCovariance(0,1);
+	pose_cov_(1,0) = 2*z->locationCovariance(1,0);
+	pose_cov_(1,1) = 2*z->locationCovariance(1,1);
 
 	pose_cov_(2,2) = VEL_NOISE_VAR;
 	pose_cov_(3,3) = VEL_NOISE_VAR;

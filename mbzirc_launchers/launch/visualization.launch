@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="mbzirc_gcs_view" name="visualizer_node" type="visualizer_node" />
+  <node pkg="rviz" name="rviz" type="rviz" args="-d $(find mbzirc_launchers)/cfg/mbzirc.rviz"/>
+</launch>

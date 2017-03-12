@@ -42,6 +42,7 @@
 #include <uav_state_machine/takeoff_service.h>
 #include <uav_state_machine/land_service.h>
 #include <uav_state_machine/waypoint_service.h>
+#include <mbzirc_scheduler/SetTargetStatus.h>
 
 #include <grvc_utils/argument_parser.h>
 
@@ -64,7 +65,8 @@ private:
     bool targetServiceCallback(uav_state_machine::target_service::Request  &req,
          uav_state_machine::target_service::Response &res);
 
-    void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
+    //void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
+    void positionCallback(const std_msgs::String::ConstPtr& uav_pose);
     void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
     void lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg);
     void joyCallback(const sensor_msgs::Joy::ConstPtr& _joy);
@@ -75,13 +77,14 @@ private:
 
     void candidateCallback(const uav_state_machine::candidate_list::ConstPtr& _msg);
     bool bestCandidateMatch(const uav_state_machine::candidate_list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result);
-    
+
     int uav_id_ = -1;
     CatchingDevice *catching_device_;
     ros::ServiceServer take_off_service_;
     ros::ServiceServer land_service_;
     ros::ServiceServer search_service_;
     ros::ServiceServer target_service_;
+    ros::ServiceClient target_status_client_;
 
     ros::Subscriber position_sub_;
     ros::Subscriber altitude_sub_;
@@ -101,7 +104,10 @@ private:
     unsigned int waypoint_index_ = 0;
     float current_altitude_ = 0;
     float target_altitude_ = 0;
-    uav_state_machine::candidate target_;
+    float flying_level_;
+    //uav_state_machine::candidate target_;
+    uav_state_machine::target_service::Request target_;
+    grvc::hal::Waypoint deploy_waypoint_;
 };
 
 #endif  // _MBZIRC_STATEMACHINE_H_

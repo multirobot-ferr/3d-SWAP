@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<launch>
+
+    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find mbzirc_gcs_view)/world/sdf_world.world">
+        <env name="LC_NUMERIC" value="C"/>
+        <!--env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/-->
+    </node>
+
+    <!-- launch gazebo client -->
+    <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
+        <env name="LC_NUMERIC" value="C"/>
+    </node>
+
+<!--******************************UAVs****************************************-->
+
+    <arg name="frames" default="/cfg/map_simulation.xml"/>
+
+    <!-- Launch robot id=1 -->
+    <include file="$(find px4_bringup)/launch/spawn_robot.launch">
+        <arg name="id" value="1"/>
+        <arg name="material" value="Orange"/>
+	    <arg name="frames" value="$(arg frames)"/>
+    </include>
+    <!-- Launch robot id=2 -->
+    <include file="$(find px4_bringup)/launch/spawn_robot.launch">
+        <arg name="id" value="2"/>
+        <arg name="material" value="Indigo"/>
+	    <arg name="frames" value="$(arg frames)"/>
+    </include>
+    <!-- Launch robot id=3 -->
+    <include file="$(find px4_bringup)/launch/spawn_robot.launch">
+        <arg name="id" value="3"/>
+        <arg name="material" value="ZincYellow"/>
+	    <arg name="frames" value="$(arg frames)"/>
+    </include>
+
+</launch>

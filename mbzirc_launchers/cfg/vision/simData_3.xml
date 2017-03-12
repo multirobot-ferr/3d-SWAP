@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<CameraConfig>
+	<!--If streaming of the image contains a pair of images, set to 1 to crop it and use only the left one. Set 0 if monocular-->
+	<IsStereo>0</IsStereo>
+	<!--Size of image-->
+	<ImageWidth>800</ImageWidth>
+	<ImageHeight>600</ImageHeight>
+
+	<CameraType>ros</CameraType> <!--CameraTypes: ros, real, video-->
+	<CameraIndex>1</CameraIndex> <!--Index of the camera, only if CameraType is real-->
+	<CameraTopic>/mbzirc_3/camera_0/image_raw</CameraTopic> <!--ROS topic for the image stream, only if CameraType is ros-->
+	<VideoPath>/home/user/video.avi</VideoPath> <!--Path to a video, only if CameraType is video-->
+
+	<!--Intrinsic matrix from camera calibration-->
+	<IntrinsicMatrix type_id="opencv-matrix">
+	  <rows>3</rows>
+	  <cols>3</cols>
+	  <dt>d</dt>
+	  <data>
+	    674.3185644045923 0. 400. 0.
+	    674.3185644045923 300. 0. 0. 1.</data></IntrinsicMatrix>
+
+	<!--Distortion coefficients from camera calibration-->
+	<DistCoeffs type_id="opencv-matrix">
+	  <rows>5</rows>
+	  <cols>1</cols>
+	  <dt>d</dt>
+	  <data>
+	    0 0 0 0 0</data></DistCoeffs>
+
+	<!--Transformation between the camera and the body-frame of the Drone-->
+	<CameraTransformation type_id="opencv-matrix">
+	  <rows>4</rows>
+	  <cols>4</cols>
+	  <dt>d</dt>
+	  <data>
+	    <!-- Rotation is composed (by cols) for the vectors of the Camera CS in Drone CS-->
+            <!-- Translation is composed by the postion of the desired center in Camera CS-->
+	    0.0 -1.0 0 0.0
+	    -1.0 0.0 0.0 0.0
+	    0 0.0 -1.0 0.0
+	    0.0 0.0 0.0 1.0 </data></CameraTransformation>
+</CameraConfig>
+
+<!--Path to the configuration of the file for segmentation of color-->
+<ccsConfig>../cfg/vision/ccsRGBYO.json</ccsConfig>
+
+<!--Name of topic with PoseStamped message that contains the rotation of the UAV-->
+<UavPoseTopic>/mavros_3/local_position/pose</UavPoseTopic>
+
+<!--Name of topic with Float64 with the altitude of the drone, desiderable Z distance of the floor in the camera CS-->
+<UavAltitudeTopic>/mavros_3/global_position/rel_alt</UavAltitudeTopic>
+
+<!--Topic to position of UAV in map coordinates-->
+<UavMapCoordinatesTopic>/mbzirc_3/hal/pose</UavMapCoordinatesTopic>
+
+<!--Set to 1 if candidate lists needs to be published-->
+<PublishData>1</PublishData>
+
+<!--Name of topic in which the list of candidate is going to be published-->
+<CandidateTopic>/mbzirc_3/candidateList</CandidateTopic>
+
+<!--Set to 1 to see result of the algorithm in a screen, disable in a console environment-->
+<VisualizeResults>0</VisualizeResults>
+
+<!--UAV id-->
+<UavId>3</UavId>
+
+<!-- Covariance of candidates -->
+<CovarianceCandidates> 5.0 </CovarianceCandidates>
+
+<!--Max and min side of the bounding box allowed for the candidates from the segmentation-->
+<MinObjectSize>0.15</MinObjectSize>
+<MaxObjectSize>1.0</MaxObjectSize>
+
+<!--Path to a image file with a mask for the input image. Pixels with value 1 are processed and with 0 not-->
+<MaskImagePath>/home/user/mask.png</MaskImagePath>
+
+</opencv_storage>
