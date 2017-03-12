@@ -37,11 +37,13 @@ namespace mbzirc {
 /** Constructor
 \param likelihood_th Likelihood threshold to associate observations
 \param lost_th Time threshold to consider target lost
+\param min_update_count Minimum number of updates to consider a target consistent 
 */
-CentralizedEstimator::CentralizedEstimator(double lkhd_th, double lost_th)
+CentralizedEstimator::CentralizedEstimator(double lkhd_th, double lost_th, int min_update_count)
 {
 	likelihood_th_ = lkhd_th;
 	lost_th_ = lost_th;
+	min_update_count_ = min_update_count;
 	track_id_count_ = 0;
 }
 
@@ -333,7 +335,7 @@ void CentralizedEstimator::removeLostTargets()
 
 	while(it != targets_.end())
 	{		
-		if( ((it->second)->getStatus() == LOST) || ((it->second)->isStatic() == false && (it->second)->lastUpdateTime() > lost_th_) )
+		if( ((it->second)->getStatus() == LOST) || ((it->second)->isStatic() == false && (it->second)->lastUpdateTime() > lost_th_) || ((it->second)->isStatic() == true && (it->second)->lastUpdateTime() > lost_th_ && (it->second)->getUpdateCount() < min_update_count_) )
 		{
 			delete(it->second);
 			it = targets_.erase(it);

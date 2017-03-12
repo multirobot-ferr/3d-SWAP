@@ -45,7 +45,7 @@ class CentralizedEstimator
 {
 public:
 
-	CentralizedEstimator(double lkhd_th, double lost_th);
+	CentralizedEstimator(double lkhd_th, double lost_th, int min_update_count);
 	~CentralizedEstimator();
 
 	void predict(double dt);
@@ -63,9 +63,10 @@ public:
 protected:
 
 	std::map<int, TargetTracker *> targets_;	/// Map with targets
-	double likelihood_th_;				/// Minimum likelihood threshold for data association
-	double lost_th_;				/// Maximum time threshold to lose target
-	int track_id_count_;				/// Counter of tracks identifiers
+	double likelihood_th_;						/// Minimum likelihood threshold for data association
+	double lost_th_;							/// Maximum time threshold to lose target
+	int min_update_count_;						/// Minimum update counter to consider target consistent
+	int track_id_count_;						/// Counter of tracks identifiers
 };
 
 }
