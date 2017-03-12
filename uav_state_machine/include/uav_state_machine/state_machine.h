@@ -85,6 +85,8 @@ private:
     ros::ServiceServer search_service_;
     ros::ServiceServer target_service_;
     ros::ServiceClient target_status_client_;
+    ros::ServiceClient deploy_approach_client_;
+    ros::ServiceClient deploy_area_client_;
 
     ros::Subscriber position_sub_;
     ros::Subscriber altitude_sub_;
@@ -107,7 +109,7 @@ private:
     float flying_level_;
     //uav_state_machine::candidate target_;
     uav_state_machine::target_service::Request target_;
-    grvc::hal::Waypoint deploy_waypoint_;
+    //grvc::hal::Waypoint deploy_waypoint_;
 };
 
 #endif  // _MBZIRC_STATEMACHINE_H_

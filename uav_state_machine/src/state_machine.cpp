@@ -27,6 +27,8 @@
 #include<sstream>
 #include <thread>
 #include <math.h>
+#include <gcs_state_machine/ApproachPoint.h>
+#include <gcs_state_machine/DeployArea.h>
 #include <grvc_utils/frame_transform.h>
 
 #define Z_GIVE_UP_CATCHING 15.0  // TODO: From config file?
@@ -45,6 +47,8 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     search_service_    = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/waypoint", &UavStateMachine::searchServiceCallback, this);
     target_service_    = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/enabled",  &UavStateMachine::targetServiceCallback, this);
     target_status_client_ = nh.serviceClient<mbzirc_scheduler::SetTargetStatus>("/scheduler/set_target_status");
+    deploy_approach_client_ = nh.serviceClient<gcs_state_machine::ApproachPoint>("/gcs/approach_point");
+    deploy_area_client_ = nh.serviceClient<gcs_state_machine::DeployArea>("/gcs/deploy_area");
 
     //position_sub_ = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_" + uav_id + "/local_position/pose", 10, &UavStateMachine::positionCallback, this);
 	position_sub_ = nh.subscribe<std_msgs::String>("/mbzirc_" + uav_id + "/hal/pose", 10, &UavStateMachine::positionCallback, this);
@@ -112,14 +116,14 @@ bool UavStateMachine::init() {
     }
     std::cout << "Initialized" << std::endl;
     std::cout << "Connected to hal" << std::endl;
-
+/*
     grvc::utils::frame_transform frameTransform;
     geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(5.6,20.7,3.0));
     deploy_waypoint_.pos.x() = deploy_point.x;
     deploy_waypoint_.pos.y() = deploy_point.y;
     deploy_waypoint_.pos.z() = flying_level_;
     //deploy_waypoint_.yaw = current_position_waypoint_.yaw;
-
+*/
     return true;
 }
 
@@ -297,9 +301,36 @@ void UavStateMachine::onGoToDeploy() {
 		if (!target_status_client_.call(target_status_call)) {
 		    ROS_ERROR("Error setting target status to CAUGHT in UAV_%d", uav_id_);
 		}
-        // TODO: Go to closest deploy point and check dropping zone is free
-        waypoint_srv_->send(deploy_waypoint_, ts);  // Blocking!
-        grvc::hal::Waypoint down_waypoint = deploy_waypoint_;
+        // Go to closest deploy point
+        gcs_state_machine::ApproachPoint approach_call;
+        approach_call.request.uav_id = uav_id_;
+        approach_call.request.uav_position.x = current_position_waypoint_.pos.x();
+        approach_call.request.uav_position.y = current_position_waypoint_.pos.y();
+        approach_call.request.question = gcs_state_machine::ApproachPoint::Request::RESERVE_APPROACH_POINT;
+        deploy_approach_client_.call(approach_call);
+        grvc::hal::Waypoint approach_waypoint;
+        if (approach_call.response.answer == gcs_state_machine::ApproachPoint::Response::OK) {
+            approach_waypoint.pos.x() = approach_call.response.approach_position.x;
+            approach_waypoint.pos.y() = approach_call.response.approach_position.y;
+            approach_waypoint.pos.z() = flying_level_;
+            waypoint_srv_->send(approach_waypoint, ts);  // Blocking!
+        } else {
+            std::cerr << "Must be an error, not available approach points!" << std::endl;
+            return;
+        }
+        // TODO: Check dropping zone is free
+        gcs_state_machine::DeployArea deploy_call;
+        deploy_call.request.uav_id = uav_id_;
+        deploy_call.request.question = gcs_state_machine::DeployArea::Request::RESERVE_DEPLOY_AREA;
+        do {
+            deploy_area_client_.call(deploy_call);
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        } while(deploy_call.response.answer == gcs_state_machine::DeployArea::Response::WAIT);
+        grvc::hal::Waypoint deploy_waypoint;
+        deploy_waypoint.pos.x() = deploy_call.response.deploy_position.x;
+        deploy_waypoint.pos.y() = deploy_call.response.deploy_position.y;
+        waypoint_srv_->send(deploy_waypoint, ts);  // Blocking!
+        grvc::hal::Waypoint down_waypoint = deploy_waypoint;
         down_waypoint.pos.z() = 3.0;  // TODO: Altitude as a parameter
         waypoint_srv_->send(down_waypoint, ts);  // Blocking!
         // Demagnetize catching device

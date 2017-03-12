@@ -27,16 +27,16 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Point.h>
 #include <gcs_state_machine.h>
+#include <grvc_utils/frame_transform.h>
 #include <DeployArea.h>
 
 int main(int _argc, char **_argv) {
 	ros::init(_argc, _argv, "GCS_STATE_MACHINE");
   
 	float deploy_area_radius = 10.0;  // TODO: Test!
-	geometry_msgs::Point deploy_area_center;
-	deploy_area_center.x = 24;  // TODO: From config file?
-	deploy_area_center.y = 30;  // TODO: From config file?
-	DeployAreaHandle deploy_area(deploy_area_center, deploy_area_radius);
+    grvc::utils::frame_transform frameTransform;
+    geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(5.6,20.7,3.0));  // TODO: From file!
+	DeployAreaHandle deploy_area(deploy_point, deploy_area_radius);
 
 	GcsStateMachine gcs;
 	if(!gcs.init()){
