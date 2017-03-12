@@ -282,14 +282,6 @@ void UavStateMachine::onCatching() {
                     waypoint_srv_->send({{ target_.global_position.x,
                                            target_.global_position.y,
                                            flying_level_}, 0.0}, ts);
-                    
-                    // Send signal to scheduler to mark the target
-                    mbzirc_scheduler::SetTargetStatus target_status_call;
-                    target_status_call.request.target_id = target_.target_id;
-                    target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::DEPLOYED;
-                    if (!target_status_client_.call(target_status_call)) {
-                        ROS_ERROR("Error setting target status to LOST in UAV_%d", uav_id_);ROS_ERROR("Error setting target status to LOST in UAV_%d", uav_id_);
-                    }
 
                     // Switch to HOVER state.
                     state_.state = uav_state::HOVER;
