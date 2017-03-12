@@ -25,13 +25,20 @@
 //------------------------------------------------------------------------------
 
 #include <ros/ros.h>
+#include <geometry_msgs/Point.h>
 #include <gcs_state_machine.h>
+#include <DeployArea.h>
 
 int main(int _argc, char **_argv) {
 	ros::init(_argc, _argv, "GCS_STATE_MACHINE");
   
-	GcsStateMachine gcs;
+	float deploy_area_radius = 10.0;  // TODO: Test!
+	geometry_msgs::Point deploy_area_center;
+	deploy_area_center.x = 24;  // TODO: From config file?
+	deploy_area_center.y = 30;  // TODO: From config file?
+	DeployArea deploy_area(deploy_area_center, deploy_area_radius);
 
+	GcsStateMachine gcs;
 	if(!gcs.init()){
 		ROS_ERROR("ERROR INITIALIZING GCS!");
 		return -1;	

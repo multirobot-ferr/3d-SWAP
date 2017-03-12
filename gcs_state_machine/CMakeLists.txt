@@ -49,6 +49,11 @@ find_package(catkin REQUIRED COMPONENTS
 			uav_state_machine 
 			message_generation)
 
+add_service_files(
+		FILES
+		ApproachPoint.srv
+		DeployArea.srv)
+
 add_message_files(	FILES
 			gcs_state.msg )
 
