@@ -191,10 +191,6 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 			distances.push_back(t_distances);			
 		}
 
-		// Update with best pair and remove it
-		//valid_targets[best_pair.first] = -1;
-		//n_valid_targets--;
-
 		valid_candidates[best_pair.second] = -1;
 		n_valid_candidates--;
 	}
