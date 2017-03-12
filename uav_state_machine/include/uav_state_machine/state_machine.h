@@ -88,6 +88,7 @@ private:
     ros::ServiceClient target_status_client_;
     ros::ServiceClient deploy_approach_client_;
     ros::ServiceClient deploy_area_client_;
+    ros::ServiceClient vision_algorithm_switcher_client_;
 
     ros::Subscriber position_sub_;
     ros::Subscriber altitude_sub_;

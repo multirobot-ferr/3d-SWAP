@@ -1,0 +1,7 @@
+int8 algorithm
+int8 ALGORITHM_DISABLE=0
+int8 ALGORITHM_CANDIDATES=1
+int8 ALGORITHM_BOX=2
+
+---
+bool success

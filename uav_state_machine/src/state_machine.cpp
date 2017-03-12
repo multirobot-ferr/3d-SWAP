@@ -30,6 +30,8 @@
 #include <gcs_state_machine/ApproachPoint.h>
 #include <gcs_state_machine/DeployArea.h>
 #include <grvc_utils/frame_transform.h>
+#include <uav_state_machine/switch_vision.h>
+
 
 #define Z_GIVE_UP_CATCHING 15.0  // TODO: From config file?
 #define Z_RETRY_CATCH 1.0
@@ -49,6 +51,7 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     target_status_client_ = nh.serviceClient<mbzirc_scheduler::SetTargetStatus>("/scheduler/set_target_status");
     deploy_approach_client_ = nh.serviceClient<gcs_state_machine::ApproachPoint>("/gcs/approach_point");
     deploy_area_client_ = nh.serviceClient<gcs_state_machine::DeployArea>("/gcs/deploy_area");
+    vision_algorithm_switcher_client_ = nh.serviceClient<gcs_state_machine::DeployArea>("/mbzirc_" + uav_id + "/vision_node/algorithm_service");
 
     //position_sub_ = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_" + uav_id + "/local_position/pose", 10, &UavStateMachine::positionCallback, this);
 	position_sub_ = nh.subscribe<std_msgs::String>("/mbzirc_" + uav_id + "/hal/pose", 10, &UavStateMachine::positionCallback, this);
