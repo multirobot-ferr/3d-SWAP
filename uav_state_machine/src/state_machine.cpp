@@ -56,6 +56,7 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     // Matched candidate can't be invalid until first detection...
     matched_candidate_.header.stamp.sec = 0;  // ...so initialize its timestamp in epoch
     matched_candidate_.header.stamp.nsec = 0;
+    max_tries_counter_ = _args.getArgument<int>("max_tries_catching", 3);
 
     // Initial state is repose
     state_.state = uav_state::REPOSE;
@@ -216,6 +217,8 @@ void UavStateMachine::onCatching() {
     // Magnetize catching device
     catching_device_->setMagnetization(true);
 
+    unsigned triesCounter = 0;
+
     bool free_fall = false;
     while (state_.state == uav_state::CATCHING) {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
@@ -256,6 +259,26 @@ void UavStateMachine::onCatching() {
                 grvc::hal::Waypoint approachingWaypoint = {target_.global_position.x, target_.global_position.y, 1.0};
                 waypoint_srv_->send(approachingWaypoint, ts);  // Blocking!
                 
+                triesCounter++;
+                if(triesCounter > max_tries_counter_){
+                    // Go to initial catch position.
+                    waypoint_srv_->send({{ target_.global_position.x,
+                                           target_.global_position.y,
+                                           flying_level_}, 0.0}, ts);
+                    
+                    // Send signal to scheduler to mark the target
+                    mbzirc_scheduler::SetTargetStatus target_status_call;
+                    target_status_call.request.target_id = target_.target_id;
+                    target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::DEPLOYED;
+                    if (!target_status_client_.call(target_status_call)) {
+                        ROS_ERROR("Error setting target status to LOST in UAV_%d", uav_id_);ROS_ERROR("Error setting target status to LOST in UAV_%d", uav_id_);
+                    }
+
+                    // Switch to HOVER state.
+                    state_.state = uav_state::HOVER;
+                    // Break loop.
+                    return;
+                }
             } else {
                 target_position_[2] = -0.22;
 		    }

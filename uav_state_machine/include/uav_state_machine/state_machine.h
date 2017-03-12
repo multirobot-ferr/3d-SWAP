@@ -98,6 +98,7 @@ private:
 
     uav_state_machine::candidate matched_candidate_;
     Eigen::Matrix<double, 3, 1> target_position_ = {0.0, 0.0, 0.0};
+    unsigned max_tries_counter_ = 3;
 
     grvc::hal::Waypoint current_position_waypoint_; // Stores current position of the drone.
     std::vector<grvc::hal::Waypoint> waypoint_list_;
