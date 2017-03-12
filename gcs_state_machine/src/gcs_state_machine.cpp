@@ -219,7 +219,7 @@ void GcsStateMachine::onStateCatching(){
 				if (!assign_target_client.call(assign_target_call)) {
 					//gcs_state_ = eGcsState::ERROR;  // No, retry!
 					state_msg_ = "Error calling assign target service in UAV_" + std::to_string(index_to_id_map_[i]);
-				} else {
+				} else if (assign_target_call.response.target_id >= 0) {
 					uav_state_machine::target_service catch_target_call;
 					catch_target_call.request.enabled = true;
 					catch_target_call.request.color = assign_target_call.response.color;
@@ -232,6 +232,9 @@ void GcsStateMachine::onStateCatching(){
 					}
 					else
 						std::cout << "Target " << assign_target_call.response.target_id << " assigned to UAV " << (i+1) << std::endl;
+				} else {
+					// TODO: What? Finished?
+					std::cerr << "No valid target assigned!" << std::endl;
 				}
 			}
 		}
