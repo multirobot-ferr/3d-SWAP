@@ -134,6 +134,7 @@ bool UavStateMachine::init() {
 //--------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::step() {
     grvc::hal::TaskState ts;
+    gcs_state_machine::ApproachPoint approach_call;
     switch (state_.state) {
 
         case uav_state::REPOSE:
@@ -152,6 +153,15 @@ void UavStateMachine::step() {
             break;
 
         case uav_state::GOTO_CATCH:
+            approach_call.request.uav_id = uav_id_;
+            approach_call.request.question = gcs_state_machine::ApproachPoint::Request::FREE_APPROACH_POINT;
+            deploy_approach_client_.call(approach_call);
+            if (approach_call.response.answer != gcs_state_machine::ApproachPoint::Response::OK) {
+                std::cerr << "Couldn't free approach point" << std::endl;
+            }
+            waypoint_srv_->send({{current_position_waypoint_.pos.x(),
+                                  current_position_waypoint_.pos.y(),
+                                  flying_level_}, 0.0}, ts);
             waypoint_srv_->send({{target_.global_position.x,
                                   target_.global_position.y,
                                   flying_level_}, 0.0}, ts);
@@ -358,6 +368,7 @@ void UavStateMachine::onGoToDeploy() {
         grvc::hal::Waypoint deploy_waypoint;
         deploy_waypoint.pos.x() = deploy_call.response.deploy_position.x;
         deploy_waypoint.pos.y() = deploy_call.response.deploy_position.y;
+        deploy_waypoint.pos.z() = flying_level_;
         waypoint_srv_->send(deploy_waypoint, ts);  // Blocking!
         grvc::hal::Waypoint down_waypoint = deploy_waypoint;
         down_waypoint.pos.z() = 3.0;  // TODO: Altitude as a parameter
@@ -373,6 +384,12 @@ void UavStateMachine::onGoToDeploy() {
         up_waypoint = current_position_waypoint_;
         up_waypoint.pos.z() = flying_level_;
         waypoint_srv_->send(up_waypoint, ts);  // Blocking!
+        waypoint_srv_->send(approach_waypoint, ts);  // Blocking!
+        deploy_call.request.question = gcs_state_machine::DeployArea::Request::FREE_DEPLOY_AREA;
+        do {
+            deploy_area_client_.call(deploy_call);
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        } while(deploy_call.response.answer == gcs_state_machine::DeployArea::Response::WAIT);
         state_.state = uav_state::HOVER;
     } else {
         std::cout << "Miss the catch, try again!" << std::endl;
