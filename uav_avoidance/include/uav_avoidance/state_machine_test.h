@@ -1,0 +1,234 @@
+/*
+ * Copyright (c) 2017, University of Duisburg-Essen, swap-ferr
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of swap-ferr nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/**
+ * @file state_machine_test.h
+ * @author Eduardo Ferrera
+ * @version 0.8
+ * @date    12/3/17
+ * @short: Emulates a state machine that makes the uav fly to different goals
+ *
+ * The following state machine is able to control the uav as the real one should
+ * do. Moreover, it shares the necessary commands with swap to avoid collisions
+ * when necessary.
+ * This state machine can be used to test swap in the real robots before the full
+ * integration to the system
+ */
+
+
+#ifndef STATE_MACHINE_TEST
+#define STATE_MACHINE_TEST
+
+#include <armadillo>
+#include <stdlib.h> //rand
+
+#include <ros/ros.h>
+#include <tf/transform_datatypes.h>     // to convert quaternion to roll-pitch-yaw
+#include <grvc_quadrotor_hal/types.h>
+#include <grvc_quadrotor_hal/server.h>
+#include <grvc_utils/argument_parser.h>
+#include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
+#include <geometry_msgs/Vector3.h>
+
+// Uncomment this define if all the robots starts in (0,0)
+//#define UAV_NOT_IN_ZERO_ZERO 1
+
+#ifdef UAV_NOT_IN_ZERO_ZERO
+// values extracted from the simulator:
+                        //   x      y   yaw
+const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
+                           {-20.0, 30.0, 0.0 },
+                           {-28.0, 26.0, 0.0 } };
+#endif
+
+// Constant values
+const std::string pose_uav_topic = "/hal/pose";
+const std::string takeoff_service= "/hal/take_off";
+const std::string speed_service  = "/hal/velocity";
+const std::string way_point_service  = "/hal/go_to_wp";
+const std::string pos_err_service = "/hal/pos_error";
+const std::string land_service   = "/hal/land";
+
+class StateMachine
+{
+    public:
+        /**
+         * @brief Default constructor of the class
+         *
+         * Request to ROS the necessary parameters
+         * and connects to the publishers, subscribers
+         * and services to control a single uav
+         */
+        StateMachine( int argc, char **argv);
+
+        /**
+         * @brief Destructor to release the memory
+         */
+        ~StateMachine();
+
+        /**
+         * @brief Performs all necessary actions on the loop
+         */
+        void Loop();
+
+        /**
+         * @brief Lands the uav
+         */
+        void Land();
+
+    private:
+        ros::NodeHandle nh_;                    //!< ROS Node handler
+        ros::NodeHandle* pnh_;                  //!< Private node handler
+
+        // Subscribers
+        ros::Subscriber  pos_uav_sub_;          //!< Receives the position of the UAV
+
+    // ###########  Communication with SWAP  ########### //
+        ros::Subscriber  confl_warning_sub_;    //!< Receives warnings from SWAP
+        bool confl_warning_ = false;            //!< Flag to know if there is a conflict to avoid
+        ros::Publisher   wished_mov_dir_pub_;   //!< Sends the direction of movement that the uav wants to take (respect to the map)
+        ros::Subscriber  avoid_mov_dir_sub_;    //!< Requested direction to avoid a conflict
+        geometry_msgs::Vector3 wished_direction_uav_; //!< Movement direction with respect to the map (where the uav wants to go)
+        geometry_msgs::Vector3 avoid_mov_direction_uav_; //!< Movement direction requested from swap
+    // ###########  #######################  ########### //
+
+        // System variables
+        bool initialization_error = false;      //!< Tracks possible initialization errors
+        int uav_id_ = -1;                       //!< Identification number of the current uav
+
+        // Position of the UAV
+        bool   pose_received_ = false;          //!< Tracks if the pose is already known
+        double uav_x_, uav_y_, uav_z_, uav_yaw_;//!< Keeps the knowledge of the postion of the uav
+
+        // UAV references
+        double z_ref_;
+        double d_goal_;
+
+        //Requested from the grvc communication system
+        int argc_;
+        char** argv_;
+
+        //Requested from the grvcQuadcopter
+        grvc::hal::TaskState ts_;
+
+        //Preparing to command the UAV
+        grvc::hal::Server::TakeOffService::Client   *takeOff_srv_ = NULL;
+        grvc::hal::Server::WaypointService::Client  *way_point_srv_ = NULL;
+        grvc::hal::Server::VelocityService::Client  *speed_srv_ = NULL;
+        grvc::hal::Server::PositionErrorService::Client *pos_err_srv_ = NULL;
+        grvc::hal::Server::LandService::Client      *land_srv_ = NULL;
+        double dist_between_uav_z_ = 0.0;
+
+        //Waypoints to debug the system
+        unsigned wp_idx_ = 0;    //  x    y   yaw
+        arma::mat way_points_ ={ {-28.0, +20.0, 0.0    },
+                                 {-28.0, +40.0, 0.0    },
+                                 {-31.0, +40.0, M_PI   },
+                                 {-25.0, +26.0,-M_PI   },
+                                 {-31.0, +26.0, M_PI/2 },
+                                 {-31.0, +20.0,-M_PI/4 },
+                                 {-25.0, +40.0, M_PI/16} };
+
+        /* Callbacks for ROS */
+        /**
+         * @brief Callback for own pose estimation
+         *
+         * @param msg Position message from the grvc
+         */
+        void PoseReceived(const std_msgs::String::ConstPtr& uav_pose);
+
+    // ###########  Communication with SWAP  ########### //
+        /**
+         * @brief Callback from SWAP that informs to the state machine of a conflict
+         *
+         * @param msg Boolean equal to true if there is a collision risk
+         */
+        void WarningCallback(const std_msgs::Bool::ConstPtr& collision_warning);
+    // ###########  #######################  ########### //
+
+    // ###########  Communication with SWAP  ########### //
+        /**
+         * @brief Informs to the state machine of the direction to take in case of a conflict
+         * @param avoidance_direction direction to take in case of conflict
+         */
+        void AvoidMovementCallback(const geometry_msgs::Vector3::ConstPtr& avoidance_direction);
+    // ###########  #######################  ########### //
+
+        /* Internal publishers */
+    // ###########  Communication with SWAP  ########### //
+        /**
+         * @brief Computes the necessary control actions for the robot and publishes them
+         *
+         * Makes the robot move to the next goal unless the collision avoidance system informs
+         * from a possible collision. On that case, follows the avoidance reference
+         */
+        void PublishPosErr();
+    // ###########  #######################  ########### //
+
+        /**
+         * @brief Publish a position error on the controller of the uav
+         * @param xe error in x
+         * @param ye error in y
+         * @param ze error in z
+         */
+        void PublishGRVCPosErr(const double xe, const double ye, const double ze);
+
+        /**
+         * @brief Publishes a speed on the grvc controler
+         * @param vx speed in the x coordinate
+         * @param vy speed in the y coordinate
+         * @param vz speed in the z coordinate
+         */
+        void PublishGRVCCmdVel(const double vx, const double vy, const double vz, const double yaw_rate);
+
+        /**
+         * @brief Publishes a goal on the grvc controler
+         * @param x coordinate x of the goal
+         * @param y coordinate y of the goal
+         * @param z coordinate z of the goal
+         * @param yaw coordinate yaw of the goal
+         */
+        void PublishGRVCgoal(const double x, const double y, const double z, const double yaw);
+
+        /**
+         * @brief Takes off the quadrotor
+         * @return Success of the operation
+         */
+        void TakeOff();
+
+        /**
+         * @brief If the robot is close to a waypoint, it actualizes to the next waypoint
+         */
+        void UpdateWayPoints();
+
+}; // class StateMachine
+
+#endif // STATE_MACHINE_TEST
