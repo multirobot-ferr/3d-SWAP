@@ -488,25 +488,26 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
 bool UavStateMachine::bestCandidateMatch(const uav_state_machine::candidate_list _list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result) {
     double bestScore = 0;
     bool foundMatch = false;
+    
+    typedef std::pair<double, uav_state_machine::candidate> PairDistanceCandidate;
+    std::vector<PairDistanceCandidate> pairsDistCands;
+
+    Eigen::Vector3d specPos = {_specs.global_position.x, _specs.global_position.y, _specs.global_position.z};
     for (auto&candidate:_list.candidates) {
-        double score = 0;
-
-        if (candidate.color == _specs.color) {
-            score +=1;
-        }
-
-        //if(candidate.shape == _specs.shape){
-        //    score +=1;
-        //}
-
-        //if((candidate.location - _specs.location).norm() < (_result.location - _specs.location).norm()){
-        //    score +=1;
-        //}
-
-        if (score > bestScore) {
-            _result = candidate;
-            foundMatch = true;
+        Eigen::Vector3d candidatePos = {candidate.global_position.x, candidate.global_position.y, candidate.global_position.z};
+        double dist = (specPos - candidatePos).norm();
+        pairsDistCands.push_back(PairDistanceCandidate(dist, candidate));
+    }
+    
+    std::sort(pairsDistCands.begin(), pairsDistCands.end(), [](const PairDistanceCandidate &a, const PairDistanceCandidate &b) {
+        return a.first < b.first;   
+    });
+        
+    for(auto &pair: pairsDistCands){
+        if (pair.second.color == _specs.color) {
+            _result = pair.second;
+            return true;
         }
     }
-    return foundMatch;
+    return false;
 }
