@@ -260,7 +260,7 @@ void UavStateMachine::onCatching() {
                 waypoint_srv_->send(up_waypoint, ts);  // Blocking!
 
                 // Move to target position.
-                grvc::hal::Waypoint approachingWaypoint = {target_.global_position.x, target_.global_position.y, 1.0};
+                grvc::hal::Waypoint approachingWaypoint = {{target_.global_position.x, target_.global_position.y, 1.0}, current_position_waypoint_.yaw};
                 waypoint_srv_->send(approachingWaypoint, ts);  // Blocking!
                 
                 triesCounter++;
