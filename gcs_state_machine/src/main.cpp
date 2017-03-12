@@ -36,7 +36,7 @@ int main(int _argc, char **_argv) {
 	geometry_msgs::Point deploy_area_center;
 	deploy_area_center.x = 24;  // TODO: From config file?
 	deploy_area_center.y = 30;  // TODO: From config file?
-	DeployArea deploy_area(deploy_area_center, deploy_area_radius);
+	DeployAreaHandle deploy_area(deploy_area_center, deploy_area_radius);
 
 	GcsStateMachine gcs;
 	if(!gcs.init()){

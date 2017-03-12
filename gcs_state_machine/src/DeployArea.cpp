@@ -11,7 +11,7 @@
 
 using namespace gcs_state_machine;
 
-DeployArea::DeployArea(const geometry_msgs::Point& _center, float _radius) {
+DeployAreaHandle::DeployAreaHandle(const geometry_msgs::Point& _center, float _radius) {
     const int num_points = 6;
     float inc = (float)(2*M_PI/num_points);
     float ang = 0.0;   
@@ -25,12 +25,18 @@ DeployArea::DeployArea(const geometry_msgs::Point& _center, float _radius) {
         ang += inc;
     }
 
+    deploy_area_reserved_.set(false);
+    deploy_center_position_ = _center;
+
     // Advertise services:
     ros::NodeHandle nh;
-    approach_point_service_ = nh.advertiseService("/gcs/approach_point", &DeployArea::ApproachPointSrvCallback, this);
+    approach_point_service_ = nh.advertiseService("/gcs/approach_point", \
+    &DeployAreaHandle::ApproachPointSrvCallback, this);
+    deploy_area_service_ = nh.advertiseService("/gcs/deploy_area", \
+    &DeployAreaHandle::DeployAreaSrvCallback, this);
 }
 
-bool DeployArea::ApproachPointSrvCallback(ApproachPoint::Request &req, ApproachPoint::Response &res) {
+bool DeployAreaHandle::ApproachPointSrvCallback(ApproachPoint::Request &req, ApproachPoint::Response &res) {
     switch (req.question) {
         case ApproachPoint::Request::RESERVE_APPROACH_POINT: {
             float dist_min = 30000.0;
@@ -72,4 +78,32 @@ bool DeployArea::ApproachPointSrvCallback(ApproachPoint::Request &req, ApproachP
             break;
     }
     return true;  // TODO: Use return value instead of OK / WAIT?
+}
+
+bool DeployAreaHandle::DeployAreaSrvCallback(DeployArea::Request &req, DeployArea::Response &res) {
+    switch (req.question) {
+        case DeployArea::Request::FREE_DEPLOY_AREA:
+            if (deploy_area_owner_ == req.uav_id) {
+                deploy_area_reserved_.set(false);
+                res.answer = DeployArea::Response::OK;
+            } else {
+                // Only the owner can free...
+                res.answer = DeployArea::Response::WAIT;
+            }
+            break;
+        case DeployArea::Request::RESERVE_DEPLOY_AREA:
+            // Set reserved to true if it equals false
+            if (deploy_area_reserved_.setIfDataEquals(true, false)) {
+                deploy_area_owner_ = req.uav_id;
+                res.deploy_position = deploy_center_position_;
+                res.answer = DeployArea::Response::OK;
+            } else {
+                res.answer = DeployArea::Response::WAIT;
+            }
+            break;
+        default:
+            std::cerr << "Deploy area service callback: not expected question!" << std::endl;
+            break;
+    }
+    return true;
 }
