@@ -9,18 +9,13 @@ add_definitions(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
 	roscpp
-        std_msgs
-        grvc_quadrotor_hal
+    std_msgs
+    grvc_quadrotor_hal
+	#grvc_utils				# TODO: REPARE
 )
 
 find_package(Armadillo REQUIRED)
 
-
-## Generate added messages and services with any dependencies listed here
-#generate_messages(
-#        DEPENDENCIES
-#        std_msgs  # Or other packages containing msgs
-#)
 
 ###################################
 ## catkin specific configuration ##
@@ -33,10 +28,11 @@ find_package(Armadillo REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include src/core
-  LIBRARIES swar_2_5d_library
+  LIBRARIES swap_2_5d_library
   CATKIN_DEPENDS
         roscpp
         grvc_quadrotor_hal
+		#grvc_utils			# TODO: REPARE
         std_msgs
   DEPENDS ARMADILLO
 )
@@ -59,8 +55,10 @@ include_directories(
 add_library(swap_2_5d_library
     src/core/swap.cpp
     src/core/polarobstaclediagram.cpp
+	#../../collision_avoidance/swap/src/swap/core/swap.cpp
+	#../../collision_avoidance/swap/src/swap/core/polarobstaclediagram.cpp
 )
-#target_link_libraries(swap_2_5d_library ${LARMADILLO_LIBRARY})
+
 target_link_libraries(swap_2_5d_library ${ARMADILLO_LIBRARIES})
 
 # Creating the ROS node for SWAP
@@ -68,4 +66,7 @@ add_executable(swap_2_5d src/swap_2_5d.cpp)
 add_dependencies(swap_2_5d swap_2_5d_library ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(swap_2_5d swap_2_5d_library ${catkin_LIBRARIES})
 
-
+# Creating a node to test the system
+add_executable(state_machine src/state_machine_test.cpp)
+add_dependencies(state_machine ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(state_machine swap_2_5d_library ${catkin_LIBRARIES})
