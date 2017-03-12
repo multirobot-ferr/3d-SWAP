@@ -34,8 +34,8 @@ int main(int _argc, char **_argv) {
 	ros::init(_argc, _argv, "GCS_STATE_MACHINE");
   
 	float deploy_area_radius = 10.0;  // TODO: Test!
-    grvc::utils::frame_transform frameTransform;
-    geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(5.6,20.7,3.0));  // TODO: From file!
+	grvc::utils::frame_transform frameTransform;
+	geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(24, 30, 3.0));  // TODO: From file!
 	DeployAreaHandle deploy_area(deploy_point, deploy_area_radius);
 
 	GcsStateMachine gcs;
