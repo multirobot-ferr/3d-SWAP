@@ -245,14 +245,17 @@ void UavStateMachine::onCatching() {
             }
         } else {   // No fresh candidates (timeout)
 	        if (!free_fall) {
-                // TODO: Go directly to some fixed altitude?
-        	    // x-y-control slowly goes to 0
-       		    target_position_[0] = 0.99*target_position_[0];
-        	    target_position_[1] = 0.99*target_position_[1];
-        	    // z-control: ascend
-        	    target_position_[2] = +1.0;  // TODO: As a function of x-y error?
-        	    //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
-        	    std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
+                std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
+                // Go up in the same position.
+                grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
+                up_waypoint.pos.z() = 1.0;  // TODO: Altitude as a parameter
+                grvc::hal::TaskState ts;
+                waypoint_srv_->send(up_waypoint, ts);  // Blocking!
+
+                // Move to target position.
+                grvc::hal::Waypoint approachingWaypoint = {target_.global_position.x, target_.global_position.y, 1.0};
+                waypoint_srv_->send(approachingWaypoint, ts);  // Blocking!
+                
             } else {
                 target_position_[2] = -0.22;
 		    }
@@ -470,7 +473,7 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
             target_candidate.color = target_.color;
             target_candidate.shape = target_.shape;
             target_candidate.global_position.x = target_.global_position.x;
-            target_candidate.global_position.y = target_.global_position.x;
+            target_candidate.global_position.y = target_.global_position.y;
             if (bestCandidateMatch(candidateList, target_candidate, matched_candidate_)) {
                 matched_candidate_.header.stamp = ros::Time::now();
                 target_position_[0] = matched_candidate_.local_position.x;
