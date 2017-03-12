@@ -129,6 +129,7 @@ void TargetTracker::initialize(Candidate* z)
 
 	// Update timer
 	update_timer_.reset();
+	update_count_ = 0;
 }
 
 /**
@@ -246,6 +247,7 @@ bool TargetTracker::update(Candidate* z)
 
 	// Update timer
 	update_timer_.reset();
+	update_count_++;
 }
     
 /**
@@ -302,6 +304,15 @@ Return the time since the last observation update.
 double TargetTracker::lastUpdateTime()
 {
 	return update_timer_.elapsed();
+}
+
+/**
+Return the counter of updates. 
+\return Update counter
+*/
+int TargetTracker::getUpdateCount()
+{
+	return update_count_;
 }
     
 /** \brief Return pose information from the target

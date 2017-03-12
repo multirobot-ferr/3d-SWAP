@@ -61,6 +61,7 @@ public:
 	double getLikelihood(Candidate* z);
 	double getDistance(Candidate* z);
 	double lastUpdateTime();
+	int getUpdateCount();
 	void getPose(double &x, double &y);
 	void getVelocity(double &vx, double &vy);
 	std::vector<std::vector<double> > getCov();
@@ -75,11 +76,12 @@ public:
 	Color getColor();
 
 protected:
-	Timer update_timer_;				/// Timer for last update
-	int id_;					/// Target identifier
+	Timer update_timer_;			/// Timer for last update
+	int update_count_;				/// Counter with the number of updates
+	int id_;						/// Target identifier
 	bool is_static_;				/// It indicates whether the target is static/dynamic
 	bool is_large_;					/// It indicates whether the targes is large
-	TargetStatus status_;				/// Current status
+	TargetStatus status_;			/// Current status
 
 	/// Factored discrete belief: COLOR	
 	std::vector<std::vector<double> > fact_bel_;	
