@@ -45,6 +45,7 @@
 #include <mbzirc_scheduler/SetTargetStatus.h>
 
 #include <grvc_utils/argument_parser.h>
+#include <grvc_utils/frame_transform.h>
 
 #include <thread>
 
@@ -110,6 +111,8 @@ private:
     //uav_state_machine::candidate target_;
     uav_state_machine::target_service::Request target_;
     //grvc::hal::Waypoint deploy_waypoint_;
+    grvc::utils::frame_transform frame_transform_;
+
 };
 
 #endif  // _MBZIRC_STATEMACHINE_H_
