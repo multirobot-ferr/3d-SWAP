@@ -50,7 +50,7 @@
 <UavPoseTopic>/mavros_1/local_position/pose</UavPoseTopic>
 
 <!--Name of topic with Float64 with the altitude of the drone, desiderable Z distance of the floor in the camera CS-->
-<UavAltitudeTopic>/mavros_1/global_position/rel_alt</UavAltitudeTopic>
+<UavAltitudeTopic>/mavros_1/uav_state_machine/lidar_altitude</UavAltitudeTopic>
 
 <!--Topic to position of UAV in map coordinates-->
 <UavMapCoordinatesTopic>/mbzirc_1/hal/pose</UavMapCoordinatesTopic>
@@ -62,7 +62,7 @@
 <CandidateTopic>/mbzirc_1/candidateList</CandidateTopic>
 
 <!--Set to 1 to see result of the algorithm in a screen, disable in a console environment-->
-<VisualizeResults>0</VisualizeResults>
+<VisualizeResults>1</VisualizeResults>
 
 <!--UAV id-->
 <UavId>1</UavId>
