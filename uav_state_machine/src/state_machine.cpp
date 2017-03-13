@@ -257,6 +257,8 @@ void UavStateMachine::onCatching() {
 
     unsigned triesCounter = 0;
 
+    std::vector<double> history_xy_errors;
+
     bool free_fall = false;
     while (state_.state == uav_state::CATCHING) {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
@@ -272,15 +274,25 @@ void UavStateMachine::onCatching() {
             // z-control: descend
             if (current_altitude_ < 1.0) {
                 double xy_error = sqrt(target_position_[0]*target_position_[0] + target_position_[1]*target_position_[1]);
+                history_xy_errors.push_back(xy_error);
+                
+                if(history_xy_errors.size() > 10){   // 666 TODO: Check window size for avg xy error!
+                    history_xy_errors.erase(history_xy_errors.begin());
 
-                if (xy_error < 0.1) {
-                    target_position_[2] = -0.22;  // TODO: As a function of x-y error?
-		            free_fall = true;
-		        } else if (!free_fall) {
-                        target_position_[2] = 1.0-current_altitude_;  // Hold at 1m
-                } else {
-		            	target_position_[2] = -0.22;
-			    }
+                    double avg_xy_error;
+                    avg_xy_error = std::accumulate(history_xy_errors.begin(), history_xy_errors.end(), 0);
+                    
+                    if (avg_xy_error < 0.1) {
+                        target_position_[2] = -0.22;  // TODO: As a function of x-y error?
+                        free_fall = true;
+                    } else if (!free_fall) {
+                            target_position_[2] = 1.0-current_altitude_;  // Hold at 1m
+                    } else {
+                            target_position_[2] = -0.22;
+                    }
+                }else {
+                    target_position_[2] = 1.0-current_altitude_;  // Hold at 1m
+                }
             } else {
                 target_position_[2] = -0.5;  // TODO: As a function of x-y error?
             }
