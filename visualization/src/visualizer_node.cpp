@@ -270,7 +270,7 @@ void Visualizer::publishMarkers()
 
             marker.ns = "uavs_state";
             marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-            marker.text = uavs_states_[uav_id];
+            marker.text = std::to_string(uav_id) + " " + uavs_states_[uav_id];
             marker.pose.position.z += 2.0;
             
             marker.scale.x = 1;

@@ -8,6 +8,7 @@ uint8 LANDING=5
 uint8 GOTO_DEPLOY=6
 uint8 GOTO_CATCH=7
 uint8 RETRY_CATCH=8
+uint8 ERROR=9
 
 # And here message itself:
 uint8 uav_id

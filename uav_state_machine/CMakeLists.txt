@@ -37,6 +37,7 @@ if(GRVCQUAD_USE_ROS)
 		   waypoint_service.srv
 		   land_service.srv
 		   magnetize_service.srv
+		   switch_vision.srv
 	 )
 	add_message_files(
 		   FILES

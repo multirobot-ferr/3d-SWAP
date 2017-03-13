@@ -109,13 +109,15 @@ Scheduler::Scheduler()
 	pnh_ = new ros::NodeHandle("~");
 
 	double lost_time_th, association_th;
+	int min_update_count;
 	int task_alloc_mode;
 	double task_alloc_alpha;
 	
 
 	// Read parameters
 	pnh_->param<double>("estimator_rate", estimator_rate_, 5.0); 
-	pnh_->param<double>("lost_time_th", lost_time_th, 20.0); 
+	pnh_->param<double>("lost_time_th", lost_time_th, 20.0);
+	pnh_->param<int>("min_update_count", min_update_count, 0); 
 	pnh_->param<double>("association_th", association_th, 6.0);
 	pnh_->param<double>("delay_max", delay_max_, 2.0);
 	pnh_->param<int>("task_alloc_mode",task_alloc_mode, HIGHER_PRIORITY_NEAREST);
@@ -123,7 +125,7 @@ Scheduler::Scheduler()
 	pnh_->param<int>("n_uavs",n_uavs_, 3);
 
 	// Estimator and allocator
-	estimator_ = new CentralizedEstimator(association_th, lost_time_th);
+	estimator_ = new CentralizedEstimator(association_th, lost_time_th, min_update_count);
 	allocator_ = new TaskAllocator(estimator_, (TargetSelectionMode)task_alloc_mode, n_uavs_, task_alloc_alpha);
 
 	// Subscriptions/publications

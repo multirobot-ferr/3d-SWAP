@@ -24,10 +24,14 @@
 // SOFTWARE.
 //----------
 #include <uav_state_machine/state_machine.h>
-#include<sstream>
+#include <sstream>
 #include <thread>
 #include <math.h>
+#include <gcs_state_machine/ApproachPoint.h>
+#include <gcs_state_machine/DeployArea.h>
 #include <grvc_utils/frame_transform.h>
+#include <uav_state_machine/switch_vision.h>
+
 
 #define Z_GIVE_UP_CATCHING 15.0  // TODO: From config file?
 #define Z_RETRY_CATCH 1.0
@@ -45,6 +49,9 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     search_service_    = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/waypoint", &UavStateMachine::searchServiceCallback, this);
     target_service_    = nh.advertiseService("/mbzirc_" + uav_id + "/uav_state_machine/enabled",  &UavStateMachine::targetServiceCallback, this);
     target_status_client_ = nh.serviceClient<mbzirc_scheduler::SetTargetStatus>("/scheduler/set_target_status");
+    deploy_approach_client_ = nh.serviceClient<gcs_state_machine::ApproachPoint>("/gcs/approach_point");
+    deploy_area_client_ = nh.serviceClient<gcs_state_machine::DeployArea>("/gcs/deploy_area");
+    vision_algorithm_switcher_client_ = nh.serviceClient<gcs_state_machine::DeployArea>("/mbzirc_" + uav_id + "/vision_node/algorithm_service");
 
     //position_sub_ = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_" + uav_id + "/local_position/pose", 10, &UavStateMachine::positionCallback, this);
 	position_sub_ = nh.subscribe<std_msgs::String>("/mbzirc_" + uav_id + "/hal/pose", 10, &UavStateMachine::positionCallback, this);
@@ -56,6 +63,7 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     // Matched candidate can't be invalid until first detection...
     matched_candidate_.header.stamp.sec = 0;  // ...so initialize its timestamp in epoch
     matched_candidate_.header.stamp.nsec = 0;
+    max_tries_counter_ = _args.getArgument<int>("max_tries_catching", 3);
 
     // Initial state is repose
     state_.state = uav_state::REPOSE;
@@ -95,6 +103,9 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
                 case uav_state::RETRY_CATCH:
                 this->state_.state_str.data = std::string("RETRY_CATCH");
                 break;
+                case uav_state::ERROR:
+                this->state_.state_str.data = std::string("ERROR");
+                break;
             }	
             this->state_.uav_id = uav_id_;
 
@@ -112,20 +123,21 @@ bool UavStateMachine::init() {
     }
     std::cout << "Initialized" << std::endl;
     std::cout << "Connected to hal" << std::endl;
-
+/*
     grvc::utils::frame_transform frameTransform;
     geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(5.6,20.7,3.0));
     deploy_waypoint_.pos.x() = deploy_point.x;
     deploy_waypoint_.pos.y() = deploy_point.y;
     deploy_waypoint_.pos.z() = flying_level_;
     //deploy_waypoint_.yaw = current_position_waypoint_.yaw;
-
+*/
     return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::step() {
     grvc::hal::TaskState ts;
+    gcs_state_machine::ApproachPoint approach_call;
     switch (state_.state) {
 
         case uav_state::REPOSE:
@@ -144,6 +156,15 @@ void UavStateMachine::step() {
             break;
 
         case uav_state::GOTO_CATCH:
+            approach_call.request.uav_id = uav_id_;
+            approach_call.request.question = gcs_state_machine::ApproachPoint::Request::FREE_APPROACH_POINT;
+            deploy_approach_client_.call(approach_call);
+            if (approach_call.response.answer != gcs_state_machine::ApproachPoint::Response::OK) {
+                std::cerr << "Couldn't free approach point" << std::endl;
+            }
+            waypoint_srv_->send({{current_position_waypoint_.pos.x(),
+                                  current_position_waypoint_.pos.y(),
+                                  flying_level_}, 0.0}, ts);
             waypoint_srv_->send({{target_.global_position.x,
                                   target_.global_position.y,
                                   flying_level_}, 0.0}, ts);
@@ -186,6 +207,15 @@ void UavStateMachine::step() {
 
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::onSearching() {
+    // Enable candidate search vision algorithm
+    uav_state_machine::switch_vision switchRequest;
+    switchRequest.request.algorithm = switchRequest.request.ALGORITHM_CANDIDATES;
+    if (!vision_algorithm_switcher_client_.call(switchRequest)) {
+        state_.state = uav_state::ERROR;
+        state_.state_str.data = "Error enabling candidate detector algorithm";
+        return;
+    }
+
     // When the UAV finish the track, it starts again the same track
     grvc::hal::TaskState ts;
     waypoint_srv_->send(waypoint_list_[waypoint_index_], ts);
@@ -200,6 +230,15 @@ void UavStateMachine::onSearching() {
 
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::onCatching() {
+    // Enable candidate search vision algorithm
+    uav_state_machine::switch_vision switchRequest;
+    switchRequest.request.algorithm = switchRequest.request.ALGORITHM_CANDIDATES;
+    if (!vision_algorithm_switcher_client_.call(switchRequest)) {
+        state_.state = uav_state::ERROR;
+        state_.state_str.data = "Error enabling candidate detector algorithm";
+        return;
+    }
+
     //TargetTracking (aka visual servoing)
     /// Init subscriber to candidates
     ros::NodeHandle nh;
@@ -216,6 +255,8 @@ void UavStateMachine::onCatching() {
     // Magnetize catching device
     catching_device_->setMagnetization(true);
 
+    unsigned triesCounter = 0;
+
     bool free_fall = false;
     while (state_.state == uav_state::CATCHING) {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
@@ -230,8 +271,8 @@ void UavStateMachine::onCatching() {
             // x-y-control: in candidateCallback
             // z-control: descend
             if (current_altitude_ < 1.0) {
-                double xy_error = sqrt(target_position_[0]*target_position_[0] + \
-                target_position_[1]*target_position_[1]);
+                double xy_error = sqrt(target_position_[0]*target_position_[0] + target_position_[1]*target_position_[1]);
+
                 if (xy_error < 0.1) {
                     target_position_[2] = -0.22;  // TODO: As a function of x-y error?
 		            free_fall = true;
@@ -245,14 +286,29 @@ void UavStateMachine::onCatching() {
             }
         } else {   // No fresh candidates (timeout)
 	        if (!free_fall) {
-                // TODO: Go directly to some fixed altitude?
-        	    // x-y-control slowly goes to 0
-       		    target_position_[0] = 0.99*target_position_[0];
-        	    target_position_[1] = 0.99*target_position_[1];
-        	    // z-control: ascend
-        	    target_position_[2] = +1.0;  // TODO: As a function of x-y error?
-        	    //target_position_[2] = target_altitude_-current_altitude_;  // From joystick!
-        	    std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
+                std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
+                // Go up in the same position.
+                grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
+                up_waypoint.pos.z() = 1.0;  // TODO: Altitude as a parameter
+                grvc::hal::TaskState ts;
+                waypoint_srv_->send(up_waypoint, ts);  // Blocking!
+
+                // Move to target position.
+                grvc::hal::Waypoint approachingWaypoint = {{target_.global_position.x, target_.global_position.y, 1.0}, current_position_waypoint_.yaw};
+                waypoint_srv_->send(approachingWaypoint, ts);  // Blocking!
+                
+                triesCounter++;
+                if(triesCounter > max_tries_counter_){
+                    // Go to initial catch position.
+                    waypoint_srv_->send({{ target_.global_position.x,
+                                           target_.global_position.y,
+                                           flying_level_}, 0.0}, ts);
+
+                    // Switch to HOVER state.
+                    state_.state = uav_state::HOVER;
+                    // Break loop.
+                    return;
+                }
             } else {
                 target_position_[2] = -0.22;
 		    }
@@ -283,6 +339,15 @@ void UavStateMachine::onCatching() {
 
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::onGoToDeploy() {
+    // Disable searching
+    uav_state_machine::switch_vision switchRequest;
+    switchRequest.request.algorithm = switchRequest.request.ALGORITHM_DISABLE;
+    if (!vision_algorithm_switcher_client_.call(switchRequest)) {
+        state_.state = uav_state::ERROR;
+        state_.state_str.data = "Error disabling vision algorithm";
+        return;
+    }
+
     // Go up!
     grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
     up_waypoint.pos.z() = 5.0;  // TODO: Altitude as a parameter
@@ -297,9 +362,37 @@ void UavStateMachine::onGoToDeploy() {
 		if (!target_status_client_.call(target_status_call)) {
 		    ROS_ERROR("Error setting target status to CAUGHT in UAV_%d", uav_id_);
 		}
-        // TODO: Go to closest deploy point and check dropping zone is free
-        waypoint_srv_->send(deploy_waypoint_, ts);  // Blocking!
-        grvc::hal::Waypoint down_waypoint = deploy_waypoint_;
+        // Go to closest deploy point
+        gcs_state_machine::ApproachPoint approach_call;
+        approach_call.request.uav_id = uav_id_;
+        approach_call.request.uav_position.x = current_position_waypoint_.pos.x();
+        approach_call.request.uav_position.y = current_position_waypoint_.pos.y();
+        approach_call.request.question = gcs_state_machine::ApproachPoint::Request::RESERVE_APPROACH_POINT;
+        deploy_approach_client_.call(approach_call);
+        grvc::hal::Waypoint approach_waypoint;
+        if (approach_call.response.answer == gcs_state_machine::ApproachPoint::Response::OK) {
+            approach_waypoint.pos.x() = approach_call.response.approach_position.x;
+            approach_waypoint.pos.y() = approach_call.response.approach_position.y;
+            approach_waypoint.pos.z() = flying_level_;
+            waypoint_srv_->send(approach_waypoint, ts);  // Blocking!
+        } else {
+            std::cerr << "Must be an error, not available approach points!" << std::endl;
+            return;
+        }
+        // TODO: Check dropping zone is free
+        gcs_state_machine::DeployArea deploy_call;
+        deploy_call.request.uav_id = uav_id_;
+        deploy_call.request.question = gcs_state_machine::DeployArea::Request::RESERVE_DEPLOY_AREA;
+        do {
+            deploy_area_client_.call(deploy_call);
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        } while(deploy_call.response.answer == gcs_state_machine::DeployArea::Response::WAIT);
+        grvc::hal::Waypoint deploy_waypoint;
+        deploy_waypoint.pos.x() = deploy_call.response.deploy_position.x;
+        deploy_waypoint.pos.y() = deploy_call.response.deploy_position.y;
+        deploy_waypoint.pos.z() = flying_level_;
+        waypoint_srv_->send(deploy_waypoint, ts);  // Blocking!
+        grvc::hal::Waypoint down_waypoint = deploy_waypoint;
         down_waypoint.pos.z() = 3.0;  // TODO: Altitude as a parameter
         waypoint_srv_->send(down_waypoint, ts);  // Blocking!
         // Demagnetize catching device
@@ -313,6 +406,12 @@ void UavStateMachine::onGoToDeploy() {
         up_waypoint = current_position_waypoint_;
         up_waypoint.pos.z() = flying_level_;
         waypoint_srv_->send(up_waypoint, ts);  // Blocking!
+        waypoint_srv_->send(approach_waypoint, ts);  // Blocking!
+        deploy_call.request.question = gcs_state_machine::DeployArea::Request::FREE_DEPLOY_AREA;
+        do {
+            deploy_area_client_.call(deploy_call);
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        } while(deploy_call.response.answer == gcs_state_machine::DeployArea::Response::WAIT);
         state_.state = uav_state::HOVER;
     } else {
         std::cout << "Miss the catch, try again!" << std::endl;
@@ -470,7 +569,7 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
             target_candidate.color = target_.color;
             target_candidate.shape = target_.shape;
             target_candidate.global_position.x = target_.global_position.x;
-            target_candidate.global_position.y = target_.global_position.x;
+            target_candidate.global_position.y = target_.global_position.y;
             if (bestCandidateMatch(candidateList, target_candidate, matched_candidate_)) {
                 matched_candidate_.header.stamp = ros::Time::now();
                 target_position_[0] = matched_candidate_.local_position.x;
@@ -488,25 +587,31 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
 bool UavStateMachine::bestCandidateMatch(const uav_state_machine::candidate_list _list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result) {
     double bestScore = 0;
     bool foundMatch = false;
+    
+    typedef std::pair<double, uav_state_machine::candidate> PairDistanceCandidate;
+    std::vector<PairDistanceCandidate> pairsDistCands;
+
+    Eigen::Vector3d specPos = {_specs.global_position.x, _specs.global_position.y, _specs.global_position.z};
     for (auto&candidate:_list.candidates) {
-        double score = 0;
-
-        if (candidate.color == _specs.color) {
-            score +=1;
-        }
-
-        //if(candidate.shape == _specs.shape){
-        //    score +=1;
-        //}
-
-        //if((candidate.location - _specs.location).norm() < (_result.location - _specs.location).norm()){
-        //    score +=1;
-        //}
-
-        if (score > bestScore) {
-            _result = candidate;
-            foundMatch = true;
+	bool isInField = frame_transform_.isInGameField( grvc::utils::constructPoint(   candidate.global_position.x,
+                                                                                            candidate.global_position.y,
+                                                                                            candidate.global_position.z) );
+	if(isInField){
+		Eigen::Vector3d candidatePos = {candidate.global_position.x, candidate.global_position.y, candidate.global_position.z};
+		double dist = (specPos - candidatePos).norm();
+		pairsDistCands.push_back(PairDistanceCandidate(dist, candidate));
+	}
+    }
+    
+    std::sort(pairsDistCands.begin(), pairsDistCands.end(), [](const PairDistanceCandidate &a, const PairDistanceCandidate &b) {
+        return a.first < b.first;   
+    });
+        
+    for(auto &pair: pairsDistCands){
+        if (pair.second.color == _specs.color) {
+            _result = pair.second;
+            return true;
         }
     }
-    return foundMatch;
+    return false;
 }
