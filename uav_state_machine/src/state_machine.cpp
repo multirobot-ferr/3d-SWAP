@@ -608,7 +608,12 @@ bool UavStateMachine::bestCandidateMatch(const uav_state_machine::candidate_list
 	bool isInField = frame_transform_.isInGameField( grvc::utils::constructPoint(   candidate.global_position.x,
                                                                                             candidate.global_position.y,
                                                                                             candidate.global_position.z) );
-	if(isInField){
+
+    bool isInDroppingArea = frame_transform_.isInDroppingArea( grvc::utils::constructPoint(   candidate.global_position.x,
+                                                                                            candidate.global_position.y,
+                                                                                            candidate.global_position.z) );
+
+	if(isInField && !isInDroppingArea){
 		Eigen::Vector3d candidatePos = {candidate.global_position.x, candidate.global_position.y, candidate.global_position.z};
 		double dist = (specPos - candidatePos).norm();
 		pairsDistCands.push_back(PairDistanceCandidate(dist, candidate));

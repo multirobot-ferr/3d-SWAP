@@ -255,7 +255,8 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 		for(int j = 0; j < candidate_list->candidates.size(); j++)
 		{
 			// Check if candidate pose is in the game field
-			if( frameTransform.isInGameField( grvc::utils::constructPoint(candidate_list->candidates[j].global_position.x,candidate_list->candidates[j].global_position.y,candidate_list->candidates[j].global_position.z) ) )
+			if( frameTransform.isInGameField( grvc::utils::constructPoint(candidate_list->candidates[j].global_position.x,candidate_list->candidates[j].global_position.y,candidate_list->candidates[j].global_position.z) ) \
+			 && !frameTransform.isInDroppingArea( grvc::utils::constructPoint(candidate_list->candidates[j].global_position.x,candidate_list->candidates[j].global_position.y,candidate_list->candidates[j].global_position.z) ) )
 			{
 				Candidate* cand_p = new Candidate;
 
