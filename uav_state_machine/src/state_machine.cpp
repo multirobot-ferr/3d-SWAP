@@ -536,16 +536,11 @@ void UavStateMachine::altitudeCallback(const std_msgs::Float64::ConstPtr& _msg){
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg){
     const float object_height = 0.2;  // TODO: Check
-    if (lidar_reading_ == LidarReading::UNKNOWN) {
-        // Initialize, guess first seen is floor
+    float delta_range = _msg->range - lidar_range_;
+    if (delta_range > object_height) {
         lidar_reading_ = LidarReading::FLOOR;
-    } else {
-        float delta_range = _msg->range - lidar_range_;
-        if (delta_range > object_height) {
-            lidar_reading_ = LidarReading::FLOOR;
-        } else if (delta_range < object_height) {
-            lidar_reading_ = LidarReading::OBJECT;
-        }
+    } else if (delta_range < object_height) {
+        lidar_reading_ = LidarReading::OBJECT;
     }
     lidar_range_ = _msg->range;  // Update anyway
     switch (lidar_reading_) {
@@ -557,7 +552,6 @@ void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& 
             current_altitude_ = lidar_range_ + object_height;
             break;
 
-        case LidarReading::UNKNOWN:
         default:
             current_altitude_ = lidar_range_;
             // But it's somekind of error!

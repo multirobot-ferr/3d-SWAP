@@ -108,8 +108,8 @@ private:
     std::vector<grvc::hal::Waypoint> waypoint_list_;
     unsigned int waypoint_index_ = 0;
 
-    enum class LidarReading { UNKNOWN, FLOOR, OBJECT };
-    LidarReading lidar_reading_ = LidarReading::UNKNOWN;
+    enum class LidarReading { FLOOR, OBJECT };
+    LidarReading lidar_reading_ = LidarReading::FLOOR;
     float lidar_range_ = 0;
     float current_altitude_ = 0;
     float target_altitude_ = 0;
