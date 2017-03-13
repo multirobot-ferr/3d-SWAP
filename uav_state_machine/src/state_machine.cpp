@@ -302,7 +302,7 @@ void UavStateMachine::onCatching() {
                 std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
                 // Go up in the same position.
                 grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
-                up_waypoint.pos.z() = 1.0;  // TODO: Altitude as a parameter
+                up_waypoint.pos.z() = 2.0;  // TODO: Altitude as a parameter
                 grvc::hal::TaskState ts;
                 waypoint_srv_->send(up_waypoint, ts);  // Blocking!
 
