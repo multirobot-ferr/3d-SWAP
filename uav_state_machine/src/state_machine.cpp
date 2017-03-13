@@ -539,7 +539,7 @@ void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& 
     float delta_range = _msg->range - lidar_range_;
     if (delta_range > object_height) {
         lidar_reading_ = LidarReading::FLOOR;
-    } else if (delta_range < object_height) {
+    } else if (delta_range < -object_height) {
         lidar_reading_ = LidarReading::OBJECT;
     }
     lidar_range_ = _msg->range;  // Update anyway
