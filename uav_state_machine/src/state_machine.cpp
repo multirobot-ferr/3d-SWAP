@@ -103,6 +103,9 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
                 case uav_state::RETRY_CATCH:
                 this->state_.state_str.data = std::string("RETRY_CATCH");
                 break;
+                case uav_state::ERROR:
+                this->state_.state_str.data = std::string("ERROR");
+                break;
             }	
             this->state_.uav_id = uav_id_;
 
@@ -204,6 +207,15 @@ void UavStateMachine::step() {
 
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::onSearching() {
+    // Enable candidate search vision algorithm
+    uav_state_machine::switch_vision switchRequest;
+    switchRequest.request.algorithm = switchRequest.request.ALGORITHM_CANDIDATES;
+    if (!vision_algorithm_switcher_client_.call(switchRequest)) {
+        state_.state = uav_state::ERROR;
+        state_.state_str.data = "Error enabling candidate detector algorithm";
+        return;
+    }
+
     // When the UAV finish the track, it starts again the same track
     grvc::hal::TaskState ts;
     waypoint_srv_->send(waypoint_list_[waypoint_index_], ts);
@@ -218,6 +230,15 @@ void UavStateMachine::onSearching() {
 
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::onCatching() {
+    // Enable candidate search vision algorithm
+    uav_state_machine::switch_vision switchRequest;
+    switchRequest.request.algorithm = switchRequest.request.ALGORITHM_CANDIDATES;
+    if (!vision_algorithm_switcher_client_.call(switchRequest)) {
+        state_.state = uav_state::ERROR;
+        state_.state_str.data = "Error enabling candidate detector algorithm";
+        return;
+    }
+
     //TargetTracking (aka visual servoing)
     /// Init subscriber to candidates
     ros::NodeHandle nh;
@@ -318,6 +339,15 @@ void UavStateMachine::onCatching() {
 
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::onGoToDeploy() {
+    // Disable searching
+    uav_state_machine::switch_vision switchRequest;
+    switchRequest.request.algorithm = switchRequest.request.ALGORITHM_DISABLE;
+    if (!vision_algorithm_switcher_client_.call(switchRequest)) {
+        state_.state = uav_state::ERROR;
+        state_.state_str.data = "Error disabling vision algorithm";
+        return;
+    }
+
     // Go up!
     grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
     up_waypoint.pos.z() = 5.0;  // TODO: Altitude as a parameter
