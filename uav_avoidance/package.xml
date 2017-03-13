@@ -37,15 +37,20 @@
   <!-- Build dependencies -->
   <build_depend>roscpp</build_depend>
   <build_depend>grvc_quadrotor_hal</build_depend>
-  <build_depend>grvc_utils</build_depend>
+  <build_depend>grvc_quadrotor_utils</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>tf</build_depend>
   <build_depend>armadillo</build_depend>
-
+  
+	grvc_quadrotor_utils
   <!-- Run dependencies -->
   <run_depend>roscpp</run_depend>
   <run_depend>grvc_quadrotor_hal</run_depend>
-  <run_depend>grvc_utils</run_depend>
+  <run_depend>grvc_quadrotor_utils</run_depend>
   <run_depend>std_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>tf</run_depend>
   <run_depend>armadillo</run_depend>
   
 </package>

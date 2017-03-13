@@ -10,8 +10,10 @@ add_definitions(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
 	roscpp
     std_msgs
+    geometry_msgs
+    tf
     grvc_quadrotor_hal
-	#grvc_utils				# TODO: REPARE
+	grvc_quadrotor_utils
 )
 
 find_package(Armadillo REQUIRED)
@@ -31,9 +33,11 @@ catkin_package(
   LIBRARIES swap_2_5d_library
   CATKIN_DEPENDS
         roscpp
-        grvc_quadrotor_hal
-		#grvc_utils			# TODO: REPARE
         std_msgs
+        geometry_msgs
+        tf
+        grvc_quadrotor_hal
+	    grvc_quadrotor_utils
   DEPENDS ARMADILLO
 )
 
@@ -55,8 +59,6 @@ include_directories(
 add_library(swap_2_5d_library
     src/core/swap.cpp
     src/core/polarobstaclediagram.cpp
-	#../../collision_avoidance/swap/src/swap/core/swap.cpp
-	#../../collision_avoidance/swap/src/swap/core/polarobstaclediagram.cpp
 )
 
 target_link_libraries(swap_2_5d_library ${ARMADILLO_LIBRARIES})
