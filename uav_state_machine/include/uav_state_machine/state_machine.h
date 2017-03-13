@@ -107,6 +107,10 @@ private:
     grvc::hal::Waypoint current_position_waypoint_; // Stores current position of the drone.
     std::vector<grvc::hal::Waypoint> waypoint_list_;
     unsigned int waypoint_index_ = 0;
+
+    enum class LidarReading { FLOOR, OBJECT };
+    LidarReading lidar_reading_ = LidarReading::FLOOR;
+    float lidar_range_ = 0;
     float current_altitude_ = 0;
     float target_altitude_ = 0;
     float flying_level_;
