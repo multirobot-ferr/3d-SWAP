@@ -51,7 +51,7 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     target_status_client_ = nh.serviceClient<mbzirc_scheduler::SetTargetStatus>("/scheduler/set_target_status");
     deploy_approach_client_ = nh.serviceClient<gcs_state_machine::ApproachPoint>("/gcs/approach_point");
     deploy_area_client_ = nh.serviceClient<gcs_state_machine::DeployArea>("/gcs/deploy_area");
-    vision_algorithm_switcher_client_ = nh.serviceClient<gcs_state_machine::DeployArea>("/mbzirc_" + uav_id + "/vision_node/algorithm_service");
+    vision_algorithm_switcher_client_ = nh.serviceClient<uav_state_machine::switch_vision>("/mbzirc_" + uav_id + "/vision_node/algorithm_service");
 
     //position_sub_ = nh.subscribe<geometry_msgs::PoseStamped>("/mavros_" + uav_id + "/local_position/pose", 10, &UavStateMachine::positionCallback, this);
 	position_sub_ = nh.subscribe<std_msgs::String>("/mbzirc_" + uav_id + "/hal/pose", 10, &UavStateMachine::positionCallback, this);
@@ -198,7 +198,8 @@ void UavStateMachine::step() {
             land_srv_->send(ts);
             state_.state = uav_state::REPOSE;
             break;
-
+        case uav_state::ERROR:
+            break;
         default:
             assert(false);  // Must be an error!
             break;
@@ -209,7 +210,7 @@ void UavStateMachine::step() {
 void UavStateMachine::onSearching() {
     // Enable candidate search vision algorithm
     uav_state_machine::switch_vision switchRequest;
-    switchRequest.request.algorithm = switchRequest.request.ALGORITHM_CANDIDATES;
+    switchRequest.request.algorithm = uav_state_machine::switch_vision::Request::ALGORITHM_CANDIDATES;
     if (!vision_algorithm_switcher_client_.call(switchRequest)) {
         state_.state = uav_state::ERROR;
         state_.state_str.data = "Error enabling candidate detector algorithm";
@@ -232,7 +233,7 @@ void UavStateMachine::onSearching() {
 void UavStateMachine::onCatching() {
     // Enable candidate search vision algorithm
     uav_state_machine::switch_vision switchRequest;
-    switchRequest.request.algorithm = switchRequest.request.ALGORITHM_CANDIDATES;
+    switchRequest.request.algorithm =  uav_state_machine::switch_vision::Request::ALGORITHM_CANDIDATES;
     if (!vision_algorithm_switcher_client_.call(switchRequest)) {
         state_.state = uav_state::ERROR;
         state_.state_str.data = "Error enabling candidate detector algorithm";
@@ -301,7 +302,7 @@ void UavStateMachine::onCatching() {
                 std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
                 // Go up in the same position.
                 grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
-                up_waypoint.pos.z() = 1.0;  // TODO: Altitude as a parameter
+                up_waypoint.pos.z() = 2.0;  // TODO: Altitude as a parameter
                 grvc::hal::TaskState ts;
                 waypoint_srv_->send(up_waypoint, ts);  // Blocking!
 
@@ -353,7 +354,7 @@ void UavStateMachine::onCatching() {
 void UavStateMachine::onGoToDeploy() {
     // Disable searching
     uav_state_machine::switch_vision switchRequest;
-    switchRequest.request.algorithm = switchRequest.request.ALGORITHM_DISABLE;
+    switchRequest.request.algorithm =  uav_state_machine::switch_vision::Request::ALGORITHM_DISABLE;
     if (!vision_algorithm_switcher_client_.call(switchRequest)) {
         state_.state = uav_state::ERROR;
         state_.state_str.data = "Error disabling vision algorithm";

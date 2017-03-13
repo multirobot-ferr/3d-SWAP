@@ -38,4 +38,11 @@
 			<y_min>0</y_min>
 			<y_max>60</y_max>
 	</game_limits>
+	<!-- Dropping limits -->
+	<dropping_game_limits>
+			<x_min>19</x_min>
+			<x_max>29</x_max>
+			<y_min>25</y_min>
+			<y_max>35</y_max>
+	</dropping_game_limits>
 </frames>
