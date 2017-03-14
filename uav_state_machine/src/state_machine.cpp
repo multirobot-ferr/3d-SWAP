@@ -64,7 +64,7 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     // Matched candidate can't be invalid until first detection...
     matched_candidate_.header.stamp.sec = 0;  // ...so initialize its timestamp in epoch
     matched_candidate_.header.stamp.nsec = 0;
-    max_tries_counter_ = _args.getArgument<int>("max_tries_catching", 3);
+    max_tries_counter_ = _args.getArgument<int>("max_tries_catching", 5);
 
     // Initial state is repose
     state_.state = uav_state::REPOSE;
