@@ -144,7 +144,7 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 			{
 				for(int c_id = 0; c_id < distances[t_id].size(); c_id++)
 				{
-					if(valid_candidates[c_id] != -1 && (min_dist == -1.0 || distances[t_id][c_id] < min_dist))
+					if(valid_candidates[c_id] != -1 && distances[t_id][c_id]!= -1 && (min_dist == -1.0 || distances[t_id][c_id] < min_dist))
 					{
 						min_dist = distances[t_id][c_id];
 						best_pair.first = t_id;
@@ -155,7 +155,7 @@ bool CentralizedEstimator::update(vector<Candidate*> z_list)
 		}
 
 		// If there is no good data association, create new target
-		if(min_dist <= likelihood_th_)
+		if(min_dist != -1 && min_dist <= likelihood_th_)
 		{
 			#ifdef DEBUG_MODE
 			cout << "Candidate " << z_list[best_pair.second]->location(0) << "," << z_list[best_pair.second]->location(1) << ". Associated to target " << valid_targets[best_pair.first] << ", with distance " << min_dist << endl;

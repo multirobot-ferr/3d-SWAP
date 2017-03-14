@@ -30,6 +30,7 @@
 
 #define VEL_NOISE_VAR 0.2 
 #define COLOR_DETECTOR_PD 0.9
+#define MIN_COLOR_DISTANCE 0.15
 
 using namespace std;
 
@@ -257,6 +258,8 @@ Compute the likelihood of an observation with current belief. Based on Mahalanob
 */
 double TargetTracker::getLikelihood(Candidate* z)
 {
+	double distance;
+
 	// Compute update jacobian
 	Eigen::Matrix<double, 2, 4> H;
 	H.setZero(2, 4);
@@ -279,8 +282,25 @@ double TargetTracker::getLikelihood(Candidate* z)
 	y = H*pose_;
 	y(0,0) = z->location(0) - y(0,0);
 	y(1,0) = z->location(1) - y(1,0);
+
+	distance = y.transpose()*S.inverse()*y;
 	
-	return y.transpose()*S.inverse()*y;
+	double prob_z, prob_color = 0.0;
+
+	for(int i = 0; i < N_COLORS; i++)
+	{
+		if(z->color == i)
+			prob_z = COLOR_DETECTOR_PD;
+		else
+			prob_z = (1.0 - COLOR_DETECTOR_PD)/(N_COLORS-1);
+
+		prob_color += fact_bel_[COLOR][i]*prob_z;
+	}
+
+	if(prob_color < MIN_COLOR_DISTANCE)
+		distance = -1;
+
+	return distance;
 }
 
 /**
