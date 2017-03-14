@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find mbzirc_gcs_view)/world/sdf_world.world">
+    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find mbzirc_gcs_view)/world/arena_3.world">
         <env name="LC_NUMERIC" value="C"/>
         <!--env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/-->
     </node>
@@ -13,7 +13,7 @@
 
 <!--******************************UAVs****************************************-->
 
-    <arg name="frames" default="/cfg/map_simulation.xml"/>
+    <arg name="frames" default="/cfg/map_arena_3.xml"/>
 
     <!-- Launch robot id=1 -->
     <include file="$(find px4_bringup)/launch/spawn_robot.launch">
