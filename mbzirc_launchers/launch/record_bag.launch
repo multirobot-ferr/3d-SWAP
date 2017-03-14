@@ -1,8 +1,6 @@
 <launch>
 
   <node pkg="rosbag" type="record" output="screen" name="record_1" args=" 
-  -e '/mbzirc_(.*)|/mavros_(.*)/global_position/(.*)
-|/mavros_(.*)/local_position/(.*)
-|/mavros_(.*)/distance_sensor/lidarlite_pub' " />
+  -e '/mbzirc_(.*)|/mavros_(.*)/global_position(.*)|/mavros_(.*)/local_position(.*)|/mavros_(.*)/distance_sensor/lidarlite_pub' " />
 
 </launch>
