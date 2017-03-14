@@ -35,6 +35,7 @@
 
 #define Z_GIVE_UP_CATCHING 15.0  // TODO: From config file?
 #define Z_RETRY_CATCH 1.0
+#define Z_STOP_FREE_FALLING 0.15
 
 using namespace uav_state_machine;
 
@@ -265,7 +266,7 @@ void UavStateMachine::onCatching() {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
         ros::Duration timeout(1.0);  // TODO: from config, in [s]?
 
-        if (current_altitude_ < 0.15) {
+        if (current_altitude_ < Z_STOP_FREE_FALLING) {
             free_fall = false;
             target_position_[2] = 0.0;  // TODO: Go to retry alttitude here?
         }
