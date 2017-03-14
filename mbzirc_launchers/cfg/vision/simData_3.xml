@@ -62,7 +62,7 @@
 <CandidateTopic>/mbzirc_3/candidateList</CandidateTopic>
 
 <!--Set to 1 to see result of the algorithm in a screen, disable in a console environment-->
-<VisualizeResults>0</VisualizeResults>
+<VisualizeResults>1</VisualizeResults>
 
 <!--UAV id-->
 <UavId>3</UavId>

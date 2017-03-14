@@ -70,7 +70,7 @@
 <UavPoseTopic>/mavros_2/local_position/pose</UavPoseTopic>
 
 <!--Name of topic with Float64 with the altitude of the drone, desiderable Z distance of the floor in the camera CS-->
-<UavAltitudeTopic>/mavros_2/uav_state_machine/lidar_altitude</UavAltitudeTopic>
+<UavAltitudeTopic>/mbzirc_2/uav_state_machine/lidar_altitude</UavAltitudeTopic>
 
 <!--Topic to position of UAV in map coordinates-->
 <UavMapCoordinatesTopic>/mbzirc_2/hal/pose</UavMapCoordinatesTopic>
@@ -91,7 +91,7 @@
 
 <!--Max and min side of the bounding box allowed for the candidates from the segmentation-->
 <MinObjectSize>0.05</MinObjectSize>
-<MaxObjectSize>1.5</MaxObjectSize>
+<MaxObjectSize>2.0</MaxObjectSize>
 
 <!--Path to a image file with a mask for the input image. Pixels with value 1 are processed and with 0 not-->
 <MaskImagePath>/home/user/mask.png</MaskImagePath>
