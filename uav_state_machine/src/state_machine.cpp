@@ -35,6 +35,7 @@
 
 #define Z_GIVE_UP_CATCHING 15.0  // TODO: From config file?
 #define Z_RETRY_CATCH 1.0
+#define Z_STOP_FREE_FALLING 0.15
 
 using namespace uav_state_machine;
 
@@ -265,7 +266,7 @@ void UavStateMachine::onCatching() {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
         ros::Duration timeout(1.0);  // TODO: from config, in [s]?
 
-        if (current_altitude_ < 0.15) {
+        if (current_altitude_ < Z_STOP_FREE_FALLING) {
             free_fall = false;
             target_position_[2] = 0.0;  // TODO: Go to retry alttitude here?
         }
@@ -536,7 +537,7 @@ void UavStateMachine::altitudeCallback(const std_msgs::Float64::ConstPtr& _msg){
 }
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg){
-    const float object_height = 0.2;  // TODO: Check
+    /*const float object_height = 0.2;  // TODO: Check
     float delta_range = _msg->range - lidar_range_;
     if (delta_range > object_height) {
         lidar_reading_ = LidarReading::FLOOR;
@@ -557,7 +558,8 @@ void UavStateMachine::lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& 
             current_altitude_ = lidar_range_;
             // But it's somekind of error!
             break;
-    }
+    }*/
+    current_altitude_ = _msg->range;
     std_msgs::Float64 altitude;
     altitude.data = current_altitude_;
     lidar_altitude_remapped_pub_.publish(altitude);
