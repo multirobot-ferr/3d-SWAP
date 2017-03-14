@@ -125,7 +125,7 @@ void GcsStateMachine::onStateStart(){
 	grvc::utils::frame_transform frameTransform;
 
 	// Official map start path
-	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 46.67, Z_SEARCHING)));
+	/*start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 46.67, Z_SEARCHING)));
 	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 46.67, Z_SEARCHING)));
 	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 53.33, Z_SEARCHING)));
 	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 53.33, Z_SEARCHING)));
@@ -138,7 +138,24 @@ void GcsStateMachine::onStateStart(){
 	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 13.33, Z_SEARCHING)));
 	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 13.33, Z_SEARCHING)));
 	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33,  6.67, Z_SEARCHING)));
-	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33,  6.67, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33,  6.67, Z_SEARCHING)));*/
+
+	// More conservative path
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 46.67, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 46.67, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 48.33, Z_SEARCHING)));
+	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 48.33, Z_SEARCHING)));
+
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 33.33, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 33.33, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 26.67, Z_SEARCHING)));
+	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 26.67, Z_SEARCHING)));
+
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 13.33, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 13.33, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 11.67, Z_SEARCHING)));
+	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 11.67, Z_SEARCHING)));
+
 
 	ros::NodeHandle nh;
 	for (size_t i = 0; i < index_to_id_map_.size(); i++) {
