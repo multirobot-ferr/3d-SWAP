@@ -1,0 +1,178 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+	<world name="default">
+
+		<!-- A global light source -->
+		<include>
+			<uri>model://sun</uri>
+		</include>
+
+		<!-- A ground plane -->
+		<include>
+			<uri>model://ground_plane</uri>
+		</include>
+
+
+		<!--Model Blender of Stage-->
+
+		<model name="testbed_scene">
+			<static>true</static>
+			<!--pose>0 0 0 0 0 2.1984</pose-->
+            <pose>0 0 0 0 0 -3.0385</pose>
+			<link name="test_scene">
+				<visual name="visual">
+					<geometry>
+						<mesh><uri>model://stage_04_gazebo.dae</uri></mesh>
+					</geometry>
+				</visual>
+			</link>
+		</model>
+
+        <!-- Model of Static Objects -->
+        <model name="static_object_1">
+            <pose>-20.8365  -17.4365 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_green_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="static_object_2">
+            <pose>37.4698  -34.0252 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_green_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="static_object_3">
+            <pose>17.8852   -9.4298 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_green_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="static_object_4">
+            <pose> 9.0487  -32.9539 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_green_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="static_object_5">
+            <pose>2.2773  -22.9877 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_blue_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="static_object_6">
+            <pose>29.9628  -15.7808 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_blue_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="static_object_7">
+            <pose>-23.7384  -43.9055 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_blue_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="static_object_8">
+            <pose>39.2744  -24.2577 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_red_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="static_object_9">
+            <pose>-10.4183   -8.7182 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_red_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="static_object_10">
+            <pose>-7.4938  -49.3329 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_red_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <!-- BIG OBJECTS -->
+
+        <model name="big_object_1">
+            <pose>2.4563  -38.1296 0.05 0 0 0.39270</pose>
+            <include>
+                <uri>model://object_big_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="big_object_2">
+            <pose>-37.6818  -17.6710 0.05 0 0 1.76715</pose>
+            <include>
+                <uri>model://object_big_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="big_object_3">
+            <pose>43.8999  -41.9557 0.1 0 0 2.15985</pose>
+            <include>
+                <uri>model://object_big_mbzirc</uri>
+            </include>
+        </model>
+
+         <!-- Model of Mobile Objects -->
+
+        <model name="mobile_object_1">
+            <pose>2.1286   -8.5262 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_yellow_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="mobile_object_2">
+            <pose>-11.7802  -50.2689 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_yellow_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="mobile_object_3">
+            <pose>-2.9102  -26.6810 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_yellow_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="mobile_object_4">
+            <pose>-28.1690  -55.6940 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_yellow_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="mobile_object_5">
+            <pose>-29.3104  -36.3990 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_yellow_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <model name="mobile_object_6">
+            <pose>18.3501  -41.3313 0.05 0 0 0</pose>
+            <include>
+                <uri>model://object_yellow_cylinder_mbzirc</uri>
+            </include>
+        </model>
+
+        <!-- DROP BOX -->
+
+        <model name="drop_box">
+            <pose>-20.7858 -32.3102 0.05 0 0 -3.0385</pose>
+            <include>
+                <uri>model://dropping_box</uri>
+            </include>
+        </model>
+	</world>
+</sdf>
