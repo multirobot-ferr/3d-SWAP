@@ -199,8 +199,8 @@ void Visualizer::publishMarkers()
 
     marker.pose.orientation.x = 0.0;
     marker.pose.orientation.y = 0.0;
-    marker.pose.orientation.z = 0.0;
-    marker.pose.orientation.w = 1.0;
+    marker.pose.orientation.z = -0.99867;
+    marker.pose.orientation.w = 0.051524;
 
     marker.scale.x = 1;
     marker.scale.y = 1;
