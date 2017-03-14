@@ -4,7 +4,8 @@
 	<node name="mbzirc_estimator" pkg="mbzirc_scheduler" type="scheduler_node" respawn="false" output="screen">
 	<param name="estimator_rate" value="5.0" />     <!-- in herzs -->
 	<param name="lost_time_th" value="20.0" />      <!-- in seconds -->
-	<param name="association_th" value="8.0" />
+	<param name="association_th" value="6.0" />
+	<param name="min_update_count" value="5" />
 	<param name="delay_max" value="2.0" />          <!-- in seconds -->
 	<param name="task_alloc_mode" value="2" />	<!-- HIGHER_PRIORITY_NEAREST -->
 	<param name="task_alloc_alpha" value="0.8" />   
