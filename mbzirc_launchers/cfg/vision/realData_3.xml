@@ -87,11 +87,11 @@
 <UavId>3</UavId>
 
 <!-- Covariance of candidates -->
-<CovarianceCandidates> 5.0 </CovarianceCandidates>
+<CovarianceCandidates> 3.0 </CovarianceCandidates>
 
 <!--Max and min side of the bounding box allowed for the candidates from the segmentation-->
 <MinObjectSize>0.05</MinObjectSize>
-<MaxObjectSize>1.5</MaxObjectSize>
+<MaxObjectSize>2.0</MaxObjectSize>
 
 <!--Path to a image file with a mask for the input image. Pixels with value 1 are processed and with 0 not-->
 <MaskImagePath>/home/user/mask.png</MaskImagePath>

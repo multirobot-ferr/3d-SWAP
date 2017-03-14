@@ -62,13 +62,13 @@
 <CandidateTopic>/mbzirc_2/candidateList</CandidateTopic>
 
 <!--Set to 1 to see result of the algorithm in a screen, disable in a console environment-->
-<VisualizeResults>0</VisualizeResults>
+<VisualizeResults>1</VisualizeResults>
 
 <!--UAV id-->
 <UavId>2</UavId>
 
 <!-- Covariance of candidates -->
-<CovarianceCandidates> 5.0 </CovarianceCandidates>
+<CovarianceCandidates> 3.0 </CovarianceCandidates>
 
 <!--Max and min side of the bounding box allowed for the candidates from the segmentation-->
 <MinObjectSize>0.15</MinObjectSize>

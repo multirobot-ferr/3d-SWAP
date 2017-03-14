@@ -35,6 +35,7 @@
 
 #define Z_GIVE_UP_CATCHING 15.0  // TODO: From config file?
 #define Z_RETRY_CATCH 1.0
+#define Z_STOP_FREE_FALLING 0.15
 
 using namespace uav_state_machine;
 
@@ -63,7 +64,7 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : HalClient(
     // Matched candidate can't be invalid until first detection...
     matched_candidate_.header.stamp.sec = 0;  // ...so initialize its timestamp in epoch
     matched_candidate_.header.stamp.nsec = 0;
-    max_tries_counter_ = _args.getArgument<int>("max_tries_catching", 3);
+    max_tries_counter_ = _args.getArgument<int>("max_tries_catching", 5);
 
     // Initial state is repose
     state_.state = uav_state::REPOSE;
@@ -265,7 +266,7 @@ void UavStateMachine::onCatching() {
         ros::Duration since_last_candidate = ros::Time::now() - matched_candidate_.header.stamp;
         ros::Duration timeout(1.0);  // TODO: from config, in [s]?
 
-        if (current_altitude_ < 0.15) {
+        if (current_altitude_ < Z_STOP_FREE_FALLING) {
             free_fall = false;
             target_position_[2] = 0.0;  // TODO: Go to retry alttitude here?
         }
@@ -282,6 +283,7 @@ void UavStateMachine::onCatching() {
 
                     double avg_xy_error;
                     avg_xy_error = std::accumulate(history_xy_errors.begin(), history_xy_errors.end(), 0);
+                    avg_xy_error /= history_xy_errors.size();
                     
                     if (avg_xy_error < 0.1) {
                         target_position_[2] = -0.22;  // TODO: As a function of x-y error?
