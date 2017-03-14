@@ -80,7 +80,7 @@ TaskAllocator::~TaskAllocator()
 **/
 void TaskAllocator::updateUavPosition(int id, double x, double y, double z)
 {
-	if(id < 1 && id > num_of_uavs )
+	if(id < 1 || id > num_of_uavs )
 	{
 		ROS_ERROR("TaskAllocator::updateUavPosition() id argument must be bigger than 1 and lower than %d", num_of_uavs);
 		exit(0);
@@ -219,6 +219,24 @@ int TaskAllocator::getOptimalTarget(int id)
 	return optimal_target_id;
 }
 
+/** Set the target that a certain UAV is assigned
+\param target Target identifier		
+\param uav UAV identifier
+\return	-1 if the UAV does not exist
+**/
+int TaskAllocator::setUavTarget(int target_, int uav_)
+{
+	int error = 0;
+
+	if(uav_ > 0 && uav_ <= num_of_uavs )
+	{
+		uav[uav_-1].target = target_;	
+	}
+	else
+		error = 1;
+
+	return error;
+}
 
 
 // Auxiliar function that returns the module of [dx,dy]

@@ -367,6 +367,8 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 
 			// Set target to assigned
 			estimator_->setTargetStatus(res.target_id, ASSIGNED);
+
+			allocator_->setUavTarget(res.target_id, req.uav_id);
 		}
 
 		result = true;

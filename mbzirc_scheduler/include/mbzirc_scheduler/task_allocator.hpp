@@ -53,8 +53,9 @@ enum Priority {LOW_PRIORITY = -1, BIG_PRIORITY = 1, MOVING_PRIORITY = 2, STATIC_
 class Uav
 {
 	public:
-	   int id;		// Unique identifier
-	   double x,y,z;	// Global Position
+	   int id;				// Unique identifier
+	   double x,y,z;		// Global Position
+	   int target;			// Target assigned
 
 };
 
@@ -91,6 +92,11 @@ class TaskAllocator
 		 * Get optimal Target given the UAV identifier (-1 if error)
 		**/
 		int getOptimalTarget(int id);
+
+		/**
+		 * Set Target to an UAV to keep record
+		**/
+		int setUavTarget(int target_, int uav_);
 		
 	protected:
 	
