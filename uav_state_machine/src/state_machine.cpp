@@ -283,6 +283,7 @@ void UavStateMachine::onCatching() {
 
                     double avg_xy_error;
                     avg_xy_error = std::accumulate(history_xy_errors.begin(), history_xy_errors.end(), 0);
+                    avg_xy_error /= history_xy_errors.size();
                     
                     if (avg_xy_error < 0.1) {
                         target_position_[2] = -0.22;  // TODO: As a function of x-y error?
