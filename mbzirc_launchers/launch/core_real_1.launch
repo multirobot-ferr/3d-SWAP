@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <arg name="frames" default="/cfg/map_karting.xml"/>
+    <arg name="frames" default="/cfg/map_arena_3.xml"/>
 
     <!-- Launch robot id=1 -->
     <include file="$(find px4_bringup)/launch/spawn_robot.launch">
