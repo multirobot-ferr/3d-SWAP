@@ -1,0 +1,14 @@
+#!/bin/bash
+# This scripts launches all in UAV 2 
+
+roslaunch mbzirc_launchers core_real_2.launch
+
+sleep 5
+
+roslaunch mbzirc_launchers hal_real_2.launch
+
+sleep 5
+
+./vision_node ../cfg/vision/realData_2.xml
+
+
