@@ -114,6 +114,8 @@ int TaskAllocator::getOptimalTarget(int id)
 
 		if(tmp_target.status == UNASSIGNED)
 		{
+			tmp_target.conflict = checkConflict(id,tmp_target.id);
+
 			switch(target_color)
 			{
 				case UNKNOWN: 
@@ -243,6 +245,17 @@ int TaskAllocator::setUavTarget(int target_, int uav_)
 double TaskAllocator::getModule(double dx, double dy)
 {
 	return sqrtf(dx*dx+dy*dy);
+}
+
+/** Check whether a target could cause a conflict if assigned to UAV
+\param uav_id UAV identifier
+\param target_id Target identifier		
+\return True if conflict
+**/
+bool TaskAllocator::checkConflict(int uav_id, int target_id)
+{
+	bool conflict = false;
+	return conflict;
 }
 
 // Auxiliar function that returns the maximum priority inside the 'targets' vect

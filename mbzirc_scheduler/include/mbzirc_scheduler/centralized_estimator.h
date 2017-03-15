@@ -58,6 +58,7 @@ public:
 	bool getTargetInfo(int target_id, double &x, double &y, std::vector<std::vector<double> > &covariances, double &vx, double &vy);
 	bool setTargetStatus(int target_id, TargetStatus status);
 	void removeLostTargets();
+	void resetFailedTargets();
 	void printTargetsInfo();
 
 protected:

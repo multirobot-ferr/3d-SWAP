@@ -228,7 +228,7 @@ vector<int> CentralizedEstimator::getActiveTargets()
 
 	for(auto it = targets_.begin(); it != targets_.end(); ++it)
 	{
-		if( (it->second)->getStatus() != LOST && (it->second)->getStatus() != CAUGHT && (it->second)->getStatus() != DEPLOYED )
+		if( (it->second)->getStatus() != LOST && (it->second)->getStatus() != CAUGHT && (it->second)->getStatus() != DEPLOYED && (it->second)->getStatus() != FAILED )
 		{
 			targets_ids.push_back((it->second)->getId());
 		}
@@ -345,6 +345,27 @@ void CentralizedEstimator::removeLostTargets()
 	}
 }
 
+/** Reset targets to UNASSIGNED if all are FAILED
+*/
+void CentralizedEstimator::resetFailedTargets()
+{
+	bool all_failed = true;
+	for(auto it = targets_.begin(); it != targets_.end() && all_failed; ++it)
+	{
+		if((it->second)->getStatus() == UNASSIGNED)
+			all_failed = false;
+	}
+
+	if(all_failed)
+	{
+		for(auto it = targets_.begin(); it != targets_.end(); ++it)
+		{
+			if((it->second)->getStatus() == FAILED)
+				(it->second)->setStatus(UNASSIGNED); 
+		}
+	}	
+}
+
 /** Print information from the targets for debugging
 */
 void CentralizedEstimator::printTargetsInfo()
@@ -371,7 +392,10 @@ void CentralizedEstimator::printTargetsInfo()
 			cout << "Status: " << "DEPLOYED. "; 
 			break;
 			case LOST:
-			cout << "Status: " << "LOST. "; 
+			cout << "Status: " << "LOST. ";
+			break;
+			case FAILED:
+			cout << "Status: " << "FAILED. ";
 			break;
 			default:
 			cout << "Status: " << "ERROR. ";

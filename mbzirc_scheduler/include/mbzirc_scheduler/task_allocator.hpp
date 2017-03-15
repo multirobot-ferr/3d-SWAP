@@ -62,11 +62,12 @@ class Uav
 class Target
 {
 	public:
-	   int id;		// Unique identifier
+	   int id;				// Unique identifier
 	   TargetStatus status;	// Possible status: UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST
-	   Score score;		// Score according to the color
+	   Score score;			// Score according to the color
 	   double priority; 
-	   double x,y;		// Global Position
+	   double x,y;			// Global Position
+	   bool conflict;		// Indicate whether the target could cause conflict
 };
 
 // Task allocator: class to get the optimal target to a UAV given the current targets estimations and the selection mode
@@ -102,6 +103,9 @@ class TaskAllocator
 	
 		// Return module of [dx,dy]
 		double getModule(double dx, double dy);
+
+		// Check conflicts for target assignments
+		bool checkConflict(int uav_id, int target_id);
 		
 		// Return the maximum priority inside the 'targets' vect
 		double getMaxPriority(std::vector<Target> targets_);

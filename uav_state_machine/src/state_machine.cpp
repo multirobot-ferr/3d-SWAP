@@ -319,6 +319,14 @@ void UavStateMachine::onCatching() {
                                            target_.global_position.y,
                                            flying_level_}, 0.0}, ts);
 
+                    // Set target to failed
+                    mbzirc_scheduler::SetTargetStatus target_status_call;
+                    target_status_call.request.target_id = target_.target_id;
+                    target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::FAILED;
+                    if (!target_status_client_.call(target_status_call)) {
+                        ROS_ERROR("Error setting target status to FAILED in UAV_%d", uav_id_);
+                    }                                           
+
                     // Switch to HOVER state.
                     state_.state = uav_state::HOVER;
                     // Break loop.

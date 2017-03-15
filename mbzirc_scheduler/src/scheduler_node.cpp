@@ -190,6 +190,7 @@ Scheduler::Scheduler()
 		}
 
 		estimator_->removeLostTargets();
+		estimator_->resetFailedTargets();
 
 		publishBelief();
 
@@ -401,6 +402,9 @@ bool Scheduler::setTargetStatus(mbzirc_scheduler::SetTargetStatus::Request &req,
 		break;
 		case mbzirc_scheduler::SetTargetStatus::Request::LOST:
 		target_status = LOST;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::FAILED:
+		target_status = FAILED;
 		break;
 		default:
 		ROS_ERROR("Not valid target status for assignment.");
