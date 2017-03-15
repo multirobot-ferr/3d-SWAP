@@ -43,7 +43,7 @@
 bool GcsStateMachine::init(){
 	state_publisher_thread_ = std::thread([&](){
 		ros::NodeHandle nh;
-		state_publisher_ = nh.advertise<gcs_state_machine::gcs_state>("/gcs/state", 1);
+		state_publisher_ = nh.advertise<gcs_state_machine::gcs_state>("/mbzirc_gcs/state", 1);
 		while(ros::ok()){
 			gcs_state_machine::gcs_state state;
 			state.state_msg.data = state_msg_.c_str();
