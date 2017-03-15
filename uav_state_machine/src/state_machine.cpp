@@ -323,9 +323,6 @@ void UavStateMachine::onCatching() {
                                             flying_level_}, 0.0}, ts);
 
                         // Switch to HOVER state.
-                        waypoint_srv_->send({{current_position_waypoint_.pos.x(),
-                        current_position_waypoint_.pos.y(),
-                        flying_level_}, 0.0}, ts);
                         state_.state = uav_state::HOVER;
                         // Break loop.
                         return;
@@ -351,9 +348,6 @@ void UavStateMachine::onCatching() {
             if (!target_status_client_.call(target_status_call)) {
                 ROS_ERROR("Error setting target status to LOST in UAV_%d", uav_id_);
             }
-            waypoint_srv_->send({{current_position_waypoint_.pos.x(),
-                        current_position_waypoint_.pos.y(),
-                        flying_level_}, 0.0}, ts);
             state_.state = uav_state::HOVER;
         }
 
