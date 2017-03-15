@@ -43,7 +43,7 @@
 bool GcsStateMachine::init(){
 	state_publisher_thread_ = std::thread([&](){
 		ros::NodeHandle nh;
-		state_publisher_ = nh.advertise<gcs_state_machine::gcs_state>("/gcs/state", 1);
+		state_publisher_ = nh.advertise<gcs_state_machine::gcs_state>("/mbzirc_gcs/state", 1);
 		while(ros::ok()){
 			gcs_state_machine::gcs_state state;
 			state.state_msg.data = state_msg_.c_str();
@@ -165,14 +165,16 @@ void GcsStateMachine::onStateStart(){
 		uav_state_machine::takeoff_service takeoff_call;
 		takeoff_call.request.altitude = Z_SEARCHING;
 		if (!takeoff_client.call(takeoff_call)) {
-			gcs_state_ = eGcsState::ERROR;
+			//gcs_state_ = eGcsState::ERROR;
 			state_msg_ = "Error taking off UAV_" + std::to_string(id);
-			return;
+			//return;
 		}
-		while (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
+		/*while (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
 			// Wait until takeoff finishes
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		}
+		}*/
+		// Wait for a fixed time
+		std::this_thread::sleep_for(std::chrono::seconds(10));
 		std::string waypoint_url = "/mbzirc_" + std::to_string(id) + "/uav_state_machine/waypoint";
 		ros::ServiceClient waypoint_client = nh.serviceClient<uav_state_machine::waypoint_service>(waypoint_url);
 		uav_state_machine::waypoint_service waypoint_call;
@@ -181,9 +183,9 @@ void GcsStateMachine::onStateStart(){
 			waypoint_call.request.waypoint_track.push_back(wp);
 		}
 		if (!waypoint_client.call(waypoint_call)) {
-			gcs_state_ = eGcsState::ERROR;
+			//gcs_state_ = eGcsState::ERROR;
 			state_msg_ = "Error sending waypoints to UAV_" + std::to_string(id);
-			return;
+			//return;
 		}
 	}
 	// Arrived here, change state
@@ -193,15 +195,15 @@ void GcsStateMachine::onStateStart(){
 //-------------------------------------------------------------------------------------------------------------
 void GcsStateMachine::onStateSearching(){
 	for (size_t i = 0; i < index_to_id_map_.size(); i++) {
-		while (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
-			// Wait all UAV to finish starting path
+		if (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
+			// Wait only until first UAV finishes starting path
+			gcs_state_ = eGcsState::CATCHING;
+			return;
+		} else {
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		// TODO: Go to catching level instead of wait until other finishes? (sequence_?)
 	}
-
 	// TODO: Ask scheduler and repeat searching if no objects were found
-	gcs_state_ = eGcsState::CATCHING;
 }
 
 //-------------------------------------------------------------------------------------------------------------
@@ -231,7 +233,7 @@ void GcsStateMachine::onStateCatching(){
 					catch_target_call.request.target_id = assign_target_call.response.target_id;
 					catch_target_call.request.global_position = assign_target_call.response.global_position;
 					if (!catch_target_client[i].call(catch_target_call)) {
-						gcs_state_ = eGcsState::ERROR;
+						//gcs_state_ = eGcsState::ERROR;  // No, retry!
 						state_msg_ = "Error sending targets to UAV_" + std::to_string(index_to_id_map_[i]);
 					}
 					else
