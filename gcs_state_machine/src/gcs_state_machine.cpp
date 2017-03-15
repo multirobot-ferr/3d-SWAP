@@ -193,15 +193,15 @@ void GcsStateMachine::onStateStart(){
 //-------------------------------------------------------------------------------------------------------------
 void GcsStateMachine::onStateSearching(){
 	for (size_t i = 0; i < index_to_id_map_.size(); i++) {
-		while (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
-			// Wait all UAV to finish starting path
+		if (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
+			// Wait only until first UAV finishes starting path
+			gcs_state_ = eGcsState::CATCHING;
+			return;
+		} else {
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
-		// TODO: Go to catching level instead of wait until other finishes? (sequence_?)
 	}
-
 	// TODO: Ask scheduler and repeat searching if no objects were found
-	gcs_state_ = eGcsState::CATCHING;
 }
 
 //-------------------------------------------------------------------------------------------------------------
