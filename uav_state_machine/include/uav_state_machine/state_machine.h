@@ -105,6 +105,7 @@ private:
     unsigned max_tries_counter_ = 3;
 
     grvc::hal::Waypoint current_position_waypoint_; // Stores current position of the drone.
+    grvc::hal::Waypoint hover_position_waypoint_;
     std::vector<grvc::hal::Waypoint> waypoint_list_;
     unsigned int waypoint_index_ = 0;
 

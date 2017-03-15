@@ -146,10 +146,15 @@ void UavStateMachine::step() {
 
         case uav_state::TAKINGOFF:
             take_off_srv_->send(target_altitude_, ts);
+            hover_position_waypoint_ = current_position_waypoint_;
             state_.state = uav_state::HOVER;
             break;
 
         case uav_state::HOVER:
+            waypoint_srv_->send({{hover_position_waypoint_.pos.x(),
+                                  hover_position_waypoint_.pos.y(),
+                                  hover_position_waypoint_.pos.z()}, 0.0}, ts);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
             break;
 
         case uav_state::SEARCHING:
@@ -172,6 +177,7 @@ void UavStateMachine::step() {
             if (ts == grvc::hal::TaskState::finished) {
                 state_.state = uav_state::CATCHING;
             } else {
+                hover_position_waypoint_ = current_position_waypoint_;
                 state_.state = uav_state::HOVER;
             }
             break;
@@ -187,6 +193,7 @@ void UavStateMachine::step() {
             if (ts == grvc::hal::TaskState::finished) {
                 state_.state = uav_state::CATCHING;
             } else {
+                hover_position_waypoint_ = current_position_waypoint_;
                 state_.state = uav_state::HOVER;
             }
             break;
@@ -225,6 +232,7 @@ void UavStateMachine::onSearching() {
         waypoint_index_++;
         if (waypoint_index_ > (waypoint_list_.size()-1)) {
             waypoint_index_ = 0;
+            hover_position_waypoint_ = current_position_waypoint_;
             state_.state = uav_state::HOVER;
         }
     }
@@ -248,6 +256,7 @@ void UavStateMachine::onCatching() {
 
     if (!candidate_subscriber) {
         std::cout << "Can't start candidate subscriber." << std::endl;
+        hover_position_waypoint_ = current_position_waypoint_;
         state_.state = uav_state::HOVER;
 	    return;
     } else {
@@ -323,6 +332,7 @@ void UavStateMachine::onCatching() {
                                             flying_level_}, 0.0}, ts);
 
                         // Switch to HOVER state.
+                        hover_position_waypoint_ = current_position_waypoint_;
                         state_.state = uav_state::HOVER;
                         // Break loop.
                         return;
@@ -348,6 +358,7 @@ void UavStateMachine::onCatching() {
             if (!target_status_client_.call(target_status_call)) {
                 ROS_ERROR("Error setting target status to LOST in UAV_%d", uav_id_);
             }
+            hover_position_waypoint_ = current_position_waypoint_;
             state_.state = uav_state::HOVER;
         }
 
@@ -431,6 +442,7 @@ void UavStateMachine::onGoToDeploy() {
             deploy_area_client_.call(deploy_call);
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
         } while(deploy_call.response.answer == gcs_state_machine::DeployArea::Response::WAIT);
+        hover_position_waypoint_ = current_position_waypoint_;
         state_.state = uav_state::HOVER;
     } else {
         std::cout << "Miss the catch, try again!" << std::endl;
@@ -470,6 +482,7 @@ bool UavStateMachine::searchServiceCallback(uav_state_machine::waypoint_service:
 
         case waypoint_serviceRequest::STOP:
             if (state_.state == uav_state::SEARCHING) {
+                hover_position_waypoint_ = current_position_waypoint_;
                 state_.state = uav_state::HOVER;
                 grvc::hal::TaskState ts;
                 abort_srv_->send(ts);
@@ -527,6 +540,7 @@ bool UavStateMachine::targetServiceCallback(uav_state_machine::target_service::R
         state_.state = uav_state::GOTO_CATCH;
         return true;
     } else if(state_.state == uav_state::CATCHING && !req.enabled){
+        hover_position_waypoint_ = current_position_waypoint_;
         state_.state = uav_state::HOVER;
         return true;
     }else {
