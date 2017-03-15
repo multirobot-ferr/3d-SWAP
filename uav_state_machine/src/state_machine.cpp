@@ -150,6 +150,13 @@ void UavStateMachine::step() {
             break;
 
         case uav_state::HOVER:
+            waypoint_srv_->send({{current_position_waypoint_.pos.x(),
+                                    current_position_waypoint_.pos.y(),
+                                    flying_level_}, 0.0}, ts);
+            while (true) {
+                // Wait until some callback changes state, but hold position
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
             break;
 
         case uav_state::SEARCHING:
@@ -305,7 +312,7 @@ void UavStateMachine::onCatching() {
 	        	    target_position_[2] = +1.0;  // TODO: As a function of x-y error?
                     std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
                 }else{
-                    std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
+                    //std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
                     // Go up in the same position.
                     grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
                     up_waypoint.pos.z() = 2.0;  // TODO: Altitude as a parameter

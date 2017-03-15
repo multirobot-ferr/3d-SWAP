@@ -2,8 +2,7 @@
 <sdf version="1.4">
 <model name="Big Object">
   <pose>0 0 0.04 0 0 0</pose>
-  <static>true</static>
-    <link name="link">
+    <link name="grab_here">
       <inertial>
         <mass>2</mass>
         <inertia>
