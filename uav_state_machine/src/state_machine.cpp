@@ -611,8 +611,6 @@ void UavStateMachine::candidateCallback(const uav_state_machine::candidate_list:
                 matched_candidate_.header.stamp = ros::Time::now();
                 target_position_[0] = matched_candidate_.local_position.x;
                 target_position_[1] = matched_candidate_.local_position.y;
-            } else {
-                std::cout << "Cant find a valid candidate" << std::endl;
             }
         } else {
             std::cout << "Candidate list is empty!" << std::endl;
