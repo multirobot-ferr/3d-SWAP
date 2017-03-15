@@ -165,9 +165,9 @@ void GcsStateMachine::onStateStart(){
 		uav_state_machine::takeoff_service takeoff_call;
 		takeoff_call.request.altitude = Z_SEARCHING;
 		if (!takeoff_client.call(takeoff_call)) {
-			gcs_state_ = eGcsState::ERROR;
+			//gcs_state_ = eGcsState::ERROR;
 			state_msg_ = "Error taking off UAV_" + std::to_string(id);
-			return;
+			//return;
 		}
 		/*while (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
 			// Wait until takeoff finishes
@@ -183,9 +183,9 @@ void GcsStateMachine::onStateStart(){
 			waypoint_call.request.waypoint_track.push_back(wp);
 		}
 		if (!waypoint_client.call(waypoint_call)) {
-			gcs_state_ = eGcsState::ERROR;
+			//gcs_state_ = eGcsState::ERROR;
 			state_msg_ = "Error sending waypoints to UAV_" + std::to_string(id);
-			return;
+			//return;
 		}
 	}
 	// Arrived here, change state
@@ -233,7 +233,7 @@ void GcsStateMachine::onStateCatching(){
 					catch_target_call.request.target_id = assign_target_call.response.target_id;
 					catch_target_call.request.global_position = assign_target_call.response.global_position;
 					if (!catch_target_client[i].call(catch_target_call)) {
-						gcs_state_ = eGcsState::ERROR;
+						//gcs_state_ = eGcsState::ERROR;  // No, retry!
 						state_msg_ = "Error sending targets to UAV_" + std::to_string(index_to_id_map_[i]);
 					}
 					else
