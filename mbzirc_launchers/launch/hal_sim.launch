@@ -14,9 +14,9 @@
       args="-uavId=1 -flying_level=3.0"/>
     
     <node name="uav_state_machine_2" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
-          args="-uavId=2 -flying_level=7.0"/>
+          args="-uavId=2 -flying_level=11.0"/>
 
     <node name="uav_state_machine_3" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
-          args="-uavId=3 -flying_level=11.0"/>
+          args="-uavId=3 -flying_level=7.0"/>
 
 </launch>
