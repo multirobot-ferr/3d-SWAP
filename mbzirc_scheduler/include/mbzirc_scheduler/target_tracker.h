@@ -37,7 +37,7 @@
 
 namespace mbzirc {
 
-enum TargetStatus {UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST, N_STATUS};
+enum TargetStatus {UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST, FAILED, N_STATUS};
 enum Color {UNKNOWN = -1, RED = 0, BLUE, GREEN, YELLOW, ORANGE, N_COLORS};
 enum Factor {COLOR};
     

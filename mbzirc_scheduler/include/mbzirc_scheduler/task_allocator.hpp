@@ -56,17 +56,19 @@ class Uav
 	   int id;				// Unique identifier
 	   double x,y,z;		// Global Position
 	   int target;			// Target assigned
+	   bool initialized;	// True if any position received
 
 };
 
 class Target
 {
 	public:
-	   int id;		// Unique identifier
+	   int id;				// Unique identifier
 	   TargetStatus status;	// Possible status: UNASSIGNED, ASSIGNED, CAUGHT, DEPLOYED, LOST
-	   Score score;		// Score according to the color
+	   Score score;			// Score according to the color
 	   double priority; 
-	   double x,y;		// Global Position
+	   double x,y;			// Global Position
+	   bool conflict;		// Indicate whether the target could cause conflict
 };
 
 // Task allocator: class to get the optimal target to a UAV given the current targets estimations and the selection mode
@@ -76,7 +78,7 @@ class TaskAllocator
 		/**
 		 * Constructor
 		**/
-		TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_, double alpha_);
+		TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_, double alpha_, double min_conflict_dist_);
 		
 		/**
 		 * Destructor
@@ -102,6 +104,12 @@ class TaskAllocator
 	
 		// Return module of [dx,dy]
 		double getModule(double dx, double dy);
+
+		// Check conflicts for target assignments
+		bool checkConflict(int uav_id, int target_id);
+
+		// Compute minimum distance from a point to a segment
+		double minDistanceToSegment(double x, double y, double x_1, double y_1, double x_2, double y_2);
 		
 		// Return the maximum priority inside the 'targets' vect
 		double getMaxPriority(std::vector<Target> targets_);
@@ -123,6 +131,9 @@ class TaskAllocator
 		
 		// Diagonal of Arena field [m]
 		double maximum_distance;
+
+		// Minimum distance for conflict
+		double min_conflict_dist;
 };
 
 }

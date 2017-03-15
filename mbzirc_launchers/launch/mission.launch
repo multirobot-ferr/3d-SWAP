@@ -9,7 +9,8 @@
 	<param name="min_update_count" value="5" />
 	<param name="delay_max" value="2.0" />          <!-- in seconds -->
 	<param name="task_alloc_mode" value="2" />	<!-- HIGHER_PRIORITY_NEAREST -->
-	<param name="task_alloc_alpha" value="0.8" />   
+	<param name="task_alloc_alpha" value="0.8" />  
+	<param name="min_conflict_dist" value="5.0" /> 
 	<param name="n_uavs" value="3" />
    </node>
 

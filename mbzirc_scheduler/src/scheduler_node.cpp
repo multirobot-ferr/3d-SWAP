@@ -112,6 +112,7 @@ Scheduler::Scheduler()
 	int min_update_count;
 	int task_alloc_mode;
 	double task_alloc_alpha;
+	double min_conflict_dist;
 	
 
 	// Read parameters
@@ -122,11 +123,12 @@ Scheduler::Scheduler()
 	pnh_->param<double>("delay_max", delay_max_, 2.0);
 	pnh_->param<int>("task_alloc_mode",task_alloc_mode, HIGHER_PRIORITY_NEAREST);
 	pnh_->param<double>("task_alloc_alpha",task_alloc_alpha, 0.8);
+	pnh_->param<double>("min_conflict_dist",min_conflict_dist, 0.0);
 	pnh_->param<int>("n_uavs",n_uavs_, 3);
 
 	// Estimator and allocator
 	estimator_ = new CentralizedEstimator(association_th, lost_time_th, min_update_count);
-	allocator_ = new TaskAllocator(estimator_, (TargetSelectionMode)task_alloc_mode, n_uavs_, task_alloc_alpha);
+	allocator_ = new TaskAllocator(estimator_, (TargetSelectionMode)task_alloc_mode, n_uavs_, task_alloc_alpha, min_conflict_dist);
 
 	// Subscriptions/publications
 	for(int i = 0; i < n_uavs_; i++)
@@ -190,6 +192,7 @@ Scheduler::Scheduler()
 		}
 
 		estimator_->removeLostTargets();
+		estimator_->resetFailedTargets();
 
 		publishBelief();
 
@@ -401,6 +404,9 @@ bool Scheduler::setTargetStatus(mbzirc_scheduler::SetTargetStatus::Request &req,
 		break;
 		case mbzirc_scheduler::SetTargetStatus::Request::LOST:
 		target_status = LOST;
+		break;
+		case mbzirc_scheduler::SetTargetStatus::Request::FAILED:
+		target_status = FAILED;
 		break;
 		default:
 		ROS_ERROR("Not valid target status for assignment.");

@@ -155,6 +155,7 @@ void UavStateMachine::step() {
                                   hover_position_waypoint_.pos.y(),
                                   hover_position_waypoint_.pos.z()}, 0.0}, ts);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
             break;
 
         case uav_state::SEARCHING:
@@ -313,7 +314,6 @@ void UavStateMachine::onCatching() {
                 if(current_altitude_ > flying_level_*0.75){
 	        	    target_position_[2] = +1.0;  // TODO: As a function of x-y error?
                 }else{
-                    //std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
                     // Go up in the same position.
                     grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
                     up_waypoint.pos.z() = 2.0;  // TODO: Altitude as a parameter
@@ -330,6 +330,14 @@ void UavStateMachine::onCatching() {
                         waypoint_srv_->send({{ target_.global_position.x,
                                             target_.global_position.y,
                                             flying_level_}, 0.0}, ts);
+
+                        // Set target to failed
+                        mbzirc_scheduler::SetTargetStatus target_status_call;
+                        target_status_call.request.target_id = target_.target_id;
+                        target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::FAILED;
+                        if (!target_status_client_.call(target_status_call)) {
+                            ROS_ERROR("Error setting target status to FAILED in UAV_%d", uav_id_);
+                        }                                           
 
                         // Switch to HOVER state.
                         hover_position_waypoint_ = current_position_waypoint_;

@@ -28,6 +28,7 @@
 
 
 #include <mbzirc_scheduler/task_allocator.hpp>
+#include <cmath>
 
 namespace mbzirc {
 
@@ -36,8 +37,9 @@ namespace mbzirc {
 \param	select_mode_	Target selection mode: one of TargetSelectionMode
 \param  num_of_uavs_	Number of UAVs
 \param  alpha_		Distance Weight (coefficient) for WEIGHTED_SCORE_AND_DISTANCE target selection mode
+\param  min_conflict_dist_ Minimum distance to consider conflict
 **/
-TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_, double alpha_)
+TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_, double alpha_, double min_conflict_dist_)
 {
 	num_of_uavs = num_of_uavs_;
 
@@ -54,6 +56,8 @@ TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, Targ
 		uav[i].x = 0.0;
 		uav[i].y = 0.0;
 		uav[i].z = 0.0;
+		uav[i].target = -1;
+		uav[i].initialized = false;
 	}
 	
 	// Select mode
@@ -64,6 +68,8 @@ TaskAllocator::TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, Targ
 	
 	// Pre-compute maximum distance in the Arena [m]
 	maximum_distance = sqrtf(LONG_ARENA*LONG_ARENA + ALT_ARENA*ALT_ARENA);
+
+	min_conflict_dist = min_conflict_dist_;
 }
 
 /// Destructor
@@ -90,6 +96,7 @@ void TaskAllocator::updateUavPosition(int id, double x, double y, double z)
 	uav[id-1].x = x;
 	uav[id-1].y = y;
 	uav[id-1].z = z;
+	uav[id-1].initialized = true;
 }
 
 /** Get optimal Target according to the selected mode. If all targets has 
@@ -100,6 +107,10 @@ void TaskAllocator::updateUavPosition(int id, double x, double y, double z)
 **/
 int TaskAllocator::getOptimalTarget(int id)
 {	
+
+	if(!uav[id-1].initialized)
+		return -1;
+
 	// Get valid targets info --> targets vector
 	std::vector<Target> targets;
 	Target tmp_target;
@@ -107,13 +118,17 @@ int TaskAllocator::getOptimalTarget(int id)
 
 	std::vector<int> active_targets = targets_estimation_ptr->getActiveTargets();
 
+	std::cout << "Targets sin UNASSIGNED y sin conflicto para UAV " << id << " ";
 	for(int i = 0; i < active_targets.size(); i++)
 	{
 		tmp_target.id = active_targets[i];
-		targets_estimation_ptr->getTargetInfo(active_targets[i], tmp_target.x, tmp_target.y, tmp_target.status, target_color);
 
-		if(tmp_target.status == UNASSIGNED)
-		{
+		targets_estimation_ptr->getTargetInfo(active_targets[i], tmp_target.x, tmp_target.y, tmp_target.status, target_color);
+		tmp_target.conflict = checkConflict(id,tmp_target.id);
+
+		std::cout << tmp_target.id << " ";
+		if(tmp_target.status == UNASSIGNED && !tmp_target.conflict)
+		{	
 			switch(target_color)
 			{
 				case UNKNOWN: 
@@ -142,8 +157,11 @@ int TaskAllocator::getOptimalTarget(int id)
 				break;
 			}
 			targets.push_back(tmp_target);
+			std::cout << "NC";
 		}
+		std::cout << ",";
 	}
+	std::cout << endl;
 	
 	// Get optimal target: lower difficulty and/or nearest target in 'targets', according to selected mode
 	int optimal_target_id = -1; 					// Optimal target result
@@ -238,11 +256,82 @@ int TaskAllocator::setUavTarget(int target_, int uav_)
 	return error;
 }
 
-
 // Auxiliar function that returns the module of [dx,dy]
 double TaskAllocator::getModule(double dx, double dy)
 {
 	return sqrtf(dx*dx+dy*dy);
+}
+
+/** Check whether a target could cause a conflict if assigned to UAV
+\param uav_id UAV identifier
+\param target_id Target identifier		
+\return True if conflict
+**/
+bool TaskAllocator::checkConflict(int uav_id, int target_id)
+{
+	bool conflict = false;
+	double target_x, target_y, assigned_x, assigned_y;
+	Color target_color, assigned_color;
+	TargetStatus target_status, assigned_status;
+
+	targets_estimation_ptr->getTargetInfo(target_id, assigned_x, assigned_y, assigned_status, assigned_color);
+
+	for(int i=0; i<num_of_uavs && !conflict; i++)
+	{
+		// only check conflicts with other UAVs with target assigned
+		if(uav[i].id != uav_id && uav[i].target != -1)
+		{
+			targets_estimation_ptr->getTargetInfo(uav[i].target, target_x, target_y, target_status, target_color);
+
+			// If is caught or deployed there is no more conflict
+			if(target_status == ASSIGNED)
+			{
+				double closest_dist = minDistanceToSegment(target_x, target_y, uav[i].x, uav[i].y, assigned_x, assigned_y);
+				closest_dist = sqrt((assigned_x-target_x)*(assigned_x-target_x)+(assigned_y-target_y)*(assigned_y-target_y));
+
+				if(closest_dist < min_conflict_dist)
+					conflict = true;
+			}
+		}
+	}
+
+	return conflict;
+}
+
+/** Compute the minimum distance from a point to a segment
+\param x,y Point
+\param x_1, y_1 Point 1 of the segment
+\param x_2, y_2 Point 2 of the segment		
+\return Distance
+**/
+double TaskAllocator::minDistanceToSegment(double x, double y, double x_1, double y_1, double x_2, double y_2)
+{
+	double d, t_hat, t_star;
+	double close_x, close_y;
+
+	double s2ms1_x = x_2 - x_1;
+	double s2ms1_y = y_2 - y_1;
+
+	t_hat = (s2ms1_x*(x-x_1) + s2ms1_y*(y-y_1))/(s2ms1_x*s2ms1_x + s2ms1_y*s2ms1_y);
+
+	if(t_hat < 0.0)
+	{
+		t_star = 0;
+	}
+	else if(t_hat > 1.0)
+	{
+		t_star = 1;
+	}
+	else
+	{
+		t_star = t_hat;
+	}
+
+	close_x = x_1 + t_star*s2ms1_x - x;
+	close_y = y_1 + t_star*s2ms1_y - y;
+	d = sqrt(close_x*close_x + close_y*close_y);
+
+	return d;
 }
 
 // Auxiliar function that returns the maximum priority inside the 'targets' vect
