@@ -304,7 +304,7 @@ void UavStateMachine::onCatching() {
                 if(current_altitude_ > flying_level_*0.75){
 	        	    target_position_[2] = +1.0;  // TODO: As a function of x-y error?
                 }else{
-                    std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
+                    //std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
                     // Go up in the same position.
                     grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
                     up_waypoint.pos.z() = 2.0;  // TODO: Altitude as a parameter
