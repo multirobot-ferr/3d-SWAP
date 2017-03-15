@@ -169,10 +169,12 @@ void GcsStateMachine::onStateStart(){
 			state_msg_ = "Error taking off UAV_" + std::to_string(id);
 			return;
 		}
-		while (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
+		/*while (uav_state_[i].state != uav_state_machine::uav_state::HOVER) {
 			// Wait until takeoff finishes
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		}
+		}*/
+		// Wait for a fixed time
+		std::this_thread::sleep_for(std::chrono::seconds(10));
 		std::string waypoint_url = "/mbzirc_" + std::to_string(id) + "/uav_state_machine/waypoint";
 		ros::ServiceClient waypoint_client = nh.serviceClient<uav_state_machine::waypoint_service>(waypoint_url);
 		uav_state_machine::waypoint_service waypoint_call;
