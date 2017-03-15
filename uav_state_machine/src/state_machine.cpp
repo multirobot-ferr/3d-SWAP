@@ -150,6 +150,13 @@ void UavStateMachine::step() {
             break;
 
         case uav_state::HOVER:
+            waypoint_srv_->send({{current_position_waypoint_.pos.x(),
+                                    current_position_waypoint_.pos.y(),
+                                    flying_level_}, 0.0}, ts);
+            while (true) {
+                // Wait until some callback changes state, but hold position
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
             break;
 
         case uav_state::SEARCHING:
