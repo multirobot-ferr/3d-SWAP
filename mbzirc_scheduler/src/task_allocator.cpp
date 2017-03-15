@@ -118,6 +118,7 @@ int TaskAllocator::getOptimalTarget(int id)
 
 	std::vector<int> active_targets = targets_estimation_ptr->getActiveTargets();
 
+	std::cout << "Targets sin UNASSIGNED y sin conflicto para UAV " << id << " ";
 	for(int i = 0; i < active_targets.size(); i++)
 	{
 		tmp_target.id = active_targets[i];
@@ -125,6 +126,7 @@ int TaskAllocator::getOptimalTarget(int id)
 		targets_estimation_ptr->getTargetInfo(active_targets[i], tmp_target.x, tmp_target.y, tmp_target.status, target_color);
 		tmp_target.conflict = checkConflict(id,tmp_target.id);
 
+		std::cout << tmp_target.id << " ";
 		if(tmp_target.status == UNASSIGNED && !tmp_target.conflict)
 		{	
 			switch(target_color)
@@ -155,8 +157,11 @@ int TaskAllocator::getOptimalTarget(int id)
 				break;
 			}
 			targets.push_back(tmp_target);
+			std::cout << "NC";
 		}
+		std::cout << ",";
 	}
+	std::cout << endl;
 	
 	// Get optimal target: lower difficulty and/or nearest target in 'targets', according to selected mode
 	int optimal_target_id = -1; 					// Optimal target result
@@ -278,10 +283,15 @@ bool TaskAllocator::checkConflict(int uav_id, int target_id)
 		{
 			targets_estimation_ptr->getTargetInfo(uav[i].target, target_x, target_y, target_status, target_color);
 
-			double closest_dist = minDistanceToSegment(target_x, target_y, uav[i].x, uav[i].y, assigned_x, assigned_y);
+			// If is caught or deployed there is no more conflict
+			if(target_status == ASSIGNED)
+			{
+				double closest_dist = minDistanceToSegment(target_x, target_y, uav[i].x, uav[i].y, assigned_x, assigned_y);
+				closest_dist = sqrt((assigned_x-target_x)*(assigned_x-target_x)+(assigned_y-target_y)*(assigned_y-target_y));
 
-			if(closest_dist < min_conflict_dist)
-				conflict = true;
+				if(closest_dist < min_conflict_dist)
+					conflict = true;
+			}
 		}
 	}
 
