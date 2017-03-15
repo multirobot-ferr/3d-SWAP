@@ -301,28 +301,32 @@ void UavStateMachine::onCatching() {
             }
         } else {   // No fresh candidates (timeout)
 	        if (!free_fall) {
-                std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
-                // Go up in the same position.
-                grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
-                up_waypoint.pos.z() = 2.0;  // TODO: Altitude as a parameter
-                grvc::hal::TaskState ts;
-                waypoint_srv_->send(up_waypoint, ts);  // Blocking!
+                if(current_altitude_ > flying_level_*0.75){
+	        	    target_position_[2] = +1.0;  // TODO: As a function of x-y error?
+                }else{
+                    std::cout << "Last candidate received " << since_last_candidate.toSec() << "s ago, ascend!" << std::endl;
+                    // Go up in the same position.
+                    grvc::hal::Waypoint up_waypoint = current_position_waypoint_;
+                    up_waypoint.pos.z() = 2.0;  // TODO: Altitude as a parameter
+                    grvc::hal::TaskState ts;
+                    waypoint_srv_->send(up_waypoint, ts);  // Blocking!
 
-                // Move to target position.
-                grvc::hal::Waypoint approachingWaypoint = {{target_.global_position.x, target_.global_position.y, 1.0}, current_position_waypoint_.yaw};
-                waypoint_srv_->send(approachingWaypoint, ts);  // Blocking!
-                
-                triesCounter++;
-                if(triesCounter > max_tries_counter_){
-                    // Go to initial catch position.
-                    waypoint_srv_->send({{ target_.global_position.x,
-                                           target_.global_position.y,
-                                           flying_level_}, 0.0}, ts);
+                    // Move to target position.
+                    grvc::hal::Waypoint approachingWaypoint = {{target_.global_position.x, target_.global_position.y, 1.0}, current_position_waypoint_.yaw};
+                    waypoint_srv_->send(approachingWaypoint, ts);  // Blocking!
+                    
+                    triesCounter++;
+                    if(triesCounter > max_tries_counter_){
+                        // Go to initial catch position.
+                        waypoint_srv_->send({{ target_.global_position.x,
+                                            target_.global_position.y,
+                                            flying_level_}, 0.0}, ts);
 
-                    // Switch to HOVER state.
-                    state_.state = uav_state::HOVER;
-                    // Break loop.
-                    return;
+                        // Switch to HOVER state.
+                        state_.state = uav_state::HOVER;
+                        // Break loop.
+                        return;
+                    }
                 }
             } else {
                 target_position_[2] = -0.22;
