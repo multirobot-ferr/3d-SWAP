@@ -172,7 +172,7 @@ Scheduler::Scheduler()
 		prev_time = time_now;
 
 		if(elapsed_time)
-			estimator_->predict(elapsed_time);
+			//estimator_->predict(elapsed_time);
 
 		// Update 
 		for(auto it = candidates_.begin(); it != candidates_.end(); ++it)
