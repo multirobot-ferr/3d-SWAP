@@ -122,7 +122,7 @@ void GcsStateMachine::onStateStart(){
 
 
 	// Prepare waypoints depending on the number of UAVs
-	const double cEightHeight = 66;
+	const double cEightHeight = 60;
 	const double cEightWidth = 36;
 	const double cFieldWidth = 60;
 	
