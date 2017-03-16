@@ -123,38 +123,42 @@ int TaskAllocator::getOptimalTarget(int id)
 		tmp_target.id = active_targets[i];
 
 		targets_estimation_ptr->getTargetInfo(active_targets[i], tmp_target.x, tmp_target.y, tmp_target.status, target_color);
-		tmp_target.conflict = checkConflict(id,tmp_target.id);
 
-		if(tmp_target.status == UNASSIGNED && !tmp_target.conflict)
+		if(tmp_target.status == UNASSIGNED)
 		{	
-			switch(target_color)
+			tmp_target.conflict = checkConflict(id,tmp_target.id);
+
+			if(!tmp_target.conflict)
 			{
-				case UNKNOWN: 
-				tmp_target.score = UNKNOWN_S;
-				tmp_target.priority = LOW_PRIORITY;
-				break;
-				case RED:
-				tmp_target.score = RED_S;
-				tmp_target.priority = STATIC_PRIORITY + tmp_target.score;
-				break;
-				case GREEN:
-				tmp_target.score = GREEN_S;
-				tmp_target.priority = STATIC_PRIORITY + tmp_target.score;
-				break;
-				case BLUE:
-				tmp_target.score = BLUE_S;
-				tmp_target.priority = STATIC_PRIORITY + tmp_target.score;
-				break;
-				case YELLOW:
-				tmp_target.score = YELLOW_S;
-				tmp_target.priority = MOVING_PRIORITY;
-				break;
-				case ORANGE:
-				tmp_target.score = YELLOW_S;
-				tmp_target.priority = BIG_PRIORITY;
-				break;
+				switch(target_color)
+				{
+					case UNKNOWN: 
+					tmp_target.score = UNKNOWN_S;
+					tmp_target.priority = LOW_PRIORITY;
+					break;
+					case RED:
+					tmp_target.score = RED_S;
+					tmp_target.priority = STATIC_PRIORITY + tmp_target.score;
+					break;
+					case GREEN:
+					tmp_target.score = GREEN_S;
+					tmp_target.priority = STATIC_PRIORITY + tmp_target.score;
+					break;
+					case BLUE:
+					tmp_target.score = BLUE_S;
+					tmp_target.priority = STATIC_PRIORITY + tmp_target.score;
+					break;
+					case YELLOW:
+					tmp_target.score = YELLOW_S;
+					tmp_target.priority = MOVING_PRIORITY;
+					break;
+					case ORANGE:
+					tmp_target.score = YELLOW_S;
+					tmp_target.priority = BIG_PRIORITY;
+					break;
+				}
+				targets.push_back(tmp_target);
 			}
-			targets.push_back(tmp_target);
 		}
 	}
 	
@@ -281,8 +285,8 @@ bool TaskAllocator::checkConflict(int uav_id, int target_id)
 			// If is caught or deployed there is no more conflict
 			if(target_status == ASSIGNED)
 			{
-				double closest_dist = minDistanceToSegment(target_x, target_y, uav[i].x, uav[i].y, assigned_x, assigned_y);
-				closest_dist = sqrt((assigned_x-target_x)*(assigned_x-target_x)+(assigned_y-target_y)*(assigned_y-target_y));
+				double closest_dist = minDistanceToSegment(target_x, target_y, uav[uav_id-1].x, uav[uav_id-1].y, assigned_x, assigned_y);
+				//closest_dist = sqrt((assigned_x-target_x)*(assigned_x-target_x)+(assigned_y-target_y)*(assigned_y-target_y));
 
 				if(closest_dist < min_conflict_dist)
 					conflict = true;
@@ -336,7 +340,7 @@ double TaskAllocator::getMaxPriority(std::vector<Target> targets_)
 
 	for(int i = 0; i < targets_.size(); i++)
 	{
-		if(targets_[i].priority > max_priority && !targets_[i].conflict)
+		if(targets_[i].priority > max_priority)
 		{
 			max_priority = targets_[i].priority;
 		}
