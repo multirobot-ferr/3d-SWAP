@@ -173,8 +173,6 @@ void GcsStateMachine::onStateStart(){
 			// Wait until takeoff finishes
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}*/
-		// Wait for a fixed time
-		std::this_thread::sleep_for(std::chrono::seconds(10));
 		std::string waypoint_url = "/mbzirc_" + std::to_string(id) + "/uav_state_machine/waypoint";
 		ros::ServiceClient waypoint_client = nh.serviceClient<uav_state_machine::waypoint_service>(waypoint_url);
 		uav_state_machine::waypoint_service waypoint_call;
@@ -187,6 +185,8 @@ void GcsStateMachine::onStateStart(){
 			state_msg_ = "Error sending waypoints to UAV_" + std::to_string(id);
 			//return;
 		}
+		// Wait for a fixed time between UAVs
+		std::this_thread::sleep_for(std::chrono::seconds(10));
 	}
 	// Arrived here, change state
 	gcs_state_ = eGcsState::SEARCHING;
