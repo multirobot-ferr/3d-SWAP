@@ -122,8 +122,8 @@ void GcsStateMachine::onStateStart(){
 
 
 	// Prepare waypoints depending on the number of UAVs
-	const double cEightHeight = 60;
-	const double cEightWidth = 30;
+	const double cEightHeight = 66;
+	const double cEightWidth = 36;
 	const double cFieldWidth = 60;
 	
 	switch(index_to_id_map_.size()){
@@ -203,13 +203,13 @@ void GcsStateMachine::onStateStart(){
 								frameTransform.game2map(
 									grvc::utils::constructPoint(
 											-cEightHeight/2, 
-											cFieldWidth/2 + 3*cEightWidth/6, 
+											cFieldWidth/2 + 2*cEightWidth/6, 
 											Z_SEARCHING)));
 			start_path[1].push_back(
 								frameTransform.game2map(
 									grvc::utils::constructPoint(
 											cEightHeight/2, 
-											cFieldWidth/2 + 3*cEightWidth/6, 
+											cFieldWidth/2 + 2*cEightWidth/6, 
 											Z_SEARCHING)));
 			start_path[2].push_back(
 								frameTransform.game2map(
@@ -227,13 +227,13 @@ void GcsStateMachine::onStateStart(){
 								frameTransform.game2map(
 									grvc::utils::constructPoint(
 											-cEightHeight/2, 
-											cFieldWidth/2 - 3*cEightWidth/6, 
+											cFieldWidth/2 - 2*cEightWidth/6, 
 											Z_SEARCHING)));
 			start_path[3].push_back(
 								frameTransform.game2map(
 									grvc::utils::constructPoint(
 											cEightHeight/2, 
-											cFieldWidth/2 - 3*cEightWidth/6, 
+											cFieldWidth/2 - 2*cEightWidth/6, 
 											Z_SEARCHING)));
 			break;
 
