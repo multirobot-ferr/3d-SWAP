@@ -18,7 +18,7 @@
 		<model name="testbed_scene">
 			<static>true</static>
 			<!--pose>0 0 0 0 0 2.1984</pose-->
-            <pose>0 0 0 0 0 -3.0385</pose>
+            <pose>0 0 0 0 0 -3.0489</pose>
 			<link name="test_scene">
 				<visual name="visual">
 					<geometry>
@@ -169,7 +169,7 @@
         <!-- DROP BOX -->
 
         <model name="drop_box">
-            <pose>-20.7858 -32.3102 0.05 0 0 -3.0385</pose>
+            <pose>-20.7858 -32.3102 0.05 0 0 -3.0489</pose>
             <include>
                 <uri>model://dropping_box</uri>
             </include>
