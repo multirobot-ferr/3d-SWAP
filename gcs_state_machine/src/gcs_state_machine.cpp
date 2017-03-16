@@ -120,6 +120,125 @@ void GcsStateMachine::onStateStart(){
 	std::map<int, std::vector<geometry_msgs::Point>> start_path;
 	grvc::utils::frame_transform frameTransform;
 
+
+	// Prepare waypoints depending on the number of UAVs
+	const double cEightHeight = 76.66;
+	const double cEightWidth = 30;
+	const double cFieldWidth = 60;
+	
+	switch(index_to_id_map_.size()){
+		case 0:
+			assert(false);
+			break;
+		case 1:
+			// The uav covers the whole area going forth&back.
+			start_path[index_to_id_map_[0]].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											-cEightHeight/2, 
+											cFieldWidth/2 + cEightWidth/4, 
+											Z_SEARCHING)));
+			start_path[index_to_id_map_[0]].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											cEightHeight/2, 
+											cFieldWidth/2 + cEightWidth/4, 
+											Z_SEARCHING)));
+			start_path[index_to_id_map_[0]].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											cEightHeight/2, 
+											cFieldWidth/2 - cEightWidth/4, 
+											Z_SEARCHING)));
+			start_path[index_to_id_map_[0]].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											-cEightHeight/2, 
+											cFieldWidth/2 - cEightWidth/4, 
+											Z_SEARCHING)));
+
+			break;
+		case 2:
+			// The area is divided in two parts, each uav only move forward.
+			
+			int idMin, idMax;
+			if(index_to_id_map_[0] > index_to_id_map_[1]){
+				idMax = index_to_id_map_[0];
+				idMin = index_to_id_map_[1];
+			}else{
+				idMin = index_to_id_map_[0];
+				idMax = index_to_id_map_[1];
+			}
+
+			start_path[index_to_id_map_[idMin]].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											-cEightHeight/2, 
+											cFieldWidth/2 + cEightWidth/4, 
+											Z_SEARCHING)));
+			start_path[index_to_id_map_[idMin]].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											cEightHeight/2, 
+											cFieldWidth/2 + cEightWidth/4, 
+											Z_SEARCHING)));
+
+			
+			start_path[index_to_id_map_[idMax]].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											cEightHeight/2, 
+											cFieldWidth/2 - cEightWidth/4, 
+											Z_SEARCHING)));
+			start_path[index_to_id_map_[idMax]].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											-cEightHeight/2, 
+											cFieldWidth/2 - cEightWidth/4, 
+											Z_SEARCHING)));
+			break;
+		case 3:
+			// The area is divided in three parts, each uav only move forth.
+			start_path[1].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											-cEightHeight/2, 
+											cFieldWidth/2 + 3*cEightWidth/6, 
+											Z_SEARCHING)));
+			start_path[1].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											cEightHeight/2, 
+											cFieldWidth/2 + 3*cEightWidth/6, 
+											Z_SEARCHING)));
+			start_path[2].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											-cEightHeight/2, 
+											cFieldWidth/2, 
+											Z_SEARCHING)));
+			start_path[2].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											cEightHeight/2, 
+											cFieldWidth/2, 
+											Z_SEARCHING)));
+			start_path[3].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											-cEightHeight/2, 
+											cFieldWidth/2 - 3*cEightWidth/6, 
+											Z_SEARCHING)));
+			start_path[3].push_back(
+								frameTransform.game2map(
+									grvc::utils::constructPoint(
+											cEightHeight/2, 
+											cFieldWidth/2 - 3*cEightWidth/6, 
+											Z_SEARCHING)));
+			break;
+
+	}
+
 	// Official map start path
 	/*start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33, 46.67, Z_SEARCHING)));
 	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+38.33, 46.67, Z_SEARCHING)));
@@ -137,20 +256,20 @@ void GcsStateMachine::onStateStart(){
 	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-38.33,  6.67, Z_SEARCHING)));*/
 
 	// More conservative path
-	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 46.67, Z_SEARCHING)));
-	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 46.67, Z_SEARCHING)));
-	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 48.33, Z_SEARCHING)));
-	start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 48.33, Z_SEARCHING)));
+	//start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 46.67, Z_SEARCHING)));
+	//start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 46.67, Z_SEARCHING)));
+	//start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 48.33, Z_SEARCHING)));
+	//start_path[1].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 48.33, Z_SEARCHING)));
 
-	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 33.33, Z_SEARCHING)));
-	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 33.33, Z_SEARCHING)));
-	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 26.67, Z_SEARCHING)));
-	start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 26.67, Z_SEARCHING)));
+	//start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 33.33, Z_SEARCHING)));
+	//start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 33.33, Z_SEARCHING)));
+	//start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 26.67, Z_SEARCHING)));
+	//start_path[2].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 26.67, Z_SEARCHING)));
 
-	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 13.33, Z_SEARCHING)));
-	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 13.33, Z_SEARCHING)));
-	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 11.67, Z_SEARCHING)));
-	start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 11.67, Z_SEARCHING)));
+	//start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 13.33, Z_SEARCHING)));
+	//start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 13.33, Z_SEARCHING)));
+	//start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(+33.33, 11.67, Z_SEARCHING)));
+	//start_path[3].push_back(frameTransform.game2map(grvc::utils::constructPoint(-33.33, 11.67, Z_SEARCHING)));
 
 
 	ros::NodeHandle nh;
