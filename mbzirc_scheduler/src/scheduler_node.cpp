@@ -507,11 +507,7 @@ void Scheduler::publishBelief()
 			marker.action = visualization_msgs::Marker::ADD;
 			
 			// Set the scale of the marker -- 1x1x1 here means 1m on a side
-			if(a > 5.0)
-				a = 5.0;
-			if(b > 5.0)
-				b = 5.0;
-				
+
 			marker.scale.x = a;
 			marker.scale.y = b;    
 			marker.scale.z = 0.1;
