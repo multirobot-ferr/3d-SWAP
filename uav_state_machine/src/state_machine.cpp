@@ -163,6 +163,15 @@ void UavStateMachine::step() {
             break;
 
         case uav_state::GOTO_CATCH:
+            // Enable candidate search vision algorithm
+            uav_state_machine::switch_vision switchRequest;
+            switchRequest.request.algorithm =  uav_state_machine::switch_vision::Request::ALGORITHM_CANDIDATES;
+            if (!vision_algorithm_switcher_client_.call(switchRequest)) {
+                state_.state = uav_state::ERROR;
+                state_.state_str.data = "Error enabling candidate detector algorithm";
+                return;
+            }
+            
             approach_call.request.uav_id = uav_id_;
             approach_call.request.question = gcs_state_machine::ApproachPoint::Request::FREE_APPROACH_POINT;
             deploy_approach_client_.call(approach_call);
@@ -241,15 +250,6 @@ void UavStateMachine::onSearching() {
 
 //---------------------------------------------------------------------------------------------------------------------------------
 void UavStateMachine::onCatching() {
-    // Enable candidate search vision algorithm
-    uav_state_machine::switch_vision switchRequest;
-    switchRequest.request.algorithm =  uav_state_machine::switch_vision::Request::ALGORITHM_CANDIDATES;
-    if (!vision_algorithm_switcher_client_.call(switchRequest)) {
-        state_.state = uav_state::ERROR;
-        state_.state_str.data = "Error enabling candidate detector algorithm";
-        return;
-    }
-
     //TargetTracking (aka visual servoing)
     /// Init subscriber to candidates
     ros::NodeHandle nh;
