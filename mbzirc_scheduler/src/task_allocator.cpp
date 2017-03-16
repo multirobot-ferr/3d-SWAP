@@ -336,7 +336,7 @@ double TaskAllocator::getMaxPriority(std::vector<Target> targets_)
 
 	for(int i = 0; i < targets_.size(); i++)
 	{
-		if(targets_[i].priority > max_priority)
+		if(targets_[i].priority > max_priority && !target_[i].conflict)
 		{
 			max_priority = targets_[i].priority;
 		}
