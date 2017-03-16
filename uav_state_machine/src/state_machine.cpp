@@ -147,7 +147,7 @@ void UavStateMachine::step() {
         case uav_state::TAKINGOFF:
             take_off_srv_->send(target_altitude_, ts);
             hover_position_waypoint_ = current_position_waypoint_;
-            state_.state = uav_state::HOVER;
+            state_.state = uav_state::SEARCHING;
             break;
 
         case uav_state::HOVER:
@@ -486,49 +486,14 @@ bool UavStateMachine::landServiceCallback(uav_state_machine::land_service::Reque
 //---------------------------------------------------------------------------------------------------------------------------------
 bool UavStateMachine::searchServiceCallback(uav_state_machine::waypoint_service::Request &req, uav_state_machine::waypoint_service::Response &res) {
     // The difference between start and restart is that restart continues by the last wp
-    switch (req.action) {
-
-        case waypoint_serviceRequest::STOP:
-            if (state_.state == uav_state::SEARCHING) {
-                hover_position_waypoint_ = current_position_waypoint_;
-                state_.state = uav_state::HOVER;
-                grvc::hal::TaskState ts;
-                abort_srv_->send(ts);
-                waypoint_srv_->send(current_position_waypoint_, ts);
-                res.success = true;
-            } else {
-                res.success = false;
-            }
-            break;
-
-        case waypoint_serviceRequest::START:
-            if (state_.state == uav_state::HOVER) {
-                waypoint_index_ = 0;
-                waypoint_list_.clear();
-                for (int i=0; i< req.waypoint_track.size(); i++) {
-                    waypoint_list_.push_back({{req.waypoint_track[i].x,
-                    req.waypoint_track[i].y, req.waypoint_track[i].z}, 0.0});
-                }
-                state_.state = uav_state::SEARCHING;
-                res.success = true;
-            } else {
-                res.success = false;
-            }
-            break;
-
-        case waypoint_serviceRequest::RESTART:
-            if (state_.state == uav_state::HOVER) {
-                state_.state = uav_state::SEARCHING;
-                res.success = true;
-            } else {
-                res.success = false;
-            }
-            break;
-
-        default:
-            assert(false);  // Must be an error!
-            break;
+    waypoint_index_ = 0;
+    waypoint_list_.clear();
+    for (int i=0; i< req.waypoint_track.size(); i++) {
+        waypoint_list_.push_back({{req.waypoint_track[i].x,
+        req.waypoint_track[i].y, req.waypoint_track[i].z}, 0.0});
     }
+    res.success = true;
+     
     return true;
     //TargetTracking
     //Pickup
