@@ -335,7 +335,9 @@ void CentralizedEstimator::removeLostTargets()
 
 	while(it != targets_.end())
 	{		
-		if( ((it->second)->getStatus() == LOST) || ((it->second)->isStatic() == false && (it->second)->lastUpdateTime() > lost_th_) || ((it->second)->isStatic() == true && (it->second)->lastUpdateTime() > lost_th_ && (it->second)->getUpdateCount() < min_update_count_) )
+		if( ((it->second)->getStatus() == LOST) 
+		|| ((it->second)->isStatic() == false && (it->second)->lastUpdateTime() > lost_th_ && (it->second)->getUpdateCount() < min_update_count_) 
+		|| ((it->second)->isStatic() == true && (it->second)->lastUpdateTime() > lost_th_ && (it->second)->getUpdateCount() < min_update_count_) )
 		{
 			delete(it->second);
 			it = targets_.erase(it);

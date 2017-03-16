@@ -28,7 +28,7 @@
 
 #include <mbzirc_scheduler/target_tracker.h>
 
-#define VEL_NOISE_VAR 0.2 
+#define VEL_NOISE_VAR 0.1 
 #define COLOR_DETECTOR_PD 0.9
 #define MIN_COLOR_DISTANCE 0.15
 
