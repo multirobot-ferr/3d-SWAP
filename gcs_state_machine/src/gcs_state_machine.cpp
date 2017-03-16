@@ -170,13 +170,13 @@ void GcsStateMachine::onStateStart(){
 				idMax = index_to_id_map_[1];
 			}
 
-			start_path[index_to_id_map_[idMin]].push_back(
+			start_path[idMin].push_back(
 								frameTransform.game2map(
 									grvc::utils::constructPoint(
 											-cEightHeight/2, 
 											cFieldWidth/2 + cEightWidth/4, 
 											Z_SEARCHING)));
-			start_path[index_to_id_map_[idMin]].push_back(
+			start_path[idMin].push_back(
 								frameTransform.game2map(
 									grvc::utils::constructPoint(
 											cEightHeight/2, 
@@ -184,13 +184,13 @@ void GcsStateMachine::onStateStart(){
 											Z_SEARCHING)));
 
 			
-			start_path[index_to_id_map_[idMax]].push_back(
+			start_path[idMax].push_back(
 								frameTransform.game2map(
 									grvc::utils::constructPoint(
 											cEightHeight/2, 
 											cFieldWidth/2 - cEightWidth/4, 
 											Z_SEARCHING)));
-			start_path[index_to_id_map_[idMax]].push_back(
+			start_path[idMax].push_back(
 								frameTransform.game2map(
 									grvc::utils::constructPoint(
 											-cEightHeight/2, 
