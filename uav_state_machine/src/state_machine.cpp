@@ -163,6 +163,7 @@ void UavStateMachine::step() {
             break;
 
         case uav_state::GOTO_CATCH:
+        {
             // Enable candidate search vision algorithm
             uav_state_machine::switch_vision switchRequest;
             switchRequest.request.algorithm =  uav_state_machine::switch_vision::Request::ALGORITHM_CANDIDATES;
@@ -171,7 +172,7 @@ void UavStateMachine::step() {
                 state_.state_str.data = "Error enabling candidate detector algorithm";
                 return;
             }
-            
+
             approach_call.request.uav_id = uav_id_;
             approach_call.request.question = gcs_state_machine::ApproachPoint::Request::FREE_APPROACH_POINT;
             deploy_approach_client_.call(approach_call);
@@ -191,7 +192,7 @@ void UavStateMachine::step() {
                 state_.state = uav_state::HOVER;
             }
             break;
-
+        }
         case uav_state::CATCHING:
             onCatching();
             break;
