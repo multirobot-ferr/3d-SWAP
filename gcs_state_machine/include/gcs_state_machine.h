@@ -36,7 +36,7 @@
 class GcsStateMachine{
 	public: // Public interface
 		/// Initialize GCS state machine.
-		bool init();
+		bool init(const std::vector<int> _uavsId);
 
 	private: // Private methods
 		void onStateMachine();

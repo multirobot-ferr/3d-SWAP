@@ -37,10 +37,8 @@
 #include <iostream>
 
 #define Z_SEARCHING 10.0
-#define NUMBER_OF_UAVS 3
-#define UAVS_SEQUENCE {1, 3, 2}
 
-bool GcsStateMachine::init(){
+bool GcsStateMachine::init(const std::vector<int> _uavsId){
 	state_publisher_thread_ = std::thread([&](){
 		ros::NodeHandle nh;
 		state_publisher_ = nh.advertise<gcs_state_machine::gcs_state>("/mbzirc_gcs/state", 1);
@@ -62,13 +60,11 @@ bool GcsStateMachine::init(){
 
 	state_machine_thread_ = std::thread(&GcsStateMachine::onStateMachine, this);
 
-	// TODO: from param!
-	int uavs_sequence[NUMBER_OF_UAVS] = UAVS_SEQUENCE;
-	for (size_t i = 0; i < NUMBER_OF_UAVS; i++) {
-		index_to_id_map_[i] = uavs_sequence[i];
+	for (size_t i = 0; i < _uavsId.size(); i++) {
+		index_to_id_map_[i] = _uavsId[i];
 	}
-	uav_state_subscriber_.resize(NUMBER_OF_UAVS);
-	uav_state_.resize(NUMBER_OF_UAVS);
+	uav_state_subscriber_.resize(_uavsId.size());
+	uav_state_.resize(_uavsId.size());
 
 	ros::NodeHandle nh;
 	for (size_t i = 0; i <index_to_id_map_.size(); i++) {

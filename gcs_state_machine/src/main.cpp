@@ -31,6 +31,11 @@
 #include <DeployArea.h>
 
 int main(int _argc, char **_argv) {
+	if(_argc < 2){
+		std::cout << "Not enough input arguments! Please provide any UAV id." << std::endl;
+		return -1;
+	}
+
 	ros::init(_argc, _argv, "GCS_STATE_MACHINE");
   
 	// Read dropping area from xml
@@ -71,8 +76,14 @@ int main(int _argc, char **_argv) {
 	geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(deploy_x, deploy_y, 3.0));  
 	DeployAreaHandle deploy_area(deploy_point, deploy_area_radius);
 
+	// Assumming that _argv has the path of the executable and the ids of the uavs to be launch.
+	std::vector<int> uavsId;
+	for(int i = 1; i < _argc; i++){
+		uavsId.push_back(atoi(_argv[i]));
+	}
+
 	GcsStateMachine gcs;
-	if(!gcs.init()){
+	if(!gcs.init(uavsId)){
 		ROS_ERROR("ERROR INITIALIZING GCS!");
 		return -1;	
 	}
