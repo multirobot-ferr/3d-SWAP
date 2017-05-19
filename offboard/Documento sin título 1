@@ -1,2 +1,0 @@
-. ./home/luisgrvc/catkin_ws/devel/setup.bash
-rosservice call /mavros/cmd/arming "value: true"

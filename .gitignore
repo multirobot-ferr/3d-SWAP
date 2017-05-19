@@ -1,14 +1,4 @@
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Makefile
-cmake_install.cmake
-install_manifest.txt
+CMakeLists.txt
 ./visualization/world/generate_world.world
-./gcs/world/generate_world.world
 *~
-/gcs/build
-/gcs_core/build
-build
-/vision_node_bin/scripts/Log*
-/mbzirc_launchers/scripts/Log*
+
