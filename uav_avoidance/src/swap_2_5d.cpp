@@ -49,8 +49,8 @@
  */
 
 #include <uav_avoidance/swap_2_5d.h>
-
-
+#include <std_msgs/Bool.h>
+#include <tf2/utils.h>
 
 int main(int argc, char **argv) {
     // name remapping
@@ -151,10 +151,9 @@ Swap_2_5d::Swap_2_5d()
         SetRotCtrlP(rotation_ctrl_p);
     }
 
-
     // Subscribing to the position of all UAVs
     for (int n_uav = n_uavs_; n_uav > 0; --n_uav) {
-        std::string uav_topic_name = "/mbzirc_" + std::to_string(n_uav) + pose_uav_topic.c_str();
+        std::string uav_topic_name = "ual_" + std::to_string(n_uav) + pose_uav_topic.c_str();
         pos_all_uav_sub_.push_back(nh_.subscribe(uav_topic_name.c_str(), 1, &Swap_2_5d::PoseReceived, this));
     }
 
@@ -264,30 +263,29 @@ void Swap_2_5d::SpinOnce()
 /**
  * Callback for own pose estimatimation
  */
-void Swap_2_5d::PoseReceived(const std_msgs::String::ConstPtr& uav_pose)
+void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose)
 {
-    std::stringstream msg;
-    msg << uav_pose->data;
-    grvc::hal::Pose pose;
-    msg >> pose;
-
-    tf::Quaternion q3( pose.orientation[0],
-                       pose.orientation[1],
-                       pose.orientation[2],
-                       pose.orientation[3]);
+    
+    tf2::Quaternion q3(uav_pose->pose.orientation.x,
+                       uav_pose->pose.orientation.y,
+                       uav_pose->pose.orientation.z,
+                       uav_pose->pose.orientation.w);
     q3.normalize();     //Avoids a warning
 
-    int uav_id = stoi(pose.id);
+    int uav_id;
+    //int uav_id = stoi(pose.id); //TODO where is the UAV_ID sent?
+
+    std::vector<double> offset(3,0.0);
     #ifdef UAV_NOT_IN_ZERO_ZERO
     for (int coordinate = 0; coordinate < 3; ++coordinate)
     {
-        pose.position[coordinate] += UAV_ZZ( uav_id-1, coordinate );
+        offset[coordinate] = UAV_ZZ( uav_id-1, coordinate );
     }
     #endif
-    double x   = pose.position[0];
-    double y   = pose.position[1];
-    double z   = pose.position[2];
-    double yaw = tf::getYaw(q3);
+    double x   = offset[0] + uav_pose->pose.position.x;
+    double y   = offset[1] + uav_pose->pose.position.y;
+    double z   = offset[2] + uav_pose->pose.position.z;
+    double yaw = tf2::getYaw(q3);
 
     if (uav_id == uav_id_)
     {

@@ -43,6 +43,13 @@
  */
 
 #include <uav_avoidance/state_machine_test.h>
+#include <tf2/utils.h>     // to convert quaternion to roll-pitch-yaw
+
+#include <uav_abstraction_layer/TakeOff.h>
+#include <uav_abstraction_layer/SetVelocity.h>
+#include <uav_abstraction_layer/SetPositionError.h>
+#include <uav_abstraction_layer/GoToWaypoint.h>
+#include <uav_abstraction_layer/Land.h>
 
 /**
  * Main code of the state machine
@@ -114,28 +121,26 @@ StateMachine::StateMachine(int argc, char** argv): argc_(argc), argv_(argv) {
     #endif
 
     // Subscribing to the position of the UAV
-    std::string uav_topic_name = "/mbzirc_" + std::to_string(uav_id_) + pose_uav_topic.c_str();
+    std::string uav_topic_name = "ual_" + std::to_string(uav_id_) + pose_uav_topic.c_str();
     pos_uav_sub_ = nh_.subscribe(uav_topic_name.c_str(), 1, &StateMachine::PoseReceived, this);
 
     // Preparing the necessary services
-    grvc::utils::ArgumentParser args(argc_, argv_);
-
+    
     std::string uav_service_name;
-    uav_service_name = "/mbzirc_" + std::to_string(uav_id_) + takeoff_service;
-    takeOff_srv_ = new grvc::hal::Server::TakeOffService::Client(uav_service_name, args);
+    uav_service_name = "ual_" + std::to_string(uav_id_) + takeoff_service;
+    takeOff_srv_ = nh_.serviceClient<uav_abstraction_layer::TakeOff>(uav_service_name);
 
-    uav_service_name = "/mbzirc_" + std::to_string(uav_id_) + speed_service;
-    speed_srv_ = new grvc::hal::Server::VelocityService::Client( uav_service_name, args);
+    uav_service_name = "ual_" + std::to_string(uav_id_) + speed_service;
+    speed_srv_ = nh_.serviceClient<uav_abstraction_layer::SetVelocity>(uav_service_name);
 
-    uav_service_name = "/mbzirc_" + std::to_string(uav_id_) + pos_err_service;
-    pos_err_srv_ = new grvc::hal::Server::PositionErrorService::Client( uav_service_name, args);
+    uav_service_name = "ual_" + std::to_string(uav_id_) + pos_err_service;
+    pos_err_srv_ = nh_.serviceClient<uav_abstraction_layer::SetPositionError>(uav_service_name);
 
-    uav_service_name = "/mbzirc_" + std::to_string(uav_id_) + way_point_service;
-    way_point_srv_ = new grvc::hal::Server::WaypointService::Client(uav_service_name, args);
+    uav_service_name = "ual_" + std::to_string(uav_id_) + way_point_service;
+    way_point_srv_ = nh_.serviceClient<uav_abstraction_layer::GoToWaypoint>(uav_service_name);
 
-    uav_service_name = "/mbzirc_" + std::to_string(uav_id_) + land_service;
-    land_srv_  = new grvc::hal::Server::LandService::Client( uav_service_name, args);
-
+    uav_service_name = "ual_" + std::to_string(uav_id_) + land_service;
+    land_srv_ = nh_.serviceClient<uav_abstraction_layer::Land>(uav_service_name);
 
     pnh_->param<double>("z_distance", dist_between_uav_z_, 2.0);
     pnh_->param<double>("d_goal", d_goal_, 0.5);
@@ -161,10 +166,6 @@ StateMachine::~StateMachine()
 {
     // Releasing the memory
     delete pnh_;
-    delete takeOff_srv_;
-    delete speed_srv_;
-    delete way_point_srv_;
-    delete land_srv_;
 }
 
 /**
@@ -187,35 +188,36 @@ void StateMachine::Land()
     //TODO For some reason this thing does not work.
     // Landing the quadcopter (if possible)
     ROS_INFO("Trying to land");
-    if (land_srv_)
+    
+    uav_abstraction_layer::Land srv;
+    srv.request.blocking = true;
+    if (land_srv_.call(srv))
     {
         ROS_INFO("Landing");
-        land_srv_->send(ts_);
         ros::Duration(10).sleep();
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service landing");
     }
 }
 
 /**
  * Callback for own pose estimation
  */
-void StateMachine::PoseReceived(const std_msgs::String::ConstPtr& uav_pose)
+void StateMachine::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose)
 {
-    std::stringstream msg;
-    msg << uav_pose->data;
-    grvc::hal::Pose pose;
-    msg >> pose;
-
-    tf::Quaternion q3( pose.orientation[0],
-                       pose.orientation[1],
-                       pose.orientation[2],
-                       pose.orientation[3]);
+    tf2::Quaternion q3(uav_pose->pose.orientation.x,
+                       uav_pose->pose.orientation.y,
+                       uav_pose->pose.orientation.z,
+                       uav_pose->pose.orientation.w);
     q3.normalize();     //Avoids a warning
 
     pose_received_ = true;
-    uav_x_   = pose.position[0];
-    uav_y_   = pose.position[1];
-    uav_z_   = pose.position[2];
-    uav_yaw_ = tf::getYaw(q3);
+    uav_x_   = uav_pose->pose.position.x;
+    uav_y_   = uav_pose->pose.position.y;
+    uav_z_   = uav_pose->pose.position.z;
+    uav_yaw_ = tf2::getYaw(q3);
 }
 
 // ###########  Communication with SWAP  ########### //
@@ -299,11 +301,14 @@ void StateMachine::PublishPosErr()
  */
 void StateMachine::PublishGRVCPosErr(const double xe, const double ye, const double ze)
 {
-    if (pos_err_srv_)
+    uav_abstraction_layer::SetPositionError srv;
+    srv.request.position_error.vector.x = xe;
+    srv.request.position_error.vector.y = ye;
+    srv.request.position_error.vector.z = ze;
+
+    if (!pos_err_srv_.call(srv))
     {
-        //ROS_INFO("Sending position error %.2f,%.2f,%.2f", xe, ye, ze);
-        grvc::hal::Vec3 pos_error(xe, ye, ze);
-        pos_err_srv_->send(pos_error, ts_);
+        ROS_ERROR("Failed to call service SetPositionError");
     }
 }
 
@@ -313,29 +318,38 @@ void StateMachine::PublishGRVCPosErr(const double xe, const double ye, const dou
 void StateMachine::PublishGRVCCmdVel(const double vx, const double vy,
                                      const double vz, const double yaw_rate)
 {
-    if (speed_srv_)
-    {
-        // Swap has control of the speed too
-        grvc::hal::Velocity velocity;
-        velocity.linear[0] = vy;
-        velocity.linear[1] = vy;
-        velocity.linear[2] = vz;
-        velocity.yaw_rate  = yaw_rate;
+    uav_abstraction_layer::SetVelocity srv;
+    srv.request.velocity.twist.linear.x = vx;
+    srv.request.velocity.twist.linear.y = vy;
+    srv.request.velocity.twist.linear.z = vz;
+    srv.request.velocity.twist.angular.z = yaw_rate;
 
-        speed_srv_->send( velocity, ts_);
+    if (!speed_srv_.call(srv))
+    {
+        ROS_ERROR("Failed to call service SetVelocity");
     }
 }
 
 /**
- * Publishes a goal on the grvc controler
+ * Publishes a goal on the grvc controller
  */
 void StateMachine::PublishGRVCgoal(const double x, const double y, const double z, const double yaw)
 {
-    if (way_point_srv_)
+    uav_abstraction_layer::GoToWaypoint srv;
+    srv.request.blocking = false;
+    srv.request.waypoint.pose.position.x = x;
+    srv.request.waypoint.pose.position.y = y;
+    srv.request.waypoint.pose.position.z = z;
+
+    tf2::Quaternion q3;
+    q3.setRPY(0.0,0.0,yaw); 
+
+    srv.request.waypoint.pose.orientation = tf2::toMsg(q3);
+
+
+    if (!way_point_srv_.call(srv))
     {
-        // Swap has control of the movements
-        grvc::hal::Waypoint way_point = {{ x, y, z}, yaw};
-        way_point_srv_->send(way_point, ts_);   // Blocking!
+        ROS_ERROR("Failed to call service GoToWaypoint");
     }
 }
 
@@ -347,33 +361,33 @@ void StateMachine::TakeOff()
     // Getting fresh information on the position
     ros::spinOnce();
 
-    if (takeOff_srv_ )
+    ROS_INFO("State Machine: TakingOff the UAV");
+    // Leaving some extra time for the UAL to wake up
+
+    while ( !takeOff_srv_.exists() )
     {
-        ROS_INFO("State Machine: TakingOff the UAV");
-        // Leaving some extra time for the hal to wake up
+        ROS_INFO("Waiting for connection");
         ros::Duration(1).sleep();
+    }
 
-        while ( !takeOff_srv_->isConnected() )
-        {
-            ROS_INFO("Waiting for connection");
-            ros::Duration(1).sleep();
-        }
+    z_ref_ = std::max(dist_between_uav_z_ * uav_id_, 1.0);
 
-        z_ref_ = std::max(dist_between_uav_z_ * uav_id_, 1.0);
-        takeOff_srv_->send(z_ref_, ts_);   // Blocking!
+    uav_abstraction_layer::TakeOff srv;
+    srv.request.blocking = true;
+    srv.request.height = z_ref_;
 
-
+    if (takeOff_srv_.call(srv))
+    {
         // Waiting for the UAV to really take off
         while ( abs(uav_z_ - z_ref_) > 0.5 )
         {
             ros::Duration(1).sleep();
         }
-        ROS_WARN("UAV_%d ready (hovering at %.2f)", uav_id_, z_ref_);
-
+        ROS_WARN("UAV_%d ready (hovering at %.2f)", uav_id_, z_ref_);    
     }
     else
     {
-        ROS_FATAL("Takeoff system not connected");
+        ROS_ERROR("Failed to call service TakingOff");
     }
 }
 

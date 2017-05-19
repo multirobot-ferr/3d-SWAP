@@ -50,13 +50,9 @@
 #include <stdlib.h> //rand
 
 #include <ros/ros.h>
-#include <tf/transform_datatypes.h>     // to convert quaternion to roll-pitch-yaw
-#include <grvc_quadrotor_hal/types.h>
-#include <grvc_quadrotor_hal/server.h>
-#include <grvc_utils/argument_parser.h>
-#include <std_msgs/String.h>
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/PoseStamped.h>
 
 // Uncomment this define if all the robots starts in (0,0)
 //#define UAV_NOT_IN_ZERO_ZERO 1
@@ -70,12 +66,12 @@ const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
 #endif
 
 // Constant values
-const std::string pose_uav_topic = "/hal/pose";
-const std::string takeoff_service= "/hal/take_off";
-const std::string speed_service  = "/hal/velocity";
-const std::string way_point_service  = "/hal/go_to_wp";
-const std::string pos_err_service = "/hal/pos_error";
-const std::string land_service   = "/hal/land";
+const std::string pose_uav_topic = "/pose";
+const std::string takeoff_service= "/take_off";
+const std::string speed_service  = "/set_velocity";
+const std::string way_point_service  = "/go_to_waypoint";
+const std::string pos_err_service = "/set_position_error";
+const std::string land_service   = "/land";
 
 class StateMachine
 {
@@ -136,15 +132,12 @@ class StateMachine
         int argc_;
         char** argv_;
 
-        //Requested from the grvcQuadcopter
-        grvc::hal::TaskState ts_;
-
         //Preparing to command the UAV
-        grvc::hal::Server::TakeOffService::Client   *takeOff_srv_ = NULL;
-        grvc::hal::Server::WaypointService::Client  *way_point_srv_ = NULL;
-        grvc::hal::Server::VelocityService::Client  *speed_srv_ = NULL;
-        grvc::hal::Server::PositionErrorService::Client *pos_err_srv_ = NULL;
-        grvc::hal::Server::LandService::Client      *land_srv_ = NULL;
+        ros::ServiceClient takeOff_srv_;
+        ros::ServiceClient way_point_srv_;
+        ros::ServiceClient speed_srv_;
+        ros::ServiceClient pos_err_srv_;
+        ros::ServiceClient land_srv_;
         double dist_between_uav_z_ = 0.0;
 
         //Waypoints to debug the system
@@ -163,7 +156,7 @@ class StateMachine
          *
          * @param msg Position message from the grvc
          */
-        void PoseReceived(const std_msgs::String::ConstPtr& uav_pose);
+        void PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
 
     // ###########  Communication with SWAP  ########### //
         /**

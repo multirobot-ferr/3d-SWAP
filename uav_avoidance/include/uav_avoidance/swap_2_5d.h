@@ -59,13 +59,10 @@
 #include <iostream>
 
 #include <ros/ros.h>
-#include <tf/transform_datatypes.h>     // to convert quaternion to roll-pitch-yaw
 
 // message need
-#include <std_msgs/String.h>
-#include <std_msgs/Bool.h>
-#include <geometry_msgs/Quaternion.h>
-#include <grvc_quadrotor_hal/types.h>
+#include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/PoseStamped.h>
 
 // Fixing some problems
 // If the simulator makes all uavs start in (0,0), this define should be uncommented
@@ -80,7 +77,7 @@ const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
 #endif
 
 // Constant values
-const std::string pose_uav_topic = "/hal/pose";
+const std::string pose_uav_topic = "/pose";
 
 class Swap_2_5d:  public avoid::Swap
 {
@@ -166,7 +163,7 @@ class Swap_2_5d:  public avoid::Swap
          *
          * @param msg Position message from the grvc
          */
-        void PoseReceived(const std_msgs::String::ConstPtr& uav_pose);
+        void PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
 
         /**
          * @brief Callback for the direction of movement of the uav

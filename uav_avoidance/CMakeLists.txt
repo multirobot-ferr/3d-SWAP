@@ -11,9 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
 	roscpp
     std_msgs
     geometry_msgs
-    tf
-    grvc_quadrotor_hal
-	grvc_quadrotor_utils
+    tf2
+    uav_abstraction_layer
 )
 
 find_package(Armadillo REQUIRED)
@@ -35,9 +34,8 @@ catkin_package(
         roscpp
         std_msgs
         geometry_msgs
-        tf
-        grvc_quadrotor_hal
-	    grvc_quadrotor_utils
+        tf2
+        uav_abstraction_layer
   DEPENDS ARMADILLO
 )
 

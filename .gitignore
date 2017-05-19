@@ -1,4 +1,5 @@
 CMakeLists.txt
 ./visualization/world/generate_world.world
 *~
+uav_avoidance/logs/uav*
 
