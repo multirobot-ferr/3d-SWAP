@@ -8,12 +8,10 @@ project(mbzirc_scheduler)
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   roscpp
-  tf
+  tf2
   visualization_msgs
   std_msgs
   geometry_msgs
-  grvc_quadrotor_hal
-  grvc_quadrotor_utils
   uav_state_machine
 )
 
@@ -105,7 +103,7 @@ find_package(Eigen3 REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES mbzirc_target_estimator
-  CATKIN_DEPENDS message_runtime roscpp visualization_msgs grvc_quadrotor_hal grvc_quadrotor_utils std_msgs geometry_msgs uav_state_machine tf
+  CATKIN_DEPENDS message_runtime roscpp visualization_msgs std_msgs geometry_msgs uav_state_machine tf2
   DEPENDS eigen 
 )
 

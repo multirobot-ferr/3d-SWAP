@@ -34,11 +34,9 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <mbzirc_scheduler/AssignTarget.h>
 #include <mbzirc_scheduler/SetTargetStatus.h>
-#include <std_msgs/String.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <uav_state_machine/candidate_list.h>
-#include <grvc_quadrotor_hal/types.h>
-#include <tf/transform_datatypes.h>
-#include <grvc_utils/frame_transform.h>
+#include <tf2/utils.h>
 
 #include<string>
 #include<vector>
@@ -63,7 +61,7 @@ protected:
 
 	/// Callbacks
 	void candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list);
-	void uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose);
+	void uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
 
 	void publishBelief();
 	void eigendec(double c11, double c22, double c12, vector<double> &D, vector<double> &E);
@@ -133,7 +131,7 @@ Scheduler::Scheduler()
 	// Subscriptions/publications
 	for(int i = 0; i < n_uavs_; i++)
 	{
-		string uav_topic_name = "/mbzirc_" + to_string(i+1) + "/hal/pose";
+		string uav_topic_name = "ual_" + to_string(i+1) + "/pose";
 		string candidate_topic_name = "mbzirc_" + to_string(i+1) + "/candidateList" ;
 
 		ros::Subscriber* candidate_sub = new ros::Subscriber();
@@ -141,18 +139,18 @@ Scheduler::Scheduler()
 		candidate_subs_.push_back(candidate_sub);
 
 		ros::Subscriber* uav_sub = new ros::Subscriber();
-		*uav_sub = nh_->subscribe<std_msgs::String>(uav_topic_name.c_str(), 1, &Scheduler::uavPoseReceived, this);
+		*uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, &Scheduler::uavPoseReceived, this);
 		uav_subs_.push_back(uav_sub);
 
 		vector<Candidate *> empty_vector;
 		candidates_[i+1] = empty_vector;
 	}
 	
-	belief_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/targets_belief", 1);
+	belief_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("targets_belief", 1);
 
 	// Services
-	ros::ServiceServer assign_target_srv = nh_->advertiseService("/scheduler/assign_target", &Scheduler::assignTarget, this);
-	ros::ServiceServer set_target_status_srv = nh_->advertiseService("/scheduler/set_target_status", &Scheduler::setTargetStatus, this);
+	ros::ServiceServer assign_target_srv = nh_->advertiseService("scheduler/assign_target", &Scheduler::assignTarget, this);
+	ros::ServiceServer set_target_status_srv = nh_->advertiseService("scheduler/set_target_status", &Scheduler::setTargetStatus, this);
 
 	
 	// Main loop
@@ -238,7 +236,7 @@ Scheduler::~Scheduler()
 void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
 {
 	double delay = (ros::Time::now() - candidate_list->stamp).toSec();
-	grvc::utils::frame_transform frameTransform;
+	// TODO grvc::utils::frame_transform frameTransform;
 
 	if(candidate_list->candidates.size() && delay < delay_max_)
 	{
@@ -258,7 +256,7 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 		for(int j = 0; j < candidate_list->candidates.size(); j++)
 		{
 			// Check if candidate pose is in the game field
-			if( frameTransform.isInGameField( grvc::utils::constructPoint(candidate_list->candidates[j].global_position.x,candidate_list->candidates[j].global_position.y,candidate_list->candidates[j].global_position.z) ) \
+			// TODO if( frameTransform.isInGameField( grvc::utils::constructPoint(candidate_list->candidates[j].global_position.x,candidate_list->candidates[j].global_position.y,candidate_list->candidates[j].global_position.z) ) \
 			 && !frameTransform.isInDroppingArea( grvc::utils::constructPoint(candidate_list->candidates[j].global_position.x,candidate_list->candidates[j].global_position.y,candidate_list->candidates[j].global_position.z) ) )
 			{
 				Candidate* cand_p = new Candidate;
@@ -313,16 +311,13 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 
 /** \brief Callback to receive UAVs poses
 */
-void Scheduler::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
+void Scheduler::uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose)
 {
-	stringstream msg;
-	msg << uav_pose->data;
-	grvc::hal::Pose pose;
-	msg >> pose;
-	int uav_id = stoi(pose.id);
+	int uav_id; // TODO, include uav_id
+	//int uav_id = stoi(pose.id);
 
 	if(0 < uav_id && uav_id <= n_uavs_)
-		allocator_->updateUavPosition(uav_id, pose.position[0], pose.position[1], pose.position[2]);
+		allocator_->updateUavPosition(uav_id, uav_pose->pose.position.x, uav_pose->pose.position.y, uav_pose->pose.position.z);
 }
 
 /** \brief Callback for service. Request the assignment of a target
@@ -518,7 +513,10 @@ void Scheduler::publishBelief()
 			marker.pose.position.x = x;
 			marker.pose.position.y = y;
 			marker.pose.position.z = 0;
-			marker.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
+			
+			tf2::Quaternion q;
+			q.setRPY(0.0,0.0,yaw);
+			marker.pose.orientation = tf2::toMsg(q);
 
 			marker_array.markers.push_back(marker);
 
