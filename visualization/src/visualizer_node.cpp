@@ -29,9 +29,8 @@
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <std_msgs/String.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <uav_state_machine/candidate_list.h>
-#include <grvc_quadrotor_hal/types.h>
 #include <uav_state_machine/uav_state.h>
 
 #include<string>
@@ -58,7 +57,7 @@ protected:
 
 	/// Callbacks
 	void candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list);
-	void uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose);
+	void uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
     void uavStateReceived(const uav_state_machine::uav_state::ConstPtr& uav_state);
 
 	/// Node handlers
@@ -78,7 +77,7 @@ protected:
 
 	/// Last data received
 	map<int, uav_state_machine::candidate_list> candidates_;
-    map<int, grvc::hal::Pose> uavs_poses_;
+    map<int, geometry_msgs::PoseStamped> uavs_poses_;
     map<int, std::string> uavs_states_;
 
 	/// Number of UAVs
@@ -99,7 +98,7 @@ Visualizer::Visualizer()
 	// Subscriptions/publications
 	for(int i = 0; i < n_uavs_; i++)
 	{
-		string uav_topic_name = "/mbzirc_" + to_string(i+1) + "/hal/pose";
+		string uav_topic_name = "ual_" + to_string(i+1) + "/pose";
 		string candidate_topic_name = "mbzirc_" + to_string(i+1) + "/candidateList";
         string uav_state_topic_name = "mbzirc_" + to_string(i+1) + "/uav_state_machine/state" ;
 
@@ -116,10 +115,10 @@ Visualizer::Visualizer()
 		uav_state_subs_.push_back(uav_state_sub);
 	}
 	
-    scenario_pub_ = nh_->advertise<visualization_msgs::Marker>("/mbzirc_markers/scenario", 0);
-    uavs_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/mbzirc_markers/uavs", 0);
-    uavs_state_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/mbzirc_markers/uavs_states", 0);
-    candidates_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/mbzirc_markers/candidates", 1);
+    scenario_pub_ = nh_->advertise<visualization_msgs::Marker>("mbzirc_markers/scenario", 0);
+    uavs_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("mbzirc_markers/uavs", 0);
+    uavs_state_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("mbzirc_markers/uavs_states", 0);
+    candidates_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("mbzirc_markers/candidates", 1);
 }
 
 /** \brief Destructor
@@ -156,17 +155,13 @@ void Visualizer::candidatesReceived(const uav_state_machine::candidate_list::Con
 
 /** \brief Callback to receive UAVs poses
 */
-void Visualizer::uavPoseReceived(const std_msgs::String::ConstPtr& uav_pose)
+void Visualizer::uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose)
 {
-	stringstream msg;
-	msg << uav_pose->data;
-	grvc::hal::Pose pose;
-	msg >> pose;
-
-	int uav_id = stoi(pose.id);
+    int uav_id; // TODO get uav_id
+	//int uav_id = stoi(pose.id);
 
 	if(0 < uav_id && uav_id <= n_uavs_)
-        uavs_poses_[uav_id] = pose;
+        uavs_poses_[uav_id] = uav_pose;
 }
 
 /** \brief Callback to receive UAVs states

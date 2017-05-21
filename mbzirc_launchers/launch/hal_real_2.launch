@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     
-    <node name="grvc_hal_quad2" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
-		  args="-hal_ns=/mbzirc_2/hal -mavros_ns=/mavros_2 -uavId=2"/>
+    <node pkg="uav_abstraction_layer" type="server" name="ual_server_2" output="screen" args="-uav_id=2"/>
 
     <node name="uav_state_machine_2" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
       args="-uavId=2 -flying_level=11.0"/>

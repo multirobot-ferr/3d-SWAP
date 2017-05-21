@@ -53,7 +53,7 @@
 <UavAltitudeTopic>/mavros_2/global_position/rel_alt</UavAltitudeTopic>
 
 <!--Topic to position of UAV in map coordinates-->
-<UavMapCoordinatesTopic>/mbzirc_2/hal/pose</UavMapCoordinatesTopic>
+<UavMapCoordinatesTopic>/ual_2/pose</UavMapCoordinatesTopic>
 
 <!--Set to 1 if candidate lists needs to be published-->
 <PublishData>1</PublishData>

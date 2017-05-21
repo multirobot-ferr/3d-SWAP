@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 
 <launch>
-    <node name="CreateFile" pkg="mbzirc_gcs_view" type="createfileworld" output="screen" args="$(find mbzirc_gcs_view)" />
+    <node name="CreateFile" pkg="visualization" type="createfileworld" output="screen" args="$(find visualization)" />
 </launch>

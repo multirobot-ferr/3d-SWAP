@@ -23,46 +23,68 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ################################################################################
-cmake_minimum_required (VERSION 2.6)
-project(mbzirc_gcs_view)
+cmake_minimum_required(VERSION 2.8.3)
+project(visualization)
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+## Add support for C++11, supported in ROS Kinetic and newer
+add_definitions(-std=c++11)
 
-# ---- Configurable options ----
-# Pass this options to CMake in command line to select specific functionality for this project
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	option(GRVCQUAD_USE_ROS "Enable ros-specific code and interfaces" ON)
-else()
-	option(GRVCQUAD_USE_ROS "Enable ros-specific code and interfaces" OFF)
-endif()
+## Find catkin macros and libraries
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages	
+find_package(
+	catkin REQUIRED COMPONENTS  
+			roscpp 
+			geometry_msgs 
+			visualization_msgs
+        	image_transport 
+			std_msgs 
+			cv_bridge 
+			uav_state_machine 
+			tf 
+			gazebo_ros
+)
 
-# --- Compiler specific options ---
-# Visual studio specifics
-if(MSVC)
-	add_definitions(/W4 /WX) # Enable high level warnings and treat them like errors
-endif(MSVC)
-if(CMAKE_COMPILER_IS_GNUCXX)
-    add_definitions(-std=c++11 -Wall -Werror)
-endif()
+find_package(OpenCV REQUIRED COMPONENTS)
 
-if(GRVCQUAD_USE_ROS)
-	add_definitions(-DGRVC_USE_ROS)
-	
-	find_package(catkin REQUIRED COMPONENTS 
-        grvc_quadrotor_com grvc_quadrotor_hal roscpp geometry_msgs visualization_msgs
-        image_transport std_msgs cv_bridge uav_state_machine tf gazebo_ros)
+###################################
+## catkin specific configuration ##
+###################################
+## The catkin_package macro generates cmake config files for your package
+## Declare things to be passed to dependent projects
+## INCLUDE_DIRS: uncomment this if you package contains header files
+## LIBRARIES: libraries you create in this project that dependent projects also need
+## CATKIN_DEPENDS: catkin_packages dependent projects also need
+## DEPENDS: system dependencies of this project that dependent projects also need
+catkin_package(
+	INCLUDE_DIRS
+	LIBRARIES	
+	CATKIN_DEPENDS  
+		roscpp 
+		geometry_msgs 
+		visualization_msgs
+        image_transport 
+		std_msgs 
+		cv_bridge 
+		uav_state_machine 
+		tf 
+		gazebo_ros
+	DEPENDS OpenCV
+)
 
-    find_package(OpenCV REQUIRED COMPONENTS)
+###########
+## Build ##
+###########
 
-    catkin_package(	CATKIN_DEPENDS grvc_quadrotor_com grvc_quadrotor_hal roscpp geometry_msgs visualization_msgs
-        image_transport std_msgs cv_bridge uav_state_machine tf gazebo_ros)
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
+include_directories(${catkin_INCLUDE_DIRS})
 
-	include_directories(${catkin_INCLUDE_DIRS})
-endif(GRVCQUAD_USE_ROS)
+add_executable(visualizer_node src/visualizer_node.cpp)
+add_dependencies(visualizer_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(visualizer_node ${catkin_LIBRARIES})
 
-#set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../../cmake/modules")
-#FIND_PACKAGE(Eigen3 REQUIRED)
-#INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
+
 
 add_executable(createfileworld src/createfileworld_urdf.cpp)
 target_link_libraries(createfileworld LINK_PUBLIC grvc_com)
@@ -88,9 +110,6 @@ target_link_libraries(take_object ${catkin_LIBRARIES})
 
 add_executable(moving_object src/moving_object.cpp)
 target_link_libraries(moving_object ${catkin_LIBRARIES})
-
-add_executable(visualizer_node src/visualizer_node.cpp)
-target_link_libraries(visualizer_node ${catkin_LIBRARIES})
 
 add_executable(gazebo_move src/gazebo_move.cpp)
 target_link_libraries(gazebo_move ${catkin_LIBRARIES})

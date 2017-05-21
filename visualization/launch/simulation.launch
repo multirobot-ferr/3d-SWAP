@@ -13,24 +13,24 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 <launch>
 
 <!--******************************NODE GENERATE WORLD****************************************-->
-    <!--node name="CreateFile" pkg="mbzirc_gcs_view" type="createfileworld" output="screen" args="$(find mbzirc_gcs_view)" /-->
+    <!--node name="CreateFile" pkg="visualization" type="createfileworld" output="screen" args="$(find visualization)" /-->
 
 <!--******************************NODE GENERATE OPENCV WINDOWS****************************************-->
-    <!--node name="CameraView" pkg="mbzirc_gcs_view" type="cameraview" output="screen" /-->
+    <!--node name="CameraView" pkg="visualization" type="cameraview" output="screen" /-->
 
 
 <!--******************************WORLD****************************************-->
     <!-- Actually start gazebo server -->
 
     <!---include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find mbzirc_gcs_view)/world/generate_world.world"/>
+        <arg name="world_name" value="$(find visualization)/world/generate_world.world"/>
         <arg name="paused" value="true"/>
-        <env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/>
+        <env name="GAZEBO_MODEL_PATH" value="$(find visualization)/sdf/"/>
     </include-->
 
-    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find mbzirc_gcs_view)/world/sdf_world.world">
+    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find visualization)/world/sdf_world.world">
         <env name="LC_NUMERIC" value="C"/>
-        <!--env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/-->
+        <!--env name="GAZEBO_MODEL_PATH" value="$(find visualization)/sdf/"/-->
     </node>
 
     <!-- launch gazebo client -->

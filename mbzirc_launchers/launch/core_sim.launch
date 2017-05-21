@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find mbzirc_gcs_view)/world/arena_3.world">
+    <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen" args="-u $(find visualization)/world/arena_3.world">
         <env name="LC_NUMERIC" value="C"/>
         <!--env name="GAZEBO_MODEL_PATH" value="$(find mbzirc_gcs_view)/sdf/"/-->
     </node>

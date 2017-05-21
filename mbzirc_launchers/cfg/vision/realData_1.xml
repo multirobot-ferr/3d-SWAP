@@ -73,7 +73,7 @@
 <UavAltitudeTopic>/mbzirc_1/uav_state_machine/lidar_altitude</UavAltitudeTopic>
 
 <!--Topic to position of UAV in map coordinates-->
-<UavMapCoordinatesTopic>/mbzirc_1/hal/pose</UavMapCoordinatesTopic>
+<UavMapCoordinatesTopic>/ual_1/pose</UavMapCoordinatesTopic>
 
 <!--Set to 1 if candidate lists needs to be published-->
 <PublishData>1</PublishData>

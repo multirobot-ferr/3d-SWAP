@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>mbzirc_gcs_view</name>
+  <name>visualization</name>
   <version>0.0.0</version>
-  <description>The mbzirc package</description>
+  <description>This package containts tools for visualization and simulation in MBZIRC</description>
   <maintainer email="luisgrvc@todo.todo">luisgrvc</maintainer>
   <license>BSD</license>
   <author>Luis Manuel Ramirez</author>
@@ -10,8 +10,6 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   
-  <build_depend>grvc_quadrotor_com</build_depend>
-  <build_depend>grvc_quadrotor_hal</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>visualization_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
@@ -23,9 +21,6 @@
   <build_depend>gazebo_ros</build_depend>
   <build_depend>tf</build_depend>
 
-
-  <run_depend>grvc_quadrotor_com</run_depend>
-  <run_depend>grvc_quadrotor_hal</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>visualization_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
@@ -35,8 +30,7 @@
   <run_depend>uav_state_machine</run_depend>
   <run_depend>opencv2</run_depend>
   <run_depend>gazebo_ros</run_depend>
-  <run_depend>tf</run_depend>
- 
+  <run_depend>tf</run_depend> 
 
   <export>
     <!-- gazebo_ros_paths_plugin automatically adds these to

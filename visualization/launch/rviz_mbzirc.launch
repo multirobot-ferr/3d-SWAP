@@ -2,8 +2,8 @@
 
 <launch>
 
-    <node name="marker_stage" pkg="mbzirc_gcs_view" type="marker_stage" />
+    <node name="marker_stage" pkg="visualization" type="marker_stage" />
 
-    <node name="rviz_mbzirc" pkg="rviz" type="rviz" args="-d $(find mbzirc_gcs_view)/rviz/rviz_all_objects.rviz" />
+    <node name="rviz_mbzirc" pkg="rviz" type="rviz" args="-d $(find visualization)/rviz/rviz_all_objects.rviz" />
 
 </launch>
