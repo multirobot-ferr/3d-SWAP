@@ -42,6 +42,8 @@
 #include<vector>
 #include<map>
 #include<sstream>
+#include<functional>
+#include<algorithm>
 
 using namespace std;
 
@@ -61,7 +63,7 @@ protected:
 
 	/// Callbacks
 	void candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list);
-	void uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
+	void uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id);
 
 	void publishBelief();
 	void eigendec(double c11, double c22, double c12, vector<double> &D, vector<double> &E);
@@ -90,6 +92,9 @@ protected:
 
 	/// Number of UAVs
 	int n_uavs_;
+
+	/// Identifiers
+	vector<int> uav_ids_;
 
 	/// Centralized filter for target estimation 
 	CentralizedEstimator* estimator_;
@@ -122,28 +127,38 @@ Scheduler::Scheduler()
 	pnh_->param<int>("task_alloc_mode",task_alloc_mode, HIGHER_PRIORITY_NEAREST);
 	pnh_->param<double>("task_alloc_alpha",task_alloc_alpha, 0.8);
 	pnh_->param<double>("min_conflict_dist",min_conflict_dist, 0.0);
-	pnh_->param<int>("n_uavs",n_uavs_, 3);
+
+	if(pnh_->hasParam("uav_ids"))
+	{
+		pnh_->getParam("uav_ids", uav_ids_);
+		n_uavs_ = uav_ids_.size();
+	}
+	else
+	{
+		ROS_ERROR("Missing parameter uav_ids");
+		n_uavs_ = 0;
+	}
 
 	// Estimator and allocator
 	estimator_ = new CentralizedEstimator(association_th, lost_time_th, min_update_count);
-	allocator_ = new TaskAllocator(estimator_, (TargetSelectionMode)task_alloc_mode, n_uavs_, task_alloc_alpha, min_conflict_dist);
+	allocator_ = new TaskAllocator(estimator_, (TargetSelectionMode)task_alloc_mode, uav_ids_, task_alloc_alpha, min_conflict_dist);
 
 	// Subscriptions/publications
 	for(int i = 0; i < n_uavs_; i++)
 	{
-		string uav_topic_name = "ual_" + to_string(i+1) + "/pose";
-		string candidate_topic_name = "mbzirc_" + to_string(i+1) + "/candidateList" ;
+		string uav_topic_name = "ual_" + to_string(uav_ids_[i]) + "/pose";
+		string candidate_topic_name = "mbzirc_" + to_string(uav_ids_[i]) + "/candidateList" ;
 
 		ros::Subscriber* candidate_sub = new ros::Subscriber();
 		*candidate_sub = nh_->subscribe<uav_state_machine::candidate_list>(candidate_topic_name.c_str(), 1, &Scheduler::candidatesReceived, this);
 		candidate_subs_.push_back(candidate_sub);
 
 		ros::Subscriber* uav_sub = new ros::Subscriber();
-		*uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, &Scheduler::uavPoseReceived, this);
+		*uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Scheduler::uavPoseReceived, this, std::placeholders::_1,uav_ids_[i]) );
 		uav_subs_.push_back(uav_sub);
 
 		vector<Candidate *> empty_vector;
-		candidates_[i+1] = empty_vector;
+		candidates_[uav_ids_[i]] = empty_vector;
 	}
 	
 	belief_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("targets_belief", 1);
@@ -220,11 +235,11 @@ Scheduler::~Scheduler()
 		delete candidate_subs_[i];
 		delete uav_subs_[i];
 
-		for(int j = 0; j < candidates_[i+1].size(); j++)
+		for(int j = 0; j < candidates_[uav_ids_[i]].size(); j++)
 		{
-			delete candidates_[i+1][j];
+			delete candidates_[uav_ids_[i]][j];
 		}
-		candidates_[i+1].clear();
+		candidates_[uav_ids_[i]].clear();
 	}
 	candidates_.clear();
 	candidate_subs_.clear();
@@ -238,10 +253,10 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 	double delay = (ros::Time::now() - candidate_list->stamp).toSec();
 	// TODO grvc::utils::frame_transform frameTransform;
 
-	if(candidate_list->candidates.size() && delay < delay_max_)
-	{
-		int uav = candidate_list->uav_id;
+	int uav = candidate_list->uav_id;
 
+	if(candidate_list->candidates.size() && delay < delay_max_ && find(uav_ids_.begin(), uav_ids_.end(), uav) != uav_ids_.end())
+	{
 		// Remove existing candidates
 		if(candidates_[uav].size())
 		{
@@ -306,18 +321,14 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 		}
 	}
 	else
-		ROS_WARN("Received candidates empty or with long delay.");
+		ROS_WARN("Received candidates empty, with long delay or from a UAV not considered.");
 }
 
 /** \brief Callback to receive UAVs poses
 */
-void Scheduler::uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose)
+void Scheduler::uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id)
 {
-	int uav_id; // TODO, include uav_id
-	//int uav_id = stoi(pose.id);
-
-	if(0 < uav_id && uav_id <= n_uavs_)
-		allocator_->updateUavPosition(uav_id, uav_pose->pose.position.x, uav_pose->pose.position.y, uav_pose->pose.position.z);
+	allocator_->updateUavPosition(uav_id, uav_pose->pose.position.x, uav_pose->pose.position.y, uav_pose->pose.position.z);
 }
 
 /** \brief Callback for service. Request the assignment of a target
@@ -329,7 +340,7 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 	TargetStatus target_status;
 	Color target_color;
 
-	if(0 < req.uav_id && req.uav_id <= n_uavs_)
+	if(find(uav_ids_.begin(), uav_ids_.end(), req.uav_id) != uav_ids_.end())
 	{
 		res.target_id = allocator_->getOptimalTarget(req.uav_id);
 
@@ -528,7 +539,9 @@ void Scheduler::publishBelief()
 			marker.scale.z = 0.1;
 			if(marker.scale.x != 0.0)
 			{
-				marker.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(vy,vx));
+				tf2::Quaternion q;
+				q.setRPY(0.0,0.0,atan2(vy,vx));
+				marker.pose.orientation = tf2::toMsg(q);
 			}
 			
 			marker_array.markers.push_back(marker);

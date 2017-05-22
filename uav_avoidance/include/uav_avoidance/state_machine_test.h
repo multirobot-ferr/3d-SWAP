@@ -83,7 +83,7 @@ class StateMachine
          * and connects to the publishers, subscribers
          * and services to control a single uav
          */
-        StateMachine( int argc, char **argv);
+        StateMachine();
 
         /**
          * @brief Destructor to release the memory
@@ -128,10 +128,6 @@ class StateMachine
         double z_ref_;
         double d_goal_;
 
-        //Requested from the grvc communication system
-        int argc_;
-        char** argv_;
-
         //Preparing to command the UAV
         ros::ServiceClient takeOff_srv_;
         ros::ServiceClient way_point_srv_;
@@ -155,6 +151,7 @@ class StateMachine
          * @brief Callback for own pose estimation
          *
          * @param msg Position message from the grvc
+         * @param uav_id Identifier for UAV
          */
         void PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
 

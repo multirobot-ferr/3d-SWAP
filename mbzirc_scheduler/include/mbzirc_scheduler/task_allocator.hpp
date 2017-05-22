@@ -42,8 +42,6 @@ enum TargetSelectionMode {NEAREST = 1, HIGHER_PRIORITY_NEAREST = 2, WEIGHTED_SCO
 // LOWER_SCORE_NEAREST: get the easiest target closest to the UAV
 // WEIGHTED_SCORE_AND_DISTANCE: weight distance and score with a factor
 
-using namespace std;
-
 namespace mbzirc {
 
 enum Score {UNKNOWN_S = -1, RED_S = 1, GREEN_S = 2, BLUE_S = 3, YELLOW_S = 5, ORANGE_DOUBLE_S = 10};
@@ -53,7 +51,6 @@ enum Priority {LOW_PRIORITY = -1, BIG_PRIORITY = 1, MOVING_PRIORITY = 2, STATIC_
 class Uav
 {
 	public:
-	   int id;				// Unique identifier
 	   double x,y,z;		// Global Position
 	   int target;			// Target assigned
 	   bool initialized;	// True if any position received
@@ -78,7 +75,7 @@ class TaskAllocator
 		/**
 		 * Constructor
 		**/
-		TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, int num_of_uavs_, double alpha_, double min_conflict_dist_);
+		TaskAllocator(CentralizedEstimator* targets_estimation_ptr_, TargetSelectionMode mode_, std::vector<int> uav_ids_, double alpha_, double min_conflict_dist_);
 		
 		/**
 		 * Destructor
@@ -118,10 +115,11 @@ class TaskAllocator
 		CentralizedEstimator* targets_estimation_ptr;
 		
 		// UAVs positions
-		std::vector<Uav> uav;
+		std::map<int,Uav> uav;
 		
-		// Number of UAVs in operation
-		int num_of_uavs;		
+		// Number of UAVs in operation and IDs
+		int num_of_uavs;
+		std::vector<int> uav_ids;		
 		
 		// Target selection mode
 		TargetSelectionMode mode;

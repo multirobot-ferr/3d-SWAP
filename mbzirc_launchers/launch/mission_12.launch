@@ -11,7 +11,7 @@
 	<param name="task_alloc_mode" value="2" />	<!-- HIGHER_PRIORITY_NEAREST -->
 	<param name="task_alloc_alpha" value="0.8" />  
 	<param name="min_conflict_dist" value="5.0" /> 
-	<param name="n_uavs" value="3" />
+	<rosparam param="uav_ids">[1, 2]</rosparam>
    </node>
 
    <!-- Estimator and task allocator -->

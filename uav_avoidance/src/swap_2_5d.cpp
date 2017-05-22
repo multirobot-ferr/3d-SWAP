@@ -51,6 +51,7 @@
 #include <uav_avoidance/swap_2_5d.h>
 #include <std_msgs/Bool.h>
 #include <tf2/utils.h>
+#include <functional>
 
 int main(int argc, char **argv) {
     // name remapping
@@ -87,14 +88,20 @@ Swap_2_5d::Swap_2_5d()
     ROS_INFO("SWAP: Waiting %f seconds before start", sleep_time);
     ros::Duration( sleep_time).sleep();
 
+    // Getting the uav_ids
+    n_uavs_ = 0;
+    if (!pnh_->getParam("uav_ids", uav_ids_)) {
+        initialization_error_ = true;
+        ROS_FATAL("SWAP: uav_ids are not set. Closing the avoidance system");
+    }
+    else
+        n_uavs_ = uav_ids_.size();
+
     // Getting the uav_id
     if (!pnh_->getParam("uav_id", uav_id_)) {
         initialization_error_ = true;
         ROS_FATAL("SWAP: uav_id is not set. Closing the avoidance system");
     }
-
-    // Getting the number of uavs
-    pnh_->param<int>("n_uavs", n_uavs_, 3);
 
     // Getting the sleeping time of the loop
     pnh_->param<double>("spin_sleep", spin_sleep_, 0.2);
@@ -152,9 +159,9 @@ Swap_2_5d::Swap_2_5d()
     }
 
     // Subscribing to the position of all UAVs
-    for (int n_uav = n_uavs_; n_uav > 0; --n_uav) {
-        std::string uav_topic_name = "ual_" + std::to_string(n_uav) + pose_uav_topic.c_str();
-        pos_all_uav_sub_.push_back(nh_.subscribe(uav_topic_name.c_str(), 1, &Swap_2_5d::PoseReceived, this));
+    for (int n_uav = 0; n_uav < n_uavs_; n_uav++) {
+        std::string uav_topic_name = "/ual_" + std::to_string(uav_ids_[n_uav]) + pose_uav_topic.c_str();
+        pos_all_uav_sub_.push_back(nh_.subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Swap_2_5d::PoseReceived, this, std::placeholders::_1, uav_ids_[n_uav]) ));
     }
 
     // Information for the state machine
@@ -263,7 +270,7 @@ void Swap_2_5d::SpinOnce()
 /**
  * Callback for own pose estimatimation
  */
-void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose)
+void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id)
 {
     
     tf2::Quaternion q3(uav_pose->pose.orientation.x,
@@ -271,9 +278,6 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
                        uav_pose->pose.orientation.z,
                        uav_pose->pose.orientation.w);
     q3.normalize();     //Avoids a warning
-
-    int uav_id;
-    //int uav_id = stoi(pose.id); //TODO where is the UAV_ID sent?
 
     std::vector<double> offset(3,0.0);
     #ifdef UAV_NOT_IN_ZERO_ZERO
@@ -308,9 +312,11 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
     // If necessary, save the positions on the log
     if (pos_all)
     {
-        pos_all[(uav_id - 1)*3 + 0] = x;
-        pos_all[(uav_id - 1)*3 + 1] = y;
-        pos_all[(uav_id - 1)*3 + 2] = z;
+        int pos = log_pos_map_[uav_id];
+
+        pos_all[pos*3 + 0] = x;
+        pos_all[pos*3 + 1] = y;
+        pos_all[pos*3 + 2] = z;
     }
 }
 
@@ -355,11 +361,13 @@ void Swap_2_5d::FillLogFile()
 
         //TODO: Add the ros time
 
-        for (auto uav_id = 1; uav_id <= n_uavs_; ++uav_id )
+        for (auto id = 0; id < n_uavs_; ++id )
         {
-            values2log_.push_back( pos_all[(uav_id - 1)*3 + 0] );    //x
-            values2log_.push_back( pos_all[(uav_id - 1)*3 + 1] );    //y
-            values2log_.push_back( pos_all[(uav_id - 1)*3 + 2] );    //z
+            int pos = log_pos_map_[uav_ids_[id]];
+
+            values2log_.push_back( pos_all[pos*3 + 0] );    //x
+            values2log_.push_back( pos_all[pos*3 + 1] );    //y
+            values2log_.push_back( pos_all[pos*3 + 2] );    //z
         }
 
         // Showing the orientation of movement of the robot
@@ -425,6 +433,12 @@ void Swap_2_5d::Log2MatlabInit( const std::string file_path)
     pos_all = new double[std::max(n_uavs_ * 3, 20)];
     std::string log_all = file_path + "uav" + std::to_string(uav_id_) + ".txt";
     log2mat_.open(log_all.c_str(), std::ofstream::binary);
+
+    // Map UAV ids into log positions
+    for(int id = 0; id < n_uavs_; id++)
+    {
+        log_pos_map_[uav_ids_[id]] = id;
+    }
 }
 
 /**

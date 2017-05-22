@@ -53,6 +53,7 @@
 
 #include <swap.h>                    // base class
 #include <vector>
+#include <map>
 #include <sstream>
 #include <armadillo>
 #include <fstream>
@@ -130,7 +131,8 @@ class Swap_2_5d:  public avoid::Swap
         bool initialization_error_ = false;             //!< Flags to track possible errors in initialization
         double spin_sleep_ = 0.1;                       //!< Time that the system will sleep between iterations of the main loop
         int uav_id_ = -1;                               //!< Identification number of the current uav
-        int n_uavs_ =  3;                               //!< Number of UAV involved
+        int n_uavs_;                                    //!< Number of UAV involved
+        std::vector<int> uav_ids_;                      //!< IDs of UAV involved
         double uav_vector_speed_;                       //!< Modulus of the vector sent to the uav for avoidance
         double uav_safety_radius_ = -1.0;               //!< Safety radius of each uav
 
@@ -154,16 +156,18 @@ class Swap_2_5d:  public avoid::Swap
         std::ofstream log2mat_;
         std::vector<double> values2log_;    // Defined here to avoid multiple allocations of memory
         double bracking_distance_, positioning_error_, gamma_offset_;
-        double* pos_all;
+        double *pos_all;
+        std::map<int,int> log_pos_map_;
 
 
         /* Callbacks for ROS */
         /**
          * @brief Callback for own pose estimatimation
          *
-         * @param msg Position message from the grvc
+         * @param uav_pose Position message from the grvc
+         * @param uav_id Identifier from UAV
          */
-        void PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
+        void PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id);
 
         /**
          * @brief Callback for the direction of movement of the uav

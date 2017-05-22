@@ -42,7 +42,6 @@
 	<arg name="robot_number" default="1"/>
 	
 	<!-- Starts the uav manager -->
-    <node name="grvc_hal_quad$(arg robot_number)" pkg="grvc_quadrotor_hal" type="hal_node" respawn="false" output="screen"
-		  args="-hal_ns=/mbzirc_$(arg robot_number)/hal -mavros_ns=/mavros_$(arg robot_number) -uavId=$(arg robot_number)"/>
+	<node pkg="uav_abstraction_layer" type="server" name="ual_server_$(arg robot_number)" output="screen" args="-uav_id=$(arg robot_number)"/>
 
 </launch>
