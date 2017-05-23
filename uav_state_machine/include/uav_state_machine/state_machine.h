@@ -33,7 +33,9 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/Range.h>
 	
-#include <uav_state_machine/hal_client.h>
+// #include <uav_state_machine/hal_client.h>
+#include <uav_abstraction_layer/ual.h>
+
 #include <uav_state_machine/catching_device.h>
 #include <uav_state_machine/candidate_list.h>
 #include <uav_state_machine/candidate.h>
@@ -80,6 +82,7 @@ private:
     bool bestCandidateMatch(const uav_state_machine::candidate_list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result);
 
     int uav_id_ = -1;
+    grvc::ual::UAL ual;
     CatchingDevice *catching_device_;
     ros::ServiceServer take_off_service_;
     ros::ServiceServer land_service_;
