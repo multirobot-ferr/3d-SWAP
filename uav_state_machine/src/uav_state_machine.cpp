@@ -309,6 +309,7 @@ void UavStateMachine::onCatching() {
                     approaching_waypoint.pose.position.x = target_.global_position.x;
                     approaching_waypoint.pose.position.y = target_.global_position.y;
                     approaching_waypoint.pose.position.z = 1.0;
+                    approaching_waypoint.header.frame_id = "map";
                     ual_.goToWaypoint(approaching_waypoint);  // Blocking!
 
                     tries_counter++;
@@ -317,7 +318,8 @@ void UavStateMachine::onCatching() {
                         grvc::ual::Waypoint initial_catch = ual_.pose();
                         initial_catch.pose.position.x = target_.global_position.x;
                         initial_catch.pose.position.y = target_.global_position.y;
-                        initial_catch.pose.position.z = flying_level_;                        
+                        initial_catch.pose.position.z = flying_level_;
+                        initial_catch.header.frame_id = "map";                    
                         ual_.goToWaypoint(initial_catch);
 
                         // @Capi
@@ -396,7 +398,7 @@ void UavStateMachine::onGoToDeploy() {
         // Go to closest deploy point
         gcs_state_machine::ApproachPoint approach_call;
         approach_call.request.uav_id = uav_id_;
-        approach_call.request.uav_position.x = ual_.pose().pose.position.x;
+        approach_call.request.uav_position.x = ual_.pose().pose.position.x; // @Arturo TODO: enviar en coordenadas map
         approach_call.request.uav_position.y = ual_.pose().pose.position.y;
         approach_call.request.question = gcs_state_machine::ApproachPoint::Request::RESERVE_APPROACH_POINT;
         deploy_approach_client_.call(approach_call);

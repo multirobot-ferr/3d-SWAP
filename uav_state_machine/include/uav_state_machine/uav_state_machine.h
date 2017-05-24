@@ -44,8 +44,6 @@
 // #include <mbzirc_scheduler/SetTargetStatus.h>
 #include <uav_abstraction_layer/ual.h>
 #include <argument_parser/argument_parser.h>
-// @Arturo
-// #include <grvc_utils/frame_transform.h>
 
 class UavStateMachine {
 public:
