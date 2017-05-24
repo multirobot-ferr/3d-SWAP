@@ -26,17 +26,12 @@
 #ifndef MBZIRC_UAV_STATE_MACHINE_H
 #define MBZIRC_UAV_STATE_MACHINE_H
 
+#include <thread>
 #include <ros/ros.h>
 #include <Eigen/Core>
 #include <std_msgs/Float64.h>
-// #include <sensor_msgs/Joy.h>
-// #include <std_msgs/String.h>
-#include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/Range.h>
-
-// #include <uav_state_machine/hal_client.h>
-#include <uav_abstraction_layer/ual.h>
-
+#include <geometry_msgs/PoseStamped.h>
 #include <uav_state_machine/catching_device.h>
 #include <uav_state_machine/CandidateList.h>
 #include <uav_state_machine/Candidate.h>
@@ -45,14 +40,12 @@
 #include <uav_state_machine/TakeOff.h>
 #include <uav_state_machine/Land.h>
 #include <uav_state_machine/TrackPath.h>
+// @Capi
 // #include <mbzirc_scheduler/SetTargetStatus.h>
-
+#include <uav_abstraction_layer/ual.h>
 #include <argument_parser/argument_parser.h>
+// @Arturo
 // #include <grvc_utils/frame_transform.h>
-
-#include <thread>
-
-namespace grvc { namespace mbzirc {
 
 class UavStateMachine {
 public:
@@ -71,11 +64,8 @@ private:
     bool targetServiceCallback(uav_state_machine::SetTarget::Request  &req,
          uav_state_machine::SetTarget::Response &res);
 
-    //void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
     void positionCallback(const geometry_msgs::Pose::ConstPtr& uav_pose);
-    // void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
     void lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg);
-    // void joyCallback(const sensor_msgs::Joy::ConstPtr& _joy);
 
     void onSearching();
     void onCatching();
@@ -100,34 +90,27 @@ private:
     ros::Subscriber altitude_sub_;
     ros::Subscriber lidar_altitude_sub_;
     ros::Publisher lidar_altitude_remapped_pub_;
-    // ros::Subscriber joy_sub_;
 
     uav_state_machine::UavState state_;
     std::thread state_pub_thread_;
     ros::Publisher state_publisher_;
 
     uav_state_machine::Candidate matched_candidate_;
-    Eigen::Matrix<double, 3, 1> target_position_ = {0.0, 0.0, 0.0};
+    Eigen::Matrix<double, 3, 1> target_position_ = { 0.0, 0.0, 0.0 };
     unsigned max_tries_counter_ = 3;
 
-    grvc::ual::Waypoint current_position_waypoint_; // Stores current position of the drone.
+    grvc::ual::Waypoint current_position_waypoint_;  // Stores current position of the uav
     grvc::ual::Waypoint hover_position_waypoint_;
     std::vector<grvc::ual::Waypoint> waypoint_list_;
     unsigned int waypoint_index_ = 0;
 
-    // enum class LidarReading { FLOOR, OBJECT };
-    // LidarReading lidar_reading_ = LidarReading::FLOOR;
     float lidar_range_ = 0;
     float current_altitude_ = 0;
     float target_altitude_ = 0;
     float flying_level_;
-    //uav_state_machine::candidate target_;
     uav_state_machine::SetTarget::Request target_;
-    //grvc::hal::Waypoint deploy_waypoint_;
+    // @Arturo
     // grvc::utils::frame_transform frame_transform_;
-
 };
-
-}};  // namespace grvc::mbzirc
 
 #endif  // MBZIRC_UAV_STATE_MACHINE_H

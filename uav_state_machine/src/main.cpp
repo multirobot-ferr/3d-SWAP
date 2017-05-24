@@ -27,13 +27,13 @@
 #include <argument_parser/argument_parser.h>
 #include <uav_state_machine/uav_state_machine.h>
 
-int main(int _argc, char** _argv){
+int main(int _argc, char** _argv) {
     grvc::utils::ArgumentParser args(_argc, _argv);
     ROS_INFO("Setting up uav_state_machine[%d]", args.getArgument("uav_id", 1));
-    grvc::mbzirc::UavStateMachine uav_state_machine(args);
+    UavStateMachine uav_state_machine(args);
     uav_state_machine.init();
 
-    ros::Rate loop_rate(10); // [Hz]
+    ros::Rate loop_rate(10);  // [Hz]
     while (ros::ok()) {
         uav_state_machine.step();
         loop_rate.sleep();

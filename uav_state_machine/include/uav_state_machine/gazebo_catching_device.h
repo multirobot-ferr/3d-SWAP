@@ -37,14 +37,14 @@
 
 class GazeboCatchingDevice: public CatchingDevice {
 public:
-    
+
     GazeboCatchingDevice(unsigned int _uav_id, ros::NodeHandle& _nh) {
         robot_link_name_ = "mbzirc_" + std::to_string(_uav_id) + "::base_link";
 
-        std::string magnetize_advertise = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/magnetize";
+        std::string magnetize_advertise = "mbzirc_" + std::to_string(_uav_id) + "/catching_device/magnetize";
         magnetize_service_ = _nh.advertiseService(magnetize_advertise, &GazeboCatchingDevice::magnetizeServiceCallback, this);
 
-        std::string switch_pub_topic = "/mbzirc_" + std::to_string(_uav_id) + "/catching_device/switch";
+        std::string switch_pub_topic = "mbzirc_" + std::to_string(_uav_id) + "/catching_device/switch";
         switch_publisher_ = _nh.advertise<std_msgs::Bool>(switch_pub_topic, 1);
 
         std::string link_states_sub_topic = "/gazebo/link_states";
@@ -53,10 +53,10 @@ public:
         std::string link_state_pub_topic = "/gazebo/set_link_state";
         link_state_publisher_ = _nh.advertise<gazebo_msgs::LinkState>(link_state_pub_topic, 1);
 
-        std::string lidar_altitude_pub_topic = "/mavros_" + std::to_string(_uav_id) + "/distance_sensor/lidarlite_pub";
+        std::string lidar_altitude_pub_topic = "mavros_" + std::to_string(_uav_id) + "/distance_sensor/lidarlite_pub";
         lidar_altitude_pub_ = _nh.advertise<sensor_msgs::Range>(lidar_altitude_pub_topic, 1);
 
-        std::string altitude_sub_topic = "/mavros_" + std::to_string(_uav_id) + "/global_position/rel_alt";
+        std::string altitude_sub_topic = "mavros_" + std::to_string(_uav_id) + "/global_position/rel_alt";
         altitude_sub_ = _nh.subscribe<std_msgs::Float64>(altitude_sub_topic, 10, [this](const std_msgs::Float64::ConstPtr& _msg){
             sensor_msgs::Range fake_lidar;
             fake_lidar.range = _msg->data;

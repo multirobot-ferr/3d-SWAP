@@ -44,8 +44,6 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>uav_abstraction_layer</build_depend>
-  <!--<build_depend>px4_bringup</build_depend>-->
-  <!--<build_depend>robots_description</build_depend>-->
   <build_depend>geometry_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>roscpp</build_depend>
@@ -53,8 +51,6 @@
   
   <run_depend>message_runtime</run_depend>
   <run_depend>uav_abstraction_layer</run_depend>
-  <!--<run_depend>px4_bringup</run_depend>-->
-  <!--<run_depend>robots_description</run_depend>-->
   <run_depend>geometry_msgs</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>roscpp</run_depend>
