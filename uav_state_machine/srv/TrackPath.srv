@@ -5,6 +5,6 @@ uint8 RESTART=2
 
 # And here service itself:
 uint8 action
-geometry_msgs/Point[] waypoint_track
+geometry_msgs/PoseStamped[] waypoint_track
 ---
 bool success

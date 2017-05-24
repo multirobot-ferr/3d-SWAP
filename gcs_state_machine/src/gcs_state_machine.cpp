@@ -33,6 +33,7 @@
 // #include <mbzirc_scheduler/AssignTarget.h>
 // #include <grvc_utils/frame_transform.h>
 #include <iostream>
+#include <geometry_msgs/PoseStamped.h>
 
 #define Z_SEARCHING 10.0
 
@@ -115,10 +116,7 @@ void GcsStateMachine::onStateRepose(){
 
 
 void GcsStateMachine::onStateStart(){
-	std::map<int, std::vector<geometry_msgs::Point>> start_path;
-	// @Arturo
-	// grvc::utils::frame_transform frameTransform;
-
+	std::map<int, std::vector<geometry_msgs::PoseStamped>> start_path;
 
 	// Prepare waypoints depending on the number of UAVs
 	const double cEightHeight = 60;
@@ -130,35 +128,34 @@ void GcsStateMachine::onStateStart(){
 			assert(false);
 			break;
 		case 1:
-			// @Arturo
+		{
+			geometry_msgs::PoseStamped waypoint;
+			waypoint.header.frame_id = "game";
 			// The uav covers the whole area going forth&back.
-			// start_path[index_to_id_map_[0]].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								-cEightHeight/2, 
-			// 								cFieldWidth/2 + cEightWidth/4, 
-			// 								Z_SEARCHING)));
-			// start_path[index_to_id_map_[0]].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								cEightHeight/2, 
-			// 								cFieldWidth/2 + cEightWidth/4, 
-			// 								Z_SEARCHING)));
-			// start_path[index_to_id_map_[0]].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								cEightHeight/2, 
-			// 								cFieldWidth/2 - cEightWidth/4, 
-			// 								Z_SEARCHING)));
-			// start_path[index_to_id_map_[0]].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								-cEightHeight/2, 
-			// 								cFieldWidth/2 - cEightWidth/4, 
-			// 								Z_SEARCHING)));
+			waypoint.pose.position.x = -cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 + cEightWidth/4;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[index_to_id_map_[0]].push_back(waypoint);
+
+			waypoint.pose.position.x = cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 + cEightWidth/4;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[index_to_id_map_[0]].push_back(waypoint);
+
+			waypoint.pose.position.x = cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 - cEightWidth/4;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[index_to_id_map_[0]].push_back(waypoint);
+
+			waypoint.pose.position.x = -cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 - cEightWidth/4;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[index_to_id_map_[0]].push_back(waypoint);
 
 			break;
+		}
 		case 2:
+		{
 			// The area is divided in two parts, each uav only move forward.
 			
 			int idMin, idMax;
@@ -169,75 +166,71 @@ void GcsStateMachine::onStateStart(){
 				idMin = index_to_id_map_[0];
 				idMax = index_to_id_map_[1];
 			}
-			// @Arturo
-			// start_path[idMin].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								-cEightHeight/2, 
-			// 								cFieldWidth/2 + cEightWidth/4, 
-			// 								Z_SEARCHING)));
-			// start_path[idMin].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								cEightHeight/2, 
-			// 								cFieldWidth/2 + cEightWidth/4, 
-			// 								Z_SEARCHING)));
-
 			
-			// start_path[idMax].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								-cEightHeight/2, 
-			// 								cFieldWidth/2 - cEightWidth/4, 
-			// 								Z_SEARCHING)));
-			// start_path[idMax].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								cEightHeight/2, 
-			// 								cFieldWidth/2 - cEightWidth/4, 
-			// 								Z_SEARCHING)));
-			break;
-		case 3:
-			// The area is divided in three parts, each uav only move forth.
-			// @Arturo
-			// start_path[1].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								-cEightHeight/2, 
-			// 								cFieldWidth/2 + 2*cEightWidth/6, 
-			// 								Z_SEARCHING)));
-			// start_path[1].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								cEightHeight/2, 
-			// 								cFieldWidth/2 + 2*cEightWidth/6, 
-			// 								Z_SEARCHING)));
-			// start_path[2].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								-cEightHeight/2, 
-			// 								cFieldWidth/2, 
-			// 								Z_SEARCHING)));
-			// start_path[2].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								cEightHeight/2, 
-			// 								cFieldWidth/2, 
-			// 								Z_SEARCHING)));
-			// start_path[3].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								-cEightHeight/2, 
-			// 								cFieldWidth/2 - 2*cEightWidth/6, 
-			// 								Z_SEARCHING)));
-			// start_path[3].push_back(
-			// 					frameTransform.game2map(
-			// 						grvc::utils::constructPoint(
-			// 								cEightHeight/2, 
-			// 								cFieldWidth/2 - 2*cEightWidth/6, 
-			// 								Z_SEARCHING)));
-			break;
+			geometry_msgs::PoseStamped waypoint;
+			waypoint.header.frame_id = "game";
 
+			waypoint.pose.position.x = -cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 + cEightWidth/4;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[idMin].push_back(waypoint);
+
+			waypoint.pose.position.x = cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 + cEightWidth/4;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[idMin].push_back(waypoint);
+			
+			waypoint.pose.position.x = -cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 - cEightWidth/4;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[idMax].push_back(waypoint);
+			
+			waypoint.pose.position.x = cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 - cEightWidth/4;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[idMax].push_back(waypoint);
+			
+			break;
+		}
+		case 3:
+		{
+			// The area is divided in three parts, each uav only move forth.
+			
+			geometry_msgs::PoseStamped waypoint;
+			waypoint.header.frame_id = "game";
+
+			waypoint.pose.position.x = -cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 + 2*cEightWidth/6;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[1].push_back(waypoint);
+			
+			waypoint.pose.position.x = cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 + 2*cEightWidth/6;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[1].push_back(waypoint);
+			
+			waypoint.pose.position.x = -cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[2].push_back(waypoint);
+
+			waypoint.pose.position.x = cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[2].push_back(waypoint);
+			
+			waypoint.pose.position.x = -cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 - 2*cEightWidth/6;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[3].push_back(waypoint);
+
+			waypoint.pose.position.x = cEightHeight/2;
+			waypoint.pose.position.y = cFieldWidth/2 - 2*cEightWidth/6;
+			waypoint.pose.position.z = Z_SEARCHING;
+			start_path[3].push_back(waypoint);
+
+			break;
+		}
 	}
 
 

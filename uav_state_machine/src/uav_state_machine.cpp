@@ -486,7 +486,8 @@ bool UavStateMachine::searchServiceCallback(TrackPath::Request &req, TrackPath::
     waypoint_list_.clear();
     for (int i=0; i< req.waypoint_track.size(); i++) {
         grvc::ual::Waypoint wp;
-        wp.pose.position = req.waypoint_track[i];
+        wp.header.frame_id = req.waypoint_track[i].header.frame_id;
+        wp.pose.position = req.waypoint_track[i].pose.position;
         wp.pose.orientation.w = 1;
         waypoint_list_.push_back(wp);
     }

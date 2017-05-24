@@ -27,7 +27,8 @@
 #include <geometry_msgs/Point.h>
 #include <gcs_state_machine/gcs_state_machine.h>
 #include <gcs_state_machine/deploy_area_handle.h>
-// #include <grvc_utils/frame_transform.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 int main(int _argc, char **_argv) {
 	if (_argc < 2) {
@@ -36,45 +37,32 @@ int main(int _argc, char **_argv) {
 	}
 
 	ros::init(_argc, _argv, "gcs_state_machine");
-  
-	// @Arturo
-	// Read dropping area from xml
-	// tinyxml2::XMLDocument doc;
-    // std::string xml_file;
-    // ros::param::get("frames_file", xml_file);
-    // std::string path = ros::package::getPath("mbzirc_launchers") + xml_file;
-			
-    // doc.LoadFile(path.c_str());
-        
-    // tinyxml2::XMLNode* root = doc.RootElement();
-    // if(!root) {
-    //     ROS_ERROR("Error loading xml file %s\n", xml_file.c_str());
-    //     return -1;
-	// }
 
-	// // Get dropping game limits
-	// tinyxml2::XMLElement* dropping_game_limits_element = root->FirstChildElement("dropping_game_limits");
-	// tinyxml2::XMLElement* d_xmin_element = dropping_game_limits_element->FirstChildElement("x_min");
-    // double d_x_min;
-	// d_xmin_element->QueryDoubleText(&d_x_min);
-	// tinyxml2::XMLElement* d_xmax_element = dropping_game_limits_element->FirstChildElement("x_max");
-    // double d_x_max;
-	// d_xmax_element->QueryDoubleText(&d_x_max);
-	// tinyxml2::XMLElement* d_ymin_element = dropping_game_limits_element->FirstChildElement("y_min");
-    // double d_y_min;
-	// d_ymin_element->QueryDoubleText(&d_y_min);
-	// tinyxml2::XMLElement* d_ymax_element = dropping_game_limits_element->FirstChildElement("y_max");
-    // double d_y_max;
-	// d_ymax_element->QueryDoubleText(&d_y_max);
-	
-	// double deploy_x = (d_x_min + d_x_max)/2.0;
-	// double deploy_y = (d_y_min + d_y_max)/2.0;
+	float deploy_area_radius = 8.0;  // TODO: Test!
 
-	// float deploy_area_radius = 8.0;  // TODO: Test!
+	tf2_ros::Buffer tfBuffer;
+    tf2_ros::TransformListener tfListener(tfBuffer);
+	geometry_msgs::TransformStamped transformToMap;
+	geometry_msgs::PointStamped game_deploy_point;
+	geometry_msgs::PointStamped deploy_point;
 
-	// grvc::utils::frame_transform frameTransform;
-	// geometry_msgs::Point deploy_point = frameTransform.game2map(grvc::utils::constructPoint(deploy_x, deploy_y, 3.0));  
-	// DeployAreaHandle deploy_area(deploy_point, deploy_area_radius);
+	// Extract deploy point from params
+	std::vector<double> dropping_limits;
+
+	ros::param::get("/dropping_limits/limits", dropping_limits);
+
+	double deploy_x = (dropping_limits[0] + dropping_limits[1])/2.0;
+	double deploy_y = (dropping_limits[2] + dropping_limits[3])/2.0;
+
+	game_deploy_point.header.frame_id = "game";
+	game_deploy_point.point.x = deploy_x;
+	game_deploy_point.point.y = deploy_y;
+	game_deploy_point.point.z = 3.0;
+
+	transformToMap = tfBuffer.lookupTransform("map", "game", ros::Time(0), ros::Duration(0.2));
+	tf2::doTransform(game_deploy_point, deploy_point, transformToMap);
+
+	DeployAreaHandle deploy_area(deploy_point.point, deploy_area_radius);
 
 	// Assumming that _argv has the path of the executable and the ids of the uavs to be launch.
 	std::vector<int> uavs_id;
