@@ -121,26 +121,33 @@ StateMachine::StateMachine() {
     #endif
 
     // Subscribing to the position of the UAV
-    std::string uav_topic_name = "/ual_" + std::to_string(uav_id_) + pose_uav_topic.c_str();
-    pos_uav_sub_ = nh_.subscribe(uav_topic_name.c_str(), 1, &StateMachine::PoseReceived, this);
+    std::string ual_ns;
+    if (!pnh_->getParam("ual_namespace", ual_ns))
+        ual_ns = "/";
+
+    // Specific namespace for UAL
+    ros::NodeHandle nh_ual(ual_ns.c_str());
+
+    std::string uav_topic_name = "ual_" + std::to_string(uav_id_) + pose_uav_topic.c_str();
+    pos_uav_sub_ = nh_ual.subscribe(uav_topic_name.c_str(), 1, &StateMachine::PoseReceived, this);
 
     // Preparing the necessary services
     
     std::string uav_service_name;
-    uav_service_name = "/ual_" + std::to_string(uav_id_) + takeoff_service;
-    takeOff_srv_ = nh_.serviceClient<uav_abstraction_layer::TakeOff>(uav_service_name);
+    uav_service_name = "ual_" + std::to_string(uav_id_) + takeoff_service;
+    takeOff_srv_ = nh_ual.serviceClient<uav_abstraction_layer::TakeOff>(uav_service_name);
 
-    uav_service_name = "/ual_" + std::to_string(uav_id_) + speed_service;
-    speed_srv_ = nh_.serviceClient<uav_abstraction_layer::SetVelocity>(uav_service_name);
+    uav_service_name = "ual_" + std::to_string(uav_id_) + speed_service;
+    speed_srv_ = nh_ual.serviceClient<uav_abstraction_layer::SetVelocity>(uav_service_name);
 
-    uav_service_name = "/ual_" + std::to_string(uav_id_) + pos_err_service;
-    pos_err_srv_ = nh_.serviceClient<uav_abstraction_layer::SetPositionError>(uav_service_name);
+    uav_service_name = "ual_" + std::to_string(uav_id_) + pos_err_service;
+    pos_err_srv_ = nh_ual.serviceClient<uav_abstraction_layer::SetPositionError>(uav_service_name);
 
-    uav_service_name = "/ual_" + std::to_string(uav_id_) + way_point_service;
-    way_point_srv_ = nh_.serviceClient<uav_abstraction_layer::GoToWaypoint>(uav_service_name);
+    uav_service_name = "ual_" + std::to_string(uav_id_) + way_point_service;
+    way_point_srv_ = nh_ual.serviceClient<uav_abstraction_layer::GoToWaypoint>(uav_service_name);
 
-    uav_service_name = "/ual_" + std::to_string(uav_id_) + land_service;
-    land_srv_ = nh_.serviceClient<uav_abstraction_layer::Land>(uav_service_name);
+    uav_service_name = "ual_" + std::to_string(uav_id_) + land_service;
+    land_srv_ = nh_ual.serviceClient<uav_abstraction_layer::Land>(uav_service_name);
 
     pnh_->param<double>("z_distance", dist_between_uav_z_, 2.0);
     pnh_->param<double>("d_goal", d_goal_, 0.5);

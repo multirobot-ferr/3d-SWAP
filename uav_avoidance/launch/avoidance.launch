@@ -45,8 +45,11 @@
 	<!-- Configurable parameters -->
 	<arg name="robot_number" default="1"/>
 	
-	<group ns="/uav_$(arg robot_number)">
+	<group ns="uav_$(arg robot_number)">
     	<node pkg="uav_avoidance" type="swap_2_5d" name="avoidance_swap" output="screen">
+
+            <!--<param name="ual_namespace" value="/">-->
+            
 	        <!-- Parameters for SWAP -->
 	
 	        <!-- Debugging parameters -->
