@@ -29,8 +29,8 @@
 
 CatchingDevice* CatchingDevice::createCatchingDevice(unsigned int _uav_id, ros::NodeHandle& _nh) {
     CatchingDevice* implementation = nullptr;
-    // Return an implementation based on rosparam 'mavros_spawn/(_uav_id)/mode'
-    std::string param_name = "mavros_spawn/" + std::to_string(_uav_id) + "/mode";
+    // Return an implementation based on rosparam 'run_mavros/uav_(id)/mode'
+    std::string param_name = "run_mavros/uav_" + std::to_string(_uav_id) + "/mode";
     std::string mode;
     _nh.param<std::string>(param_name, mode, "real");  // Get param, default is 'real' mode
     if (mode == "real") {

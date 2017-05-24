@@ -99,8 +99,8 @@ public:
         magnet_state_ = (magnetize? MagnetState::MAGNETIZED : MagnetState::DEMAGNETIZED);
     }
 
-    bool magnetizeServiceCallback(uav_state_machine::magnetize_service::Request &_req,
-         uav_state_machine::magnetize_service::Response &_res)
+    bool magnetizeServiceCallback(uav_state_machine::Magnetize::Request &_req,
+         uav_state_machine::Magnetize::Response &_res)
     {
         setMagnetization(_req.magnetize);
         _res.success = true;

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// GRVC MBZIRC Vision
+// GRVC MBZIRC
 //------------------------------------------------------------------------------
 // The MIT License (MIT)
 //
@@ -24,19 +24,18 @@
 // SOFTWARE.
 //------------------------------------------------------------------------------
 #include <thread>
-#include <grvc_utils/argument_parser.h>
-#include <uav_state_machine/state_machine.h>
+#include <argument_parser/argument_parser.h>
+#include <uav_state_machine/uav_state_machine.h>
 
 int main(int _argc, char** _argv){
-    std::cout << "Setting up" << std::endl;
     grvc::utils::ArgumentParser args(_argc, _argv);
-    UavStateMachine uav_state_machine(args);
-    if (!uav_state_machine.init()) {
-        return -1;
-    }
+    ROS_INFO("Setting up uav_state_machine[%d]", args.getArgument("uav_id", 1));
+    grvc::mbzirc::UavStateMachine uav_state_machine(args);
+    uav_state_machine.init();
 
+    ros::Rate loop_rate(10); // [Hz]
     while (ros::ok()) {
         uav_state_machine.step();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        loop_rate.sleep();
     }
 }

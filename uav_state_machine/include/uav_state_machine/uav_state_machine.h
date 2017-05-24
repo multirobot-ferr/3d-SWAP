@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// GRVC MBZIRC Vision
+// GRVC MBZIRC
 //------------------------------------------------------------------------------
 // The MIT License (MIT)
 //
@@ -23,66 +23,69 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //------------------------------------------------------------------------------
-#ifndef _MBZIRC_STATEMACHINE_H_
-#define _MBZIRC_STATEMACHINE_H_
+#ifndef MBZIRC_UAV_STATE_MACHINE_H
+#define MBZIRC_UAV_STATE_MACHINE_H
 
 #include <ros/ros.h>
+#include <Eigen/Core>
 #include <std_msgs/Float64.h>
-#include <sensor_msgs/Joy.h>
-#include <std_msgs/String.h>
+// #include <sensor_msgs/Joy.h>
+// #include <std_msgs/String.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/Range.h>
-	
+
 // #include <uav_state_machine/hal_client.h>
 #include <uav_abstraction_layer/ual.h>
 
 #include <uav_state_machine/catching_device.h>
-#include <uav_state_machine/candidate_list.h>
-#include <uav_state_machine/candidate.h>
-#include <uav_state_machine/uav_state.h>
-#include <uav_state_machine/target_service.h>
-#include <uav_state_machine/takeoff_service.h>
-#include <uav_state_machine/land_service.h>
-#include <uav_state_machine/waypoint_service.h>
-#include <mbzirc_scheduler/SetTargetStatus.h>
+#include <uav_state_machine/CandidateList.h>
+#include <uav_state_machine/Candidate.h>
+#include <uav_state_machine/UavState.h>
+#include <uav_state_machine/SetTarget.h>
+#include <uav_state_machine/TakeOff.h>
+#include <uav_state_machine/Land.h>
+#include <uav_state_machine/TrackPath.h>
+// #include <mbzirc_scheduler/SetTargetStatus.h>
 
-#include <grvc_utils/argument_parser.h>
-#include <grvc_utils/frame_transform.h>
+#include <argument_parser/argument_parser.h>
+// #include <grvc_utils/frame_transform.h>
 
 #include <thread>
 
-class UavStateMachine : public HalClient {
+namespace grvc { namespace mbzirc {
+
+class UavStateMachine {
 public:
     UavStateMachine(grvc::utils::ArgumentParser _args);
 
-    bool init();
+    void init();
     void step();
 
 private:
-    bool takeoffServiceCallback(uav_state_machine::takeoff_service::Request  &req,
-         uav_state_machine::takeoff_service::Response &res);
-    bool landServiceCallback(uav_state_machine::land_service::Request  &req,
-         uav_state_machine::land_service::Response &res);
-    bool searchServiceCallback(uav_state_machine::waypoint_service::Request &req,
-         uav_state_machine::waypoint_service::Response &res);
-    bool targetServiceCallback(uav_state_machine::target_service::Request  &req,
-         uav_state_machine::target_service::Response &res);
+    bool takeoffServiceCallback(uav_state_machine::TakeOff::Request  &req,
+         uav_state_machine::TakeOff::Response &res);
+    bool landServiceCallback(uav_state_machine::Land::Request  &req,
+         uav_state_machine::Land::Response &res);
+    bool searchServiceCallback(uav_state_machine::TrackPath::Request &req,
+         uav_state_machine::TrackPath::Response &res);
+    bool targetServiceCallback(uav_state_machine::SetTarget::Request  &req,
+         uav_state_machine::SetTarget::Response &res);
 
     //void positionCallback(const geometry_msgs::PoseStamped::ConstPtr& _msg);
-    void positionCallback(const std_msgs::String::ConstPtr& uav_pose);
-    void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
+    void positionCallback(const geometry_msgs::Pose::ConstPtr& uav_pose);
+    // void altitudeCallback(const std_msgs::Float64::ConstPtr& _msg);
     void lidarAltitudeCallback(const sensor_msgs::Range::ConstPtr& _msg);
-    void joyCallback(const sensor_msgs::Joy::ConstPtr& _joy);
+    // void joyCallback(const sensor_msgs::Joy::ConstPtr& _joy);
 
     void onSearching();
     void onCatching();
     void onGoToDeploy();
 
-    void candidateCallback(const uav_state_machine::candidate_list::ConstPtr& _msg);
-    bool bestCandidateMatch(const uav_state_machine::candidate_list, const uav_state_machine::candidate &_specs, uav_state_machine::candidate &_result);
+    void candidateCallback(const uav_state_machine::CandidateList::ConstPtr& _msg);
+    bool bestCandidateMatch(const uav_state_machine::CandidateList, const uav_state_machine::Candidate &_specs, uav_state_machine::Candidate &_result);
 
     int uav_id_ = -1;
-    grvc::ual::UAL ual;
+    grvc::ual::UAL ual_;
     CatchingDevice *catching_device_;
     ros::ServiceServer take_off_service_;
     ros::ServiceServer land_service_;
@@ -97,32 +100,34 @@ private:
     ros::Subscriber altitude_sub_;
     ros::Subscriber lidar_altitude_sub_;
     ros::Publisher lidar_altitude_remapped_pub_;
-    ros::Subscriber joy_sub_;
+    // ros::Subscriber joy_sub_;
 
-    uav_state_machine::uav_state state_;
+    uav_state_machine::UavState state_;
     std::thread state_pub_thread_;
     ros::Publisher state_publisher_;
 
-    uav_state_machine::candidate matched_candidate_;
+    uav_state_machine::Candidate matched_candidate_;
     Eigen::Matrix<double, 3, 1> target_position_ = {0.0, 0.0, 0.0};
     unsigned max_tries_counter_ = 3;
 
-    grvc::hal::Waypoint current_position_waypoint_; // Stores current position of the drone.
-    grvc::hal::Waypoint hover_position_waypoint_;
-    std::vector<grvc::hal::Waypoint> waypoint_list_;
+    grvc::ual::Waypoint current_position_waypoint_; // Stores current position of the drone.
+    grvc::ual::Waypoint hover_position_waypoint_;
+    std::vector<grvc::ual::Waypoint> waypoint_list_;
     unsigned int waypoint_index_ = 0;
 
-    enum class LidarReading { FLOOR, OBJECT };
-    LidarReading lidar_reading_ = LidarReading::FLOOR;
+    // enum class LidarReading { FLOOR, OBJECT };
+    // LidarReading lidar_reading_ = LidarReading::FLOOR;
     float lidar_range_ = 0;
     float current_altitude_ = 0;
     float target_altitude_ = 0;
     float flying_level_;
     //uav_state_machine::candidate target_;
-    uav_state_machine::target_service::Request target_;
+    uav_state_machine::SetTarget::Request target_;
     //grvc::hal::Waypoint deploy_waypoint_;
-    grvc::utils::frame_transform frame_transform_;
+    // grvc::utils::frame_transform frame_transform_;
 
 };
 
-#endif  // _MBZIRC_STATEMACHINE_H_
+}};  // namespace grvc::mbzirc
+
+#endif  // MBZIRC_UAV_STATE_MACHINE_H
