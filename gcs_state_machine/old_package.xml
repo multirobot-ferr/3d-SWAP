@@ -1,0 +1,39 @@
+<package>
+	<name>gcs_state_machine</name>
+	<version>1.0.0</version>
+	<description>
+		gcs_state_machine
+	</description>
+	<maintainer email="todo@todo.com">GRVC University of Seville</maintainer>
+	<license>MIT</license>
+
+	<buildtool_depend>catkin </buildtool_depend>
+
+	<build_depend>roscpp </build_depend>
+	<build_depend>mavros_msgs</build_depend>
+	<build_depend>sensor_msgs</build_depend>
+	<build_depend>std_msgs</build_depend>
+	<build_depend>grvc_quadrotor_uav</build_depend>
+	<build_depend>grvc_quadrotor_utils</build_depend>
+	<build_depend>uav_state_machine</build_depend>
+	<build_depend>message_generation</build_depend>
+	<build_depend>message_runtime</build_depend>
+	<build_depend>geometry_msgs</build_depend>
+
+
+
+
+
+	<run_depend>roscpp </run_depend>
+	<run_depend>mavros_msgs</run_depend>
+	<run_depend>sensor_msgs</run_depend>
+	<run_depend>std_msgs</run_depend>
+	<run_depend>grvc_quadrotor_uav</run_depend>
+	<run_depend>grvc_quadrotor_utils</run_depend>
+	<run_depend>uav_state_machine</run_depend>
+	<run_depend>message_generation</run_depend>
+	<run_depend>message_runtime</run_depend>
+	<run_depend>geometry_msgs</run_depend>
+
+	
+</package>

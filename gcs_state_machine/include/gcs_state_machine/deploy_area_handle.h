@@ -23,45 +23,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //------------------------------------------------------------------------------
-
-#ifndef GCS_STATE_MACHINE_H_
-#define GCS_STATE_MACHINE_H_
-
-#include <thread>
-
+#ifndef MBZIRC_DEPLOY_AREA_HANDLE_H
+#define MBZIRC_DEPLOY_AREA_HANDLE_H
+#include <vector>
 #include <ros/ros.h>
 #include <geometry_msgs/Point.h>
-#include <uav_state_machine/uav_state.h>
+#include <gcs_state_machine/ApproachPoint.h>
+#include <gcs_state_machine/DeployArea.h>
+#include <handy_tools/critical.h>
 
-class GcsStateMachine{
-	public: // Public interface
-		/// Initialize GCS state machine.
-		bool init(const std::vector<int> _uavsId);
+struct ApproachPointHandle {
+    geometry_msgs::Point position;
+    bool reserved;
+    int uav_id;
+    void print() {
+        std::cout << "x = " << position.x << " y = " << position.y << \
+        " uav_id = " << uav_id << (reserved? " reserved" : " free") << std::endl;
+    }
+};
 
-	private: // Private methods
-		void onStateMachine();
+class DeployAreaHandle {
+public:
+    DeployAreaHandle(const geometry_msgs::Point& _center, float _radius);
+    bool ApproachPointSrvCallback(gcs_state_machine::ApproachPoint::Request &req, gcs_state_machine::ApproachPoint::Response &res);
+    bool DeployAreaSrvCallback(gcs_state_machine::DeployArea::Request &req, gcs_state_machine::DeployArea::Response &res);
+private:
+    std::vector<ApproachPointHandle> approach_point_;
+    ros::ServiceServer approach_point_service_;
+    ros::ServiceServer deploy_area_service_;
+    geometry_msgs::Point deploy_center_position_;
+    grvc::utils::Critical<bool> deploy_area_reserved_;
+    int deploy_area_owner_ = -1;
+};
 
-		void onStateRepose();
-		void onStateStart();
-		void onStateSearching();
-		void onStateCatching();
-		void onStateEnd();
-		void onStateError();
-	private: // Members
-		// Members related to CGS state.
-		enum class eGcsState {REPOSE, START, SEARCHING, CATCHING, END, ERROR};
-		eGcsState 		gcs_state_ = eGcsState::REPOSE;
-		std::string  	state_msg_;
-		ros::Publisher	state_publisher_;
-		std::thread 	state_publisher_thread_;
-
-		std::thread state_machine_thread_;
-
-		std::vector<uav_state_machine::uav_state> uav_state_;
-		std::vector<ros::Subscriber> uav_state_subscriber_;
-		std::map<int, int> index_to_id_map_;
-
-};	// class GcsStateMachine
-
-
-#endif
+#endif  // MBZIRC_DEPLOY_AREA_HANDLE_H

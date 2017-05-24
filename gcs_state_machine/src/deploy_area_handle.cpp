@@ -1,11 +1,29 @@
+//------------------------------------------------------------------------------
+// GRVC MBZIRC 
+//------------------------------------------------------------------------------
+// The MIT License (MIT)
 //
-//  DeployPoint.cpp
-//  DeploymentPoint
+// Copyright (c) 2017 GRVC University of Seville
 //
-//  Created by Angel Rodriguez Castaño on 4/3/17.
-//  Copyright © 2017 Angel Rodriguez Castaño. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-#include <DeployArea.h>
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//------------------------------------------------------------------------------
+#include <gcs_state_machine/deploy_area_handle.h>
 #include <iostream>
 #include <math.h>
 
@@ -30,9 +48,9 @@ DeployAreaHandle::DeployAreaHandle(const geometry_msgs::Point& _center, float _r
 
     // Advertise services:
     ros::NodeHandle nh;
-    approach_point_service_ = nh.advertiseService("/gcs/approach_point", \
+    approach_point_service_ = nh.advertiseService("mbzirc_gcs/approach_point", \
     &DeployAreaHandle::ApproachPointSrvCallback, this);
-    deploy_area_service_ = nh.advertiseService("/gcs/deploy_area", \
+    deploy_area_service_ = nh.advertiseService("mbzirc_gcs/deploy_area", \
     &DeployAreaHandle::DeployAreaSrvCallback, this);
 }
 
@@ -58,7 +76,7 @@ bool DeployAreaHandle::ApproachPointSrvCallback(ApproachPoint::Request &req, App
                 res.answer = ApproachPoint::Response::OK;
             } else {
                 res.answer = ApproachPoint::Response::WAIT;  // But it's an error...
-                // ... someone forgot to free, threr are 6 approach points for 3 uavs!
+                // ... someone forgot to free, there are 6 approach points for 3 uavs!
             }
             break;
         }
