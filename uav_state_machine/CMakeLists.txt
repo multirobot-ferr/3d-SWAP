@@ -151,6 +151,9 @@ add_executable(${PROJECT_NAME} src/main.cpp
   src/catching_device.cpp
   src/serial_catching_device.cpp
 )
+add_executable(test_serial_catching_device src/test_serial_catching_device.cpp
+  src/serial_catching_device.cpp
+)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -167,6 +170,9 @@ add_executable(${PROJECT_NAME} src/main.cpp
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(test_serial_catching_device
   ${catkin_LIBRARIES}
 )
 
