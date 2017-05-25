@@ -1,9 +1,9 @@
 //------------------------------------------------------------------------------
-// GRVC MBZIRC
+// GRVC MBZIRC 
 //------------------------------------------------------------------------------
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 GRVC University of Seville
+// Copyright (c) 2017 GRVC University of Seville
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //------------------------------------------------------------------------------
+#ifndef MBZIRC_GCS_STATE_MACHINE_H
+#define MBZIRC_GCS_STATE_MACHINE_H
+
 #include <thread>
-#include <argument_parser/argument_parser.h>
-#include <uav_state_machine/uav_state_machine.h>
+#include <ros/ros.h>
+#include <geometry_msgs/Point.h>
+#include <uav_state_machine/UavState.h>
 
-int main(int _argc, char** _argv) {
-    grvc::utils::ArgumentParser args(_argc, _argv);
-    ROS_INFO("Setting up uav_state_machine[%d]", args.getArgument("uav_id", 1));
-    UavStateMachine uav_state_machine(args);
-    uav_state_machine.init();
+class GcsStateMachine {
+	public:
+		bool init(const std::vector<int> _uavsId);
 
-    ros::Rate loop_rate(10);  // [Hz]
-    while (ros::ok()) {
-        uav_state_machine.step();
-        loop_rate.sleep();
-    }
-}
+	private:
+		void onStateMachine();
+
+		void onStateRepose();
+		void onStateStart();
+		void onStateSearching();
+		void onStateCatching();
+		void onStateEnd();
+		void onStateError();
+
+		// TODO: Use msg directly?
+		enum class eGcsState { REPOSE, START, SEARCHING, CATCHING, END, ERROR };
+		eGcsState 		gcs_state_ = eGcsState::REPOSE;
+		std::string  	state_msg_;
+		ros::Publisher	state_publisher_;
+		std::thread 	state_publisher_thread_;
+
+		std::thread state_machine_thread_;
+
+		std::vector<uav_state_machine::UavState> uav_state_;
+		std::vector<ros::Subscriber> uav_state_subscriber_;
+		std::map<int, int> index_to_id_map_;
+};
+
+#endif  // MBZIRC_GCS_STATE_MACHINE_H

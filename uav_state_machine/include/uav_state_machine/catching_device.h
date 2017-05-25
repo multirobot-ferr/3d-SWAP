@@ -27,7 +27,7 @@
 #define MBZIRC_CATCHING_DEVICE_H
 
 #include <ros/ros.h>
-#include <uav_state_machine/magnetize_service.h>
+#include <uav_state_machine/Magnetize.h>
 
 class CatchingDevice {
 public:
@@ -44,8 +44,8 @@ public:
     // Handle the magnet (may be up to ~4s blocking!)
     virtual void setMagnetization(bool magnetize) = 0;
 
-    virtual bool magnetizeServiceCallback(uav_state_machine::magnetize_service::Request &_req,
-         uav_state_machine::magnetize_service::Response &_res) = 0;
+    virtual bool magnetizeServiceCallback(uav_state_machine::Magnetize::Request &_req,
+         uav_state_machine::Magnetize::Response &_res) = 0;
 };
 
 #endif  // MBZIRC_CATCHING_DEVICE_H

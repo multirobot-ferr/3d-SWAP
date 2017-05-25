@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(uav_state_machine)
+project(mbzirc_visualization)
 
 ## Add support for C++11, supported in ROS Kinetic and newer
 add_definitions(-std=c++11)
@@ -8,12 +8,11 @@ add_definitions(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-	message_generation
-  uav_abstraction_layer
+  gazebo_ros
   geometry_msgs
-	std_msgs
-	roscpp
-  handy_tools
+  roscpp
+  uav_state_machine
+  visualization_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -50,23 +49,18 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  Candidate.msg
-  CandidateList.msg
-  UavState.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  TakeOff.srv
-  TrackPath.srv
-  Land.srv
-  SwitchVision.srv
-  SetTarget.srv
-  Magnetize.srv
-)
+# add_service_files(
+#   FILES
+#   Service1.srv
+#   Service2.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -76,10 +70,10 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  geometry_msgs std_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   geometry_msgs#   visualization_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -111,9 +105,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include
-#  LIBRARIES uav_state_machine
- CATKIN_DEPENDS message_runtime uav_abstraction_layer geometry_msgs std_msgs roscpp handy_tools
+#  INCLUDE_DIRS include
+#  LIBRARIES mbzirc_visualization
+ CATKIN_DEPENDS gazebo_ros geometry_msgs roscpp uav_state_machine visualization_msgs
 #  DEPENDS system_lib
 )
 
@@ -123,14 +117,14 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include)
+# include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/uav_state_machine.cpp
+#   src/${PROJECT_NAME}/mbzirc_visualization.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -141,15 +135,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/uav_state_machine_node.cpp)
-add_executable(${PROJECT_NAME} src/main.cpp 
-  src/uav_state_machine.cpp 
-  src/catching_device.cpp
-  src/serial_catching_device.cpp
-)
-add_executable(test_serial_catching_device src/test_serial_catching_device.cpp
-  src/serial_catching_device.cpp
-)
+# add_executable(${PROJECT_NAME}_node src/mbzirc_visualization_node.cpp)
+add_executable(visualizer_node src/visualizer_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -159,18 +146,14 @@ add_executable(test_serial_catching_device src/test_serial_catching_device.cpp
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(visualizer_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-)
-target_link_libraries(test_serial_catching_device
-  ${catkin_LIBRARIES}
-)
+target_link_libraries(visualizer_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -212,7 +195,7 @@ target_link_libraries(test_serial_catching_device
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_uav_state_machine.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mbzirc_visualization.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

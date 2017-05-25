@@ -1,9 +1,9 @@
 //------------------------------------------------------------------------------
-// GRVC MBZIRC
+// GRVC MBZIRC 
 //------------------------------------------------------------------------------
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 GRVC University of Seville
+// Copyright (c) 2017 GRVC University of Seville
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //------------------------------------------------------------------------------
-#include <thread>
-#include <argument_parser/argument_parser.h>
-#include <uav_state_machine/uav_state_machine.h>
+#ifndef MBZIRC_DEPLOY_AREA_HANDLE_H
+#define MBZIRC_DEPLOY_AREA_HANDLE_H
+#include <vector>
+#include <ros/ros.h>
+#include <geometry_msgs/Point.h>
+#include <gcs_state_machine/ApproachPoint.h>
+#include <gcs_state_machine/DeployArea.h>
+#include <handy_tools/critical.h>
 
-int main(int _argc, char** _argv) {
-    grvc::utils::ArgumentParser args(_argc, _argv);
-    ROS_INFO("Setting up uav_state_machine[%d]", args.getArgument("uav_id", 1));
-    UavStateMachine uav_state_machine(args);
-    uav_state_machine.init();
-
-    ros::Rate loop_rate(10);  // [Hz]
-    while (ros::ok()) {
-        uav_state_machine.step();
-        loop_rate.sleep();
+struct ApproachPointHandle {
+    geometry_msgs::Point position;
+    bool reserved;
+    int uav_id;
+    void print() {
+        std::cout << "x = " << position.x << " y = " << position.y << \
+        " uav_id = " << uav_id << (reserved? " reserved" : " free") << std::endl;
     }
-}
+};
+
+class DeployAreaHandle {
+public:
+    DeployAreaHandle(const geometry_msgs::Point& _center, float _radius);
+    bool ApproachPointSrvCallback(gcs_state_machine::ApproachPoint::Request &req, gcs_state_machine::ApproachPoint::Response &res);
+    bool DeployAreaSrvCallback(gcs_state_machine::DeployArea::Request &req, gcs_state_machine::DeployArea::Response &res);
+private:
+    std::vector<ApproachPointHandle> approach_point_;
+    ros::ServiceServer approach_point_service_;
+    ros::ServiceServer deploy_area_service_;
+    geometry_msgs::Point deploy_center_position_;
+    grvc::utils::Critical<bool> deploy_area_reserved_;
+    int deploy_area_owner_ = -1;
+};
+
+#endif  // MBZIRC_DEPLOY_AREA_HANDLE_H

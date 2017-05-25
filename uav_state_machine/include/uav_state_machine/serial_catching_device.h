@@ -31,7 +31,7 @@
 #include <chrono>
 #include <iostream>
 #include <std_msgs/Bool.h>
-#include <grvc_utils/critical.h>
+#include <handy_tools/critical.h>
 
 typedef unsigned char byte;
 class DeviceToPcData {
@@ -67,8 +67,8 @@ public:
     // Handle the magnet (may be up to ~4s blocking!)
     void setMagnetization(bool _magnetize);
 
-    bool magnetizeServiceCallback(uav_state_machine::magnetize_service::Request &_req,
-         uav_state_machine::magnetize_service::Response &_res);
+    bool magnetizeServiceCallback(uav_state_machine::Magnetize::Request &_req,
+         uav_state_machine::Magnetize::Response &_res);
 
 protected:
     MagnetState magnet_state_ = MagnetState::UNKNOWN;
