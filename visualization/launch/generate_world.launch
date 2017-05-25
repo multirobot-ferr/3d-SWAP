@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-
-<launch>
-    <node name="CreateFile" pkg="visualization" type="createfileworld" output="screen" args="$(find visualization)" />
-</launch>

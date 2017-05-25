@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-
-<launch>
-
-    <node name="marker_stage" pkg="visualization" type="marker_stage" />
-
-    <node name="rviz_mbzirc" pkg="rviz" type="rviz" args="-d $(find visualization)/rviz/rviz_all_objects.rviz" />
-
-</launch>

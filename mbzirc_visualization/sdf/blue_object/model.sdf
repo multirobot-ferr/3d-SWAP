@@ -1,0 +1,41 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+<model name="blue cylinder">
+  <pose>0 0 0.08 0 0 0</pose>
+    <link name="grab_here">
+      <inertial>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.083</ixx>       
+          <ixy>0.0</ixy>      
+          <ixz>0.0</ixz>         
+          <iyy>0.083</iyy>       
+          <iyz>0.0</iyz>     
+          <izz>0.083</izz>      
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+            <radius>0.10</radius>
+            <length>0.2</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.10</radius>
+            <length>0.2</length>
+          </cylinder>
+        </geometry>
+        <material>
+        	<script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Blue</name>
+            </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
