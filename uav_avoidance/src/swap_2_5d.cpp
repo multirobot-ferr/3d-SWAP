@@ -158,17 +158,15 @@ Swap_2_5d::Swap_2_5d()
         SetRotCtrlP(rotation_ctrl_p);
     }
 
-    // Subscribing to the position of all UAVs
+    // Specific namespace for UAL    
     std::string ual_ns;
     if (!pnh_->getParam("ual_namespace", ual_ns))
-        ual_ns = "/";
+        ual_ns = "";
 
-    // Specific namespace for UAL
-    ros::NodeHandle nh_ual(ual_ns.c_str());
-
+    // Subscribing to the position of all UAVs
     for (int n_uav = 0; n_uav < n_uavs_; n_uav++) {
-        std::string uav_topic_name = "ual_" + std::to_string(uav_ids_[n_uav]) + pose_uav_topic.c_str();
-        pos_all_uav_sub_.push_back(nh_ual.subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Swap_2_5d::PoseReceived, this, std::placeholders::_1, uav_ids_[n_uav]) ));
+        std::string uav_topic_name = "/" + ual_ns + "ual_" + std::to_string(uav_ids_[n_uav]) + pose_uav_topic.c_str();
+        pos_all_uav_sub_.push_back(nh_.subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Swap_2_5d::PoseReceived, this, std::placeholders::_1, uav_ids_[n_uav]) ));
     }
 
     // Information for the state machine

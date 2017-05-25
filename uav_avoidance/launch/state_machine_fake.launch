@@ -56,7 +56,7 @@
     <group ns="/uav_$(arg robot_number)">
         <node pkg="uav_avoidance" type="state_machine" name="state_machine" output="screen">
             <param name="uav_id" value="$(arg robot_number)"/>
-            <!--<param name="ual_namespace" value="/">-->    
+            <param name="ual_namespace" value=""/>    
             <param name="z_distance" value="3.0"/>  <!-- Distance between the uav's in the z axis -->
             <param name="d_goal" value="1.0"/>      <!-- Distance to consider that a uav is on a goal -->
 
