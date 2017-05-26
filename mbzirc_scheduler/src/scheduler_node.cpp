@@ -35,7 +35,7 @@
 #include <mbzirc_scheduler/AssignTarget.h>
 #include <mbzirc_scheduler/SetTargetStatus.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <uav_state_machine/candidate_list.h>
+#include <uav_state_machine/CandidateList.h>
 #include <tf2/utils.h>
 
 #include<string>
@@ -62,7 +62,7 @@ public:
 protected:
 
 	/// Callbacks
-	void candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list);
+	void candidatesReceived(const uav_state_machine::CandidateList::ConstPtr& candidate_list);
 	void uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id);
 
 	void publishBelief();
@@ -150,7 +150,7 @@ Scheduler::Scheduler()
 		string candidate_topic_name = "mbzirc_" + to_string(uav_ids_[i]) + "/candidateList" ;
 
 		ros::Subscriber* candidate_sub = new ros::Subscriber();
-		*candidate_sub = nh_->subscribe<uav_state_machine::candidate_list>(candidate_topic_name.c_str(), 1, &Scheduler::candidatesReceived, this);
+		*candidate_sub = nh_->subscribe<uav_state_machine::CandidateList>(candidate_topic_name.c_str(), 1, &Scheduler::candidatesReceived, this);
 		candidate_subs_.push_back(candidate_sub);
 
 		ros::Subscriber* uav_sub = new ros::Subscriber();
@@ -248,7 +248,7 @@ Scheduler::~Scheduler()
 
 /** \brief Callback to receive observations from vision module
 */
-void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::ConstPtr& candidate_list)
+void Scheduler::candidatesReceived(const uav_state_machine::CandidateList::ConstPtr& candidate_list)
 {
 	double delay = (ros::Time::now() - candidate_list->stamp).toSec();
 	// TODO grvc::utils::frame_transform frameTransform;
@@ -278,22 +278,22 @@ void Scheduler::candidatesReceived(const uav_state_machine::candidate_list::Cons
 
 				switch(candidate_list->candidates[j].color)
 				{
-					case uav_state_machine::candidate::COLOR_UNKNOWN:
+					case uav_state_machine::Candidate::COLOR_UNKNOWN:
 					cand_p->color = UNKNOWN;
 					break;
-					case uav_state_machine::candidate::COLOR_RED:
+					case uav_state_machine::Candidate::COLOR_RED:
 					cand_p->color = RED;
 					break;
-					case uav_state_machine::candidate::COLOR_BLUE:
+					case uav_state_machine::Candidate::COLOR_BLUE:
 					cand_p->color = BLUE;
 					break;
-					case uav_state_machine::candidate::COLOR_GREEN:
+					case uav_state_machine::Candidate::COLOR_GREEN:
 					cand_p->color = GREEN;
 					break;
-					case uav_state_machine::candidate::COLOR_YELLOW:
+					case uav_state_machine::Candidate::COLOR_YELLOW:
 					cand_p->color = YELLOW;
 					break;
-					case uav_state_machine::candidate::COLOR_ORANGE:
+					case uav_state_machine::Candidate::COLOR_ORANGE:
 					cand_p->color = ORANGE;
 					break;
 					default:
@@ -355,22 +355,22 @@ bool Scheduler::assignTarget(mbzirc_scheduler::AssignTarget::Request &req, mbzir
 			switch(target_color)
 			{
 				case UNKNOWN:
-				res.color = uav_state_machine::candidate::COLOR_UNKNOWN;
+				res.color = uav_state_machine::Candidate::COLOR_UNKNOWN;
 				break;
 				case RED:
-				res.color = uav_state_machine::candidate::COLOR_RED;
+				res.color = uav_state_machine::Candidate::COLOR_RED;
 				break;
 				case BLUE:
-				res.color = uav_state_machine::candidate::COLOR_BLUE;
+				res.color = uav_state_machine::Candidate::COLOR_BLUE;
 				break;
 				case GREEN:
-				res.color = uav_state_machine::candidate::COLOR_GREEN;
+				res.color = uav_state_machine::Candidate::COLOR_GREEN;
 				break;
 				case YELLOW:
-				res.color = uav_state_machine::candidate::COLOR_YELLOW;
+				res.color = uav_state_machine::Candidate::COLOR_YELLOW;
 				break;
 				case ORANGE:
-				res.color = uav_state_machine::candidate::COLOR_ORANGE;
+				res.color = uav_state_machine::Candidate::COLOR_ORANGE;
 				break;
 			}
 
