@@ -30,6 +30,8 @@
 int main(int _argc, char** _argv) {
     grvc::utils::ArgumentParser args(_argc, _argv);
     ROS_INFO("Setting up uav_state_machine[%d]", args.getArgument("uav_id", 1));
+    // Setting 
+    args.setArgument("pose_frame_id", "map");
     UavStateMachine uav_state_machine(args);
     uav_state_machine.init();
 
