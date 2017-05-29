@@ -33,7 +33,7 @@ game_frame:
 # uav_1_home frame
 uav_1_home_frame:
   frame_id: "uav_1_home"
-  parent_frame: "map"
+  parent_frame: "game"
   units: "m"
   translation: [-28.0, 34.0, 0.5]
   rotation: [0.0, 0.0, 0.0] # RPY
@@ -41,7 +41,7 @@ uav_1_home_frame:
 # uav_2_home frame
 uav_2_home_frame:
   frame_id: "uav_2_home"
-  parent_frame: "map"
+  parent_frame: "game"
   units: "m"
   translation: [-20.0, 30.0, 0.5]
   rotation: [0.0, 0.0, 0.0] # RPY
@@ -49,7 +49,7 @@ uav_2_home_frame:
 # uav_3_home frame
 uav_3_home_frame:
   frame_id: "uav_3_home"
-  parent_frame: "map"
+  parent_frame: "game"
   units: "m"
   translation: [-28.0, 26.0, 0.5]
   rotation: [0.0, 0.0, 0.0] # RPY

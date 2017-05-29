@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     
-    <node pkg="uav_abstraction_layer" type="server" name="ual_server_3" output="screen" args="-uav_id=3"/>
-
     <node name="uav_state_machine_3" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
-      args="-uavId=3 -flying_level=7.0"/>
+      args="-uav_id=3 -flying_level=7.0"/>
     
 </launch>
