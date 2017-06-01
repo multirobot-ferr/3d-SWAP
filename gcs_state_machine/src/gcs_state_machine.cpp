@@ -30,8 +30,7 @@
 #include <uav_state_machine/TakeOff.h>
 #include <uav_state_machine/Land.h>
 #include <uav_state_machine/TrackPath.h>
-// #include <mbzirc_scheduler/AssignTarget.h>
-// #include <grvc_utils/frame_transform.h>
+#include <mbzirc_scheduler/AssignTarget.h>
 #include <iostream>
 #include <geometry_msgs/PoseStamped.h>
 
@@ -237,7 +236,7 @@ void GcsStateMachine::onStateStart(){
 	ros::NodeHandle nh;
 	for (size_t i = 0; i < index_to_id_map_.size(); i++) {
 		int id = index_to_id_map_[i];
-		std::string takeoff_url = "/mbzirc_" + std::to_string(id) + "/uav_state_machine/takeoff";
+		std::string takeoff_url = "mbzirc_" + std::to_string(id) + "/uav_state_machine/takeoff";
 		ros::ServiceClient takeoff_client = nh.serviceClient<uav_state_machine::TakeOff>(takeoff_url);
 		uav_state_machine::TakeOff takeoff_call;
 		takeoff_call.request.altitude = Z_SEARCHING;
@@ -248,7 +247,7 @@ void GcsStateMachine::onStateStart(){
 			// Wait until takeoff finishes
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}*/
-		std::string waypoint_url = "/mbzirc_" + std::to_string(id) + "/uav_state_machine/waypoint";
+		std::string waypoint_url = "mbzirc_" + std::to_string(id) + "/uav_state_machine/waypoint";
 		ros::ServiceClient waypoint_client = nh.serviceClient<uav_state_machine::TrackPath>(waypoint_url);
 		uav_state_machine::TrackPath waypoint_call;
 		waypoint_call.request.action = uav_state_machine::TrackPathRequest::START;
@@ -282,41 +281,41 @@ void GcsStateMachine::onStateSearching(){
 
 void GcsStateMachine::onStateCatching(){
 	ros::NodeHandle nh;
-	// @Capi
-	// ros::ServiceClient assign_target_client = nh.serviceClient<mbzirc_scheduler::AssignTarget>("/scheduler/assign_target");
+	ros::ServiceClient assign_target_client = nh.serviceClient<mbzirc_scheduler::AssignTarget>("scheduler/assign_target");
+
 	std::vector<ros::ServiceClient> catch_target_client;
 	catch_target_client.resize(index_to_id_map_.size());
 	for (size_t i = 0; i < index_to_id_map_.size(); i++) {
-		std::string catch_target_url = "/mbzirc_" + std::to_string(index_to_id_map_[i]) + "/uav_state_machine/enabled";
+		std::string catch_target_url = "mbzirc_" + std::to_string(index_to_id_map_[i]) + "/uav_state_machine/enabled";
 		catch_target_client[i] = nh.serviceClient<uav_state_machine::SetTarget>(catch_target_url);
 	}
 	bool finished = false;
 	while (!finished) {
 		for (size_t i = 0; i < index_to_id_map_.size(); i++) {
 			if (uav_state_[i].state == uav_state_machine::UavState::HOVER) {
-				// @Capi
-				// mbzirc_scheduler::AssignTarget assign_target_call;
-				// assign_target_call.request.uav_id = index_to_id_map_[i];
-				// if (!assign_target_client.call(assign_target_call)) {
-				// 	//gcs_state_ = eGcsState::ERROR;  // No, retry!
-				// 	state_msg_ = "Error calling assign target service in UAV_" + std::to_string(index_to_id_map_[i]);
-				// } else if (assign_target_call.response.target_id >= 0) {
-				// 	uav_state_machine::target_service catch_target_call;
-				// 	catch_target_call.request.enabled = true;
-				// 	catch_target_call.request.color = assign_target_call.response.color;
-				// 	catch_target_call.request.shape = 0;  // DEPRECATED!
-				// 	catch_target_call.request.target_id = assign_target_call.response.target_id;
-				// 	catch_target_call.request.global_position = assign_target_call.response.global_position;
-				// 	if (!catch_target_client[i].call(catch_target_call)) {
-				// 		//gcs_state_ = eGcsState::ERROR;  // No, retry!
-				// 		state_msg_ = "Error sending targets to UAV_" + std::to_string(index_to_id_map_[i]);
-				// 	}
-				// 	else
-				// 		std::cout << "Target " << assign_target_call.response.target_id << " assigned to UAV " << (i+1) << std::endl;
-				// } else {
-				// 	// TODO: What? Finished?
-				// 	std::cerr << "No valid target assigned!" << std::endl;
-				// }
+				
+				mbzirc_scheduler::AssignTarget assign_target_call;
+				assign_target_call.request.uav_id = index_to_id_map_[i];
+				if (!assign_target_client.call(assign_target_call)) {
+				 	gcs_state_ = eGcsState::ERROR;  // No, retry!
+				 	state_msg_ = "Error calling assign target service in UAV_" + std::to_string(index_to_id_map_[i]);
+				} else if (assign_target_call.response.target_id >= 0) {
+				 	uav_state_machine::SetTarget catch_target_call;
+				 	catch_target_call.request.enabled = true;
+				 	catch_target_call.request.color = assign_target_call.response.color;
+				 	catch_target_call.request.shape = 0;  // DEPRECATED!
+				 	catch_target_call.request.target_id = assign_target_call.response.target_id;
+				 	catch_target_call.request.global_position = assign_target_call.response.global_position;
+				 	if (!catch_target_client[i].call(catch_target_call)) {
+				 		gcs_state_ = eGcsState::ERROR;  // No, retry!
+				 		state_msg_ = "Error sending targets to UAV_" + std::to_string(index_to_id_map_[i]);
+				 	}
+				 	else
+				 		std::cout << "Target " << assign_target_call.response.target_id << " assigned to UAV " << (i+1) << std::endl;
+				} else {
+				 	// TODO: What? Finished?
+				 	std::cerr << "No valid target assigned!" << std::endl;
+				}
 			}
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));

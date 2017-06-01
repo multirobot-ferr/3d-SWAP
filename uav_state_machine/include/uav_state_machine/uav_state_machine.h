@@ -40,8 +40,7 @@
 #include <uav_state_machine/TakeOff.h>
 #include <uav_state_machine/Land.h>
 #include <uav_state_machine/TrackPath.h>
-// @Capi
-// #include <mbzirc_scheduler/SetTargetStatus.h>
+#include <mbzirc_scheduler/SetTargetStatus.h>
 #include <uav_abstraction_layer/ual.h>
 #include <argument_parser/argument_parser.h>
 
@@ -107,8 +106,6 @@ private:
     float target_altitude_ = 0;
     float flying_level_;
     uav_state_machine::SetTarget::Request target_;
-    // @Arturo
-    // grvc::utils::frame_transform frame_transform_;
 };
 
 #endif  // MBZIRC_UAV_STATE_MACHINE_H

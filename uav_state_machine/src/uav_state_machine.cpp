@@ -47,8 +47,7 @@ UavStateMachine::UavStateMachine(grvc::utils::ArgumentParser _args) : ual_(_args
     land_service_      = nh.advertiseService("mbzirc_" + uav_id + "/uav_state_machine/land",     &UavStateMachine::landServiceCallback, this);
     search_service_    = nh.advertiseService("mbzirc_" + uav_id + "/uav_state_machine/waypoint", &UavStateMachine::searchServiceCallback, this);
     target_service_    = nh.advertiseService("mbzirc_" + uav_id + "/uav_state_machine/enabled",  &UavStateMachine::targetServiceCallback, this);
-    // @Capi
-    // target_status_client_ = nh.serviceClient<mbzirc_scheduler::SetTargetStatus>("scheduler/set_target_status");
+    target_status_client_ = nh.serviceClient<mbzirc_scheduler::SetTargetStatus>("scheduler/set_target_status");
     deploy_approach_client_ = nh.serviceClient<gcs_state_machine::ApproachPoint>("mbzirc_gcs/approach_point");
     deploy_area_client_ = nh.serviceClient<gcs_state_machine::DeployArea>("mbzirc_gcs/deploy_area");
     vision_algorithm_switcher_client_ = nh.serviceClient<SwitchVision>("mbzirc_" + uav_id + "/vision_node/algorithm_service");
@@ -322,14 +321,13 @@ void UavStateMachine::onCatching() {
                         initial_catch.header.frame_id = "map";                    
                         ual_.goToWaypoint(initial_catch);
 
-                        // @Capi
                         // Set target to failed
-                        // mbzirc_scheduler::SetTargetStatus target_status_call;
-                        // target_status_call.request.target_id = target_.target_id;
-                        // target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::FAILED;
-                        // if (!target_status_client_.call(target_status_call)) {
-                        //     ROS_ERROR("Error setting target status to FAILED in UAV_%d", uav_id_);
-                        // }                                           
+                        mbzirc_scheduler::SetTargetStatus target_status_call;
+                        target_status_call.request.target_id = target_.target_id;
+                        target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::FAILED;
+                        if (!target_status_client_.call(target_status_call)) {
+                             ROS_ERROR("Error setting target status to FAILED in UAV_%d", uav_id_);
+                        }                                           
 
                         // Switch to HOVER state.
                         hover_position_waypoint_ = ual_.pose();
@@ -355,13 +353,13 @@ void UavStateMachine::onCatching() {
 
         // If we're too high, give up
         if (current_altitude_ > Z_GIVE_UP_CATCHING) {
-            // @Capi
-            // mbzirc_scheduler::SetTargetStatus target_status_call;
-            // target_status_call.request.target_id = target_.target_id;
-            // target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::LOST;
-            // if (!target_status_client_.call(target_status_call)) {
-            //     ROS_ERROR("Error setting target status to LOST in UAV_%d", uav_id_);
-            // }
+            
+            mbzirc_scheduler::SetTargetStatus target_status_call;
+            target_status_call.request.target_id = target_.target_id;
+            target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::LOST;
+            if (!target_status_client_.call(target_status_call)) {
+                 ROS_ERROR("Error setting target status to LOST in UAV_%d", uav_id_);
+            }
             hover_position_waypoint_ = ual_.pose();
             state_.state = UavState::HOVER;
         }
@@ -387,14 +385,15 @@ void UavStateMachine::onGoToDeploy() {
     ual_.goToWaypoint(up_waypoint);  // Blocking!
     // TODO: Go to deploy zone (what if switch turns off?)
     if (catching_device_->switchIsPressed()) {  // Check switch again
+        
         // Update target status to CAUGHT
-        // @Capi
-        // mbzirc_scheduler::SetTargetStatus target_status_call;
-		// target_status_call.request.target_id = target_.target_id;
-        // target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::CAUGHT;
-		// if (!target_status_client_.call(target_status_call)) {
-		//     ROS_ERROR("Error setting target status to CAUGHT in UAV_%d", uav_id_);
-		// }
+        mbzirc_scheduler::SetTargetStatus target_status_call;
+		target_status_call.request.target_id = target_.target_id;
+        target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::CAUGHT;
+		if (!target_status_client_.call(target_status_call)) {
+		     ROS_ERROR("Error setting target status to CAUGHT in UAV_%d", uav_id_);
+		}
+
         // Go to closest deploy point
         gcs_state_machine::ApproachPoint approach_call;
         approach_call.request.uav_id = uav_id_;
@@ -433,12 +432,13 @@ void UavStateMachine::onGoToDeploy() {
         // Demagnetize catching device
         catching_device_->setMagnetization(false);
         // TODO Check !catching_device_->switchIsPressed()
+
         // Update target status to DEPLOYED
-        // @Capi
-        // target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::DEPLOYED;
-		// if (!target_status_client_.call(target_status_call)) {
-		//     ROS_ERROR("Error setting target status to DEPLOYED in UAV_%d", uav_id_);
-		// }
+        target_status_call.request.target_status = mbzirc_scheduler::SetTargetStatus::Request::DEPLOYED;
+		if (!target_status_client_.call(target_status_call)) {
+		     ROS_ERROR("Error setting target status to DEPLOYED in UAV_%d", uav_id_);
+		}
+        
         up_waypoint = ual_.pose();
         up_waypoint.pose.position.z = flying_level_;
         ual_.goToWaypoint(up_waypoint);  // Blocking!
@@ -557,22 +557,28 @@ bool UavStateMachine::bestCandidateMatch(const CandidateList _list, const Candid
     std::vector<PairDistanceCandidate> pairsDistCands;
 
     Eigen::Vector3d specPos = {_specs.global_position.x, _specs.global_position.y, _specs.global_position.z};
-    // @Arturo
-    /*for (auto&candidate:_list.candidates) {
-	bool isInField = frame_transform_.isInGameField( grvc::utils::constructPoint(   candidate.global_position.x,
+    
+    for (auto&candidate:_list.candidates) {
+        /*
+	    bool isInField = frame_transform_.isInGameField( grvc::utils::constructPoint(   candidate.global_position.x,
                                                                                             candidate.global_position.y,
                                                                                             candidate.global_position.z) );
 
-    bool isInDroppingArea = frame_transform_.isInDroppingArea( grvc::utils::constructPoint(   candidate.global_position.x,
+        bool isInDroppingArea = frame_transform_.isInDroppingArea( grvc::utils::constructPoint(   candidate.global_position.x,
                                                                                             candidate.global_position.y,
                                                                                             candidate.global_position.z) );
+        */
 
-	if(isInField && !isInDroppingArea){
-		Eigen::Vector3d candidatePos = {candidate.global_position.x, candidate.global_position.y, candidate.global_position.z};
-		double dist = (specPos - candidatePos).norm();
-		pairsDistCands.push_back(PairDistanceCandidate(dist, candidate));
-	}
-    }*/
+        // TODO: include GEOFENCING
+        bool isInField = true;
+        bool isInDroppingArea = false;
+
+        if(isInField && !isInDroppingArea){
+            Eigen::Vector3d candidatePos = {candidate.global_position.x, candidate.global_position.y, candidate.global_position.z};
+            double dist = (specPos - candidatePos).norm();
+            pairsDistCands.push_back(PairDistanceCandidate(dist, candidate));
+        }
+    }
     
     std::sort(pairsDistCands.begin(), pairsDistCands.end(), [](const PairDistanceCandidate &a, const PairDistanceCandidate &b) {
         return a.first < b.first;   
