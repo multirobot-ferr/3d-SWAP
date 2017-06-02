@@ -148,7 +148,7 @@ void UavStateMachine::step() {
             switchRequest.request.algorithm =  SwitchVision::Request::ALGORITHM_CANDIDATES;
             if (!vision_algorithm_switcher_client_.call(switchRequest)) {
                 state_.state = UavState::ERROR;
-                state_.state_str.data = "Error enabling candidate detector algorithm";
+                state_.state_msg.data = "Error enabling candidate detector algorithm";
                 return;
             }
             // Free approach point
@@ -214,7 +214,7 @@ void UavStateMachine::onSearching() {
     switchRequest.request.algorithm = SwitchVision::Request::ALGORITHM_CANDIDATES;
     if (!vision_algorithm_switcher_client_.call(switchRequest)) {
         state_.state = UavState::ERROR;
-        state_.state_str.data = "Error enabling candidate detector algorithm";
+        state_.state_msg.data = "Error enabling candidate detector algorithm";
         return;
     }
 
@@ -376,7 +376,7 @@ void UavStateMachine::onGoToDeploy() {
     switchRequest.request.algorithm =  SwitchVision::Request::ALGORITHM_DISABLE;
     if (!vision_algorithm_switcher_client_.call(switchRequest)) {
         state_.state = UavState::ERROR;
-        state_.state_str.data = "Error disabling vision algorithm";
+        state_.state_msg.data = "Error disabling vision algorithm";
         return;
     }
     // Go up!

@@ -36,7 +36,7 @@ uav_1_home_frame:
   parent_frame: "game"
   units: "m"
   translation: [-28.0, 34.0, 0.5]
-  rotation: [0.0, 0.0, 0.0] # RPY
+  rotation: [0.0, 0.0, -2.1984] # RPY
 
 # uav_2_home frame
 uav_2_home_frame:
@@ -44,7 +44,7 @@ uav_2_home_frame:
   parent_frame: "game"
   units: "m"
   translation: [1.6, 23.0, 0.5]
-  rotation: [0.0, 0.0, 0.0] # RPY
+  rotation: [0.0, 0.0, -2.1984] # RPY
 
 # uav_3_home frame
 uav_3_home_frame:
@@ -52,7 +52,7 @@ uav_3_home_frame:
   parent_frame: "game"
   units: "m"
   translation: [1.6, 18.3, 0.5]
-  rotation: [0.0, 0.0, 0.0] # RPY
+  rotation: [0.0, 0.0, -2.1984] # RPY
 
 #--------------------------------------------------------------------------------------------#
 # Other geographic params
