@@ -43,6 +43,7 @@
 #include <mbzirc_scheduler/SetTargetStatus.h>
 #include <uav_abstraction_layer/ual.h>
 #include <argument_parser/argument_parser.h>
+#include <handy_tools/special_zone.h>
 
 class UavStateMachine {
 public:
@@ -52,6 +53,8 @@ public:
     void step();
 
 private:
+    void initSpecialZones();
+
     bool takeoffServiceCallback(uav_state_machine::TakeOff::Request  &req,
          uav_state_machine::TakeOff::Response &res);
     bool landServiceCallback(uav_state_machine::Land::Request  &req,
@@ -106,6 +109,9 @@ private:
     float target_altitude_ = 0;
     float flying_level_;
     uav_state_machine::SetTarget::Request target_;
+
+    grvc::utils::special_zone* game_field_;
+    grvc::utils::special_zone* dropping_area_;
 };
 
 #endif  // MBZIRC_UAV_STATE_MACHINE_H

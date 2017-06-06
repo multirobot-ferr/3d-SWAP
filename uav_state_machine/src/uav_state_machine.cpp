@@ -115,7 +115,69 @@ void UavStateMachine::init() {
     while (!ual_.isReady() && ros::ok()) {
         sleep(1);
     }
+    initSpecialZones();
     ROS_INFO("UAV State Machine [%d] initialized!", uav_id_);
+}
+
+void UavStateMachine::initSpecialZones() {
+    if( ros::param::has("game_limits") ) {
+        std::vector<geometry_msgs::Point> game_vertices;
+        std::vector<double> game_limits;
+        std::string game_frame;
+        geometry_msgs::Point p;
+        p.z = 0;
+        ros::param::get("game_limits/limits", game_limits);
+        ros::param::get("game_limits/frame_id", game_frame);
+
+        p.x = game_limits[0];
+        p.y = game_limits[2];
+        game_vertices.push_back(p);
+        p.x = game_limits[0];
+        p.y = game_limits[3];
+        game_vertices.push_back(p);
+        p.x = game_limits[1];
+        p.y = game_limits[3];
+        game_vertices.push_back(p);
+        p.x = game_limits[1];
+        p.y = game_limits[2];
+        game_vertices.push_back(p);
+
+        game_field_ = new grvc::utils::special_zone(game_frame,game_vertices);
+    }
+    else {
+        ROS_ERROR("game_limits not defined.");
+        state_.state = UavState::ERROR;
+        state_.state_msg.data = "Error: game_limits not defined";
+    }
+    if( ros::param::has("dropping_limits") ) {
+        std::vector<geometry_msgs::Point> dropping_vertices;
+        std::vector<double> dropping_limits;
+        std::string dropping_frame;
+        geometry_msgs::Point p;
+        p.z = 0;
+        ros::param::get("dropping_limits/limits", dropping_limits);
+        ros::param::get("dropping_limits/frame_id", dropping_frame);
+
+        p.x = dropping_limits[0];
+        p.y = dropping_limits[2];
+        dropping_vertices.push_back(p);
+        p.x = dropping_limits[0];
+        p.y = dropping_limits[3];
+        dropping_vertices.push_back(p);
+        p.x = dropping_limits[1];
+        p.y = dropping_limits[3];
+        dropping_vertices.push_back(p);
+        p.x = dropping_limits[1];
+        p.y = dropping_limits[2];
+        dropping_vertices.push_back(p);
+
+        dropping_area_ = new grvc::utils::special_zone(dropping_frame,dropping_vertices);
+    }
+    else {
+        ROS_ERROR("dropping_limits not defined.");
+        state_.state = UavState::ERROR;
+        state_.state_msg.data = "Error: dropping_limits not defined";
+    }
 }
 
 
@@ -559,19 +621,15 @@ bool UavStateMachine::bestCandidateMatch(const CandidateList _list, const Candid
     Eigen::Vector3d specPos = {_specs.global_position.x, _specs.global_position.y, _specs.global_position.z};
     
     for (auto&candidate:_list.candidates) {
-        /*
-	    bool isInField = frame_transform_.isInGameField( grvc::utils::constructPoint(   candidate.global_position.x,
-                                                                                            candidate.global_position.y,
-                                                                                            candidate.global_position.z) );
 
-        bool isInDroppingArea = frame_transform_.isInDroppingArea( grvc::utils::constructPoint(   candidate.global_position.x,
-                                                                                            candidate.global_position.y,
-                                                                                            candidate.global_position.z) );
-        */
+        geometry_msgs::PointStamped p;
+        p.header.frame_id = "map";
+        p.point.x = candidate.global_position.x;
+        p.point.y = candidate.global_position.y;
+        p.point.z = candidate.global_position.z;
 
-        // TODO: include GEOFENCING
-        bool isInField = true;
-        bool isInDroppingArea = false;
+	    bool isInField = game_field_->isIn(p);
+        bool isInDroppingArea = dropping_area_->isIn(p);
 
         if(isInField && !isInDroppingArea){
             Eigen::Vector3d candidatePos = {candidate.global_position.x, candidate.global_position.y, candidate.global_position.z};
@@ -579,11 +637,11 @@ bool UavStateMachine::bestCandidateMatch(const CandidateList _list, const Candid
             pairsDistCands.push_back(PairDistanceCandidate(dist, candidate));
         }
     }
-    
+
     std::sort(pairsDistCands.begin(), pairsDistCands.end(), [](const PairDistanceCandidate &a, const PairDistanceCandidate &b) {
         return a.first < b.first;   
     });
-        
+
     for(auto &pair: pairsDistCands){
         if (pair.second.color == _specs.color) {
             _result = pair.second;
