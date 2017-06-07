@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-  <node pkg="visualization" name="visualizer_node" type="visualizer_node" />
+  <node pkg="mbzirc_visualization" name="visualizer_node" type="visualizer_node" />
   <node pkg="rviz" name="rviz" type="rviz" args="-d $(find mbzirc_launchers)/cfg/mbzirc.rviz"/>
 </launch>
