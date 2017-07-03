@@ -356,7 +356,7 @@ namespace avoid
 
         conflictive_angles.clear();
 
-        // The system tryes to find the limits of a conflictive region and on it extracts
+        // The system tryes to find  limits of a conflictive region and on it extracts
         // the local minimum.
         bool in_confl_region   = false;
         double   global_min_val = 0.0;

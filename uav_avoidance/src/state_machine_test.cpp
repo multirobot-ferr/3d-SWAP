@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2017, University of Duisburg-Essen, swap-ferr
  * All rights reserved.
  *
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
         ros::Duration(0.1).sleep();
     }
 
-    state_machine.Land();
+   // state_machine.Land();
 
     return 0;
 }
@@ -150,7 +150,7 @@ StateMachine::StateMachine() {
     pnh_->param<double>("z_distance", dist_between_uav_z_, 2.0);
     pnh_->param<double>("d_goal", d_goal_, 0.5);
 
-    // ###########  Communication with SWAP  ########### //
+    // ###########  Communication with SWAP  ########## //
     confl_warning_sub_  = nh_.subscribe("collision_warning", 1, &StateMachine::WarningCallback, this);
     wished_mov_dir_pub_ = nh_.advertise<geometry_msgs::Vector3>("wished_movement_direction",1 , true);  // the final true is required
     avoid_mov_dir_sub_  = nh_.subscribe("avoid_movement_direction", 1, &StateMachine::AvoidMovementCallback, this);
@@ -162,6 +162,8 @@ StateMachine::StateMachine() {
     {
         ROS_INFO("State Machine: Init complete");
     }
+
+
 }
 
 /**
@@ -274,10 +276,10 @@ void StateMachine::PublishPosErr()
 {
     // Getting fresh information on the position and warnings
     ros::spinOnce();
-
+    //z is inluded in waypoints rigth now
     double xe = way_points_(wp_idx_, 0) - uav_x_;
     double ye = way_points_(wp_idx_, 1) - uav_y_;
-    double ze = z_ref_ - uav_z_;
+    double ze = way_points_(wp_idx_, 2) - uav_z_;
 
     // Information for SWAP (where the uav wants to go)
     wished_direction_uav_.x = xe;
@@ -295,8 +297,9 @@ void StateMachine::PublishPosErr()
     {
         // Move is not safe
         // Speed controller seems to work better with SWAP
-        PublishGRVCPosErr( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, ze);
-        //PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, ze, 0.0);
+       // PublishGRVCPosErr( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, ze);
+     // the avoid movement is goint to be in the xy plane ze=0.0
+        PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, 0.0, 0.0);
     }
 }
 // ###########  #######################  ########### //
@@ -375,7 +378,7 @@ void StateMachine::TakeOff()
         ros::Duration(1).sleep();
     }
 
-    z_ref_ = std::max(dist_between_uav_z_ * uav_id_, 1.0);
+    z_ref_ = std::max(dist_between_uav_z_ * uav_id_*0.2, 1.0); //(dist_between_uav_z_ * uav_id_, 1.0)
 
     uav_abstraction_layer::TakeOff srv;
     srv.request.blocking = true;
@@ -388,7 +391,7 @@ void StateMachine::TakeOff()
         {
             ros::Duration(1).sleep();
         }
-        ROS_WARN("UAV_%d ready (hovering at %.2f)", uav_id_, z_ref_);    
+        ROS_WARN("UAV_%d ready (hovering at %.2f)", uav_id_, z_ref_);   
     }
     else
     {
@@ -428,6 +431,6 @@ void StateMachine::UpdateWayPoints()
     }
     else
     {
-        //ROS_INFO("UAV_%d: Distance to goal %.2f", uav_id_, dist);
+        // ROS_INFO("UAV_%d: Distance to goal %.2f", uav_id_, dist);
     }
 }

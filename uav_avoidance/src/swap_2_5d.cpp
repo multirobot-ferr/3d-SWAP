@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2017, University of Duisburg-Essen, swap-ferr
  * All rights reserved.
  *
@@ -53,6 +53,7 @@
 #include <tf2/utils.h>
 #include <functional>
 
+
 int main(int argc, char **argv) {
     // name remapping
     ros::init(argc, argv, "swap_2_d");
@@ -102,6 +103,9 @@ Swap_2_5d::Swap_2_5d()
         initialization_error_ = true;
         ROS_FATAL("SWAP: uav_id is not set. Closing the avoidance system");
     }
+
+    // getting max z-distance between uavs to swap
+    pnh_->param<double>("swap/dz_min", dz_min_,1.0);
 
     // Getting the sleeping time of the loop
     pnh_->param<double>("spin_sleep", spin_sleep_, 0.2);
@@ -173,6 +177,7 @@ Swap_2_5d::Swap_2_5d()
     confl_warning_pub_  = nh_.advertise<std_msgs::Bool>("collision_warning", 1, true);
     wished_mov_dir_sub_ = nh_.subscribe( "wished_movement_direction",1 , &Swap_2_5d::WishedMovDirectionCallback, this);
     avoid_mov_dir_pub_  = nh_.advertise<geometry_msgs::Vector3>("avoid_movement_direction", 1, true);
+    laser_sub_ = nh_.subscribe<sensor_msgs::LaserScan>("/mbzirc_1/front_laser/scan",10,&Swap_2_5d::LaserCallback,this);
 
     // Meant to debug the system
     std::string file_path;
@@ -230,7 +235,7 @@ void Swap_2_5d::Spin()
         SpinOnce();
 
         // Sleeping to save time
-        ros::Duration(spin_sleep_).sleep();
+       ros::Duration(spin_sleep_).sleep();
     }
 }
 
@@ -247,7 +252,7 @@ void Swap_2_5d::SpinOnce()
     ros::spinOnce();
 
     // Checking for conflicts and finding solutions
-    CollisionAvoidance(v_ref_, yaw_ref_);
+    CollisionAvoidance(v_ref_, yaw_ref_, uav_vector_speed_);
 
     // If active, save in a log all information
     FillLogFile();
@@ -262,14 +267,35 @@ void Swap_2_5d::SpinOnce()
 
         default:
             // Requesting the control of the uav and commanding it
+            if (z_swap_==true){
+
             RequestControlPub(true);
+
+            }
     }
 
     // Showing to the user what is happening
-    if (GetMachineStateChanges(state))
+    ROS_INFO("Swap: %s", state.c_str());
+   /* if (GetMachineStateChanges(state))
     {
         ROS_INFO("Swap: %s", state.c_str());
-    }
+    }*/
+}
+
+/**
+  * Callback for laser
+  */
+
+void Swap_2_5d::LaserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
+{
+
+
+   for (unsigned id_laser = 0; id_laser < scan->ranges.size(); ++id_laser)
+       {
+           double angle = scan->angle_min + double(id_laser)*scan->angle_increment;
+           SetNewLocalMeasurement( scan->ranges[id_laser], angle, false);
+       }
+
 }
 
 /**
@@ -312,6 +338,10 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
         // The robot knows where it is and where an other robot is located.
         SetNewGlobalMeasurement(uav_x_, uav_y_, 0.0,  // The 0.0 makes it always look to the nord (even if not)
                                 x, y, uav_safety_radius_, true);
+
+        // check z-distance to swap
+
+        checkZdistance(uav_z_,z, z_swap_, dz_min_);
     }
 
     // If necessary, save the positions on the log
@@ -348,10 +378,11 @@ void Swap_2_5d::RequestControlPub(bool request_control)
 
     if (request_control)
     {
-        avoid_mov_direction_.x = uav_vector_speed_*sin(yaw_ref_);
-        avoid_mov_direction_.y = uav_vector_speed_*cos(yaw_ref_);
+        avoid_mov_direction_.x = v_ref_*cos(yaw_ref_);
+        avoid_mov_direction_.y = v_ref_*sin(yaw_ref_);
         avoid_mov_direction_.z = 0.0;   // The state machine should ignore this value.
         avoid_mov_dir_pub_.publish(avoid_mov_direction_);
+
     }
 }
 
@@ -468,3 +499,5 @@ void Swap_2_5d::Log2Matlab( std::vector<double>& values )
         log2mat_ << std::endl;
     }
 }
+
+

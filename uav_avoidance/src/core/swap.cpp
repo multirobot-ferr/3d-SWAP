@@ -132,7 +132,7 @@ namespace avoid
      /**
       * Calculates a direction and a speed for collision avoidance.
       */
-     void Swap::CollisionAvoidance( double& v_ref, double& yaw_ref )
+     void Swap::CollisionAvoidance( double& v_ref, double& yaw_ref, double& uav_vector_speed)
      {
          // Searches conflicts
          GetConflicts( conflictive_angles_ );
@@ -144,6 +144,7 @@ namespace avoid
          }
          else
          {
+
              ConflictsManager();
          }
 
@@ -151,18 +152,18 @@ namespace avoid
          switch (statusOri_)
          {
              case FREE:
-                 // The robot can travel freely to the goal.
-                 v_ref   = GetDesiredVelocity();
+                 // The robot can travel freely to the goal. 
+                 v_ref   = uav_vector_speed;                                                         // GetDesiredVelocity();
                  yaw_ref = goal_angle_;
                  break;
              case RENCONTRE:
                  // The robot should stop while turning in the specified avoidance direction.
-                 v_ref   = 0.0;
+                 v_ref   = 0.5*uav_vector_speed;
                  yaw_ref = yaw_avoidance_;
                  break;
              case RENDEZVOUS:
                  // The robot should surround the obstacle.
-                 v_ref   = v_avoidance_;
+                 v_ref   = uav_vector_speed;
                  yaw_ref = yaw_avoidance_;
                  break;
              case BLOCKED:
@@ -285,7 +286,9 @@ namespace avoid
             }
             else   // Conflicts detected but no solution available
             {
+
                 statusOri_ = BLOCKED;
+
             }
      }
 
@@ -294,8 +297,11 @@ namespace avoid
       */
      bool Swap::ComputeForbiddenDirections( double& conflict_left_phi, double& conflict_right_phi)
      {
+
+
          if (conflictive_angles_.size() == 1)
          {  // There is only one conflict around
+
              conflict_left_phi  = conflictive_angles_[0];
              conflict_right_phi = conflictive_angles_[0];
              return true;
@@ -522,5 +528,24 @@ namespace avoid
          return y;
      }
 
+     /**
+      * Utility function. Compute the height diference between uavs and check if it is too
+      */
 
-};  // namespace avoid
+     void Swap::checkZdistance(double ual_z_,double z, bool& z_swap_, double dz_min_)
+     {
+
+         double difference=fabs(ual_z_-z);
+
+         if(difference>=dz_min_){
+             z_swap_=false;
+         }
+         else
+         {
+             z_swap_=true;
+         }
+
+     }
+
+
+}  // namespace avoid

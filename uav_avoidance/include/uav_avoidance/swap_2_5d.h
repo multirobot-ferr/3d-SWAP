@@ -64,6 +64,7 @@
 // message need
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <sensor_msgs/LaserScan.h>
 
 // Fixing some problems
 // If the simulator makes all uavs start in (0,0), this define should be uncommented
@@ -122,6 +123,7 @@ class Swap_2_5d:  public avoid::Swap
         // Subscribers
         std::vector<ros::Subscriber> pos_all_uav_sub_;  //!< Receives the positions of all UAVs
         ros::Subscriber wished_mov_dir_sub_;            //!< Receives the direction where the uav whants to go
+        ros::Subscriber laser_sub_;                     //!< Receives laser data
 
         // Publishers
         ros::Publisher confl_warning_pub_;              //!< Publisher to determine if there is a possible collision or not
@@ -135,11 +137,11 @@ class Swap_2_5d:  public avoid::Swap
         std::vector<int> uav_ids_;                      //!< IDs of UAV involved
         double uav_vector_speed_;                       //!< Modulus of the vector sent to the uav for avoidance
         double uav_safety_radius_ = -1.0;               //!< Safety radius of each uav
-
+	double dz_min_;	    		   		 //!< max z-distance to swap. It is a parameter
         // Position of the UAV
         bool   pose_received_ = false;                  //!< Tracks if the uav knows its position
         double uav_x_, uav_y_, uav_z_, uav_yaw_;        //!< Position of the current uav
-
+        bool z_swap_;			    		//!< Flag to swap depends on z-distance between uavs
         // START ----- IMPORTANT ----- START
         // uav_yaw_ is the direction where the robot wants to go
         // with respect to the x axis, not his orientation
@@ -151,6 +153,7 @@ class Swap_2_5d:  public avoid::Swap
         double v_ref_;      //!< Since swap has no control of the speed, it can be ignored
         double yaw_ref_;    //!< Orientation with respect to the nord that the uav should take to avoid a conflict
         geometry_msgs::Vector3 avoid_mov_direction_;    //!< Message where the avoidance direction will be published
+	
 
         // Debuging parameters
         std::ofstream log2mat_;
@@ -168,6 +171,11 @@ class Swap_2_5d:  public avoid::Swap
          * @param uav_id Identifier from UAV
          */
         void PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id);
+
+        /**
+         * @brief Callback for laser date
+         */
+        void LaserCallback(const sensor_msgs::LaserScan::ConstPtr& scan);
 
         /**
          * @brief Callback for the direction of movement of the uav

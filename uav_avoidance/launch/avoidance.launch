@@ -73,8 +73,8 @@
                 account twice!
                 -->
 
-                <!-- I am assuming that the uav is able to stop in 1.5m -->
-                <param name="swap/braking_distance" value="1.5"/>
+                <!-- I am assuming that the uav is able to stop in 2m -->
+                <param name="swap/braking_distance" value="2"/>
 
                 <!-- I am assuming that the largest error in the positioning
                 system is 1m. -->
@@ -83,7 +83,9 @@
                 <!-- Start playing with this parameter if you want to increase
                 the safety of your system -->
                 <param name="swap/gamma_offset" value="0.0"/>
-
+		
+		<!--if distance between uavs is larger than dz_min dont swap -->
+		<param name="swap/dz_min" value="4"/>
 
                 <!--  #######  Carefully tunning ########### -->
                 <!-- This parameter will help to the robots to keep the 
@@ -103,7 +105,7 @@
                 
             <!-- Specific configuration parameters [do not change them if not necessary]-->
             <param name="uav_id" value="$(arg robot_number)"/>
-            <rosparam param="uav_ids">[1, 2, 3]</rosparam>
+            <rosparam param="uav_ids">[1, 2, 3, 4]</rosparam>
             <param name="swap/granularity" value="360"/>    <!-- One measurement set per degree -->
             <param name="swap/num_measurements" value="3"/>    <!-- 3 measurements per measurement set (fights against noise) -->
             <!-- If two values commes on the same run, takes only the closer to the robot -->

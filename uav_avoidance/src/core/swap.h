@@ -116,7 +116,13 @@ namespace avoid
               * \param[out] v_ref The reference velocity for collision avoidance (normalized between 0 and 1)
               * \param[out] yaw_ref The reference orientation for collision avoidance (relative to the current orientation, positive value means go left).
               */
-             void CollisionAvoidance( double& v_ref, double& yaw_ref );
+             void CollisionAvoidance( double& v_ref, double& yaw_ref, double& uav_vector_speed);
+
+	     /**
+	     * It is a utility function to check if height between uavs is too
+	     */
+	    void checkZdistance(double ual_z_,double z, bool& z_swap_, double dz_min_);
+
 
             /* ****************************************************************************
              * SETTER                                                                     *
@@ -216,7 +222,8 @@ namespace avoid
             state_orientation statusOri_ = FREE;    //!< Current state for the orientation state machine.
             double yaw_avoidance_ = 0.0;            //!< Orientation to follow on the RENDEZVOUS or RENCONTRE cases
             double v_avoidance_   = 0.0;            //!< Speed to follow on the RENDEZVOUS case
-
+	    
+	    
             // Conflict dealing
             double goal_lateral_vision_ = 0.0;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
             double rot_ctrl_P_ = 0.0;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
@@ -229,11 +236,14 @@ namespace avoid
             double d_approach_ = 0.3;               //!< Distance close to the goal where the robot should start braking.
 
             // Other variables
+
+	   
             /**
              * The robot will try to stop if his orientation is too far away from the desired one
              * unless the robot is holonomic
              */
             bool holonomic_robot_ = false;
+
 
             /**
              * @brief Utility function Manages the conflicts and if a solution exists fills the references
@@ -242,7 +252,11 @@ namespace avoid
              * it fills the variables yaw_avoidance_ and v_avoidance_ to indicate that.
              * It also changes the value of statusOri_ indicating the current status of the state machine.
              */
+		
+	     
             void ConflictsManager();
+
+ 	     
 
             /**
              * @brief Computes all the forbidden direction due to the inflated safety regions
