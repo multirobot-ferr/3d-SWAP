@@ -144,7 +144,8 @@ namespace avoid
              */
             void SetNewLocalMeasurement(double distance,
                                         double angle,
-                                        bool   dynamic = false);
+                                        bool   dynamic = false,
+                                        int z_action = 0);
 
             /**
              * @brief Sets a measurement value in the POD, measured indirectly (E.g: information coming from the map)
@@ -159,16 +160,17 @@ namespace avoid
              * @param r_object Radius[m] of the object (system assumes a circular object)
              * @param dynamic Boolean to determine if the obstacle is static or dynamic
              */
-            void SetNewGlobalMeasurement(double x_robot,  double y_robot,  double yaw_robot,
-                                         double x_object, double y_object, double r_object,
+            void SetNewGlobalMeasurement(double x_robot,  double y_robot, double z_robot,  double yaw_robot,
+                                         double x_object, double y_object, double z_object, double r_object,
                                          bool dynamic = true);
 
             /**
              * @brief Analizes the full pod and finds the angles where a conflict exists.
              * @param[out] conflictive_angles returns by reference all the conflictive angles.
+             * @param
              * @return Returns true if there is at least one conflictive direction
              */
-            bool GetConflicts(std::vector<double>& conflictive_angles);
+            bool GetConflicts(std::vector<double>& conflictive_angles, std::vector<int>& conflictive_heights);
 
 
             /* ****************************************************************************
@@ -320,8 +322,21 @@ namespace avoid
             std::vector<double> infl_region_;   //<[m] Distances inflated and filtered.
             std::vector<double> angle_;         //<[rad] (with respect to the front of the robot)
 
+
+            /** State height for the position of the robot.
+             * Z_FREE: Height differece between uavs is too. UAVs do not swap
+             * Z_RANGE: UAVs dont navigate in Z
+             * Z_SWAP:  Height difference is not enough. UAVs swap
+             */
+            enum state_height {     Z_FREE = 0,
+                                    Z_RANGE = 1,
+                                    Z_SWAP = 2};
         private:
+
+
+
             std::vector<double> dist_;          //<[m] Distances measured on a specific direction
+            std::vector<int> zdist_;            //< Action depend on height
             std::vector<bool>   dynamic_;       //<If the object is known to be static or dynamic (true if not known)
             std::vector<double> safety_region_; //<[m] Region where the robot is defined
             std::vector<double> tmp_;           //<[m] Temporal movement of measurements
@@ -333,6 +348,8 @@ namespace avoid
             double   local_measurement_error_ = -1.0;  //<[m] Maximum possible error of a local measurement (like a ranger measurement)
             double   global_measurement_error_ = -1.0; //<[m] Maximum possible error of a global measurement (like the one comming from a communication system)
             double   gamma_offset_ = -1.0;      //<[m] Offset to take into account other potential errors
+            double   dz_min_=4;                 //<[m] Maximum z distance between uavs to swap
+            double   dz_range_=1;             //<[m] Range to Z_BLOCKED state
 
             // Smoothing variables
             int      smooth_factor_ = -1;       //!< Number of measurements to interpolate to filter out some noise
@@ -403,6 +420,14 @@ namespace avoid
              * @return whether or not are all the measurements filled.
              */
             bool SetSafetyRegion( const double dist, const double angle);
+
+            /**
+              *@brief Utility function to check the height state
+              *@param z_robot own position
+              *@param z_object position received
+              *@return return the action to do depending on the difference between uav height
+              */
+            int CheckZDistance(double z_robot, double z_object);
 
 
     };

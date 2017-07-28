@@ -138,10 +138,12 @@ class Swap_2_5d:  public avoid::Swap
         double uav_vector_speed_;                       //!< Modulus of the vector sent to the uav for avoidance
         double uav_safety_radius_ = -1.0;               //!< Safety radius of each uav
 	double dz_min_;	    		   		 //!< max z-distance to swap. It is a parameter
+        double dz_range_;
         // Position of the UAV
         bool   pose_received_ = false;                  //!< Tracks if the uav knows its position
         double uav_x_, uav_y_, uav_z_, uav_yaw_;        //!< Position of the current uav
-        bool z_swap_;			    		//!< Flag to swap depends on z-distance between uavs
+        bool z_swap_=true;			    		//!< Flag to swap depends on z-distance between uavs
+
         // START ----- IMPORTANT ----- START
         // uav_yaw_ is the direction where the robot wants to go
         // with respect to the x axis, not his orientation

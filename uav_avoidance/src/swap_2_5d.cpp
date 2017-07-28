@@ -107,6 +107,11 @@ Swap_2_5d::Swap_2_5d()
     // getting max z-distance between uavs to swap
     pnh_->param<double>("swap/dz_min", dz_min_,1.0);
 
+
+    // getting max z-distance between uavs to swap
+    pnh_->param<double>("swap/dz_range", dz_range_,1.0);
+
+
     // Getting the sleeping time of the loop
     pnh_->param<double>("spin_sleep", spin_sleep_, 0.2);
 
@@ -267,19 +272,19 @@ void Swap_2_5d::SpinOnce()
 
         default:
             // Requesting the control of the uav and commanding it
-            if (z_swap_==true){
+          // if (z_swap_==true){
 
             RequestControlPub(true);
 
-            }
+
     }
 
     // Showing to the user what is happening
-    ROS_INFO("Swap: %s", state.c_str());
-   /* if (GetMachineStateChanges(state))
+  //  ROS_INFO("Swap: %s", state.c_str());
+    if (GetMachineStateChanges(state))
     {
         ROS_INFO("Swap: %s", state.c_str());
-    }*/
+    }
 }
 
 /**
@@ -293,7 +298,7 @@ void Swap_2_5d::LaserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
    for (unsigned id_laser = 0; id_laser < scan->ranges.size(); ++id_laser)
        {
            double angle = scan->angle_min + double(id_laser)*scan->angle_increment;
-           SetNewLocalMeasurement( scan->ranges[id_laser], angle, false);
+           SetNewLocalMeasurement( scan->ranges[id_laser]- positioning_error_ , angle, false);
        }
 
 }
@@ -336,12 +341,10 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
     else if (pose_received_)
     {
         // The robot knows where it is and where an other robot is located.
-        SetNewGlobalMeasurement(uav_x_, uav_y_, 0.0,  // The 0.0 makes it always look to the nord (even if not)
-                                x, y, uav_safety_radius_, true);
+        SetNewGlobalMeasurement(uav_x_, uav_y_, uav_z_, 0.0,  // The 0.0 makes it always look to the nord (even if not)
+                                x, y, z, uav_safety_radius_, true);
 
-        // check z-distance to swap
 
-        checkZdistance(uav_z_,z, z_swap_, dz_min_);
     }
 
     // If necessary, save the positions on the log

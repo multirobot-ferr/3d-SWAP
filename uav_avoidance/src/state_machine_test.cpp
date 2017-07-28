@@ -378,7 +378,7 @@ void StateMachine::TakeOff()
         ros::Duration(1).sleep();
     }
 
-    z_ref_ = std::max(dist_between_uav_z_ * uav_id_*0.2, 1.0); //(dist_between_uav_z_ * uav_id_, 1.0)
+    z_ref_ = 1;//std::max(dist_between_uav_z_ * uav_id_*0.2, 1.0); //(dist_between_uav_z_ * uav_id_, 1.0)
 
     uav_abstraction_layer::TakeOff srv;
     srv.request.blocking = true;
@@ -389,7 +389,8 @@ void StateMachine::TakeOff()
         // Waiting for the UAV to really take off
         while ( abs(uav_z_ - z_ref_) > 0.5 )
         {
-            ros::Duration(1).sleep();
+            ros::Duration(3).sleep();
+            ROS_INFO("take off done");
         }
         ROS_WARN("UAV_%d ready (hovering at %.2f)", uav_id_, z_ref_);   
     }

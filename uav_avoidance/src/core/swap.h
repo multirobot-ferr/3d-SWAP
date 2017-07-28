@@ -76,6 +76,8 @@ namespace avoid
     class Swap: public PolarObstacleDiagram
     {
         public:
+
+
             /**
              * @brief Constructor of the class
              *
@@ -118,10 +120,7 @@ namespace avoid
               */
              void CollisionAvoidance( double& v_ref, double& yaw_ref, double& uav_vector_speed);
 
-	     /**
-	     * It is a utility function to check if height between uavs is too
-	     */
-	    void checkZdistance(double ual_z_,double z, bool& z_swap_, double dz_min_);
+
 
 
             /* ****************************************************************************
@@ -186,7 +185,7 @@ namespace avoid
 
         protected:
             std::vector<double> conflictive_angles_; //!< Storage to place the conflicts found.
-
+            std::vector<int>    conflictive_heights_; //!< Storage to place the height conflicts
             /** State machine for the orientation of the robot.
              * FREE:        There are no obstacles, or they can be ignored.
              * RENDEZVOUS:  A non-ignorable obstacle is met. The robot should stop while prepare themselves to surround it.
@@ -196,7 +195,8 @@ namespace avoid
             enum state_orientation {FREE = 1,
                                     RENDEZVOUS = 2,
                                     RENCONTRE = 3,
-                                    BLOCKED = 4};
+                                    BLOCKED = 4,
+                                    Z_BLOCKED = 5};
 
             /**
              * Options for the default behaviour.
@@ -223,11 +223,10 @@ namespace avoid
             double yaw_avoidance_ = 0.0;            //!< Orientation to follow on the RENDEZVOUS or RENCONTRE cases
             double v_avoidance_   = 0.0;            //!< Speed to follow on the RENDEZVOUS case
 	    
-	    
             // Conflict dealing
-            double goal_lateral_vision_ = 0.0;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
-            double rot_ctrl_P_ = 0.0;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
-            double yaw_max_err_ = 10*M_PI/180.0;    //!< Maximal error allowed in RENCONTRE state
+            double goal_lateral_vision_ = 20*M_PI;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
+            double rot_ctrl_P_ = 0.25;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
+            double yaw_max_err_ = 45*M_PI/180.0;    //!< Maximal error allowed in RENCONTRE state
             double lin_v_rendezvous_ = 1.0;         //!< Maximal speed in the rendezvous state
             rot_behaviour rot_behaviour_ = COUNTERCLOCKWISE;           //!< +1: Always rotate counter-clockwise, 0: not defined; -1: Always rotate clockwise
 

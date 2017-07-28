@@ -135,9 +135,9 @@ namespace avoid
      void Swap::CollisionAvoidance( double& v_ref, double& yaw_ref, double& uav_vector_speed)
      {
          // Searches conflicts
-         GetConflicts( conflictive_angles_ );
+         GetConflicts(conflictive_angles_, conflictive_heights_); //conflictive_heights_
 
-         if ( conflictive_angles_.empty() )
+         if ( conflictive_angles_.empty())
          {
              // No conflicts around, behave as desired
              statusOri_ = FREE;
@@ -158,7 +158,7 @@ namespace avoid
                  break;
              case RENCONTRE:
                  // The robot should stop while turning in the specified avoidance direction.
-                 v_ref   = 0.5*uav_vector_speed;
+                 v_ref   = uav_vector_speed;
                  yaw_ref = yaw_avoidance_;
                  break;
              case RENDEZVOUS:
@@ -171,7 +171,12 @@ namespace avoid
                  v_ref   = 0.0;
                  yaw_ref = 0.0;
                  break;
+             case Z_BLOCKED:
+                 // The robot should navigate toward goal in xy plane
+                 v_ref = uav_vector_speed;
+                 yaw_ref = goal_angle_;
          }
+
      }
 
      /**
@@ -224,6 +229,10 @@ namespace avoid
             case BLOCKED:
              state_name = "\e[36mBlocked";
              break;
+
+            case Z_BLOCKED:
+             state_name = "Z_BLOCKED";
+             break;
          }
          state_name += "\x1b[49m";
 
@@ -258,38 +267,59 @@ namespace avoid
             double conflict_left_phi  = 0.0;
             double conflict_right_phi = 0.0;
 
-            if (ComputeForbiddenDirections( conflict_left_phi, conflict_right_phi))
-            {   // There are scape directions available
-                bool conflictIgnorable = false;
+            // checking if Z_RANGE state is available
+            bool conflict_range=false;
 
-                if (statusOri_ == FREE)
-                {
-                    // If the system was previously in the FREE state, it can see the goal in any direction
-                    conflictIgnorable = AreConflictsIgnorable(conflict_left_phi, conflict_right_phi, goal_angle_, M_PI);
-                }
-                else
-                {
-                    // If the system was not previously in the FREE state, it is necessary to impose a goal_lateral_vision_ (helps on the U-Shapes)
-                    conflictIgnorable = AreConflictsIgnorable(conflict_left_phi, conflict_right_phi, goal_angle_, goal_lateral_vision_);
-                }
+             for (int id_phi = 0; id_phi < conflictive_angles_.size(); ++id_phi){
+                 if(conflictive_heights_[id_phi]==Z_RANGE){
+                     conflict_range=true;
+                 }
+                 else{
+                     conflict_range=false;
+                     break;
+                 }
+             }
 
-                if (conflictIgnorable)
-                {
-                    statusOri_ = FREE;
-                }
-                else
-                {
-                    // Computes orientations and velocities that allows the robot to surround the obstacle
-                    // Deals with RENDESVOUZ/RENCONTRE state as well as CLOCKWISE, COUNTERCLOCKWISE and TOGOAL behaviours.
-                    ApplyAvoidancePolicy(conflict_left_phi, conflict_right_phi);
-                }
-            }
-            else   // Conflicts detected but no solution available
-            {
 
-                statusOri_ = BLOCKED;
 
-            }
+             if(conflict_range==true){
+
+                 statusOri_= Z_BLOCKED;
+             }
+             else{
+                 if (ComputeForbiddenDirections( conflict_left_phi, conflict_right_phi))
+                 {   // There are scape directions available
+                    bool conflictIgnorable = false;
+
+                    if (statusOri_ == FREE)
+                    {
+                        // If the system was previously in the FREE state, it can see the goal in any direction
+                        conflictIgnorable = AreConflictsIgnorable(conflict_left_phi, conflict_right_phi, goal_angle_, M_PI);
+                    }
+                    else
+                    {
+                        // If the system was not previously in the FREE state, it is necessary to impose a goal_lateral_vision_ (helps on the U-Shapes)
+                        conflictIgnorable = AreConflictsIgnorable(conflict_left_phi, conflict_right_phi, goal_angle_, goal_lateral_vision_);
+                    }
+
+                    if (conflictIgnorable)
+                    {
+                        statusOri_ = FREE;
+                    }
+                    else
+                    {
+                        // Computes orientations and velocities that allows the robot to surround the obstacle
+                        // Deals with RENDESVOUZ/RENCONTRE state as well as CLOCKWISE, COUNTERCLOCKWISE and TOGOAL behaviours.
+                        ApplyAvoidancePolicy(conflict_left_phi, conflict_right_phi);
+                    }
+                }
+                else   // Conflicts detected but no solution available
+                {
+
+                    statusOri_ = BLOCKED;
+
+                }
+             }
      }
 
      /**
@@ -317,16 +347,20 @@ namespace avoid
 
          Note: AngleDifference returns negative values if the difference is larger than pi. this happens because the
          error is shorter if you measure it counter-clockwise instead of clockwise.
+
+         Note: an angle is conflictive only if it has not a Z_RANGE position
          */
 
          for (int id_phi = 0; id_phi < conflictive_angles_.size(); ++id_phi)
          {
+             if(conflictive_heights_[id_phi]!=Z_RANGE){
              int id_phi_minus = CircularIndex(id_phi -1, conflictive_angles_.size());
              if ( AngleDiff(conflictive_angles_[id_phi], conflictive_angles_[id_phi_minus]) < 0)
              {
                  conflict_left_phi   = conflictive_angles_[id_phi_minus];
                  conflict_right_phi  = conflictive_angles_[id_phi];
                  return true;
+             }
              }
          }
 
@@ -344,8 +378,8 @@ namespace avoid
      {
          double left_angle = conflict_left_id_phi;
          double right_angle= conflict_right_id_phi;
-         if ( fabs( AngleDiff(0, left_angle) ) < M_PI_2 ||
-              fabs( AngleDiff(0, right_angle)) < M_PI_2   )
+         if ( fabs( AngleDiff(0, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
+              fabs( AngleDiff(0, right_angle)) < M_PI/3   )
          {   // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
              return false;
          }
@@ -356,6 +390,7 @@ namespace avoid
             if (fabs( AngleDiff(goal_angle, left_angle) ) < M_PI_2 ||
                 fabs( AngleDiff(goal_angle, right_angle)) < M_PI_2)
             {
+
                 // The goal belongs to the not navigable area
                 return false;
             }
@@ -365,7 +400,6 @@ namespace avoid
              // The goal is not visible from the robot's perspective
              return false;
          }
-
          return true;
      }
 
@@ -396,13 +430,17 @@ namespace avoid
                  break;
          }
 
+
+
          yaw_avoidance_ += conflict2avoid_phi;
 
          // The system tries to keep a certain rotation distance.
          double yaw_dist_keeper = rot_ctrl_P_ * GetYawAvoidanceDistanceError( conflict2avoid_phi );
+
+
          // We have to saturate the output
-         yaw_dist_keeper = std::min(yaw_dist_keeper, +M_PI_2);
-         yaw_dist_keeper = std::max(-M_PI_2, yaw_dist_keeper );
+         yaw_dist_keeper = std::min(yaw_dist_keeper, +M_PI_2);    //+MI_PI_2
+         yaw_dist_keeper = std::max(-M_PI_2, yaw_dist_keeper );   //-MI_PI_2
 
          yaw_avoidance_ += yaw_dist_keeper;
 
@@ -420,7 +458,7 @@ namespace avoid
          double pond_ori = LinSpace(0.0, yaw_max_err_, 1.0, 0.0, fabs(yaw_avoidance_));   // Value between 0.0 and 0.4
          v_avoidance_ = pond_ori*lin_v_rendezvous_;
 
-         statusOri_ = (fabs(yaw_avoidance_) < yaw_max_err_) ? RENDEZVOUS : RENCONTRE;
+         statusOri_ = (fabs(yaw_avoidance_) < yaw_max_err_) ? RENCONTRE : RENDEZVOUS;
      }
 
      /**
@@ -528,24 +566,6 @@ namespace avoid
          return y;
      }
 
-     /**
-      * Utility function. Compute the height diference between uavs and check if it is too
-      */
-
-     void Swap::checkZdistance(double ual_z_,double z, bool& z_swap_, double dz_min_)
-     {
-
-         double difference=fabs(ual_z_-z);
-
-         if(difference>=dz_min_){
-             z_swap_=false;
-         }
-         else
-         {
-             z_swap_=true;
-         }
-
-     }
 
 
 }  // namespace avoid

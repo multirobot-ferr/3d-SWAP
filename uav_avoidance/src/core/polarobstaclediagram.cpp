@@ -181,6 +181,7 @@ namespace avoid
     {
         // Older measurements moves to the end of the pod vector.
         std::rotate(dist_.begin(),    dist_.begin()+(id_r_max_-1)*id_phi_max_,    dist_.end());
+        std::rotate(zdist_.begin(),   zdist_.begin()+(id_r_max_-1)*id_phi_max_,   zdist_.end());
         std::rotate(dynamic_.begin(), dynamic_.begin()+(id_r_max_-1)*id_phi_max_, dynamic_.end());
 
         // Old measurements are reset to standard values
@@ -188,6 +189,7 @@ namespace avoid
         {
             dist_[id_phi] = double_inf;
             dynamic_[id_phi] = false;
+            zdist_[id_phi]=0;
         }
     }
 
@@ -196,8 +198,10 @@ namespace avoid
      */
     void PolarObstacleDiagram::SetNewLocalMeasurement( double distance,
                                                        double angle,
-                                                       bool   dynamic)
+                                                       bool   dynamic,
+                                                       int z_action)
     {
+
         unsigned id_phi = Angle2Sector( angle );
 
         if (dist_[id_phi] == double_inf)
@@ -225,6 +229,26 @@ namespace avoid
             //std::cout << dist2mix_max << " " << dist2mix_min << " " << multi_input_pond_ << " " << dist_[id_phi] << std::endl;
         }
 
+
+
+        switch(z_action){
+
+            case Z_FREE:
+
+            zdist_[id_phi] = 0;
+            break;
+
+            case Z_RANGE:
+            zdist_[id_phi] = 1;
+            break;
+
+            case Z_SWAP:
+            zdist_[id_phi] = 2;
+            break;
+
+        }
+
+
         // Dynamic measurements (true) take over static ones (false)
         dynamic_[id_phi] = dynamic_[id_phi] || dynamic;
     }
@@ -232,8 +256,8 @@ namespace avoid
     /**
      * @brief Sets a measurement value in the POD, measured indirectly (E.g: information coming from the map)
      */
-    void PolarObstacleDiagram::SetNewGlobalMeasurement( double x_robot,  double y_robot,  double yaw_robot,
-                                                        double x_object, double y_object, double r_object,
+    void PolarObstacleDiagram::SetNewGlobalMeasurement( double x_robot,  double y_robot, double z_robot,  double yaw_robot,
+                                                        double x_object, double y_object, double z_object, double r_object,
                                                         bool dynamic)
     {
         // Inflating the radious of the object before anything happens
@@ -263,6 +287,10 @@ namespace avoid
 
         //Finding out the angle that points closer to the obstacle
         unsigned obstacle_id_phi = Angle2Sector( atan2(pos_object(1), pos_object(0)));
+
+        int z_action=CheckZDistance(z_robot,z_object);    // check Z distance
+
+
 
         if (far_away)
         {
@@ -326,7 +354,9 @@ namespace avoid
 
                             dist = std::min( sqrt(pow(x_hit, 2.0) + pow(y_hit, 2.0)) , dist);
                         }
-                        SetNewLocalMeasurement( dist, angle_[id_phi], dynamic);
+                        if(z_action!=Z_FREE){
+                            SetNewLocalMeasurement( dist, angle_[id_phi], dynamic, z_action);
+                        }
                     }
                     else
                     {
@@ -343,19 +373,22 @@ namespace avoid
             // This should never happen, so we are only creating a safety system
             // that introduces some information on the system
             double dist = arma::norm(pos_object, 1) - r_object;
-            SetNewLocalMeasurement( dist, angle_[obstacle_id_phi], dynamic);
+            if(z_action!=Z_FREE){
+            SetNewLocalMeasurement( dist, angle_[obstacle_id_phi], dynamic, z_action);
+            }
         }
     }
 
     /**
      * Analizes the full pod and finds the angles where a conflict exists.
      */
-    bool PolarObstacleDiagram::GetConflicts(std::vector<double>& conflictive_angles)
+    bool PolarObstacleDiagram::GetConflicts(std::vector<double>& conflictive_angles, std::vector<int>& conflictive_heights)
     {
         BuildInflatedRegrion();
-
         conflictive_angles.clear();
+        conflictive_heights.clear();
 
+        std::vector<std::pair<double,int>> conflictive;
         // The system tryes to find  limits of a conflictive region and on it extracts
         // the local minimum.
         bool in_confl_region   = false;
@@ -378,7 +411,8 @@ namespace avoid
                 if (  infl_region_[id_phi] > safety_region_[id_phi])
                 {   // leaving the conflictive region
                     in_confl_region = false;
-                    conflictive_angles.push_back(angle_[global_min_idx]);
+                    //conflictive_angles.push_back(angle_[global_min_idx]);
+                    conflictive.push_back(std::make_pair(angle_[global_min_idx],zdist_[global_min_idx]));
                 }
                 else
                 {   // finding out the local min
@@ -394,11 +428,19 @@ namespace avoid
         if (in_confl_region)
         {
             // Conflict on the -PI/2 +PI/2 discontinuity
-            conflictive_angles.push_back(angle_[id_phi_max_ - 1]);
+           conflictive.push_back(std::make_pair(angle_[id_phi_max_-1],zdist_[id_phi_max_-1]));
+           // conflictive_angles.push_back(angle_[id_phi_max_-1]);
+
         }
 
         // Sorting the conflictive angles
-        std::sort(conflictive_angles.begin(), conflictive_angles.end());
+        std::sort(conflictive.begin(), conflictive.end());
+
+        for(unsigned id=0; id<conflictive.size();++id){
+        conflictive_angles.push_back(conflictive[id].first);
+        conflictive_heights.push_back(conflictive[id].second);
+        }
+
 
         return conflictive_angles.size();
     }
@@ -714,25 +756,27 @@ namespace avoid
          *             <----------->
          *          This is the distance to keep
          */
-        double pond = 1.0;  // For static obstacles we only take one time the bracking distance
+        double pond = 2.0;  // For static obstacles we only take one time the bracking distance
         if (GetDynMeasurement(id_phi))
         {
-            pond = 2.0;     // For dynamic obstacles we take two times the bracking distance
+            pond = 1.0;     // For dynamic obstacles we take two times the bracking distance
         }
-        double desired_dist = 0.5 * pond * (bracking_distance_ + gamma_offset_ + local_measurement_error_);
+        double desired_dist =  pond * (bracking_distance_ + gamma_offset_ + local_measurement_error_);  // 0.5 *
 
         double current_dist = GetDistMeasurement( id_phi) + safety_region_[id_phi];
 
         // Returns positive values to request an atraction and
         // negative values to request a repulsion
-        double error = (current_dist - desired_dist)/desired_dist;
+        double error = -(current_dist - desired_dist)/desired_dist;
 
-        bool do_not_glue = true;
+
+
+        /* bool do_not_glue = true;
 
         if (do_not_glue)
         {
             error = std::max(error, 0.0);
-        }
+        } */
 
         return error;
     }
@@ -751,6 +795,7 @@ namespace avoid
             // Cleaning possible old values
             dist_.clear();
             angle_.clear();
+            zdist_.clear();
             dynamic_.clear();
             safety_region_.clear();
             infl_region_.clear();
@@ -758,6 +803,7 @@ namespace avoid
 
             // Allocating all memory in a row and initalizing it
             dist_.assign(id_phi_max_ * id_r_max_, double_inf);
+            zdist_.assign(id_phi_max_ * id_r_max_, 0);
             angle_.reserve(id_phi_max_);
             dynamic_.assign(id_phi_max_ * id_r_max_, false);
             safety_region_.assign(id_phi_max_, double_inf);
@@ -858,6 +904,28 @@ namespace avoid
         measurement -= pond*gamma_offset_;
 
         return measurement;
+    }
+
+    /**
+      * Returns info about Z swap
+      */
+
+    int PolarObstacleDiagram::CheckZDistance(double z_robot, double z_object)
+    {
+        double difference=fabs(z_robot-z_object);
+        double range_difference=fabs(dz_min_-dz_range_);
+
+        if(range_difference>difference){
+          return Z_SWAP;
+        }
+        else if(dz_min_>difference>range_difference){
+          return Z_RANGE;
+        }
+        else{
+
+          return Z_FREE;
+
+        }
     }
 
     /**
