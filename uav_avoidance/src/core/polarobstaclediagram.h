@@ -221,6 +221,23 @@ namespace avoid
             void SetBrackingDistance( const double bracking_distance);
 
             /**
+             * @brief Sets the dz_min inside the POD
+             *
+             * The dz_min is the z distance required to swap
+             * @param Value of the dz_min
+             */
+            void SetDzmin(const double dz_min);
+
+            /**
+             * @brief Sets the dz_min inside the POD
+             *
+             * The dz_min is the z distance required to swap
+             * @param Value of the dz_min
+             */
+            void SetDzrange(const double dz_range);
+
+
+            /**
              * @brief Sets the Local Measurement Error inside the POD
              *
              * The Local Measurement Error is the maximum error that a single measurement a local device (like your ranger)
@@ -348,8 +365,8 @@ namespace avoid
             double   local_measurement_error_ = -1.0;  //<[m] Maximum possible error of a local measurement (like a ranger measurement)
             double   global_measurement_error_ = -1.0; //<[m] Maximum possible error of a global measurement (like the one comming from a communication system)
             double   gamma_offset_ = -1.0;      //<[m] Offset to take into account other potential errors
-            double   dz_min_=4;                 //<[m] Maximum z distance between uavs to swap
-            double   dz_range_=1;             //<[m] Range to Z_BLOCKED state
+            double   dz_min_=4.0;                 //<[m] Maximum z distance between uavs to swap
+            double   dz_range_=1.0;             //<[m] Range to Z_BLOCKED state
 
             // Smoothing variables
             int      smooth_factor_ = -1;       //!< Number of measurements to interpolate to filter out some noise

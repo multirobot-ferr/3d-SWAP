@@ -523,7 +523,26 @@ namespace avoid
             bracking_distance_ = bracking_distance;
         }
     }
-
+    /**
+     * Sets the Dzmin inside the POD
+     */
+    void PolarObstacleDiagram::SetDzmin( const double dz_min)
+    {
+        if (dz_min > 0.0)
+        {
+            dz_min_ = dz_min;
+        }
+    }
+    /**
+     * Sets the Dzrange inside the POD
+     */
+    void PolarObstacleDiagram::SetDzrange( const double dz_range)
+    {
+        if (dz_range > 0.0)
+        {
+            dz_range_ = dz_range;
+        }
+    }
     /**
      * Sets the Local Measurement Error inside the POD
      */
@@ -913,16 +932,17 @@ namespace avoid
     int PolarObstacleDiagram::CheckZDistance(double z_robot, double z_object)
     {
         double difference=fabs(z_robot-z_object);
-        double range_difference=fabs(dz_min_-dz_range_);
+        double range_difference=dz_min_+dz_range_;
 
-        if(range_difference>difference){
+        if(dz_min_ > difference){
           return Z_SWAP;
         }
-        else if(dz_min_>difference>range_difference){
+        if(range_difference > difference){
+
           return Z_RANGE;
         }
-        else{
-
+        if(difference> range_difference)
+        {
           return Z_FREE;
 
         }

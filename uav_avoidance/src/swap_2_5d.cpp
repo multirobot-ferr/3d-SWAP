@@ -104,13 +104,6 @@ Swap_2_5d::Swap_2_5d()
         ROS_FATAL("SWAP: uav_id is not set. Closing the avoidance system");
     }
 
-    // getting max z-distance between uavs to swap
-    pnh_->param<double>("swap/dz_min", dz_min_,1.0);
-
-
-    // getting max z-distance between uavs to swap
-    pnh_->param<double>("swap/dz_range", dz_range_,1.0);
-
 
     // Getting the sleeping time of the loop
     pnh_->param<double>("spin_sleep", spin_sleep_, 0.2);
@@ -146,7 +139,14 @@ Swap_2_5d::Swap_2_5d()
     {
         SetBrackingDistance(bracking_distance_);
     }
-
+    if (pnh_->getParam("swap/dz_min", dz_min_))
+    {
+        SetDzmin(dz_min_);
+    }
+    if (pnh_->getParam("swap/dz_range", dz_range_))
+    {
+        SetDzrange(dz_range_);
+    }
     SetLocalMeasurementError(0.0);     // The system has not a laser ranger
     if (pnh_->getParam("swap/positioning_error", positioning_error_))
     {
@@ -409,7 +409,9 @@ void Swap_2_5d::FillLogFile()
             values2log_.push_back( pos_all[pos*3 + 2] );    //z
         }
 
-        // Showing the orientation of movement of the robot
+        values2log_.push_back(ros::Time::now().toSec());
+
+       /* // Showing the orientation of movement of the robot
         for (double d : {0.0,1.0})
         {
             double x_dir = d*cos( uav_wished_yaw_map_ );
@@ -444,7 +446,7 @@ void Swap_2_5d::FillLogFile()
             values2log_.push_back (y_m);
         }
 
-
+        */
         Log2Matlab(values2log_);
     }
 

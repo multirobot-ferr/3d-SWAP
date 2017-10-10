@@ -381,7 +381,9 @@ namespace avoid
          if ( fabs( AngleDiff(0, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
               fabs( AngleDiff(0, right_angle)) < M_PI/3   )
          {   // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
+
              return false;
+
          }
 
          if (fabs(goal_angle) <= goal_lateral_vision_)
@@ -390,7 +392,6 @@ namespace avoid
             if (fabs( AngleDiff(goal_angle, left_angle) ) < M_PI_2 ||
                 fabs( AngleDiff(goal_angle, right_angle)) < M_PI_2)
             {
-
                 // The goal belongs to the not navigable area
                 return false;
             }
@@ -398,6 +399,7 @@ namespace avoid
          else
          {
              // The goal is not visible from the robot's perspective
+
              return false;
          }
          return true;
