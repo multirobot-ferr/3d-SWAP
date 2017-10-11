@@ -270,6 +270,7 @@ namespace avoid
             // checking if Z_RANGE state is available
             bool conflict_range=false;
 
+            //Z_RANGE state is available only if all obstacles are z_range obstacles
              for (int id_phi = 0; id_phi < conflictive_angles_.size(); ++id_phi){
                  if(conflictive_heights_[id_phi]==Z_RANGE){
                      conflict_range=true;

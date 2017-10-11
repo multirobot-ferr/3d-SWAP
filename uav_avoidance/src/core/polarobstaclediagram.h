@@ -141,6 +141,7 @@ namespace avoid
              * @param distance The distance between the center of the robot and the obstacle
              * @param angle    Angle [rad] with respect to the front of the robot (positive values are left side of the robot)
              * @param dynamic  If the measurement belongs to a dynamic obstacle or not.
+             * @param z_action Type of action depends on height
              */
             void SetNewLocalMeasurement(double distance,
                                         double angle,
@@ -154,9 +155,11 @@ namespace avoid
              * with a radius r_object.
              * @param x_robot Position x[m] of the robot with respect to the map
              * @param y_robot Position y[m] of the robot with respect to the map
+             * @param z_robot Position z[m] of the robot with respect to the map
              * @param yaw_robot Orientation yaw[rad] of the robot with respect to the map
              * @param x_object Position x[m] of the object with respect to the map
              * @param y_object Position y[m] of the object with respect to the map
+             * @param z_object Position z[m] of the object with respect to the map
              * @param r_object Radius[m] of the object (system assumes a circular object)
              * @param dynamic Boolean to determine if the obstacle is static or dynamic
              */
@@ -440,9 +443,9 @@ namespace avoid
 
             /**
               *@brief Utility function to check the height state
-              *@param z_robot own position
-              *@param z_object position received
-              *@return return the action to do depending on the difference between uav height
+              *@param z_robot  Position z[m] of the robot with respect to the map
+              *@param z_object Position z[m] of the object with respect to the map
+              *@return return the action to do depending on the height difference between uav
               */
             int CheckZDistance(double z_robot, double z_object);
 

@@ -191,6 +191,7 @@ namespace avoid
              * RENDEZVOUS:  A non-ignorable obstacle is met. The robot should stop while prepare themselves to surround it.
              * RENCONTRE:   The robot surrounds the not-ignorable obstacle.
              * BLOCKED:     Surrounding obstacles (other robots mainly) trapped the robot. Wait here.
+             * Z_BLOCKED:   An obstacle is ignored moving into x-y plane towards goal
              */
             enum state_orientation {FREE = 1,
                                     RENDEZVOUS = 2,
@@ -225,7 +226,7 @@ namespace avoid
 	    
             // Conflict dealing
             double goal_lateral_vision_ = 45*M_PI/180;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
-            double rot_ctrl_P_ = 0.15;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
+            double rot_ctrl_P_ = 0.0;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
             double yaw_max_err_ = 45*M_PI/180.0;    //!< Maximal error allowed in RENCONTRE state
             double lin_v_rendezvous_ = 1.0;         //!< Maximal speed in the rendezvous state
             rot_behaviour rot_behaviour_ = COUNTERCLOCKWISE;           //!< +1: Always rotate counter-clockwise, 0: not defined; -1: Always rotate clockwise

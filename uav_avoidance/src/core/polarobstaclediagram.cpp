@@ -230,6 +230,7 @@ namespace avoid
         }
 
 
+            // we receive information about height between UAVs
 
         switch(z_action){
 
@@ -288,8 +289,8 @@ namespace avoid
         //Finding out the angle that points closer to the obstacle
         unsigned obstacle_id_phi = Angle2Sector( atan2(pos_object(1), pos_object(0)));
 
-        int z_action=CheckZDistance(z_robot,z_object);    // check Z distance
-
+        //checking z distance
+        int z_action=CheckZDistance(z_robot,z_object);
 
 
         if (far_away)
@@ -354,6 +355,7 @@ namespace avoid
 
                             dist = std::min( sqrt(pow(x_hit, 2.0) + pow(y_hit, 2.0)) , dist);
                         }
+                        // if height is dangerous
                         if(z_action!=Z_FREE){
                             SetNewLocalMeasurement( dist, angle_[id_phi], dynamic, z_action);
                         }
@@ -373,6 +375,7 @@ namespace avoid
             // This should never happen, so we are only creating a safety system
             // that introduces some information on the system
             double dist = arma::norm(pos_object, 1) - r_object;
+            // information is introduced if height is dangerous
             if(z_action!=Z_FREE){
             SetNewLocalMeasurement( dist, angle_[obstacle_id_phi], dynamic, z_action);
             }
@@ -926,7 +929,7 @@ namespace avoid
     }
 
     /**
-      * Returns info about Z swap
+      * Returns info about Z distance
       */
 
     int PolarObstacleDiagram::CheckZDistance(double z_robot, double z_object)

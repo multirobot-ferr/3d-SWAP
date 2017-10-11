@@ -119,7 +119,7 @@ class StateMachine
         // System variables
         bool initialization_error = false;      //!< Tracks possible initialization errors
         int uav_id_ = -1;                       //!< Identification number of the current uav
-
+        bool mov_cam = false;                   //!< movement depend on laser 3D is activated
         // Position of the UAV
         bool   pose_received_ = false;          //!< Tracks if the pose is already known
         double uav_x_, uav_y_, uav_z_, uav_yaw_;//!< Keeps the knowledge of the postion of the uav

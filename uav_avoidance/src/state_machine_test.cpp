@@ -290,8 +290,15 @@ void StateMachine::PublishPosErr()
     // Information for the UAV
     if (!confl_warning_)
     {
+        // if mov_cam is activated yaw move first
+        if(mov_cam){
+           // PublishGRVCgoal(5, 5, 5, 0.5);
+        }
+        else
+        {
         // Move is safe
         PublishGRVCPosErr(xe, ye, ze);
+        }
     }
     else
     {
@@ -348,6 +355,7 @@ void StateMachine::PublishGRVCgoal(const double x, const double y, const double 
     srv.request.waypoint.pose.position.x = x;
     srv.request.waypoint.pose.position.y = y;
     srv.request.waypoint.pose.position.z = z;
+
 
     tf2::Quaternion q3;
     q3.setRPY(0.0,0.0,yaw); 
