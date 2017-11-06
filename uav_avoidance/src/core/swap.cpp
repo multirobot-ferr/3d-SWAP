@@ -379,10 +379,14 @@ namespace avoid
      {
          double left_angle = conflict_left_id_phi;
          double right_angle= conflict_right_id_phi;
-         if ( fabs( AngleDiff(0, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
-              fabs( AngleDiff(0, right_angle)) < M_PI/3   )
+         double orient= fabs( AngleDiff(goal_angle, left_angle));
+         std::cout<<"la diferencia es: "<< orient << std::endl;
+
+         if ( fabs( AngleDiff(goal_angle, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
+              fabs( AngleDiff(goal_angle, right_angle)) < M_PI/3   )
          {   // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
 
+             std::cout<<"el obstáculo está en medio del camino"<<std::endl;
              return false;
 
          }
@@ -393,12 +397,16 @@ namespace avoid
             if (fabs( AngleDiff(goal_angle, left_angle) ) < M_PI_2 ||
                 fabs( AngleDiff(goal_angle, right_angle)) < M_PI_2)
             {
+
+                std::cout<<"todavía no se ha evitado por completo"<<std::endl;
                 // The goal belongs to the not navigable area
                 return false;
             }
          }
          else
          {
+
+             std::cout<<"el robot no está visible"<<std::endl;
              // The goal is not visible from the robot's perspective
 
              return false;

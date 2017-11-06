@@ -53,6 +53,7 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <pid_controller.h>
 
 // Uncomment this define if all the robots starts in (0,0)
 //#define UAV_NOT_IN_ZERO_ZERO 1
@@ -60,9 +61,9 @@
 #ifdef UAV_NOT_IN_ZERO_ZERO
 // values extracted from the simulator:
                         //   x      y   yaw
-const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
+/*const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
                            {-20.0, 30.0, 0.0 },
-                           {-28.0, 26.0, 0.0 } };
+                           {-28.0, 26.0, 0.0 } }; */
 #endif
 
 // Constant values
@@ -100,7 +101,10 @@ class StateMachine
          */
         void Land();
 
+
     private:
+
+
         ros::NodeHandle nh_;                    //!< ROS Node handler
         ros::NodeHandle* pnh_;                  //!< Private node handler
 
@@ -116,17 +120,32 @@ class StateMachine
         geometry_msgs::Vector3 avoid_mov_direction_uav_; //!< Movement direction requested from swap
     // ###########  #######################  ########### //
 
+        // control
+      //  grvc::utils::PidController* pid_yaw_;
+
+        //pid variables
+       // grvc::utils::PidController Pid;
+
+
+        grvc::utils::PidController* pid_yaw_;
+
+
+
         // System variables
         bool initialization_error = false;      //!< Tracks possible initialization errors
         int uav_id_ = -1;                       //!< Identification number of the current uav
-        bool mov_cam = false;                   //!< movement depend on laser 3D is activated
+        bool yaw_on_;                   //!< movement depend on laser 3D is activated
         // Position of the UAV
         bool   pose_received_ = false;          //!< Tracks if the pose is already known
         double uav_x_, uav_y_, uav_z_, uav_yaw_;//!< Keeps the knowledge of the postion of the uav
 
+
         // UAV references
         double z_ref_;
         double d_goal_;
+        double v_ref_=1.5;
+
+
 
         //Preparing to command the UAV
         ros::ServiceClient takeOff_srv_;
@@ -145,6 +164,12 @@ class StateMachine
                                  {-31.0, +26.0, M_PI/2 },
                                  {-31.0, +20.0,-M_PI/4 },
                                  {-25.0, +40.0, M_PI/16} };
+
+
+
+
+
+
 
         /* Callbacks for ROS */
         /**
@@ -218,6 +243,18 @@ class StateMachine
          * @brief If the robot is close to a waypoint, it actualizes to the next waypoint
          */
         void UpdateWayPoints();
+
+        /**
+         *  Pid implementation
+         */
+
+        double pid(double error, double dt);
+
+        /**
+         *
+         */
+        double ScaleAngle(double angle);
+
 
 }; // class StateMachine
 

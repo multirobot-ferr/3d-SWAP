@@ -212,6 +212,7 @@ namespace avoid
         private:
             // Variables to track if the system is ready
             bool is_ready_ = false;                 //!< Tracks if all values of Swap are initialized.
+            bool yaw_on_= false;                    //!< Tracks if all yaw is controlled
 
             // Goal storage
             double goal_dist_ = 0.0;                //!< Distance to the goal
@@ -225,7 +226,7 @@ namespace avoid
             double v_avoidance_   = 0.0;            //!< Speed to follow on the RENDEZVOUS case
 	    
             // Conflict dealing
-            double goal_lateral_vision_ = 45*M_PI/180;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
+            double goal_lateral_vision_ = 360*M_PI/180;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
             double rot_ctrl_P_ = 0.0;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
             double yaw_max_err_ = 45*M_PI/180.0;    //!< Maximal error allowed in RENCONTRE state
             double lin_v_rendezvous_ = 1.0;         //!< Maximal speed in the rendezvous state

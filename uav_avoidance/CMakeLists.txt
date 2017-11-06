@@ -16,6 +16,8 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(Armadillo REQUIRED)
+find_package(PCL 1.6 REQUIRED)
+
 
 
 ###################################
@@ -37,6 +39,7 @@ catkin_package(
         tf2
         uav_abstraction_layer
   DEPENDS ARMADILLO
+  DEPENDS PCL
 )
 
 ###########
@@ -50,6 +53,7 @@ include_directories(
     src/core
     ${catkin_INCLUDE_DIRS}
     ${ARMADILLO_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
 )
 
 
@@ -57,9 +61,23 @@ include_directories(
 add_library(swap_2_5d_library
     src/core/swap.cpp
     src/core/polarobstaclediagram.cpp
+    src/core/pid_controller.h
+
 )
 
+
+
+
 target_link_libraries(swap_2_5d_library ${ARMADILLO_LIBRARIES})
+
+target_link_libraries(swap_2_5d_library ${ARMADILLO_LIBRARIES})
+target_link_libraries(swap_2_5d_library ${PCL_LIBRARIES})
+
+#Creating the ROS node for test
+
+add_executable(measures src/measures.cpp)
+add_dependencies(measures swap_2_5d_library ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(measures swap_2_5d_library ${catkin_LIBRARIES})
 
 # Creating the ROS node for SWAP
 add_executable(swap_2_5d src/swap_2_5d.cpp)
@@ -70,3 +88,5 @@ target_link_libraries(swap_2_5d swap_2_5d_library ${catkin_LIBRARIES})
 add_executable(state_machine src/state_machine_test.cpp)
 add_dependencies(state_machine ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(state_machine swap_2_5d_library ${catkin_LIBRARIES})
+
+

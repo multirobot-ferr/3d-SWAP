@@ -44,12 +44,14 @@
 
 #include <uav_avoidance/state_machine_test.h>
 #include <tf2/utils.h>     // to convert quaternion to roll-pitch-yaw
+#include <math.h>  // to use atan2
 
 #include <uav_abstraction_layer/TakeOff.h>
 #include <uav_abstraction_layer/SetVelocity.h>
 #include <uav_abstraction_layer/SetPositionError.h>
 #include <uav_abstraction_layer/GoToWaypoint.h>
 #include <uav_abstraction_layer/Land.h>
+
 
 /**
  * Main code of the state machine
@@ -58,7 +60,9 @@ int main(int argc, char **argv) {
     // name remapping
     ros::init(argc, argv, "state_machine_test");
 
+
     StateMachine state_machine;
+
 
     while (ros::ok())
     {
@@ -84,10 +88,14 @@ StateMachine::StateMachine() {
     ROS_WARN("State Machine for testing awake! Disable it if you are not testing swap");
     pnh_ = new ros::NodeHandle("~");
 
+
     // Sleeping some random time to not colapse the system due to a big wakeup
     // Waking a time between 1 and 2 seconds
     double sleep_time = 1.0 + (rand() % 10 + 1)/10.0;
     ROS_INFO("Waiting %f seconds before start", sleep_time);
+
+    pid_yaw_ = new grvc::utils::PidController("yaw", 0.4, 0.02, 0.0);
+
     ros::Duration( sleep_time).sleep();
 
 
@@ -96,7 +104,11 @@ StateMachine::StateMachine() {
         initialization_error = true;
         ROS_FATAL("State Machine: uav_id is not set. Closing the state machine system");
     }
-
+    if (!pnh_->getParam("yaw_on", yaw_on_))
+    {
+        initialization_error = true;
+        ROS_FATAL("State Machine: uav_id is not set. Closing the state machine system");
+    }
     std::string goals_path;
     if (pnh_->getParam("goals_path", goals_path))
     {
@@ -120,32 +132,33 @@ StateMachine::StateMachine() {
     }
     #endif
 
+
     // Specific namespace for UAL
     std::string ual_ns;
     if (!pnh_->getParam("ual_namespace", ual_ns))
         ual_ns = "";
 
     // Subscribing to the position of the UAV
-    std::string uav_topic_name = "/" + ual_ns + "ual_" + std::to_string(uav_id_) + pose_uav_topic.c_str();
-    pos_uav_sub_ = nh_.subscribe(uav_topic_name.c_str(), 1, &StateMachine::PoseReceived, this);
-
+    std::string uav_topic_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual"+ pose_uav_topic.c_str();
+    pos_uav_sub_ = nh_.subscribe(  uav_topic_name.c_str() , 1, &StateMachine::PoseReceived, this);
     // Preparing the necessary services
-    
+
     std::string uav_service_name;
-    uav_service_name = "/" + ual_ns + "ual_" + std::to_string(uav_id_) + takeoff_service;
+    uav_service_name = "/" + ual_ns + "uav_" +  std::to_string(uav_id_) + "/ual"+ takeoff_service;
     takeOff_srv_ = nh_.serviceClient<uav_abstraction_layer::TakeOff>(uav_service_name);
 
-    uav_service_name = "/" + ual_ns + "ual_" + std::to_string(uav_id_) + speed_service;
+    uav_service_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual" + speed_service;
     speed_srv_ = nh_.serviceClient<uav_abstraction_layer::SetVelocity>(uav_service_name);
 
-    uav_service_name = "/" + ual_ns + "ual_" + std::to_string(uav_id_) + pos_err_service;
+    uav_service_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual" + pos_err_service;
     pos_err_srv_ = nh_.serviceClient<uav_abstraction_layer::SetPositionError>(uav_service_name);
 
-    uav_service_name = "/" + ual_ns + "ual_" + std::to_string(uav_id_) + way_point_service;
+    uav_service_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual" + way_point_service;
     way_point_srv_ = nh_.serviceClient<uav_abstraction_layer::GoToWaypoint>(uav_service_name);
 
-    uav_service_name = "/" + ual_ns + "ual_" + std::to_string(uav_id_) + land_service;
+    uav_service_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual" + land_service;
     land_srv_ = nh_.serviceClient<uav_abstraction_layer::Land>(uav_service_name);
+
 
     pnh_->param<double>("z_distance", dist_between_uav_z_, 2.0);
     pnh_->param<double>("d_goal", d_goal_, 0.5);
@@ -155,6 +168,8 @@ StateMachine::StateMachine() {
     wished_mov_dir_pub_ = nh_.advertise<geometry_msgs::Vector3>("wished_movement_direction",1 , true);  // the final true is required
     avoid_mov_dir_sub_  = nh_.subscribe("avoid_movement_direction", 1, &StateMachine::AvoidMovementCallback, this);
     // ###########  #######################  ########### //
+
+
 
     TakeOff();
 
@@ -281,6 +296,7 @@ void StateMachine::PublishPosErr()
     double ye = way_points_(wp_idx_, 1) - uav_y_;
     double ze = way_points_(wp_idx_, 2) - uav_z_;
 
+
     // Information for SWAP (where the uav wants to go)
     wished_direction_uav_.x = xe;
     wished_direction_uav_.y = ye;
@@ -291,8 +307,15 @@ void StateMachine::PublishPosErr()
     if (!confl_warning_)
     {
         // if mov_cam is activated yaw move first
-        if(mov_cam){
-           // PublishGRVCgoal(5, 5, 5, 0.5);
+        if(yaw_on_){
+
+            double dt= 0.01;
+            double ori_xy =  atan2(ye, xe);
+            double ori_yz =  atan2(ze, ye);
+            double yaw_desired=atan2((way_points_(wp_idx_, 1)), (way_points_(wp_idx_, 0)));
+            double yawe=ScaleAngle(yaw_desired)-ScaleAngle(uav_yaw_);
+            double signal=pid_yaw_->control_signal(yawe, dt);
+            PublishGRVCCmdVel(v_ref_*cos(ori_xy), v_ref_*sin(ori_xy), v_ref_*sin(ori_yz), signal);
         }
         else
         {
@@ -306,6 +329,17 @@ void StateMachine::PublishPosErr()
         // Speed controller seems to work better with SWAP
        // PublishGRVCPosErr( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, ze);
      // the avoid movement is goint to be in the xy plane ze=0.0
+        // I don't need avoid_mov_direction.z because the avoid movement is going to be in the xy plane
+        // so I use avoid_mov_direction.z to save avoid_mov_yaw
+        if(yaw_on_){
+
+        double dt= 0.01;
+        double yaw_desired=avoid_mov_direction_uav_.z;
+        double yawe=ScaleAngle(yaw_desired)-ScaleAngle(uav_yaw_);
+        double signal=pid_yaw_->control_signal(yawe, dt);
+        PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, 0.0, signal);
+
+        }
         PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, 0.0, 0.0);
     }
 }
@@ -394,12 +428,15 @@ void StateMachine::TakeOff()
 
     if (takeOff_srv_.call(srv))
     {
+
+        ros::Duration(3).sleep();
+
         // Waiting for the UAV to really take off
-        while ( abs(uav_z_ - z_ref_) > 0.5 )
+       /* while ( abs(uav_z_ - z_ref_) > 0.5 )
         {
             ros::Duration(3).sleep();
             ROS_INFO("take off done");
-        }
+        } */
         ROS_WARN("UAV_%d ready (hovering at %.2f)", uav_id_, z_ref_);   
     }
     else
@@ -418,8 +455,9 @@ void StateMachine::UpdateWayPoints()
 
     double x_diff = way_points_(wp_idx_, 0) - uav_x_;
     double y_diff = way_points_(wp_idx_, 1) - uav_y_;
+    double z_diff = way_points_(wp_idx_, 2) - uav_z_;
 
-    double dist = sqrt(powf(x_diff, 2.0) + powf(y_diff, 2.0));
+    double dist = sqrt(powf(x_diff, 2.0) + powf(y_diff, 2.0) + powf(z_diff, 2.0));
 
     if (dist < d_goal_) {
         // Stopping the uav a little bit there
@@ -442,4 +480,20 @@ void StateMachine::UpdateWayPoints()
     {
         // ROS_INFO("UAV_%d: Distance to goal %.2f", uav_id_, dist);
     }
+}
+
+/**
+ * Utility function. Returns an angle between (-pi and pi)
+ */
+double StateMachine::ScaleAngle(double angle)
+{
+    while (angle < -M_PI)
+    {
+        angle += 2.0*M_PI;
+    }
+    while (angle > +M_PI)
+    {
+        angle -= 2.0*M_PI;
+    }
+    return angle;
 }

@@ -65,6 +65,18 @@
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <pcl/point_types.h>
+#include <pcl/conversions.h>
+
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl/conversions.h>
+#include <pcl_ros/transforms.h>
+#include <pcl_ros/point_cloud.h>
+
+
 
 // Fixing some problems
 // If the simulator makes all uavs start in (0,0), this define should be uncommented
@@ -124,11 +136,13 @@ class Swap_2_5d:  public avoid::Swap
         std::vector<ros::Subscriber> pos_all_uav_sub_;  //!< Receives the positions of all UAVs
         ros::Subscriber wished_mov_dir_sub_;            //!< Receives the direction where the uav whants to go
         ros::Subscriber laser_sub_;                     //!< Receives laser data
+        ros::Subscriber pointcloud_sub_;                //!< Receives lidar data
+
 
         // Publishers
         ros::Publisher confl_warning_pub_;              //!< Publisher to determine if there is a possible collision or not
         ros::Publisher  avoid_mov_dir_pub_;             //!< Publish the direction where the uav has to go to avoid a conflict
-
+        ros::Publisher xyz_pub_;
         // System variables
         bool initialization_error_ = false;             //!< Flags to track possible errors in initialization
         double spin_sleep_ = 0.1;                       //!< Time that the system will sleep between iterations of the main loop
@@ -139,6 +153,9 @@ class Swap_2_5d:  public avoid::Swap
         double uav_safety_radius_ = -1.0;               //!< Safety radius of each uav
 	double dz_min_;	    		   		 //!< max z-distance to swap. It is a parameter
         double dz_range_;
+        pcl::PointCloud<pcl::PointXYZ> cloud_xyz_;
+
+
         // Position of the UAV
         bool   pose_received_ = false;                  //!< Tracks if the uav knows its position
         double uav_x_, uav_y_, uav_z_, uav_yaw_;        //!< Position of the current uav
@@ -173,6 +190,11 @@ class Swap_2_5d:  public avoid::Swap
          * @param uav_id Identifier from UAV
          */
         void PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id);
+
+        /**
+         * @brief Callback for lidar date
+         */
+        void CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
 
         /**
          * @brief Callback for laser date

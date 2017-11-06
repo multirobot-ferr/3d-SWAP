@@ -357,6 +357,7 @@ namespace avoid
                         }
                         // if height is dangerous
                         if(z_action!=Z_FREE){
+
                             SetNewLocalMeasurement( dist, angle_[id_phi], dynamic, z_action);
                         }
                     }

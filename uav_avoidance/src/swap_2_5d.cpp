@@ -54,6 +54,8 @@
 #include <functional>
 
 
+
+
 int main(int argc, char **argv) {
     // name remapping
     ros::init(argc, argv, "swap_2_d");
@@ -103,6 +105,14 @@ Swap_2_5d::Swap_2_5d()
         initialization_error_ = true;
         ROS_FATAL("SWAP: uav_id is not set. Closing the avoidance system");
     }
+
+   /* if (!pnh_->getParam("yaw_on", yaw_on_))
+    {
+        initialization_error = true;
+        ROS_FATAL("State Machine: yaw_on is not set");
+    }
+    // yaw_on es una miembro privado
+    */
 
 
     // Getting the sleeping time of the loop
@@ -174,7 +184,7 @@ Swap_2_5d::Swap_2_5d()
 
     // Subscribing to the position of all UAVs
     for (int n_uav = 0; n_uav < n_uavs_; n_uav++) {
-        std::string uav_topic_name = "/" + ual_ns + "ual_" + std::to_string(uav_ids_[n_uav]) + pose_uav_topic.c_str();
+        std::string uav_topic_name = "/" + ual_ns + "uav_" + std::to_string(uav_ids_[n_uav]) + "/ual" + pose_uav_topic.c_str();
         pos_all_uav_sub_.push_back(nh_.subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Swap_2_5d::PoseReceived, this, std::placeholders::_1, uav_ids_[n_uav]) ));
     }
 
@@ -183,13 +193,15 @@ Swap_2_5d::Swap_2_5d()
     wished_mov_dir_sub_ = nh_.subscribe( "wished_movement_direction",1 , &Swap_2_5d::WishedMovDirectionCallback, this);
     avoid_mov_dir_pub_  = nh_.advertise<geometry_msgs::Vector3>("avoid_movement_direction", 1, true);
     laser_sub_ = nh_.subscribe<sensor_msgs::LaserScan>("/mbzirc_1/front_laser/scan",10,&Swap_2_5d::LaserCallback,this);
-
+    pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_1/velodyne", 10, &Swap_2_5d::CloudCallback, this);
+    xyz_pub_ = nh_.advertise<pcl::PointCloud<pcl::PointXYZ>>("/velodyne/xyztopic",1,true);
     // Meant to debug the system
     std::string file_path;
     if (pnh_->getParam("debug/file_path", file_path))
     {
         Log2MatlabInit( file_path);
     }
+
 
     if (!initialization_error_)
     {
@@ -288,6 +300,28 @@ void Swap_2_5d::SpinOnce()
 }
 
 /**
+  * Callback for velodyne
+  */
+
+void Swap_2_5d::CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
+
+     pcl::PCLPointCloud2 pcl_pc2;
+     pcl_conversions::toPCL(*cloud_msg,pcl_pc2);
+     pcl::fromPCLPointCloud2(pcl_pc2,cloud_xyz_);
+
+     xyz_pub_.publish(cloud_xyz_);
+
+
+     for (unsigned id_point = 0; id_point < cloud_xyz_.size(); ++id_point)
+       {
+
+                SetNewGlobalMeasurement(uav_x_, uav_y_, uav_z_, uav_yaw_ ,  // The 0.0 makes it always look to the nord (even if not)
+                                        cloud_xyz_.points[id_point].x,  cloud_xyz_.points[id_point].y,  cloud_xyz_.points[id_point].z,
+                                        uav_safety_radius_, true);       }
+
+}
+
+/**
   * Callback for laser
   */
 
@@ -341,7 +375,7 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
     else if (pose_received_)
     {
         // The robot knows where it is and where an other robot is located.
-        SetNewGlobalMeasurement(uav_x_, uav_y_, uav_z_, 0.0,  // The 0.0 makes it always look to the nord (even if not)
+        SetNewGlobalMeasurement(uav_x_, uav_y_, uav_z_, uav_yaw_,  // The 0.0 makes it always look to the nord (even if not)
                                 x, y, z, uav_safety_radius_, true);
 
 
