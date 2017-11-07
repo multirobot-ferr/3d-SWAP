@@ -295,8 +295,9 @@ void StateMachine::PublishPosErr()
     double xe = way_points_(wp_idx_, 0) - uav_x_;
     double ye = way_points_(wp_idx_, 1) - uav_y_;
     double ze = way_points_(wp_idx_, 2) - uav_z_;
-
-
+    double dirx=xe/(sqrt(powf(xe, 2.0) + powf(ye, 2.0) + powf(ze, 2.0)));
+    double diry=ye/(sqrt(powf(xe, 2.0) + powf(ye, 2.0) + powf(ze, 2.0)));
+    double dirz=ze/(sqrt(powf(xe, 2.0) + powf(ye, 2.0) + powf(ze, 2.0)));
     // Information for SWAP (where the uav wants to go)
     wished_direction_uav_.x = xe;
     wished_direction_uav_.y = ye;
@@ -320,7 +321,8 @@ void StateMachine::PublishPosErr()
         else
         {
         // Move is safe
-        PublishGRVCPosErr(xe, ye, ze);
+         
+        PublishGRVCCmdVel(dirx,diry,dirz, 0.0);
         }
     }
     else
@@ -331,7 +333,7 @@ void StateMachine::PublishPosErr()
      // the avoid movement is goint to be in the xy plane ze=0.0
         // I don't need avoid_mov_direction.z because the avoid movement is going to be in the xy plane
         // so I use avoid_mov_direction.z to save avoid_mov_yaw
-        if(yaw_on_){
+      /*  if(yaw_on_){
 
         double dt= 0.01;
         double yaw_desired=avoid_mov_direction_uav_.z;
@@ -339,7 +341,8 @@ void StateMachine::PublishPosErr()
         double signal=pid_yaw_->control_signal(yawe, dt);
         PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, 0.0, signal);
 
-        }
+        }*/
+     
         PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, 0.0, 0.0);
     }
 }
@@ -372,7 +375,6 @@ void StateMachine::PublishGRVCCmdVel(const double vx, const double vy,
     srv.request.velocity.twist.linear.y = vy;
     srv.request.velocity.twist.linear.z = vz;
     srv.request.velocity.twist.angular.z = yaw_rate;
-
     if (!speed_srv_.call(srv))
     {
         ROS_ERROR("Failed to call service SetVelocity");
