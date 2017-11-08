@@ -74,7 +74,7 @@
                 -->
 
                 <!-- I am assuming that the uav is able to stop in 2m -->
-                <param name="swap/braking_distance" value="5.0"/>
+                <param name="swap/braking_distance" value="3.0"/>
 
                 <!-- I am assuming that the largest error in the positioning
                 system is 1m. -->
@@ -85,7 +85,7 @@
                 <param name="swap/gamma_offset" value="0.0"/>
 		
 		<!--if distance between uavs is larger than dz_min dont swap -->
-		<param name="swap/dz_min" value="40"/>
+		<param name="swap/dz_min" value="10"/>
 
 		<!--if distance between uavs is larger than dz_min dont swap -->
 		<param name="swap/dz_range" value="1"/>

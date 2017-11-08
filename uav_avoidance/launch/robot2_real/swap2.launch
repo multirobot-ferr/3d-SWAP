@@ -1,0 +1,17 @@
+<!--
+
+Launches the swap node in robot 1
+
+-->
+
+<launch>
+
+<arg name="yaw_on" default="false"/>
+
+<node name="auv_avoidance_1" pkg="uav_avoidance" type="delayed.sh"
+		args="1 roslaunch uav_avoidance avoidance.launch robot_number:=2 yaw_on:=$(arg yaw_on)" output="screen">
+
+</node>
+	
+
+</launch>
