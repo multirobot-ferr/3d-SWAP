@@ -1,0 +1,8 @@
+<!--		
+-->
+<launch>
+
+  <node pkg="avoidance_visualization" name="visualizer_avoidance_node" type="visualizer_avoidance_node"
+		output="screen" />
+  <node pkg="rviz" name="rviz" type="rviz" args="-d $(find uav_avoidance)/cfg/avoidance.rviz"/>   
+</launch>
