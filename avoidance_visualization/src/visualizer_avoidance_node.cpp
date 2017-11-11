@@ -10,7 +10,7 @@
 #include <map>
 #include <fstream>
 #include <iostream>
-
+#include <math.h>
 #include <ros/ros.h>
 
 using namespace std;
@@ -42,6 +42,10 @@ protected:
     void AvoidMovementCallback3(const geometry_msgs::Vector3::ConstPtr& avoidance_direction);
 
     
+    void GoalDirectionCallback1(const geometry_msgs::Vector3::ConstPtr& goal_direction);
+    void GoalDirectionCallback2(const geometry_msgs::Vector3::ConstPtr& goal_direction);
+    void GoalDirectionCallback3(const geometry_msgs::Vector3::ConstPtr& goal_direction);
+    
     
     
     
@@ -54,21 +58,31 @@ protected:
 
     vector<ros::Subscriber *> uav_subs_;
     vector<ros::Subscriber *> direction_subs_;
+    vector<ros::Subscriber *> goal_direction_subs_;
     
     
 
     /// Publishers
-    ros::Publisher scenario_pub_;
-    ros::Publisher cylinder_pub_;
-    ros::Publisher uavs_pub_;
-    ros::Publisher arrow_pub_;
+    ros::Publisher scenario_pub_;          // Publisher for scenario marker
+    ros::Publisher cylinder_pub_;          // Publisher for cylinder marker
+    ros::Publisher uavs_pub_;              // Publisher for uav pose
+    ros::Publisher arrow_pub_;             // Publisher for avoidance direction marker
+    ros::Publisher goal_arrow_pub_;        // Publisher for goal direction marker
+    ros::Publisher uav_cylinder_pub_;    // Publisher for safety cylinder
 
     /// Last data received
     map<int, geometry_msgs::PoseStamped> uavs_poses_;
     map<int, geometry_msgs::Vector3> uav_direction_;
+    map<int, geometry_msgs::Vector3> goal_direction_;
 
     /// Number of UAVs
     int n_uavs_;
+    double uav_safety_radius_ = -1.0;               //!< Safety radius of each uav
+    double dz_min_;	    		   		            //!< max z-distance to swap. It is a parameter
+    double bracking_distance_;
+    double dz_range_;
+    double positioning_error_;
+    double gamma_offset_;
 };
 
 /** \brief Constructor
@@ -80,15 +94,46 @@ Visualizer::Visualizer()
     pnh_ = new ros::NodeHandle("~");
     
 
-    // Read parameters
+    // getting swap parameters
+
+
     pnh_->param<int>("n_uavs", n_uavs_, 3);
+
+    if (!pnh_->getParam("safety_radius", uav_safety_radius_))
+    {
+        ROS_FATAL("VISUALIZER: safety radius is not set. Closing the visualizer system");
+    }
+
+    if (!pnh_->getParam("braking_distance", bracking_distance_))
+    {
+        ROS_FATAL("VISUALIZER: breaking distance is not set. Closing the visualizer system");
+    }
+    if (!pnh_->getParam("dz_min", dz_min_))
+    {
+        ROS_FATAL("VISUALIZER: cylinder height is not set. Closing the visualizer system");
+    }
+    if (!pnh_->getParam("dz_range", dz_range_))
+    {
+        ROS_FATAL("VISUALIZER: cylinder height is not set. Closing the visualizer system");
+    }
+
+    if (!pnh_->getParam("positioning_error", positioning_error_))
+    {
+        ROS_FATAL("VISUALIZER: positioning error is not set. Closing the visualizer system");
+    }
+
+    if (!pnh_->getParam("gamma_offset", gamma_offset_))
+    {
+        ROS_FATAL("VISUALIZER: gamma offset is not set. Closing the visualizer system");
+    }
+
 
     // Subscriptions/publications
     for(int i=0; i<n_uavs_; i++)
     {
         string uav_topic_name = "uav_" + to_string(i+1) + "/ual/pose";
         string uav_direction_topic_name =  "uav_" + to_string(i+1) + "/avoid_movement_direction";
-        
+        string goal_direction_topic_name= "uav_" + to_string(i+1) + "/wished_movement_direction";
         
         if(i==0){
             ROS_INFO("subscribiendo a pos 1");
@@ -99,6 +144,13 @@ Visualizer::Visualizer()
             ros::Subscriber* direction_sub= new ros::Subscriber();
             *direction_sub = nh_->subscribe<geometry_msgs::Vector3>(uav_direction_topic_name.c_str(), 1, &Visualizer::AvoidMovementCallback1, this);
             direction_subs_.push_back(direction_sub);
+
+            ros::Subscriber* goal_direction_sub= new ros::Subscriber();
+            *goal_direction_sub = nh_->subscribe<geometry_msgs::Vector3>(goal_direction_topic_name.c_str(), 1, &Visualizer::GoalDirectionCallback1, this);
+            goal_direction_subs_.push_back(goal_direction_sub);
+
+
+
         }
         else if(i==1)
         {
@@ -111,6 +163,10 @@ Visualizer::Visualizer()
             ros::Subscriber* direction_sub= new ros::Subscriber();
             *direction_sub = nh_->subscribe<geometry_msgs::Vector3>(uav_direction_topic_name.c_str(), 1, &Visualizer::AvoidMovementCallback2, this);
             direction_subs_.push_back(direction_sub);
+
+            ros::Subscriber* goal_direction_sub= new ros::Subscriber();
+            *goal_direction_sub = nh_->subscribe<geometry_msgs::Vector3>(goal_direction_topic_name.c_str(), 1, &Visualizer::GoalDirectionCallback2, this);
+            goal_direction_subs_.push_back(goal_direction_sub);
         }
         else if(i==2)
         {
@@ -123,17 +179,22 @@ Visualizer::Visualizer()
             ros::Subscriber* direction_sub= new ros::Subscriber();
             *direction_sub = nh_->subscribe<geometry_msgs::Vector3>(uav_direction_topic_name.c_str(), 1, &Visualizer::AvoidMovementCallback3, this);
             direction_subs_.push_back(direction_sub);
+
+            ros::Subscriber* goal_direction_sub= new ros::Subscriber();
+            *goal_direction_sub = nh_->subscribe<geometry_msgs::Vector3>(goal_direction_topic_name.c_str(), 1, &Visualizer::GoalDirectionCallback3, this);
+            goal_direction_subs_.push_back(goal_direction_sub);
         }
     
         
     }
 
 
-    scenario_pub_ = nh_->advertise<visualization_msgs::Marker>("mbzirc_markers/scenario", 0);
-    uavs_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("mbzirc_markers/uavs", 0);
+    scenario_pub_ = nh_->advertise<visualization_msgs::Marker>("avoidance_markers/scenario", 0);
+    uavs_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("avoidance_markers/uavs", 0);
     cylinder_pub_= nh_->advertise<visualization_msgs::MarkerArray>("avoidance_markers/cylinders",0);
     arrow_pub_= nh_ ->advertise<visualization_msgs::MarkerArray>("avoidance_markers/arrow",0);
-    
+    goal_arrow_pub_ = nh_ -> advertise<visualization_msgs::MarkerArray>("avoidance_markers/arrow_goal",0);
+    uav_cylinder_pub_ = nh_ -> advertise<visualization_msgs::MarkerArray>("avoidance_markers/safety_cylinder", 0);
 
 }
 
@@ -147,10 +208,15 @@ Visualizer::~Visualizer()
     for(int i=0; i < n_uavs_; i++)
     {
         delete uav_subs_[i];
+        delete direction_subs_[i];
+        delete goal_direction_subs_[i];
     }
+    
     uavs_poses_.clear();
     uav_subs_.clear();
     uav_direction_.clear();
+    direction_subs_.clear();
+    goal_direction_.clear();
 }
 
 
@@ -204,9 +270,26 @@ void Visualizer::AvoidMovementCallback3(const geometry_msgs::Vector3::ConstPtr& 
     uav_direction_[uav_id] = *avoidance_direction;
 }
 
+/** \Callback for goal direction
+*/
 
+void Visualizer::GoalDirectionCallback1(const geometry_msgs::Vector3::ConstPtr& goal_direction)
+{
+    int uav_id=1;
+    goal_direction_[uav_id] = *goal_direction;
+}
 
-void AvoidMovementCallback(const geometry_msgs::Vector3::ConstPtr& avoidance_direction);
+void Visualizer::GoalDirectionCallback2(const geometry_msgs::Vector3::ConstPtr& goal_direction)
+{
+    int uav_id=2;
+    goal_direction_[uav_id] = *goal_direction;
+}
+
+void Visualizer::GoalDirectionCallback3(const geometry_msgs::Vector3::ConstPtr& goal_direction)
+{
+    int uav_id=3;
+    goal_direction_[uav_id] = *goal_direction;
+}
 
 
 /** Publish markers
@@ -246,7 +329,9 @@ void Visualizer::publishMarkers()
     // Publish UAVs and cylinder
     visualization_msgs::MarkerArray uav_markers;
     visualization_msgs::MarkerArray cylinder_markers;
+    visualization_msgs::MarkerArray uav_cylinder_markers;
     visualization_msgs::MarkerArray arrow_markers;
+    visualization_msgs::MarkerArray arrow_goal_markers;
 
     for (int uav_id = 1; uav_id <= n_uavs_; uav_id++)
     {
@@ -305,7 +390,47 @@ void Visualizer::publishMarkers()
             marker.scale.y = 1;
             marker.scale.z = 1;
             
-           
+            // Publish uav cylinder
+
+            visualization_msgs::Marker uav_cylinder;
+            uav_cylinder.header.frame_id = "/map";
+            uav_cylinder.header.stamp = ros::Time();
+            uav_cylinder.id = uav_id;
+            uav_cylinder.ns = "uavs";
+            uav_cylinder.type = visualization_msgs::Marker::CYLINDER;
+            uav_cylinder.color.a = 0.1;   
+
+            switch(uav_id)
+            {
+                case 1:
+                
+                uav_cylinder.color.r = 0.7;
+                uav_cylinder.color.g = 0;
+                uav_cylinder.color.b = 0;
+                break;
+                case 2:
+
+                uav_cylinder.color.r = 0;
+                uav_cylinder.color.g = 0.7;
+                uav_cylinder.color.b = 0; 
+                break;
+                case 3:
+                uav_cylinder.color.r = 0.7;
+                uav_cylinder.color.g = 0.7;
+                uav_cylinder.color.b = 0;
+                break;
+            }
+
+            uav_cylinder.action = visualization_msgs::Marker::ADD;
+
+            uav_cylinder.pose = uavs_poses_[uav_id].pose;
+            uav_cylinder.scale.x = 2*uav_safety_radius_;   //Diameter
+            uav_cylinder.scale.y = 2*uav_safety_radius_;   // if x e y are different you get an elipse instead o a circle
+            uav_cylinder.scale.z = dz_min_;   // height
+            uav_cylinder.mesh_use_embedded_materials = true;
+
+            uav_cylinder_markers.markers.push_back(uav_cylinder);
+
             // Publish cylinder
 
             visualization_msgs::Marker cylinder;
@@ -331,67 +456,134 @@ void Visualizer::publishMarkers()
                 cylinder.color.b = 0; 
                 break;
                 case 3:
-                cylinder.color.r = 0;
-                cylinder.color.g = 0;
-                cylinder.color.b = 1;
+                cylinder.color.r = 1;
+                cylinder.color.g = 1;
+                cylinder.color.b = 0;
                 break;
             }
 
             cylinder.action = visualization_msgs::Marker::ADD;
 
             cylinder.pose = uavs_poses_[uav_id].pose;
-
-            cylinder.scale.x = 2;
-            cylinder.scale.y = 2;
-            cylinder.scale.z = 5;
+            double diameter=2*(uav_safety_radius_ + bracking_distance_+positioning_error_+ gamma_offset_);
+            cylinder.scale.x = diameter;   //Diameter
+            cylinder.scale.y = diameter;   // if x e y are different you get an elipse instead o a circle
+            cylinder.scale.z = dz_min_;   // height
             cylinder.mesh_use_embedded_materials = true;
 
             cylinder_markers.markers.push_back(cylinder);
 
-            //publish arrow for avoidance direction
+            //publish arrow for goal direction
 
-            visualization_msgs::Marker arrow;
-            arrow.header.frame_id = "/map";
-            arrow.header.stamp = ros::Time();
-            arrow.id = uav_id;
-            arrow.ns = "uavs";
-            arrow.type = visualization_msgs::Marker::CYLINDER;
-            arrow.color.a = 1;   
-            switch(uav_id)
+            if(goal_direction_.find(uav_id) != goal_direction_.end())
             {
-                case 1:
-                // orange
-                arrow.color.r = 1.0;
-                arrow.color.g = 0.647;
-                arrow.color.b = 0.0;
-                break;
-                case 2:
-                // ingigo
-                arrow.color.r = 0.294;
-                arrow.color.g = 0.0;
-                arrow.color.b = 0.510; 
-                break;
-                case 3:
-                // zinc yellow
-                arrow.color.r = 0.945;
-                arrow.color.g = 0.812;
-                arrow.color.b = 0.267;
-                break;
-            }
+                
+            
+            
 
-            arrow.action = visualization_msgs::Marker::ADD;
+                visualization_msgs::Marker arrow_goal;
+                arrow_goal.header.frame_id = "/map";
+                arrow_goal.header.stamp = ros::Time();
+                arrow_goal.id = uav_id;
+                arrow_goal.ns = "uavs";
+                arrow_goal.type = visualization_msgs::Marker::ARROW;
+                arrow_goal.color.a = 1;   
+                switch(uav_id)
+                {
+                    case 1:
+                    // orange
+                    arrow_goal.color.r = 0.0;
+                    arrow_goal.color.g = 0.0;
+                    arrow_goal.color.b = 0.5;
+                    break;
+                    case 2:
+                    // ingigo
+                    arrow_goal.color.r = 0;
+                    arrow_goal.color.g = 0.0;
+                    arrow_goal.color.b = 0.5; 
+                    break;
+                    case 3:
+                    // zinc yellow
+                    arrow_goal.color.r = 0.0;
+                    arrow_goal.color.g = 0.0;
+                    arrow_goal.color.b = 0.5;
+                    break;
+                }
 
-            arrow.pose = uavs_poses_[uav_id].pose;
-
-            arrow.scale.x = uav_direction_[uav_id].x;
-            arrow.scale.y = uav_direction_[uav_id].y;
-            arrow.scale.z = 0;
-            arrow.mesh_use_embedded_materials = true;
-
-            arrow_markers.markers.push_back(arrow);
-
+                arrow_goal.action = visualization_msgs::Marker::ADD;
+                arrow_goal.points.resize(2);
+                arrow_goal.points[0].x=uavs_poses_[uav_id].pose.position.x;
+                arrow_goal.points[0].y=uavs_poses_[uav_id].pose.position.y;
+                arrow_goal.points[0].z=uavs_poses_[uav_id].pose.position.z;
+                arrow_goal.points[1].x=uavs_poses_[uav_id].pose.position.x + goal_direction_[uav_id].x*2;
+                arrow_goal.points[1].y=uavs_poses_[uav_id].pose.position.y + goal_direction_[uav_id].y*2;
+                arrow_goal.points[1].z= uavs_poses_[uav_id].pose.position.z + goal_direction_[uav_id].z*2; 
 
             
+                arrow_goal.scale.x=0.1;
+                arrow_goal.scale.y = 0.2;
+            
+               // arrow_goal.mesh_use_embedded_materials = true;
+
+                arrow_goal_markers.markers.push_back(arrow_goal);
+
+            }
+                  
+        
+            //publish arrow for avoidance direction
+
+            if(uav_direction_.find(uav_id) != uav_direction_.end())
+            {
+                
+                visualization_msgs::Marker arrow;
+                arrow.header.frame_id = "/map";
+                arrow.header.stamp = ros::Time();
+                arrow.id = uav_id;
+                arrow.ns = "uavs";
+                arrow.type = visualization_msgs::Marker::ARROW;
+                arrow.color.a = 1;   
+                switch(uav_id)
+                {
+                    case 1:
+                    // orange
+                    arrow.color.r = 0.5;
+                    arrow.color.g = 0;
+                    arrow.color.b = 0.0;
+                    break;
+                    case 2:
+                    // ingigo
+                    arrow.color.r = 0.5;
+                    arrow.color.g = 0.0;
+                    arrow.color.b = 0.0; 
+                    break;
+                    case 3:
+                    // zinc yellow
+                    arrow.color.r = 0.5;
+                    arrow.color.g = 0.0;
+                    arrow.color.b = 0.0;
+                    break;
+                }
+
+                arrow.action = visualization_msgs::Marker::ADD;
+
+                
+               
+                arrow.points.resize(2);
+                arrow.points[0].x=uavs_poses_[uav_id].pose.position.x;
+                arrow.points[0].y=uavs_poses_[uav_id].pose.position.y;
+                arrow.points[0].z=uavs_poses_[uav_id].pose.position.z;
+                arrow.points[1].x=uavs_poses_[uav_id].pose.position.x + uav_direction_[uav_id].x*2;
+                arrow.points[1].y=uavs_poses_[uav_id].pose.position.y + uav_direction_[uav_id].y*2;
+                arrow.points[1].z= uavs_poses_[uav_id].pose.position.z; 
+               
+                arrow.scale.x=0.1;
+                arrow.scale.y = 0.2;
+              
+                //arrow.mesh_use_embedded_materials = true;
+
+                arrow_markers.markers.push_back(arrow);
+
+            }
 
 
         }
@@ -403,7 +595,11 @@ void Visualizer::publishMarkers()
 
     arrow_pub_.publish(arrow_markers);
 
-    
+    goal_arrow_pub_.publish(arrow_goal_markers);
+
+    uav_cylinder_pub_.publish(uav_cylinder_markers);
+
+        
 
 }
 
@@ -424,7 +620,7 @@ int main(int argc, char** argv)
 
         vis.publishMarkers();
         
-        ros::Duration(1).sleep();
+        ros::Duration(0.1).sleep();
     }
     
 }
