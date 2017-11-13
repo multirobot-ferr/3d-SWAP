@@ -464,7 +464,7 @@ void Visualizer::publishMarkers()
 
             cylinder.action = visualization_msgs::Marker::ADD;
 
-            cylinder.pose = uavs_poses_[uav_id].pose;
+            cylinder.pose.position = uavs_poses_[uav_id].pose.position;
             double diameter=2*(uav_safety_radius_ + bracking_distance_+positioning_error_+ gamma_offset_);
             cylinder.scale.x = diameter;   //Diameter
             cylinder.scale.y = diameter;   // if x e y are different you get an elipse instead o a circle
