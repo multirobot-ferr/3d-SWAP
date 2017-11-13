@@ -214,7 +214,8 @@ void StateMachine::Land()
         ROS_INFO("Trying to land");
         
         uav_abstraction_layer::Land srv;
-        srv.request.blocking = true;
+        srv.request.blocking = false;
+
         if (land_srv_.call(srv))
         {
             ROS_INFO("Landing");
@@ -224,6 +225,7 @@ void StateMachine::Land()
         {
             ROS_ERROR("Failed to call service landing");
         }
+        ros::Duration(3).sleep();
     }
 }
 
@@ -251,8 +253,9 @@ bool StateMachine::StartServiceCb(std_srvs::SetBool::Request& allowed2move, std_
 
     if (keep_moving_)
     {
-        ROS_INFO("Starting the experiment!");
-        ok.message = "Starting the experiment!";
+        std::string msg = "Starting the experiment with uav" + std::to_string(uav_id_) + "!";
+        ROS_INFO("%s", msg.c_str());
+        ok.message = msg;
     }
 
     ok.success = true;
@@ -502,6 +505,7 @@ void StateMachine::UpdateWayPoints()
             ++wp_idx_;
             if (wp_idx_ >= way_points_.n_rows) {
                 experiment_done = true;
+                wp_idx_ = way_points_.n_rows;
                 Land();
             }
             else
