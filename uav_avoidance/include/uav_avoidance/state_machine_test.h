@@ -135,8 +135,8 @@ class StateMachine
         grvc::utils::PidController* pid_yaw_;
 
 
-
         // System variables
+        bool experiment_done = false;           
         bool initialization_error = false;      //!< Tracks possible initialization errors
         int uav_id_ = -1;                       //!< Identification number of the current uav
         bool yaw_on_;                   //!< movement depend on laser 3D is activated

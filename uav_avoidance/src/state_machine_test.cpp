@@ -209,18 +209,21 @@ void StateMachine::Land()
 {
     //TODO For some reason this thing does not work.
     // Landing the quadcopter (if possible)
-    ROS_INFO("Trying to land");
-    
-    uav_abstraction_layer::Land srv;
-    srv.request.blocking = true;
-    if (land_srv_.call(srv))
+    for (auto i = 5; i > 0; --i)
     {
-        ROS_INFO("Landing");
-        ros::Duration(10).sleep();
-    }
-    else
-    {
-        ROS_ERROR("Failed to call service landing");
+        ROS_INFO("Trying to land");
+        
+        uav_abstraction_layer::Land srv;
+        srv.request.blocking = true;
+        if (land_srv_.call(srv))
+        {
+            ROS_INFO("Landing");
+            ros::Duration(10).sleep();
+        }
+        else
+        {
+            ROS_ERROR("Failed to call service landing");
+        }
     }
 }
 
@@ -485,7 +488,7 @@ void StateMachine::UpdateWayPoints()
             msg_shown = true;
         }
 
-        if (keep_moving_)
+        if (keep_moving_ && !experiment_done)
         {
             msg_shown = false;
             for (auto i = 0; i< 2; ++i)
@@ -498,9 +501,11 @@ void StateMachine::UpdateWayPoints()
 
             ++wp_idx_;
             if (wp_idx_ >= way_points_.n_rows) {
-                wp_idx_ = 0;
+                experiment_done = true;
+                Land();
             }
-            ROS_INFO("UAV_%d: New goal set: %.2f,%.2f", uav_id_, way_points_(wp_idx_, 0), way_points_(wp_idx_, 1));
+            else
+                ROS_INFO("UAV_%d: New goal set: %.2f,%.2f", uav_id_, way_points_(wp_idx_, 0), way_points_(wp_idx_, 1));
         }
     }
     else
