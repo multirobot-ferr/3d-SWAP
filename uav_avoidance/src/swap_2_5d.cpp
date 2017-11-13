@@ -401,7 +401,8 @@ void Swap_2_5d::WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPt
                                 wished_movement_direction_uav->x);
     // The goal is far away to avoid swap to think that is close .
     // If that happens, swap will command to the system to brake
-    SetGoal( 100.00, uav_wished_yaw_map_);
+    double distance=sqrt(powf(wished_movement_direction_uav->x, 2.0) + powf(wished_movement_direction_uav->y, 2.0));
+    SetGoal( distance, uav_wished_yaw_map_);
 }
 
 /**

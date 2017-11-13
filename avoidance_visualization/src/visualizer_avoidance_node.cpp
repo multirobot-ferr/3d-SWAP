@@ -424,8 +424,8 @@ void Visualizer::publishMarkers()
             uav_cylinder.action = visualization_msgs::Marker::ADD;
 
             uav_cylinder.pose = uavs_poses_[uav_id].pose;
-            uav_cylinder.scale.x = 2*uav_safety_radius_;   //Diameter
-            uav_cylinder.scale.y = 2*uav_safety_radius_;   // if x e y are different you get an elipse instead o a circle
+            uav_cylinder.scale.x = 2*(uav_safety_radius_ + positioning_error_);   //Diameter
+            uav_cylinder.scale.y = 2*(uav_safety_radius_ + positioning_error_);   // if x e y are different you get an elipse instead o a circle
             uav_cylinder.scale.z = dz_min_;   // height
             uav_cylinder.mesh_use_embedded_materials = true;
 
@@ -477,9 +477,6 @@ void Visualizer::publishMarkers()
 
             if(goal_direction_.find(uav_id) != goal_direction_.end())
             {
-                
-            
-            
 
                 visualization_msgs::Marker arrow_goal;
                 arrow_goal.header.frame_id = "/map";
@@ -510,14 +507,15 @@ void Visualizer::publishMarkers()
                     break;
                 }
 
+                double module= sqrt(powf(goal_direction_[uav_id].x, 2.0) + powf(goal_direction_[uav_id].y, 2.0) + powf(goal_direction_[uav_id].z, 2.0));
                 arrow_goal.action = visualization_msgs::Marker::ADD;
                 arrow_goal.points.resize(2);
                 arrow_goal.points[0].x=uavs_poses_[uav_id].pose.position.x;
                 arrow_goal.points[0].y=uavs_poses_[uav_id].pose.position.y;
                 arrow_goal.points[0].z=uavs_poses_[uav_id].pose.position.z;
-                arrow_goal.points[1].x=uavs_poses_[uav_id].pose.position.x + goal_direction_[uav_id].x*2;
-                arrow_goal.points[1].y=uavs_poses_[uav_id].pose.position.y + goal_direction_[uav_id].y*2;
-                arrow_goal.points[1].z= uavs_poses_[uav_id].pose.position.z + goal_direction_[uav_id].z*2; 
+                arrow_goal.points[1].x=uavs_poses_[uav_id].pose.position.x + (goal_direction_[uav_id].x*2/module);
+                arrow_goal.points[1].y=uavs_poses_[uav_id].pose.position.y + (goal_direction_[uav_id].y*2/module);
+                arrow_goal.points[1].z= uavs_poses_[uav_id].pose.position.z + (goal_direction_[uav_id].z*2/module); 
 
             
                 arrow_goal.scale.x=0.1;

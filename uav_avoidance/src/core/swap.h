@@ -209,6 +209,8 @@ namespace avoid
                                 CLOCKWISE = -1,
                                 NOTDEFINED = 0};
 
+        
+
         private:
             // Variables to track if the system is ready
             bool is_ready_ = false;                 //!< Tracks if all values of Swap are initialized.
@@ -238,6 +240,7 @@ namespace avoid
 
             // Other variables
 
+            double previous_goaldist_=0.0;
 	   
             /**
              * The robot will try to stop if his orientation is too far away from the desired one

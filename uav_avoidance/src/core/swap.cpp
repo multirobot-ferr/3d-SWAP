@@ -379,17 +379,26 @@ namespace avoid
      {
          double left_angle = conflict_left_id_phi;
          double right_angle= conflict_right_id_phi;
-         double orient= fabs( AngleDiff(goal_angle, left_angle));
+         
+         /*if ( fabs( AngleDiff(0.0, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
+              fabs( AngleDiff(0.0, right_angle)) < M_PI/3   ) */
 
          if ( fabs( AngleDiff(goal_angle, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
               fabs( AngleDiff(goal_angle, right_angle)) < M_PI/3   )
          {   // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
 
+            previous_goaldist_=goal_dist_;
              return false;
 
          }
 
-         if (fabs(goal_angle) <= goal_lateral_vision_)
+        // if (fabs(goal_angle) <= goal_lateral_vision_)
+
+        /* la idea para que el obstáculo funcione en situaciones de mínimos locales es que cuando se esté alejando del obstáculo
+        no salga del movimiento de evitación, o sea, cuando la distancia al ángulo sea mayor que la anterior, sigue evitando el obstáculo hasta que
+        se acerque */
+
+        if( previous_goaldist_> goal_dist_)
          {
             // The goal is visible from the robot's perspective
             if (fabs( AngleDiff(goal_angle, left_angle) ) < M_PI_2 ||
@@ -397,6 +406,8 @@ namespace avoid
             {
 
                 // The goal belongs to the not navigable area
+                previous_goaldist_=goal_dist_;
+
                 return false;
             }
          }
@@ -404,9 +415,13 @@ namespace avoid
          {
 
              // The goal is not visible from the robot's perspective
+             previous_goaldist_=goal_dist_;
 
              return false;
          }
+        
+        previous_goaldist_=goal_dist_;
+
          return true;
      }
 
