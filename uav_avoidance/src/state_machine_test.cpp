@@ -163,13 +163,13 @@ StateMachine::StateMachine() {
     pnh_->param<double>("z_distance", dist_between_uav_z_, 2.0);
     pnh_->param<double>("d_goal", d_goal_, 0.5);
 
+    wait_for_start_ = nh_.advertiseService("Start", &StateMachine::StartServiceCb, this);
+
     // ###########  Communication with SWAP  ########## //
     confl_warning_sub_  = nh_.subscribe("collision_warning", 1, &StateMachine::WarningCallback, this);
     wished_mov_dir_pub_ = nh_.advertise<geometry_msgs::Vector3>("wished_movement_direction",1 , true);  // the final true is required
     avoid_mov_dir_sub_  = nh_.subscribe("avoid_movement_direction", 1, &StateMachine::AvoidMovementCallback, this);
     // ###########  #######################  ########### //
-
-
 
     TakeOff();
 
@@ -240,6 +240,20 @@ void StateMachine::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_
     uav_y_   = uav_pose->pose.position.y;
     uav_z_   = uav_pose->pose.position.z;
     uav_yaw_ = tf2::getYaw(q3);
+}
+
+bool StateMachine::StartServiceCb(std_srvs::SetBool::Request& allowed2move, std_srvs::SetBool::Response& ok)
+{
+    keep_moving_ = allowed2move.data;
+
+    if (keep_moving_)
+    {
+        ROS_INFO("Starting the experiment!");
+        ok.message = "Starting the experiment!";
+    }
+
+    ok.success = true;
+    return true;
 }
 
 // ###########  Communication with SWAP  ########### //
@@ -452,6 +466,8 @@ void StateMachine::TakeOff()
  */
 void StateMachine::UpdateWayPoints()
 {
+    static bool msg_shown = false;
+
     // Getting fresh information
     ros::spinOnce();
 
@@ -463,20 +479,29 @@ void StateMachine::UpdateWayPoints()
 
     if (dist < d_goal_) {
         // Stopping the uav a little bit there
-        ROS_INFO("UAV_%d: Goal achieved (%.2fm to the goal)", uav_id_, dist);
-        for (auto i = 0; i< 2; ++i)
+        if (!msg_shown)
         {
-            //PublishGRVCPosErr(0.0, 0.0, 0.0);
-            PublishGRVCgoal(way_points_(wp_idx_, 0), way_points_(wp_idx_, 1),
-                            z_ref_, way_points_(wp_idx_, 2));   //Blocking
-            ros::Duration(1).sleep();
+            ROS_INFO("UAV_%d: Goal achieved (%.2fm to the goal)", uav_id_, dist);
+            msg_shown = true;
         }
 
-        ++wp_idx_;
-        if (wp_idx_ >= way_points_.n_rows) {
-            wp_idx_ = 0;
+        if (keep_moving_)
+        {
+            msg_shown = false;
+            for (auto i = 0; i< 2; ++i)
+            {
+                //PublishGRVCPosErr(0.0, 0.0, 0.0);
+                PublishGRVCgoal(way_points_(wp_idx_, 0), way_points_(wp_idx_, 1),
+                                z_ref_, way_points_(wp_idx_, 2));   //Blocking
+                ros::Duration(1).sleep();
+            }
+
+            ++wp_idx_;
+            if (wp_idx_ >= way_points_.n_rows) {
+                wp_idx_ = 0;
+            }
+            ROS_INFO("UAV_%d: New goal set: %.2f,%.2f", uav_id_, way_points_(wp_idx_, 0), way_points_(wp_idx_, 1));
         }
-        ROS_INFO("UAV_%d: New goal set: %.2f,%.2f", uav_id_, way_points_(wp_idx_, 0), way_points_(wp_idx_, 1));
     }
     else
     {

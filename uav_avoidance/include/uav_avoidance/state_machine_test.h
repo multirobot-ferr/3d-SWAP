@@ -53,6 +53,7 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <std_srvs/SetBool.h>
 #include <pid_controller.h>
 
 // Uncomment this define if all the robots starts in (0,0)
@@ -111,6 +112,10 @@ class StateMachine
         // Subscribers
         ros::Subscriber  pos_uav_sub_;          //!< Receives the position of the UAV
 
+        // Services
+        ros::ServiceServer wait_for_start_;           //!< Service that makes the UAV wait on the Goal point 1
+        bool keep_moving_ = false;              //!< Allows the UAV to move on from the Goal point 1                     
+
     // ###########  Communication with SWAP  ########### //
         ros::Subscriber  confl_warning_sub_;    //!< Receives warnings from SWAP
         bool confl_warning_ = false;            //!< Flag to know if there is a conflict to avoid
@@ -146,7 +151,6 @@ class StateMachine
         double v_ref_=1.5;
 
 
-
         //Preparing to command the UAV
         ros::ServiceClient takeOff_srv_;
         ros::ServiceClient way_point_srv_;
@@ -167,10 +171,6 @@ class StateMachine
 
 
 
-
-
-
-
         /* Callbacks for ROS */
         /**
          * @brief Callback for own pose estimation
@@ -179,6 +179,13 @@ class StateMachine
          * @param uav_id Identifier for UAV
          */
         void PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose);
+
+        /**
+         * @brief Allows the UAV to move from the position 1 to the next one
+         * 
+         * @param 
+         */
+        bool StartServiceCb(std_srvs::SetBool::Request& allowed2move, std_srvs::SetBool::Response& ok);
 
     // ###########  Communication with SWAP  ########### //
         /**
