@@ -474,7 +474,7 @@ void Visualizer::publishMarkers()
 
             uav_cylinder.action = visualization_msgs::Marker::ADD;
 
-            uav_cylinder.pose = uavs_poses_[uav_id].pose;
+            uav_cylinder.pose.position = uavs_poses_[uav_id].pose.position;
             uav_cylinder.scale.x = 2*(uav_safety_radius_ + positioning_error_);   //Diameter
             uav_cylinder.scale.y = 2*(uav_safety_radius_ + positioning_error_);   // if x e y are different you get an elipse instead o a circle
             uav_cylinder.scale.z = dz_min_;   // height
@@ -495,21 +495,45 @@ void Visualizer::publishMarkers()
             switch(uav_id)
             {
                 case 1:
-                
-                cylinder.color.r = 1;
-                cylinder.color.g = 0;
-                cylinder.color.b = 0;
+                    if(uav_direction_received_[uav_id]==false){
+                    cylinder.color.r = 0;
+                    cylinder.color.g = 1;
+                    cylinder.color.b = 0;
+                    }
+                    else
+                    {
+                    cylinder.color.r = 1;
+                    cylinder.color.g = 1;
+                    cylinder.color.b = 0;
+                    }
+
                 break;
                 case 2:
 
-                cylinder.color.r = 0;
-                cylinder.color.g = 1;
-                cylinder.color.b = 0; 
+                if(uav_direction_received_[uav_id]==false){
+                    cylinder.color.r = 0;
+                    cylinder.color.g = 1;
+                    cylinder.color.b = 0;
+                    }
+                    else
+                    {
+                    cylinder.color.r = 1;
+                    cylinder.color.g = 1;
+                    cylinder.color.b = 0;
+                    }
                 break;
                 case 3:
-                cylinder.color.r = 1;
-                cylinder.color.g = 1;
-                cylinder.color.b = 0;
+                if(uav_direction_received_[uav_id]==false){
+                    cylinder.color.r = 0;
+                    cylinder.color.g = 1;
+                    cylinder.color.b = 0;
+                    }
+                    else
+                    {
+                    cylinder.color.r = 1;
+                    cylinder.color.g = 1;
+                    cylinder.color.b = 0;
+                    }
                 break;
             }
 
