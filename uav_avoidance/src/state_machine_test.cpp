@@ -52,7 +52,6 @@
 #include <uav_abstraction_layer/GoToWaypoint.h>
 #include <uav_abstraction_layer/Land.h>
 
-
 /**
  * Main code of the state machine
  */
@@ -338,13 +337,14 @@ void StateMachine::PublishPosErr()
     {
         // if mov_cam is activated yaw move first
         if(yaw_on_){
-
+            ROS_ERROR("yaw_on active, system not available");
             double dt= 0.01;
             double ori_xy =  atan2(ye, xe);
             double ori_yz =  atan2(ze, ye);
             double yaw_desired=atan2((way_points_(wp_idx_, 1)), (way_points_(wp_idx_, 0)));
             double yawe=ScaleAngle(yaw_desired)-ScaleAngle(uav_yaw_);
             double signal=pid_yaw_->control_signal(yawe, dt);
+            
             PublishGRVCCmdVel(v_ref_*cos(ori_xy), v_ref_*sin(ori_xy), v_ref_*sin(ori_yz), signal);
         }
         else
@@ -513,7 +513,7 @@ void StateMachine::UpdateWayPoints()
             {
                 //PublishGRVCPosErr(0.0, 0.0, 0.0);
                 PublishGRVCgoal(way_points_(wp_idx_, 0), way_points_(wp_idx_, 1),
-                                z_ref_, way_points_(wp_idx_, 2));   //Blocking
+                                way_points_(wp_idx_, 2), 0.0);   //Blocking
                 ros::Duration(1).sleep();
             }
 

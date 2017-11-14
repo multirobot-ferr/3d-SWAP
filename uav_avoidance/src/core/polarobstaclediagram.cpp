@@ -171,7 +171,6 @@ namespace avoid
             why_not += "If your laser is not noisy or you have no laser, you can set it to zero and save computational power.\n";
             return false;
         }
-
         return true;
     }
 
@@ -291,7 +290,8 @@ namespace avoid
         unsigned obstacle_id_phi = Angle2Sector( atan2(pos_object(1), pos_object(0)));
 
         //checking z distance
-        int z_action = CheckZDistance( z_robot, z_object);
+        int z_action=CheckZDistance(z_robot,z_object);
+
 
         if (far_away)
         {
@@ -356,8 +356,8 @@ namespace avoid
                             dist = std::min( sqrt(pow(x_hit, 2.0) + pow(y_hit, 2.0)) , dist);
                         }
                         // if height is dangerous
-                        if(z_action != Z_FREE)
-                        {
+                        if(z_action!=Z_FREE){
+
                             SetNewLocalMeasurement( dist, angle_[id_phi], dynamic, z_action);
                         }
                     }
@@ -377,9 +377,8 @@ namespace avoid
             // that introduces some information on the system
             double dist = arma::norm(pos_object, 1) - r_object;
             // information is introduced if height is dangerous
-            if(z_action != Z_FREE)
-            {
-                SetNewLocalMeasurement( dist, angle_[obstacle_id_phi], dynamic, z_action);
+            if(z_action!=Z_FREE){
+            SetNewLocalMeasurement( dist, angle_[obstacle_id_phi], dynamic, z_action);
             }
         }
     }
@@ -939,17 +938,17 @@ namespace avoid
         double difference=fabs(z_robot-z_object);
         double range_difference=dz_min_+dz_range_;
 
-        if(dz_min_ > difference)
-        {
+        if(dz_min_ > difference){
           return Z_SWAP;
         }
-        if(range_difference > difference)
-        {
+        if(range_difference > difference){
+
           return Z_RANGE;
         }
-        if(difference > range_difference)
+        if(difference> range_difference)
         {
           return Z_FREE;
+
         }
     }
 

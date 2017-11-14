@@ -53,7 +53,7 @@ Visualization Manager:
       Marker Topic: /avoidance_markers/arrow
       Name: SWAPdirection
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -61,7 +61,7 @@ Visualization Manager:
       Marker Topic: /avoidance_markers/arrow_goal
       Name: Direction2Goal
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -87,6 +87,27 @@ Visualization Manager:
       Namespaces:
         uavs: true
       Queue Size: 100
+      Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 1
+      Name: OrientationUAV1
+      Radius: 0.100000001
+      Reference Frame: uav_1
+      Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 1
+      Name: OrientationUAV2
+      Radius: 0.100000001
+      Reference Frame: uav_2
+      Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 1
+      Name: OrientationUAV3
+      Radius: 0.100000001
+      Reference Frame: uav_3
       Value: true
   Enabled: true
   Global Options:
