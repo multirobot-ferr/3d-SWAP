@@ -45,7 +45,6 @@
 	<!-- Configurable parameters -->
 	<arg name="robot_number" default="1"/>
     <arg name="file_path"    default="$(find uav_avoidance)/logs/"/>
-    <arg name="experim"      default="simulator"/>      <!-- simulator/real-->
 	
 	<group ns="uav_$(arg robot_number)">
 
@@ -88,7 +87,7 @@
                 <param name="swap/gamma_offset" value="0.0"/>
 		
 		<!--if distance between uavs is larger than dz_min dont swap -->
-		<param name="swap/dz_min" value="100"/>
+		<param name="swap/dz_min" value="10"/>
 
 		<!--if distance between uavs is larger than dz_min dont swap -->
 		<param name="swap/dz_range" value="1"/>
@@ -113,7 +112,7 @@
                 
             <!-- Specific configuration parameters [do not change them if not necessary]-->
             <param name="uav_id" value="$(arg robot_number)"/>
-            <rosparam param="uav_ids">[1, 2, 3]</rosparam>
+            <rosparam param="uav_ids">[1, 2, 3, 4]</rosparam>
             <param name="swap/granularity" value="360"/>    <!-- One measurement set per degree -->
             <param name="swap/num_measurements" value="3"/>    <!-- 3 measurements per measurement set (fights against noise) -->
             <!-- If two values commes on the same run, takes only the closer to the robot -->
