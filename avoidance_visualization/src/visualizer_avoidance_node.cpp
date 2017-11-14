@@ -47,7 +47,10 @@ protected:
     void GoalDirectionCallback3(const geometry_msgs::Vector3::ConstPtr& goal_direction);
     
     
-    
+    void WarningCallback1(const std_msgs::Bool::ConstPtr& collision_warning);
+    void WarningCallback2(const std_msgs::Bool::ConstPtr& collision_warning);
+    void WarningCallback3(const std_msgs::Bool::ConstPtr& collision_warning);
+
     
 
     ///Node handlers
@@ -59,7 +62,7 @@ protected:
     vector<ros::Subscriber *> uav_subs_;
     vector<ros::Subscriber *> direction_subs_;
     vector<ros::Subscriber *> goal_direction_subs_;
-    
+    vector<ros::Subscriber *> conflict_subs_;
     
 
     /// Publishers
@@ -73,7 +76,9 @@ protected:
     /// Last data received
     map<int, geometry_msgs::PoseStamped> uavs_poses_;
     map<int, geometry_msgs::Vector3> uav_direction_;
+    map<int, bool> uav_direction_received_;
     map<int, geometry_msgs::Vector3> goal_direction_;
+    map<int, std_msgs::Bool> conflict_sub_;
 
     /// Number of UAVs
     int n_uavs_;
@@ -129,6 +134,9 @@ Visualizer::Visualizer()
 
 
     // Subscriptions/publications
+
+    
+
     for(int i=0; i<n_uavs_; i++)
     {
         string uav_topic_name = "uav_" + to_string(i+1) + "/ual/pose";
@@ -136,6 +144,11 @@ Visualizer::Visualizer()
         string goal_direction_topic_name= "uav_" + to_string(i+1) + "/wished_movement_direction";
         
         if(i==0){
+
+            ros::Subscriber* conflict_warning_sub= new ros::Subscriber();
+            *conflict_warning_sub = nh_->subscribe<std_msgs::Bool>("/uav_1/collision_warning", 1, &Visualizer::WarningCallback1, this);
+            conflict_subs_.push_back(conflict_warning_sub);
+
             ROS_INFO("subscribiendo a pos 1");
             ros::Subscriber* uav_sub= new ros::Subscriber();
             *uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, &Visualizer::uavPoseReceived1, this);
@@ -154,6 +167,12 @@ Visualizer::Visualizer()
         }
         else if(i==1)
         {
+
+            ros::Subscriber* conflict_warning_sub= new ros::Subscriber();
+            *conflict_warning_sub = nh_->subscribe<std_msgs::Bool>("uav_2/collision_warning", 1, &Visualizer::WarningCallback2, this);
+            conflict_subs_.push_back(conflict_warning_sub);
+
+
             ROS_INFO("subscribiendo a pos 2");
             ros::Subscriber* uav_sub= new ros::Subscriber();
             *uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, &Visualizer::uavPoseReceived2, this);
@@ -171,7 +190,12 @@ Visualizer::Visualizer()
         else if(i==2)
         {
             ROS_INFO("subscribiendo a pos 3");
-            
+
+            ros::Subscriber* conflict_warning_sub= new ros::Subscriber();
+            *conflict_warning_sub = nh_->subscribe<std_msgs::Bool>("/uav_3/collision_warning", 1, &Visualizer::WarningCallback3, this);
+            conflict_subs_.push_back(conflict_warning_sub);
+
+
             ros::Subscriber* uav_sub= new ros::Subscriber();
             *uav_sub = nh_->subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, &Visualizer::uavPoseReceived3, this);
             uav_subs_.push_back(uav_sub);
@@ -210,9 +234,11 @@ Visualizer::~Visualizer()
         delete uav_subs_[i];
         delete direction_subs_[i];
         delete goal_direction_subs_[i];
+        delete conflict_subs_[i];
     }
     
     uavs_poses_.clear();
+    conflict_subs_.clear();
     uav_subs_.clear();
     uav_direction_.clear();
     direction_subs_.clear();
@@ -254,6 +280,7 @@ void Visualizer::AvoidMovementCallback1(const geometry_msgs::Vector3::ConstPtr& 
     // Receives an avoidance direction (when is necessary to take one)
     int uav_id=1;
     uav_direction_[uav_id] = *avoidance_direction;
+    uav_direction_received_[uav_id] = true;
 }
 
 void Visualizer::AvoidMovementCallback2(const geometry_msgs::Vector3::ConstPtr& avoidance_direction)
@@ -261,6 +288,7 @@ void Visualizer::AvoidMovementCallback2(const geometry_msgs::Vector3::ConstPtr& 
     // Receives an avoidance direction (when is necessary to take one)
     int uav_id=2;
     uav_direction_[uav_id] = *avoidance_direction;
+    uav_direction_received_[uav_id] = true;
 }
 
 void Visualizer::AvoidMovementCallback3(const geometry_msgs::Vector3::ConstPtr& avoidance_direction)
@@ -268,6 +296,7 @@ void Visualizer::AvoidMovementCallback3(const geometry_msgs::Vector3::ConstPtr& 
     // Receives an avoidance direction (when is necessary to take one)
     int uav_id=3;
     uav_direction_[uav_id] = *avoidance_direction;
+    uav_direction_received_[uav_id] = true;
 }
 
 /** \Callback for goal direction
@@ -291,6 +320,28 @@ void Visualizer::GoalDirectionCallback3(const geometry_msgs::Vector3::ConstPtr& 
     goal_direction_[uav_id] = *goal_direction;
 }
 
+/**\Callback for conflict warning
+*/
+void Visualizer::WarningCallback1(const std_msgs::Bool::ConstPtr& collision_warning)
+{
+    int uav_id=0;
+    conflict_sub_[uav_id]= *collision_warning;
+    ROS_INFO("conflict_warning 1 received");
+}
+
+void Visualizer::WarningCallback2(const std_msgs::Bool::ConstPtr& collision_warning)
+{
+    int uav_id=1;
+    conflict_sub_[uav_id]= *collision_warning;
+    ROS_INFO("conflict_warning 2 received");
+}
+
+void Visualizer::WarningCallback3(const std_msgs::Bool::ConstPtr& collision_warning)
+{
+    int uav_id=2;
+    conflict_sub_[uav_id]= *collision_warning;
+    ROS_INFO("conflict_warning 3 received");
+}
 
 /** Publish markers
 */
@@ -530,7 +581,8 @@ void Visualizer::publishMarkers()
         
             //publish arrow for avoidance direction
 
-            if(uav_direction_.find(uav_id) != uav_direction_.end())
+            if(uav_direction_.find(uav_id) != uav_direction_.end() &&
+               uav_direction_received_[uav_id])
             {
                 
                 visualization_msgs::Marker arrow;
@@ -539,6 +591,7 @@ void Visualizer::publishMarkers()
                 arrow.id = uav_id;
                 arrow.ns = "uavs";
                 arrow.type = visualization_msgs::Marker::ARROW;
+                arrow.lifetime = ros::Duration(0.15);
                 arrow.color.a = 1;   
                 switch(uav_id)
                 {
@@ -580,6 +633,7 @@ void Visualizer::publishMarkers()
                 //arrow.mesh_use_embedded_materials = true;
 
                 arrow_markers.markers.push_back(arrow);
+                uav_direction_received_[uav_id] = false;
 
             }
 
@@ -606,10 +660,8 @@ void Visualizer::publishMarkers()
 int main(int argc, char** argv)
 {
 
-
     ros::init(argc, argv, "visualizer_avoidance_node");
         
-
     Visualizer vis; 
     
     while(ros::ok())
