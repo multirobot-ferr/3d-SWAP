@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
     StateMachine state_machine;
 
 
-    while (ros::ok())
+    while (ros::ok() && state_machine.Running())
     {
         ros::spinOnce();
 
@@ -209,7 +209,7 @@ void StateMachine::Land()
 {
     //TODO For some reason this thing does not work.
     // Landing the quadcopter (if possible)
-    for (auto i = 5; i > 0; --i)
+    for (auto i = 5; i > 0 && !landed_; --i)
     {
         ROS_INFO("Trying to land");
         
@@ -220,6 +220,7 @@ void StateMachine::Land()
         {
             ROS_INFO("Landing");
             ros::Duration(10).sleep();
+            landed_ = true;
         }
         else
         {
@@ -227,6 +228,14 @@ void StateMachine::Land()
         }
         ros::Duration(3).sleep();
     }
+}
+
+/**
+ * @brief Returns true while the system still flying
+ */
+bool StateMachine::Running()
+{
+    return (!landed_);
 }
 
 /**
@@ -491,6 +500,12 @@ void StateMachine::UpdateWayPoints()
             msg_shown = true;
         }
 
+        if (wp_idx_ == way_points_.n_rows - 1)
+        {
+            experiment_done = true;
+            Land();
+        }
+
         if (keep_moving_ && !experiment_done)
         {
             msg_shown = false;
@@ -504,9 +519,9 @@ void StateMachine::UpdateWayPoints()
 
             ++wp_idx_;
             if (wp_idx_ >= way_points_.n_rows) {
-                experiment_done = true;
-                wp_idx_ = way_points_.n_rows;
-                Land();
+                // experiment_done = true;
+                // wp_idx_ = way_points_.n_rows;
+                // Land();
             }
             else
                 ROS_INFO("UAV_%d: New goal set: %.2f,%.2f", uav_id_, way_points_(wp_idx_, 0), way_points_(wp_idx_, 1));

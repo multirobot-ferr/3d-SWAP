@@ -1,0 +1,7 @@
+<!--		
+-->
+<launch>
+	<!-- Representation node -->
+    <node name="visualization_system" pkg="uav_avoidance" type="delayed.sh"
+		args="3 roslaunch avoidance_visualization avoidance_visualization.launch" output="screen"/>
+</launch>

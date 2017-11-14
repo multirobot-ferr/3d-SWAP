@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-
-    <!-- Launch UAL server for uav id=1 -->
-    <node pkg="uav_abstraction_layer" type="server" name="server_3" output="screen" args="-uav_id=3 -pose_frame_id=map -ns_prefix=$(arg ns_prefix)"/>
-
-    
-</launch>

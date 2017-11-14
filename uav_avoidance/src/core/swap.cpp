@@ -284,7 +284,7 @@ namespace avoid
 
 
              if(conflict_range==true){
-
+                std::cout << "en Z_BLOCKED" << std::endl;
                  statusOri_= Z_BLOCKED;
              }
              else{
@@ -354,14 +354,15 @@ namespace avoid
 
          for (int id_phi = 0; id_phi < conflictive_angles_.size(); ++id_phi)
          {
-             if(conflictive_heights_[id_phi]!=Z_RANGE){
-             int id_phi_minus = CircularIndex(id_phi -1, conflictive_angles_.size());
-             if ( AngleDiff(conflictive_angles_[id_phi], conflictive_angles_[id_phi_minus]) < 0)
+             if(conflictive_heights_[id_phi] != Z_RANGE)
              {
-                 conflict_left_phi   = conflictive_angles_[id_phi_minus];
-                 conflict_right_phi  = conflictive_angles_[id_phi];
-                 return true;
-             }
+                int id_phi_minus = CircularIndex(id_phi -1, conflictive_angles_.size());
+                if ( AngleDiff(conflictive_angles_[id_phi], conflictive_angles_[id_phi_minus]) < 0)
+                {
+                    conflict_left_phi   = conflictive_angles_[id_phi_minus];
+                    conflict_right_phi  = conflictive_angles_[id_phi];
+                    return true;
+                }
              }
          }
 
@@ -380,31 +381,31 @@ namespace avoid
          double left_angle = conflict_left_id_phi;
          double right_angle= conflict_right_id_phi;
          
-         /*if ( fabs( AngleDiff(0.0, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
-              fabs( AngleDiff(0.0, right_angle)) < M_PI/3   ) */
+         //if ( fabs( AngleDiff(0.0, left_angle) ) < M_PI_2  ||         // PI/3 is working better than PI/2
+         //     fabs( AngleDiff(0.0, right_angle)) < M_PI_2   ) 
 
-         if ( fabs( AngleDiff(goal_angle, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
-              fabs( AngleDiff(goal_angle, right_angle)) < M_PI/3   )
+         if ( fabs( AngleDiff(goal_angle, left_angle) ) < M_PI_2  ||         // PI/3 is working better than PI/2
+              fabs( AngleDiff(goal_angle, right_angle)) < M_PI_2   )
          {   // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
-
+            std::cout << "facing not navigable area" <<std::endl;
             previous_goaldist_=goal_dist_;
              return false;
 
          }
 
-        // if (fabs(goal_angle) <= goal_lateral_vision_)
+         if (fabs(goal_angle) <= goal_lateral_vision_)
 
         /* la idea para que el obstáculo funcione en situaciones de mínimos locales es que cuando se esté alejando del obstáculo
         no salga del movimiento de evitación, o sea, cuando la distancia al ángulo sea mayor que la anterior, sigue evitando el obstáculo hasta que
         se acerque */
 
-        if( previous_goaldist_> goal_dist_)
+        //if( previous_goaldist_> goal_dist_)
          {
             // The goal is visible from the robot's perspective
             if (fabs( AngleDiff(goal_angle, left_angle) ) < M_PI_2 ||
                 fabs( AngleDiff(goal_angle, right_angle)) < M_PI_2)
             {
-
+                std::cout << "goal visible but dangerous" <<std::endl;
                 // The goal belongs to the not navigable area
                 previous_goaldist_=goal_dist_;
 
@@ -413,7 +414,7 @@ namespace avoid
          }
          else
          {
-
+            std::cout << "goal not visible" <<std::endl;
              // The goal is not visible from the robot's perspective
              previous_goaldist_=goal_dist_;
 
@@ -422,7 +423,7 @@ namespace avoid
         
         previous_goaldist_=goal_dist_;
 
-         return true;
+        return true;
      }
 
 

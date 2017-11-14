@@ -496,6 +496,9 @@ void Swap_2_5d::Log2MatlabInit( const std::string file_path)
     std::string log_var = file_path + "uav" + std::to_string(uav_id_) + "vars.txt";
     log2mat_.open(log_var.c_str(), std::ofstream::binary);
 
+    ROS_INFO("SwapROS: Saving a log file in %s", log_var.c_str());
+    ROS_WARN("SwapROS: Saving a log file can compromise the performance of the system");
+
     values2log_.clear();
 
     values2log_.push_back(uav_safety_radius_);

@@ -151,7 +151,7 @@ class Swap_2_5d:  public avoid::Swap
         std::vector<int> uav_ids_;                      //!< IDs of UAV involved
         double uav_vector_speed_;                       //!< Modulus of the vector sent to the uav for avoidance
         double uav_safety_radius_ = -1.0;               //!< Safety radius of each uav
-	double dz_min_;	    		   		 //!< max z-distance to swap. It is a parameter
+	    double dz_min_;	    		   		            //!< max z-distance to swap. It is a parameter
         double dz_range_;
         pcl::PointCloud<pcl::PointXYZ> cloud_xyz_;
 

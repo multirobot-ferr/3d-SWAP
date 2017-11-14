@@ -102,6 +102,11 @@ class StateMachine
          */
         void Land();
 
+        /**
+         * @brief Returns true while the system still flying
+         */
+        bool Running();
+
 
     private:
 
@@ -114,7 +119,8 @@ class StateMachine
 
         // Services
         ros::ServiceServer wait_for_start_;           //!< Service that makes the UAV wait on the Goal point 1
-        bool keep_moving_ = false;              //!< Allows the UAV to move on from the Goal point 1                     
+        bool keep_moving_ = false;              //!< Allows the UAV to move on from the Goal point 1
+        bool landed_ = false;                     
 
     // ###########  Communication with SWAP  ########### //
         ros::Subscriber  confl_warning_sub_;    //!< Receives warnings from SWAP
