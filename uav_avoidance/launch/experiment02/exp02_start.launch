@@ -12,13 +12,13 @@ Launches the swap node in robot 1
 
     <!-- Prepare the bag -->
     <include file="$(find uav_avoidance)/launch/common/recordbag.launch">
-            <arg name="topics2salve" default="  /uav_1/ual/pose 
+            <arg name="topics2salve" default="  /uav_3/ual/pose 
                                                 /uav_2/ual/pose 
-                                                /uav_1/avoid_movement_direction 
+                                                /uav_3/avoid_movement_direction 
                                                 /uav_2/avoid_movement_direction  
-                                                /uav_1/wished_movement_direction 
+                                                /uav_3/wished_movement_direction 
                                                 /uav_2/wished_movement_direction 
-                                                /uav_1/collision_worning 
+                                                /uav_3/collision_worning 
                                                 /uav_2/collision_worning"/>
 
             <arg name="nameofbag" default="experiment02/experiment02_01"/>

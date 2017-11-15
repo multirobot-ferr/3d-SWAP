@@ -2,3 +2,5 @@
 uav_avoidance/logs/uav*
 mbzirc_launchers/scripts/Log_*
 /CMakeLists.txt
+uav_avoidance/bags/experiment02/*.bag
+uav_avoidance/logs/experiment02/*.txt
