@@ -21,7 +21,7 @@ uav_1_home:
   home_frame_id: "uav_1_home"
   parent_frame: "map"
   units: "m"
-  translation: [0.0, 20.0, 0.0]
+  translation: [0.0, 0.0, 0.0]
   gz_initial_yaw: 0.0
 
 # uav_2_home
@@ -37,7 +37,7 @@ uav_3_home:
   home_frame_id: "uav_3_home"
   parent_frame: "map"
   units: "m"
-  translation: [0.0, 0.0, 0.0]
+  translation: [0.0, 20.0, 0.0]
   gz_initial_yaw: 0.0
 
   # uav_4_home

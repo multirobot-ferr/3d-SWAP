@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
         ros::Duration(0.1).sleep();
     }
 
-   // state_machine.Land();
+    state_machine.Land();
 
     return 0;
 }
