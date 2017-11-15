@@ -496,17 +496,24 @@ void Swap_2_5d::Log2MatlabInit( const std::string file_path)
     std::string log_var = file_path + "uav" + std::to_string(uav_id_) + "vars.txt";
     log2mat_.open(log_var.c_str(), std::ofstream::binary);
 
-    ROS_INFO("SwapROS: Saving a log file in %s", log_var.c_str());
-    ROS_WARN("SwapROS: Saving a log file can compromise the performance of the system");
+    if (log2mat_)
+    {
+        ROS_INFO("SwapROS: Saving a log file in %s", log_var.c_str());
+        ROS_WARN("SwapROS: Saving a log file can compromise the performance of the system");
 
-    values2log_.clear();
+        values2log_.clear();
 
-    values2log_.push_back(uav_safety_radius_);
-    values2log_.push_back(bracking_distance_);
-    values2log_.push_back(positioning_error_);
+        values2log_.push_back(uav_safety_radius_);
+        values2log_.push_back(bracking_distance_);
+        values2log_.push_back(positioning_error_);
 
-    Log2Matlab(values2log_);
-    log2mat_.close();
+        Log2Matlab(values2log_);
+        log2mat_.close();
+    }
+    else
+    {
+        ROS_ERROR("SwapROS: Imposible to save the log file in %s", log_var.c_str());
+    }
 
     // Preparing to save the rest
     pos_all = new double[std::max(n_uavs_ * 3, 20)];
