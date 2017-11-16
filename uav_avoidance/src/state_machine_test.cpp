@@ -354,7 +354,7 @@ void StateMachine::PublishPosErr()
         else
         {
             // Move is safe
-            PublishGRVCCmdVel(x_actuation, y_actuation, dirz);
+            PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation);
         }
     }
     else

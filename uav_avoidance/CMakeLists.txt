@@ -7,8 +7,11 @@ add_definitions(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-	roscpp
+find_package(catkin 
+    REQUIRED 
+    dynamic_reconfigure
+    COMPONENTS
+    roscpp
     std_msgs
     geometry_msgs
     tf2
@@ -17,6 +20,10 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(Armadillo REQUIRED)
 find_package(PCL 1.6 REQUIRED)
+
+generate_dynamic_reconfigure_options(
+    config/pid.cfg
+)
 
 
 
@@ -84,7 +91,7 @@ target_link_libraries(swap_2_5d swap_2_5d_library ${catkin_LIBRARIES})
 
 # Creating a node to test the system
 add_executable(state_machine src/state_machine_test.cpp)
-add_dependencies(state_machine ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(state_machine ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 target_link_libraries(state_machine swap_2_5d_library ${catkin_LIBRARIES})
 
 

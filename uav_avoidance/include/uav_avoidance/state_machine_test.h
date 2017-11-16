@@ -76,54 +76,6 @@ const std::string pos_err_service = "/set_position_error";
 const std::string land_service   = "/land";
 
 /**
- * Necessary controllers to command the uav to the specific positions
- */
-class PID: public grvc::utils::PidController
-{
-    public:
-        PID(std::string _pid_name = "pid")
-        {
-            pid_name_ = _pid_name;
-            PidController::set_output_limit(1.0);
-        };
-
-    double control_signal(double _error)
-    {
-        ros::Duration dt = ros::Time::now() - last_update_;
-        last_update_ = ros::Time::now();
-        
-        if (!started_)
-        {
-            started_ = true;
-            return 0.0;
-        }
-        else
-        {
-            ROS_INFO("Control signal %f, error %f", PidController::control_signal(_error, dt.toSec()), _error);
-            double ref = PidController::control_signal(_error, dt.toSec());
-            if (!std::isnan(ref))
-            {
-                return ref;
-            }
-            else
-            {
-                ROS_ERROR("Error in %s pid. Sleeping time too short.", pid_name_.c_str());
-                return 0.0;
-            }
-        }
-    }
-
-    private:
-        // Time management
-        bool started_ = false;
-        ros::Time last_update_ = ros::Time::now();
-
-        // Parameter management
-        std::string pid_name_;
-
-};
-
-/**
  * Main class of the state machine
  */ 
 class StateMachine
@@ -186,9 +138,9 @@ class StateMachine
       //  grvc::utils::PidController* pid_yaw_;
 
         //pid variables
-        PID xv_pid_{"xv_pid"};
-        PID yv_pid_{"yv_pid"};
-        PID zv_pid_{"yv_pid"};
+        grvc::utils::PidROS xv_pid_{"state_machine/xv_pid", 1.0, 0.0, 0.0, 1.0};
+        grvc::utils::PidROS yv_pid_{"state_machine/yv_pid", 2.0, 0.0, 0.0, 1.0};
+        grvc::utils::PidROS zv_pid_{"state_machine/zv_pid", 5.0, 0.0, 0.0, 1.0};
 
 
         grvc::utils::PidController* pid_yaw_;
