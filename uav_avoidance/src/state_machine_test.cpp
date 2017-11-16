@@ -349,9 +349,9 @@ void StateMachine::PublishPosErr()
         }
         else
         {
-        // Move is safe
+            // Move is safe
          
-        PublishGRVCCmdVel(dirx,diry,dirz, 0.0);
+            PublishGRVCCmdVel(dirx,diry,dirz, 0.0);
         }
     }
     else
