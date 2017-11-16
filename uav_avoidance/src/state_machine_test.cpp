@@ -332,6 +332,13 @@ void StateMachine::PublishPosErr()
     wished_direction_uav_.z = ze;
     wished_mov_dir_pub_.publish(wished_direction_uav_);
 
+    static bool last_confl_warning = true;
+    if (confl_warning_ != last_confl_warning)
+    {
+        xv_pid_.reset();
+        yv_pid_.reset();
+    }
+
     double x_actuation = xv_pid_.control_signal(xe);
     double y_actuation = yv_pid_.control_signal(ye);
     double z_actuation = zv_pid_.control_signal(ze);

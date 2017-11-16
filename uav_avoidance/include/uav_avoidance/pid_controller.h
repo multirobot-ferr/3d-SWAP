@@ -41,8 +41,6 @@
 
 namespace grvc { namespace utils {
 
-
-
 // TODO: Add dynamic tuning tools
 class PidController {
     public:
