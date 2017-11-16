@@ -138,14 +138,14 @@ Visualizer::Visualizer(int id)
 
         goal_direction_subs_ = nh_.subscribe<geometry_msgs::Vector3>(goal_direction_topic_name.c_str(), 1, &Visualizer::GoalDirectionCallback, this);
 
-        goal_marker_pub_= nh_.advertise<visualization_msgs::Marker>("avoidance_marker/goal",0);
-        id_marker_pub_= nh_.advertise<visualization_msgs::Marker>("avoidance_marker/id",0);
-        height_marker_pub_ = nh_.advertise<visualization_msgs::Marker>("avoidance_markers/height", 0);
-        uavs_pub_ = nh_.advertise<visualization_msgs::Marker>("avoidance_markers/uavs", 0);
-        cylinder_pub_= nh_.advertise<visualization_msgs::Marker>("avoidance_markers/cylinders",0);
-        arrow_pub_= nh_.advertise<visualization_msgs::Marker>("avoidance_markers/arrow",0);
-        goal_arrow_pub_ = nh_.advertise<visualization_msgs::Marker>("avoidance_markers/arrow_goal",0);
-        uav_cylinder_pub_ = nh_.advertise<visualization_msgs::Marker>("avoidance_markers/safety_cylinder", 0);
+        goal_marker_pub_= nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/goal",0);
+        id_marker_pub_= nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/id",0);
+        height_marker_pub_ = nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/height", 0);
+        uavs_pub_ = nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/uavs", 0);
+        cylinder_pub_= nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/bracking_cylinder",0);
+        arrow_pub_= nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/arrow",0);
+        goal_arrow_pub_ = nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/arrow_goal",0);
+        uav_cylinder_pub_ = nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/safety_cylinder", 0);
 }
 /** \brief Destructor
 */
