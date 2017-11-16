@@ -519,7 +519,11 @@ void StateMachine::UpdateWayPoints()
                 // Land();
             }
             else
+            {
                 ROS_INFO("UAV_%d: New goal set: %.2f,%.2f", uav_id_, way_points_(wp_idx_, 0), way_points_(wp_idx_, 1));
+                xv_pid_.reset();
+                yv_pid_.reset();
+            }
         }
     }
     else
