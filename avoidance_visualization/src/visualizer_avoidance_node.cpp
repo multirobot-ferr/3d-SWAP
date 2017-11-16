@@ -309,11 +309,11 @@ void Visualizer::publishMarkers()
             goal_marker.header.stamp = ros::Time();
             goal_marker.id = uav_id;
             goal_marker.ns = "uavs_state";
-            goal_marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+            goal_marker.type = visualization_msgs::Marker::SPHERE;
             goal_marker.text = std::to_string(uav_id);
-            goal_marker.pose.position.z = uavs_poses_.pose.position.z+2.0;
-            goal_marker.pose.position.y = uavs_poses_.pose.position.y;
-            goal_marker.pose.position.x = uavs_poses_.pose.position.x;
+            goal_marker.pose.position.z = uavs_poses_.pose.position.z + goal_direction_.z;
+            goal_marker.pose.position.y = uavs_poses_.pose.position.y + goal_direction_.y;
+            goal_marker.pose.position.x = uavs_poses_.pose.position.x + goal_direction_.x;
             goal_marker.color.a=1;
              switch(uav_id)
             {
@@ -575,8 +575,8 @@ void Visualizer::publishMarkers()
 
     id_marker_pub_.publish(id_marker);
 
-    //goal_marker_pub_.publish(id_marker);
-    //
+    goal_marker_pub_.publish(goal_marker);
+    
 }
 
 
