@@ -62,6 +62,7 @@ int main(int argc, char **argv) {
 
     StateMachine state_machine;
 
+    ros::Rate sleeper(10);  // 10Hz
 
     while (ros::ok() && state_machine.Running())
     {
@@ -71,7 +72,8 @@ int main(int argc, char **argv) {
         state_machine.Loop();
 
         // Sleeping to save time
-        ros::Duration(0.1).sleep();
+        //ros::Duration(0.1).sleep();
+        sleeper.sleep();
     }
 
     state_machine.Land();
@@ -120,7 +122,6 @@ StateMachine::StateMachine() {
         }
     }
 
-
     #ifdef UAV_NOT_IN_ZERO_ZERO
     for (auto row = 0; row < way_points_.n_rows; ++row)
     {
@@ -130,7 +131,6 @@ StateMachine::StateMachine() {
         }
     }
     #endif
-
 
     // Specific namespace for UAL
     std::string ual_ns;
@@ -357,21 +357,6 @@ void StateMachine::PublishPosErr()
     else
     {
         // Move is not safe
-        // Speed controller seems to work better with SWAP
-       // PublishGRVCPosErr( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, ze);
-     // the avoid movement is goint to be in the xy plane ze=0.0
-        // I don't need avoid_mov_direction.z because the avoid movement is going to be in the xy plane
-        // so I use avoid_mov_direction.z to save avoid_mov_yaw
-      /*  if(yaw_on_){
-
-        double dt= 0.01;
-        double yaw_desired=avoid_mov_direction_uav_.z;
-        double yawe=ScaleAngle(yaw_desired)-ScaleAngle(uav_yaw_);
-        double signal=pid_yaw_->control_signal(yawe, dt);
-        PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, 0.0, signal);
-
-        }*/
-     
         PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, 0.0, 0.0);
     }
 }

@@ -75,6 +75,17 @@ const std::string way_point_service  = "/go_to_waypoint";
 const std::string pos_err_service = "/set_position_error";
 const std::string land_service   = "/land";
 
+/**
+ * Necessary controllers to command the uav to the specific positions
+ */
+class PID
+{
+
+};
+
+/**
+ * Main class of the state machine
+ */ 
 class StateMachine
 {
     public:
