@@ -576,6 +576,7 @@ void Visualizer::publishMarkers()
     id_marker_pub_.publish(id_marker);
 
     //goal_marker_pub_.publish(id_marker);
+    //
 }
 
 
