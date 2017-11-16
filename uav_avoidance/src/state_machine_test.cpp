@@ -87,31 +87,29 @@ int main(int argc, char **argv) {
 StateMachine::StateMachine() {
     // Preparing private acquisition of parameters
     ROS_WARN("State Machine for testing awake! Disable it if you are not testing swap");
-    pnh_ = new ros::NodeHandle("~");
-
 
     // Sleeping some random time to not colapse the system due to a big wakeup
     // Waking a time between 1 and 2 seconds
     double sleep_time = 1.0 + (rand() % 10 + 1)/10.0;
     ROS_INFO("Waiting %f seconds before start", sleep_time);
 
-    pid_yaw_ = new grvc::utils::PidController("yaw", 0.4, 0.02, 0.0);
+    //pid_yaw_ = new grvc::utils::PidController("yaw", 0.4, 0.02, 0.0);
 
     ros::Duration( sleep_time).sleep();
 
 
-    if (!pnh_->getParam("uav_id", uav_id_))
+    if (!pnh_.getParam("uav_id", uav_id_))
     {
         initialization_error = true;
         ROS_FATAL("State Machine: uav_id is not set. Closing the state machine system");
     }
-    if (!pnh_->getParam("yaw_on", yaw_on_))
+    if (!pnh_.getParam("yaw_on", yaw_on_))
     {
         initialization_error = true;
         ROS_FATAL("State Machine: uav_id is not set. Closing the state machine system");
     }
     std::string goals_path;
-    if (pnh_->getParam("goals_path", goals_path))
+    if (pnh_.getParam("goals_path", goals_path))
     {
         ROS_INFO("State Machine: Goal set:");
         way_points_.load(goals_path);
@@ -134,7 +132,7 @@ StateMachine::StateMachine() {
 
     // Specific namespace for UAL
     std::string ual_ns;
-    if (!pnh_->getParam("ual_namespace", ual_ns))
+    if (!pnh_.getParam("ual_namespace", ual_ns))
         ual_ns = "";
 
     // Subscribing to the position of the UAV
@@ -159,8 +157,8 @@ StateMachine::StateMachine() {
     land_srv_ = nh_.serviceClient<uav_abstraction_layer::Land>(uav_service_name);
 
 
-    pnh_->param<double>("z_distance", dist_between_uav_z_, 2.0);
-    pnh_->param<double>("d_goal", d_goal_, 0.5);
+    pnh_.param<double>("z_distance", dist_between_uav_z_, 2.0);
+    pnh_.param<double>("d_goal", d_goal_, 0.5);
 
     wait_for_start_ = nh_.advertiseService("Start", &StateMachine::StartServiceCb, this);
 
@@ -186,7 +184,7 @@ StateMachine::StateMachine() {
 StateMachine::~StateMachine()
 {
     // Releasing the memory
-    delete pnh_;
+    //delete pnh_;
 }
 
 /**
@@ -319,6 +317,7 @@ void StateMachine::PublishPosErr()
 {
     // Getting fresh information on the position and warnings
     ros::spinOnce();
+
     //z is inluded in waypoints rigth now
     double xe = way_points_(wp_idx_, 0) - uav_x_;
     double ye = way_points_(wp_idx_, 1) - uav_y_;
@@ -326,11 +325,16 @@ void StateMachine::PublishPosErr()
     double dirx=xe/(sqrt(powf(xe, 2.0) + powf(ye, 2.0) + powf(ze, 2.0)));
     double diry=ye/(sqrt(powf(xe, 2.0) + powf(ye, 2.0) + powf(ze, 2.0)));
     double dirz=ze/(sqrt(powf(xe, 2.0) + powf(ye, 2.0) + powf(ze, 2.0)));
+    
     // Information for SWAP (where the uav wants to go)
     wished_direction_uav_.x = xe;
     wished_direction_uav_.y = ye;
     wished_direction_uav_.z = ze;
     wished_mov_dir_pub_.publish(wished_direction_uav_);
+
+    double x_actuation = xv_pid_.control_signal(xe);
+    double y_actuation = yv_pid_.control_signal(ye);
+    double z_actuation = zv_pid_.control_signal(ze);
 
     // Information for the UAV
     if (!confl_warning_)
@@ -350,14 +354,13 @@ void StateMachine::PublishPosErr()
         else
         {
             // Move is safe
-         
-            PublishGRVCCmdVel(dirx,diry,dirz, 0.0);
+            PublishGRVCCmdVel(x_actuation, y_actuation, dirz);
         }
     }
     else
     {
         // Move is not safe
-        PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y, 0.0, 0.0);
+        PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y);
     }
 }
 // ###########  #######################  ########### //
@@ -436,7 +439,7 @@ void StateMachine::TakeOff()
         ros::Duration(1).sleep();
     }
 
-    z_ref_ = 1;//std::max(dist_between_uav_z_ * uav_id_*0.2, 1.0); //(dist_between_uav_z_ * uav_id_, 1.0)
+    z_ref_ = std::max(1.0, way_points_(0, 2));
 
     uav_abstraction_layer::TakeOff srv;
     srv.request.blocking = true;

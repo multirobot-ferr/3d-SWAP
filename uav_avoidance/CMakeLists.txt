@@ -61,8 +61,6 @@ include_directories(
 add_library(swap_2_5d_library
     src/core/swap.cpp
     src/core/polarobstaclediagram.cpp
-    src/core/pid_controller.h
-
 )
 
 

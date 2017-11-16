@@ -54,7 +54,7 @@
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_srvs/SetBool.h>
-#include <pid_controller.h>
+#include <uav_avoidance/pid_controller.h>         
 
 // Uncomment this define if all the robots starts in (0,0)
 //#define UAV_NOT_IN_ZERO_ZERO 1
@@ -78,8 +78,48 @@ const std::string land_service   = "/land";
 /**
  * Necessary controllers to command the uav to the specific positions
  */
-class PID
+class PID: public grvc::utils::PidController
 {
+    public:
+        PID(std::string _pid_name = "pid")
+        {
+            pid_name_ = _pid_name;
+            PidController::set_output_limit(1.0);
+        };
+
+    double control_signal(double _error)
+    {
+        ros::Duration dt = ros::Time::now() - last_update_;
+        last_update_ = ros::Time::now();
+        
+        if (!started_)
+        {
+            started_ = true;
+            return 0.0;
+        }
+        else
+        {
+            ROS_INFO("Control signal %f, error %f", PidController::control_signal(_error, dt.toSec()), _error);
+            double ref = PidController::control_signal(_error, dt.toSec());
+            if (!std::isnan(ref))
+            {
+                return ref;
+            }
+            else
+            {
+                ROS_ERROR("Error in %s pid. Sleeping time too short.", pid_name_.c_str());
+                return 0.0;
+            }
+        }
+    }
+
+    private:
+        // Time management
+        bool started_ = false;
+        ros::Time last_update_ = ros::Time::now();
+
+        // Parameter management
+        std::string pid_name_;
 
 };
 
@@ -123,7 +163,7 @@ class StateMachine
 
 
         ros::NodeHandle nh_;                    //!< ROS Node handler
-        ros::NodeHandle* pnh_;                  //!< Private node handler
+        ros::NodeHandle pnh_{"~"};                  //!< Private node handler
 
         // Subscribers
         ros::Subscriber  pos_uav_sub_;          //!< Receives the position of the UAV
@@ -146,7 +186,9 @@ class StateMachine
       //  grvc::utils::PidController* pid_yaw_;
 
         //pid variables
-       // grvc::utils::PidController Pid;
+        PID xv_pid_{"xv_pid"};
+        PID yv_pid_{"yv_pid"};
+        PID zv_pid_{"yv_pid"};
 
 
         grvc::utils::PidController* pid_yaw_;
@@ -246,7 +288,7 @@ class StateMachine
          * @param vy speed in the y coordinate
          * @param vz speed in the z coordinate
          */
-        void PublishGRVCCmdVel(const double vx, const double vy, const double vz, const double yaw_rate);
+        void PublishGRVCCmdVel(const double vx, const double vy, const double vz = 0.0, const double yaw_rate = 0.0);
 
         /**
          * @brief Publishes a goal on the grvc controler
