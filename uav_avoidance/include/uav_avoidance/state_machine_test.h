@@ -54,7 +54,7 @@
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_srvs/SetBool.h>
-#include <pid_controller.h>
+#include <uav_avoidance/pid_controller.h>         
 
 // Uncomment this define if all the robots starts in (0,0)
 //#define UAV_NOT_IN_ZERO_ZERO 1
@@ -74,14 +74,6 @@ const std::string speed_service  = "/set_velocity";
 const std::string way_point_service  = "/go_to_waypoint";
 const std::string pos_err_service = "/set_position_error";
 const std::string land_service   = "/land";
-
-/**
- * Necessary controllers to command the uav to the specific positions
- */
-class PID
-{
-
-};
 
 /**
  * Main class of the state machine
@@ -123,7 +115,7 @@ class StateMachine
 
 
         ros::NodeHandle nh_;                    //!< ROS Node handler
-        ros::NodeHandle* pnh_;                  //!< Private node handler
+        ros::NodeHandle pnh_{"~"};                  //!< Private node handler
 
         // Subscribers
         ros::Subscriber  pos_uav_sub_;          //!< Receives the position of the UAV
@@ -146,7 +138,9 @@ class StateMachine
       //  grvc::utils::PidController* pid_yaw_;
 
         //pid variables
-       // grvc::utils::PidController Pid;
+        grvc::utils::PidROS xv_pid_{"state_machine/xv_pid", 1.0, 0.0, 0.0, 1.0};
+        grvc::utils::PidROS yv_pid_{"state_machine/yv_pid", 2.0, 0.0, 0.0, 1.0};
+        grvc::utils::PidROS zv_pid_{"state_machine/zv_pid", 5.0, 0.0, 0.0, 1.0};
 
 
         grvc::utils::PidController* pid_yaw_;
@@ -246,7 +240,7 @@ class StateMachine
          * @param vy speed in the y coordinate
          * @param vz speed in the z coordinate
          */
-        void PublishGRVCCmdVel(const double vx, const double vy, const double vz, const double yaw_rate);
+        void PublishGRVCCmdVel(const double vx, const double vy, const double vz = 0.0, const double yaw_rate = 0.0);
 
         /**
          * @brief Publishes a goal on the grvc controler
