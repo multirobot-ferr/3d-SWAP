@@ -41,8 +41,6 @@
 
 namespace grvc { namespace utils {
 
-
-
 // TODO: Add dynamic tuning tools
 class PidController {
     public:
@@ -125,17 +123,10 @@ class PidController {
 class PidROS: public PidController
 {
     public:
-        PidROS(std::string _pid_name = "pid", 
-                double _k_p = 1.0, double _k_i = 0.0, double _k_d = 0.0,
-                double _output_limit = 2.0, double _integral_limit = 5.0):
-                server(_pid_name)
+        PidROS(std::string _pid_name = "pid"):
+                server(ros::this_node::getName() + "/" + _pid_name)
         {
             pid_name_ = _pid_name;
-            set_k_p(_k_p);
-            set_k_i(_k_i);
-            set_k_d(_k_d);
-            set_output_limit(_output_limit);
-            set_integral_limit(_integral_limit);
 
             f = boost::bind(&PidROS::ReconfigureCallback, this, _1, _2);
             server.setCallback(f);
@@ -181,10 +172,10 @@ class PidROS: public PidController
 
         void ReconfigureCallback(uav_avoidance::pidConfig &config, uint32_t level)
         {
-            ROS_INFO("Reconfigure Request in pid %s: \n" 
-                     "\t k_p=%f k_i=%f, k_d=%f\n"
-                     "\t pid_output_limit=%f integral_limit=%f",
-                    pid_name_.c_str(), 
+            ROS_INFO("\nReconfigure Request in pid %s: \n" 
+                     "\t k_p = %.3f, k_i = %.3f, k_d = %.3f\n"
+                     "\t pid_output_limit = %.3f, integral_limit = %.3f",
+                    (ros::this_node::getName() + "/" + pid_name_).c_str(), 
                     config.k_p, config.k_i, config.k_d,
                     config.pid_output_limit, config.integral_limit);
 
