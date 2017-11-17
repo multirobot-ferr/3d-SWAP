@@ -76,12 +76,18 @@ protected:
 
             /// Number of UAVs
         int n_uavs_;
-        double uav_safety_radius_ = -1.0;               //!< Safety radius of each uav
-        double dz_min_;	    		   		            //!< max z-distance to swap. It is a parameter
+        double uav_safety_radius_ = -1.0;
+        double uav_safety_radius_swap_;               //!< Safety radius of each uav
+        double dz_min_;
+        double dz_min_swap_;	    		   		            //!< max z-distance to swap. It is a parameter
         double bracking_distance_;
+        double bracking_distance_swap_;
         double dz_range_;
+        double dz_range_swap_;
         double positioning_error_;
+        double positioning_error_swap_;
         double gamma_offset_;
+        double gamma_offset_swap_;
     };
 
     /** \brief Constructor
@@ -95,34 +101,58 @@ Visualizer::Visualizer(int id)
 
     cout<<"el id es: "<<id<<endl;
 
-    if (!pnh_->getParam("safety_radius", uav_safety_radius_))
-        {
-            ROS_FATAL("VISUALIZER: safety radius is not set. Closing the visualizer system");
-        }
+    //getting visualization parameters
 
-        if (!pnh_->getParam("braking_distance", bracking_distance_))
-        {
-            ROS_FATAL("VISUALIZER: breaking distance is not set. Closing the visualizer system");
-        }
-        if (!pnh_->getParam("dz_min", dz_min_))
-        {
-            ROS_FATAL("VISUALIZER: cylinder height is not set. Closing the visualizer system");
-        }
-        if (!pnh_->getParam("dz_range", dz_range_))
-        {
-            ROS_FATAL("VISUALIZER: cylinder height is not set. Closing the visualizer system");
-        }
+    pnh_->getParam("safety_radius", uav_safety_radius_);
+    pnh_->getParam("braking_distance", bracking_distance_);
+    pnh_->getParam("dz_min", dz_min_);
+    pnh_->getParam("dz_range", dz_range_);
+    pnh_->getParam("positioning_error", positioning_error_);
+    pnh_->getParam("gamma_offset", gamma_offset_);
 
-        if (!pnh_->getParam("positioning_error", positioning_error_))
-        {
-            ROS_FATAL("VISUALIZER: positioning error is not set. Closing the visualizer system");
-        }
 
-        if (!pnh_->getParam("gamma_offset", gamma_offset_))
-        {
-            ROS_FATAL("VISUALIZER: gamma offset is not set. Closing the visualizer system");
-        }
+    pnh_->getParam("/uav_1/avoidance_swap/swap/safety_radius", uav_safety_radius_swap_);
+    pnh_->getParam("/uav_1/avoidance_swap/swap/braking_distance", bracking_distance_swap_);
+    pnh_->getParam("/uav_1/avoidance_swap/swap/dz_min", dz_min_swap_);
+    pnh_->getParam("/uav_1/avoidance_swap/swap/dz_range",dz_range_swap_);
+    pnh_->getParam("/uav_1/avoidance_swap/swap/positioning_error", positioning_error_swap_);
+    pnh_->getParam("/uav_1/avoidance_swap/swap/gamma_offset", gamma_offset_swap_);
 
+    if(uav_safety_radius_!=uav_safety_radius_swap_)
+    {
+        ROS_WARN("safety radius is not swap value. visual radius: %lf swap radius: %lf", uav_safety_radius_, uav_safety_radius_swap_);
+    }
+
+    if(bracking_distance_!=bracking_distance_swap_)
+    {
+        ROS_WARN("bracking distance is not swap value.visual b_dist: %lf swap b_dist: %lf", bracking_distance_, bracking_distance_swap_);
+
+    }
+    if(dz_min_!=dz_min_swap_)
+    {
+        ROS_WARN("visual dz_min is not swap value. visual dz_min: %lf swap dz_min: %lf", dz_min_, dz_min_swap_);
+
+    }
+
+    if(dz_range_!=dz_range_swap_)
+    {
+        ROS_WARN("visual dz_range is not swap value. visual dz_range: %lf swap dz_range: %lf", dz_range_, dz_range_swap_);
+
+    }
+
+    if(positioning_error_!=positioning_error_swap_)
+    {
+        ROS_WARN("pos_error is not swap value. visual pos_error: %lf swap pos_error: %lf", positioning_error_, positioning_error_swap_);
+
+    }
+    
+    if(gamma_offset_swap_!=gamma_offset_)
+    {
+        ROS_WARN("gamma_offset is not swap value. visual offset: %lf swap offset: %lf", gamma_offset_, gamma_offset_swap_);
+
+    }
+
+ 
         uav_id=id;
     // Subscriptions/publications
 
