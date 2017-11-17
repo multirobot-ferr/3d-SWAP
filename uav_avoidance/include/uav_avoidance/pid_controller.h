@@ -152,7 +152,12 @@ class PidROS: public PidController
             }
             else
             {
-                ROS_ERROR("Error in %s pid. Sleeping time too short.", pid_name_.c_str());
+                --max_short_times;
+                if (max_short_times < 0)
+                {
+                    ROS_WARN("Error in %s pid. Sleeping time too short.", pid_name_.c_str());
+                    max_short_times = 3;
+                }
                 return 0.0;
             }
         }
@@ -162,6 +167,7 @@ class PidROS: public PidController
         // Time management
         bool started_ = false;
         ros::Time last_update_ = ros::Time::now();
+        int max_short_times = 3;
 
         // Parameter management
         std::string pid_name_;

@@ -12,9 +12,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <arg name="multi" default="false"/>
     <arg name="ns_prefix" default="uav_"/>
+    <arg name="simulator_params" default="simulator_params_carting"/>
 
     <!-- Load frame transforms for map and UAVs -->
-    <rosparam file="$(find uav_avoidance)/config/simulator/simulator_params.yaml" command="load" />
+    <rosparam file="$(find uav_avoidance)/config/simulator/$(arg simulator_params).yaml" command="load" />
 
     <!-- Launch static_tf_publisher for map to world transform (if defined) -->
     <node pkg="static_tf_publisher" type="static_tf_publisher_node" name="static_tf_publisher"/>
@@ -28,13 +29,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         - serial: for serial connection to px4
         - udp: for udp connection to px4
     -->
-    <!-- Launch robot id=1 -->
-    <include file="$(find px4_bringup)/launch/spawn_robot.launch">
-        <arg name="id" value="1"/>
-        <arg name="material" value="Orange"/>
-        <arg name="mode" value="sitl"/>
-        <arg name="ns_prefix" value="$(arg ns_prefix)"/>
-    </include>
 
         <!-- Launch robot id=2 -->
         <include file="$(find px4_bringup)/launch/spawn_robot.launch">
@@ -43,27 +37,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
             <arg name="mode" value="sitl"/>
             <arg name="ns_prefix" value="$(arg ns_prefix)"/>
         </include>
-
-        <!-- Launch robot id=3 -->
-        <include file="$(find px4_bringup)/launch/spawn_robot.launch">
-            <arg name="id" value="3"/>
-            <arg name="material" value="Indigo"/>
-            <arg name="mode" value="sitl"/>
-            <arg name="ns_prefix" value="$(arg ns_prefix)"/>
-        </include>
     
-
-    <!-- Launch UAL server for uav id=1 -->
-    <node pkg="uav_abstraction_layer" type="server" name="server_1" output="screen" args="-uav_id=1 -pose_frame_id=map -ns_prefix=$(arg ns_prefix)"/>
 
     <!-- Launch UAL server for uav id=2 -->
     <node pkg="uav_abstraction_layer" type="server" name="server_2" output="screen" args="-uav_id=2 -pose_frame_id=map -ns_prefix=$(arg ns_prefix)"/>
 
-    <!-- Launch UAL server for uav id=3 -->
-    <node pkg="uav_abstraction_layer" type="server" name="server_3" output="screen" args="-uav_id=3 -pose_frame_id=map -ns_prefix=$(arg ns_prefix)"/>
-
     <!-- Visualization system -->
     <node name="visualization_system" pkg="uav_avoidance" type="delayed.sh"
-		args="10 roslaunch uav_avoidance visualization.launch" output="screen"/>
+		args="8 roslaunch uav_avoidance visualization.launch" output="screen"/>
 		
 </launch>

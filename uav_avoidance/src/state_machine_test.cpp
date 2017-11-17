@@ -349,6 +349,11 @@ void StateMachine::PublishPosErr()
     double y_actuation = yv_pid_.control_signal(ye);
     double z_actuation = zv_pid_.control_signal(ze);
 
+    /*std::cout << "ex: " << std::setprecision(2) << xe << " ax: " << std::setprecision(2) << x_actuation << 
+              "\t ey: " << std::setprecision(2) << ye << " ay: " << std::setprecision(2) << y_actuation << 
+              "\t ez: " << std::setprecision(2) << ze << " az: " << std::setprecision(2) << z_actuation << std::endl;
+    */
+    
     // Information for the UAV
     if (!confl_warning_)
     {
@@ -512,13 +517,24 @@ void StateMachine::UpdateWayPoints()
         if (keep_moving_ && !experiment_done)
         {
             msg_shown = false;
-            for (auto i = 0; i< 2; ++i)
+            
+            // Remaining two seconds on the position
+            ros::Rate sleeper(10);  // 10Hz
+            ros::Time start = ros::Time::now();
+            ros::Duration duration;
+            do{
+                duration = ros::Time::now() - start;
+                PublishPosErr();
+                sleeper.sleep();
+            }while (duration.toSec() < 5.0 && ros::ok());
+
+            /*for (auto i = 0; i< 2; ++i)
             {
                 //PublishGRVCPosErr(0.0, 0.0, 0.0);
                 PublishGRVCgoal(way_points_(wp_idx_, 0), way_points_(wp_idx_, 1),
                                 way_points_(wp_idx_, 2), 0.0);   //Blocking
                 ros::Duration(1).sleep();
-            }
+            }*/
 
             ++wp_idx_;
             if (wp_idx_ >= way_points_.n_rows) {
@@ -528,9 +544,12 @@ void StateMachine::UpdateWayPoints()
             }
             else
             {
-                ROS_INFO("UAV_%d: New goal set: %.2f,%.2f", uav_id_, way_points_(wp_idx_, 0), way_points_(wp_idx_, 1));
+                ROS_INFO("UAV_%d: New goal set (%d/%d): %.2f, %.2f, %.2f", 
+                        uav_id_, wp_idx_+1, int(way_points_.n_rows)+1,
+                        way_points_(wp_idx_, 0), way_points_(wp_idx_, 1), way_points_(wp_idx_, 2));
                 xv_pid_.reset();
                 yv_pid_.reset();
+                zv_pid_.reset();
             }
         }
     }
