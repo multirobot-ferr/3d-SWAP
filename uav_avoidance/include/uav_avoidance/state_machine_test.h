@@ -134,14 +134,10 @@ class StateMachine
         geometry_msgs::Vector3 avoid_mov_direction_uav_; //!< Movement direction requested from swap
     // ###########  #######################  ########### //
 
-        // control
-      //  grvc::utils::PidController* pid_yaw_;
-
         //pid variables
-        grvc::utils::PidROS xv_pid_{"state_machine/xv_pid", 1.0, 0.0, 0.0, 1.0};
-        grvc::utils::PidROS yv_pid_{"state_machine/yv_pid", 2.0, 0.0, 0.0, 1.0};
-        grvc::utils::PidROS zv_pid_{"state_machine/zv_pid", 5.0, 0.0, 0.0, 1.0};
-
+        grvc::utils::PidROS xv_pid_{"xv_pid"};
+        grvc::utils::PidROS yv_pid_{"yv_pid"};
+        grvc::utils::PidROS zv_pid_{"zv_pid"};
 
         grvc::utils::PidController* pid_yaw_;
 
@@ -159,7 +155,7 @@ class StateMachine
         // UAV references
         double z_ref_;
         double d_goal_;
-        double v_ref_=1.5;
+        double v_ref_ = 1.5;
 
 
         //Preparing to command the UAV

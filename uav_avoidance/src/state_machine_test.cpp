@@ -106,8 +106,14 @@ StateMachine::StateMachine() {
     if (!pnh_.getParam("yaw_on", yaw_on_))
     {
         initialization_error = true;
-        ROS_FATAL("State Machine: uav_id is not set. Closing the state machine system");
+        ROS_FATAL("State Machine: yaw_on is not set. Closing the state machine system");
     }
+    if (!pnh_.getParam("v_max", v_ref_))
+    {
+        initialization_error = true;
+        ROS_FATAL("State Machine: v_max is not set. Closing the state machine system");
+    }
+
     std::string goals_path;
     if (pnh_.getParam("goals_path", goals_path))
     {
@@ -367,7 +373,9 @@ void StateMachine::PublishPosErr()
     else
     {
         // Move is not safe
-        PublishGRVCCmdVel( avoid_mov_direction_uav_.x, avoid_mov_direction_uav_.y);
+        PublishGRVCCmdVel(  0.8*v_ref_*avoid_mov_direction_uav_.x,  // 1 before
+                            0.8*v_ref_*avoid_mov_direction_uav_.y,  // 1 before
+                            z_actuation);
     }
 }
 // ###########  #######################  ########### //
