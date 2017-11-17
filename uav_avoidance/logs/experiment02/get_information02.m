@@ -1,4 +1,4 @@
-function get_information()
+function get_information02()
 % PROCESS_EXPERIMENT recovers the measurement taken from the uavs 
 
 %sshpass -p "password" scp -r user@example.com:/some/remote/path /some/local/path
