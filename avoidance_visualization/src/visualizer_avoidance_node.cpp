@@ -67,9 +67,9 @@ protected:
 
         geometry_msgs::PoseStamped uavs_poses_;
         geometry_msgs::Vector3 uav_direction_;
+        bool uav_pose_received_;
         bool uav_direction_received_;
         geometry_msgs::Vector3 goal_direction_;
-        bool uav_position_received_;
 
 
         int uav_id;
@@ -189,6 +189,7 @@ Visualizer::~Visualizer()
 void Visualizer::uavPoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose)
 {
         uavs_poses_ = *uav_pose;
+        uav_pose_received_ = true;
 }
 
 /** \brief Callback for avoid direction
@@ -582,30 +583,30 @@ void Visualizer::publishMarkers()
               
                 //arrow.mesh_use_embedded_materials = true;
 
-                uav_direction_received_ = false;
                 
+    if(uav_direction_received_)         // mark is publishing if topic is received
+    {
+            arrow_pub_.publish(arrow);                    // publish avoid direction           
+            uav_direction_received_ = false;
 
+
+    }
         
+    if(uav_pose_received_)         // mark is publishing if topic is received
+    {
+        uavs_pub_.publish(marker_robot);                  // publish robot
+        cylinder_pub_.publish(cylinder);                  // publish bracking distance cylinder
+        height_marker_pub_.publish(height_marker);        // publish height of UAV
+        uav_cylinder_pub_.publish(uav_cylinder);          // publish safety cylinder
+        id_marker_pub_.publish(id_marker);                // publish number of UAV
+        goal_arrow_pub_.publish(arrow_goal);              // publish goal direction
+        goal_marker_pub_.publish(goal_marker);            // publish goal
 
+        uav_pose_received_= false;
+  
+    }
 
-        
     
-
-    uavs_pub_.publish(marker_robot);
-
-    cylinder_pub_.publish(cylinder);
-
-    arrow_pub_.publish(arrow);
-
-    goal_arrow_pub_.publish(arrow_goal);
-
-    uav_cylinder_pub_.publish(uav_cylinder);
-
-    height_marker_pub_.publish(height_marker);
-
-    id_marker_pub_.publish(id_marker);
-
-    goal_marker_pub_.publish(goal_marker);
     
 }
 
