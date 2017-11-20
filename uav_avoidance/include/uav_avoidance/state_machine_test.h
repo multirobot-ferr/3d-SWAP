@@ -181,6 +181,8 @@ class StateMachine
                                  {-31.0, +20.0,-M_PI/4 },
                                  {-25.0, +40.0, M_PI/16} };
 
+                                 ros::Time t = ros::Time::now();
+
 
 
         /* Callbacks for ROS */

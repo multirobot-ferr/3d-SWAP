@@ -53,8 +53,18 @@ class PidController {
 
         double control_signal(double _error, double _dt) {
             // TODO: anti-windup and other pid sofistications :)
+            
+            // Computing integral
             error_sum_ += _error * _dt;
             error_sum_ = num_limit(error_sum_, integral_limit_);
+
+            // Computing derivate
+            if (reset_error_d_)
+            {
+                reset_error_d_ = false;
+                previous_error_ = _error;
+            }
+
             double error_diff = _error - previous_error_;
             previous_error_ = _error;
 
@@ -66,8 +76,18 @@ class PidController {
 
         void reset()
         {
+            resetI();
+            resetD();
+        }
+
+        void resetI()
+        {
             error_sum_ = 0.0;
-            previous_error_ = 0.0;
+        }
+
+        void resetD()
+        {
+            reset_error_d_ = true;
         }
 
         void set_k_p(double _k_p)
@@ -107,6 +127,7 @@ class PidController {
         double k_i_;
         double k_d_;
         double error_sum_      = 0.0;
+        bool   reset_error_d_  = true;
         double previous_error_ = 0.0;
         double integral_limit_ = std::numeric_limits<double>::max();
         double output_limit_   = std::numeric_limits<double>::max();

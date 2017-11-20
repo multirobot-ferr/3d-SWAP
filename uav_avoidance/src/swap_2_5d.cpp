@@ -252,7 +252,7 @@ void Swap_2_5d::Spin()
         SpinOnce();
 
         // Sleeping to save time
-       ros::Duration(spin_sleep_).sleep();
+        ros::Duration(spin_sleep_).sleep();
     }
 }
 
@@ -271,9 +271,6 @@ void Swap_2_5d::SpinOnce()
     // Checking for conflicts and finding solutions
     CollisionAvoidance(v_ref_, yaw_ref_, uav_vector_speed_);
 
-    // If active, save in a log all information
-    FillLogFile();
-
     // Communicating with the state machine
     std::string state;
     switch (GetMachineState(state))
@@ -284,11 +281,7 @@ void Swap_2_5d::SpinOnce()
 
         default:
             // Requesting the control of the uav and commanding it
-          // if (z_swap_==true){
-
             RequestControlPub(true);
-
-
     }
 
     // Showing to the user what is happening
@@ -297,6 +290,9 @@ void Swap_2_5d::SpinOnce()
     {
         ROS_INFO("Swap: %s", state.c_str());
     }
+
+    // If active, save in a log all information
+    FillLogFile();
 }
 
 /**

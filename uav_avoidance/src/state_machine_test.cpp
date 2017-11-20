@@ -66,8 +66,6 @@ int main(int argc, char **argv) {
 
     while (ros::ok() && state_machine.Running())
     {
-        ros::spinOnce();
-
         // Performs all necessary actions
         state_machine.Loop();
 
@@ -302,6 +300,8 @@ void StateMachine::WarningCallback(const std_msgs::Bool::ConstPtr& collision_war
         transition = confl_warning_;
         if (confl_warning_)
         {
+            t = ros::Time::now();
+            std::cout << "conflict!" << std::endl;
             ROS_WARN("Conflict warning");
         }
         else
@@ -354,13 +354,28 @@ void StateMachine::PublishPosErr()
     static bool last_confl_warning = true;
     if (confl_warning_ != last_confl_warning)
     {
-        xv_pid_.reset();
-        yv_pid_.reset();
+        xv_pid_.resetI();
+        yv_pid_.resetI();
+        last_confl_warning = confl_warning_;
+    }
+
+    if (confl_warning_)
+    {
+        // Movement is not safe. Changing the reference
+        xe = 0.8*v_ref_*avoid_mov_direction_uav_.x;
+        ye = 0.8*v_ref_*avoid_mov_direction_uav_.y;
     }
 
     double x_actuation = xv_pid_.control_signal(xe);
     double y_actuation = yv_pid_.control_signal(ye);
     double z_actuation = zv_pid_.control_signal(ze);
+
+    PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation);
+
+
+/*    double x_actuation = xv_pid_.control_signal(xe);
+    double y_actuation = yv_pid_.control_signal(ye);
+    double z_actuation = zv_pid_.control_signal(ze);*/
 
     /*std::cout << "ex: " << std::setprecision(2) << xe << " ax: " << std::setprecision(2) << x_actuation << 
               "\t ey: " << std::setprecision(2) << ye << " ay: " << std::setprecision(2) << y_actuation << 
@@ -368,7 +383,7 @@ void StateMachine::PublishPosErr()
     */
     
     // Information for the UAV
-    if (!confl_warning_)
+/*    if (!confl_warning_)
     {
         // if mov_cam is activated yaw move first
         if(yaw_on_){
@@ -390,11 +405,15 @@ void StateMachine::PublishPosErr()
     }
     else
     {
+
+        ros::Duration d = t - ros::Time::now();
+        std::cout << "avoidance!" << d.toSec() << std::endl;
+
         // Move is not safe
         PublishGRVCCmdVel(  0.8*v_ref_*avoid_mov_direction_uav_.x,  // 1 before
                             0.8*v_ref_*avoid_mov_direction_uav_.y,  // 1 before
                             z_actuation);
-    }
+    }*/
 }
 // ###########  #######################  ########### //
 
@@ -460,9 +479,6 @@ void StateMachine::PublishGRVCgoal(const double x, const double y, const double 
  */
 void StateMachine::TakeOff()
 {
-    // Getting fresh information on the position
-    ros::spinOnce();
-
     ROS_INFO("State Machine: TakingOff the UAV");
     // Leaving some extra time for the UAL to wake up
 
@@ -504,9 +520,6 @@ void StateMachine::UpdateWayPoints()
 {
     static bool msg_shown = false;
 
-    // Getting fresh information
-    ros::spinOnce();
-
     double x_diff = way_points_(wp_idx_, 0) - uav_x_;
     double y_diff = way_points_(wp_idx_, 1) - uav_y_;
     double z_diff = way_points_(wp_idx_, 2) - uav_z_;
@@ -540,14 +553,6 @@ void StateMachine::UpdateWayPoints()
                 PublishPosErr();
                 sleeper.sleep();
             }while (duration.toSec() < 5.0 && ros::ok());
-
-            /*for (auto i = 0; i< 2; ++i)
-            {
-                //PublishGRVCPosErr(0.0, 0.0, 0.0);
-                PublishGRVCgoal(way_points_(wp_idx_, 0), way_points_(wp_idx_, 1),
-                                way_points_(wp_idx_, 2), 0.0);   //Blocking
-                ros::Duration(1).sleep();
-            }*/
 
             ++wp_idx_;
             if (wp_idx_ >= way_points_.n_rows) {
