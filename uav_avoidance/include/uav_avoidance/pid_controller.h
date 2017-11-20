@@ -37,7 +37,8 @@
 
 // Dynamic reconfigure
 #include <dynamic_reconfigure/server.h>
-#include <uav_avoidance/pidConfig.h>    
+#include <uav_avoidance/pidConfig.h> 
+#include <std_msgs/Float64.h>   
 
 namespace grvc { namespace utils {
 
@@ -169,6 +170,15 @@ class PidROS: public PidController
             double ref = PidController::control_signal(_error, dt.toSec());
             if (!std::isnan(ref))
             {
+                if (publish_error_)
+                { 
+                    std_msgs::Float64 msg;
+                    msg.data = _error;
+                    error_pub_.publish(msg);
+
+                    msg.data = ref;
+                    actuation_pub_.publish(msg);
+                }  
                 return ref;
             }
             else
@@ -194,6 +204,12 @@ class PidROS: public PidController
         std::string pid_name_;
         double k_p_, k_i_, k_d_;
 
+        // Signal publishing
+        ros::NodeHandle nh_;                   
+        bool publish_error_ = false; 
+        ros::Publisher  error_pub_;
+        ros::Publisher  actuation_pub_;
+
         dynamic_reconfigure::Server<uav_avoidance::pidConfig> server;
         dynamic_reconfigure::Server<uav_avoidance::pidConfig>::CallbackType f;
 
@@ -201,16 +217,25 @@ class PidROS: public PidController
         {
             ROS_INFO("\nReconfigure Request in pid %s: \n" 
                      "\t k_p = %.3f, k_i = %.3f, k_d = %.3f\n"
-                     "\t pid_output_limit = %.3f, integral_limit = %.3f",
+                     "\t pid_output_limit = %.3f, integral_limit = %.3f \n"
+                     "\t publish_error: %s",
                     (ros::this_node::getName() + "/" + pid_name_).c_str(), 
                     config.k_p, config.k_i, config.k_d,
-                    config.pid_output_limit, config.integral_limit);
+                    config.pid_output_limit, config.integral_limit,
+                    config.publish_error ? "true" : "false");
 
             set_k_p(config.k_p);
             set_k_i(config.k_i);
             set_k_d(config.k_d);
             set_integral_limit(config.integral_limit);
-            set_output_limit(config.pid_output_limit);            
+            set_output_limit(config.pid_output_limit);
+
+            if (publish_error_ != config.publish_error && config.publish_error)
+            { 
+                publish_error_ = config.publish_error; 
+                error_pub_ = nh_.advertise<std_msgs::Float64>((pid_name_ + "_error").c_str(), 10);
+                actuation_pub_ = nh_.advertise<std_msgs::Float64>((pid_name_ + "_actuation").c_str(), 10);
+            }          
         }
 };
 
