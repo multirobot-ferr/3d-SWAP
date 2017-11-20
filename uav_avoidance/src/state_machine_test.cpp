@@ -76,7 +76,9 @@ int main(int argc, char **argv) {
         sleeper.sleep();
     }
 
-    state_machine.Land();
+    // Forcing a landing out of the node
+    state_machine.ForcedLand();
+
 
     return 0;
 }
@@ -231,6 +233,17 @@ void StateMachine::Land()
         }
         ros::Duration(3).sleep();
     }
+}
+
+/**
+ * @brief Forces a land of the uav
+ */
+void StateMachine::ForcedLand()
+{
+    std::cout << "Forcing a landing out of the node" << std::endl;
+    std::string command = "rosservice call /uav_" + std::to_string(uav_id_) + "/ual/land \"blocking: false\"";
+    std::cout << command.c_str() << std::endl;
+    system(command.c_str());
 }
 
 /**

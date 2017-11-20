@@ -54,7 +54,7 @@ Visualization Manager:
       Marker Topic: /uav_1/arrow
       Name: Marker
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -118,7 +118,7 @@ Visualization Manager:
       Marker Topic: /uav_2/arrow
       Name: Marker
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -126,7 +126,7 @@ Visualization Manager:
       Marker Topic: /uav_2/arrow
       Name: Marker
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -134,13 +134,13 @@ Visualization Manager:
       Marker Topic: /uav_2/arrow_goal
       Name: Marker
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /uav_2/bracking_cylinder
-      Name: Marker
+      Name: uav2/br_distance
       Namespaces:
         uavs: true
       Queue Size: 100
@@ -148,7 +148,7 @@ Visualization Manager:
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /uav_2/goal
-      Name: Marker
+      Name: uav2/goal
       Namespaces:
         uavs_state: true
       Queue Size: 100
@@ -190,7 +190,7 @@ Visualization Manager:
       Marker Topic: /uav_3/arrow
       Name: Marker
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -198,7 +198,7 @@ Visualization Manager:
       Marker Topic: /uav_3/arrow_goal
       Name: Marker
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
