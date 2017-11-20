@@ -1,0 +1,20 @@
+Today we performed three experiments:
+
+Experiment 03.
+Repeating the experiment to see the bracking distance of the robot.
+
+Experiment 04_01
+Two UAV flying at different altitudes (3 and 6m). The parameters were:
+<param name="swap/safety_radius" value="0.8486"/>
+<param name="swap/braking_distance" value="1.25"/>   <!-- The uav is capable of breacking in 1.25m-->
+<param name="swap/positioning_error" value="1.0"/> 
+<param name="swap/gamma_offset" value="0.5"/>
+The day was windy and the uavs did not stopped fast enough.
+
+Experiment 04_02
+Two UAV flying at different altitudes (3 and 6m). The parameters were:
+<param name="swap/safety_radius" value="0.8486"/>
+<param name="swap/braking_distance" value="1.25"/>   <!-- The uav is capable of breacking in 1.25m-->
+<param name="swap/positioning_error" value="1.0"/> 
+<param name="swap/gamma_offset" value="1.5"/>
+The day was windy and the uavs did not stopped fast enough.

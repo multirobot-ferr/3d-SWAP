@@ -5,6 +5,8 @@ mbzirc_launchers/scripts/Log_*
 uav_avoidance/bags/experiment01/*.bag
 uav_avoidance/bags/experiment02/*.bag
 uav_avoidance/bags/experiment03/*.bag
+uav_avoidance/bags/experiment04/*.bag
 uav_avoidance/logs/experiment01/*.txt
 uav_avoidance/logs/experiment02/*.txt
 uav_avoidance/logs/experiment03/*.txt
+uav_avoidance/logs/experiment04/*.txt

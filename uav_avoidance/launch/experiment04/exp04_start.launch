@@ -25,7 +25,7 @@ Launches the swap node in robot 1
     </include>
 
     <!-- Green light -->
-    <node name="ready2go" pkg="uav_avoidance" type="ready2go.sh" args="uav_2" output="screen"/>
-    <node name="ready2go" pkg="uav_avoidance" type="ready2go.sh" args="uav_3" output="screen"/>
+    <node name="ready2go_uav2" pkg="uav_avoidance" type="ready2go.sh" args="uav_2" output="screen"/>
+    <node name="ready2go_uav3" pkg="uav_avoidance" type="ready2go.sh" args="uav_3" output="screen"/>
 	
 </launch>
