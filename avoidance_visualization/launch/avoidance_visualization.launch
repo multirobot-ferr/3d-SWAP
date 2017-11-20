@@ -11,7 +11,7 @@
         <param name="safety_radius" value="0.8486"/>
 
         <!-- I am assuming that the uav is able to stop in 2m -->
-        <param name="braking_distance" value="3.0"/>
+        <param name="braking_distance" value="1.25"/>
 
         <!-- I am assuming that the largest error in the positioning
         system is 1m. -->
@@ -19,7 +19,7 @@
 
         <!-- Start playing with this parameter if you want to increase
         the safety of your system -->
-        <param name="gamma_offset" value="0.0"/>
+        <param name="gamma_offset" value="1.5"/>
 
         <!-- Start playing with this parameter if you want to increase
         the safety of your system -->
