@@ -10,3 +10,4 @@ uav_avoidance/logs/experiment01/*.txt
 uav_avoidance/logs/experiment02/*.txt
 uav_avoidance/logs/experiment03/*.txt
 uav_avoidance/logs/experiment04/*.txt
+uav_avoidance_experiments/
