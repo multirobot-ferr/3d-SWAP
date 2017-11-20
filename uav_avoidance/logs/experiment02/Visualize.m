@@ -17,7 +17,7 @@ window = 10;
 step = window/dt;
 
 close all
-for t = (step+1):length(x)
+for t = 200+(step+1):10:length(x)
     subplot(2,2,1)
     plot3(x(t-step:t),y(t-step:t),z(t-step:t))
     axis square
