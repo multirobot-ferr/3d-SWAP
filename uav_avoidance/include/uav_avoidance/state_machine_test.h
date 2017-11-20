@@ -106,6 +106,11 @@ class StateMachine
         void Land();
 
         /**
+         * @brief Forces a land of the UAV out of the node
+         */
+        void ForcedLand();
+
+        /**
          * @brief Returns true while the system still flying
          */
         bool Running();
