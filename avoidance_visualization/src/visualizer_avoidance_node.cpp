@@ -232,15 +232,15 @@ void Visualizer::publishMarkers()
             string s= stream.str();
             height_marker.text = s;
             height_marker.pose.position.z = uavs_poses_.pose.position.z+2.0;
-            height_marker.pose.position.y = uavs_poses_.pose.position.y+1;
+            height_marker.pose.position.y = uavs_poses_.pose.position.y+2.0;
             height_marker.pose.position.x = uavs_poses_.pose.position.x;
             height_marker.color.a=1;
             height_marker.color.r=1;
             height_marker.color.b=1;
             height_marker.color.g=1;
-            height_marker.scale.x = 0.5;
-            height_marker.scale.y = 0.5;
-            height_marker.scale.z = 0.5;
+            height_marker.scale.x = 1.5;
+            height_marker.scale.y = 1.5;
+            height_marker.scale.z = 1.5;
             height_marker.mesh_use_embedded_materials = true;
 
        
