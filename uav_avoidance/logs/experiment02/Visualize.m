@@ -12,52 +12,72 @@ x = measurement(1,:);
 y = measurement(2,:);
 z = measurement(3,:);
 
-dt = 0.1;
+dt_ = 0.1;
 window = 10;
-step = window/dt;
+step = window/dt_;
+
+reference_z = [3.5 6.0];
+reference_x = [0.0 5.0];
 
 close all
-for t = 200+(step+1):10:length(x)
+for t = (step+1 + 3000):200:length(x)    
+    % Extracting the diferentials
+    dx = x(t-step:t);
+    dy = y(t-step:t);
+    dz = z(t-step:t);
+    dt = dt_*[t-step:t];
+
+    % Representation of z with respect to the x coordinate
     subplot(2,2,1)
-    plot3(x(t-step:t),y(t-step:t),z(t-step:t))
+    plot(dx,dz)
     axis square
     xlim([-7 7])
-    ylim([-7 7])
-    zlim([0 7])
+    ylim([0 7])
+    xlabel('position x[m]')
+    ylabel('altitude z[m]')
     
+    % Representation of z with respect of the time
+    subplot(2,2,3)
+    plot(dt, dz)
+    axis square
+    ylim([0 7])
+    xlabel('time t[s]')
+    ylabel('altitude z[m]')
+    
+    % Representation of x with respect to the y coordinate
     subplot(2,2,2)
-    plot(x(t-step:t),z(t-step:t))
+    plot(dx,dy)
     axis square
-    xlim([-7 7])
-    ylim([0 7])
-    xlabel('Altitude')
+    xlim(reference_x + 2*[-1 +1])
+    ylim(max((reference_x) + 1)*[-1 1])
+    xlabel('position x[m]')
+    ylabel('position y[m]')
     
+    % Representation of x with respect of the time
     subplot(2,2,4)
-    plot(dt*[t-step:t],z(t-step:t))
+    plot(dt, dx)
     axis square
-    ylim([0 7])
-    xlabel('Altitude')
+    ylim(reference_x + 2*[-1 +1])
+    xlabel('time t[s]')
+    ylabel('position x[m]')
     
-    pause(dt)
+    pause(dt_)
 end
 
+figure 
+plot(dt_*[1:length(x)],x ...
+    ,dt_*[1:length(x)],reference_x(1)*[ones(size(x))]...
+    ,dt_*[1:length(x)],reference_x(2)*[ones(size(x))])
+title('X breacking')
+
+figure 
+plot(dt_*[1:length(z)],z ...
+    ,dt_*[1:length(z)],reference_z(1)*[ones(size(z))]...
+    ,dt_*[1:length(z)],reference_z(2)*[ones(size(z))])
+title('Z breacking')
+
+% 1.25m de frenada
  
-% % Ploting everything
-% close all
-% axis square
-% plot(measurements(1,:), measurements(2,:), '.r', ...
-%      measurements_no_out(1,:), measurements_no_out(2,:), '.b', ...
-%      p_mean(1), p_mean(2), 'or', ...
-%      e1x, e1y, '-r', ...
-%      p_mean_no_out(1), p_mean_no_out(2), 'ob', ...
-%      e2x, e2y, '-b' ...
-%      )
-% legend('Measurements Discarted', 'Measurements', 'Mean', 'Max error mean', 'Mean no outlayers','Max error mean no out')
-%  
-% xlabel(['Mean error ' num2str(max(errors)) ', Mean no outlayers error ' num2str(max(errors2))])
-% ylabel(['Measurements ' num2str(mess)])
-% disp(['Mean at (' num2str(p_mean) '), error in mean ' num2str(max(errors))])
-% disp(['Mean at (' num2str(p_mean) '), error in mean no outlayers ' num2str(max(errors2))])
- 
+
 end
 

@@ -4,7 +4,7 @@
     <arg name="uav_id" value="3"/>
 
     <!-- Load frame transforms for map and UAVs -->
-    <rosparam file="$(find uav_avoidance)/launch/config/karting_params.yaml" command="load" />
+    <rosparam file="$(find uav_avoidance)/config/simulator/simulator_params_carting.yaml" command="load" />
 
     <!-- Launch robot id=$(arg uav_id) -->
     <include file="$(find px4_bringup)/launch/spawn_robot.launch">
@@ -14,6 +14,6 @@
     </include>
 
     <!-- Launch UAL server for uav id=$(arg uav_id) -->
-    <node pkg="uav_abstraction_layer" type="server" name="server_$(arg uav_id)" output="screen" args="-uav_id=$(arg uav_id) -pose_frame_id=map -ns_prefix=$(arg ns_prefix)"/>
+    <node pkg="uav_abstraction_layer" type="server" name="server_$(arg uav_id)" output="screen" args="-uav_id=$(arg uav_id) -pose_frame_id=map -ns_prefix=uav_"/>
 
 </launch>
