@@ -84,7 +84,7 @@
 
                 <!-- Start playing with this parameter if you want to increase
                 the safety of your system -->
-                <param name="swap/gamma_offset" value="0.5"/>
+                <param name="swap/gamma_offset" value="1.5"/>
 		
 		<!--if distance between uavs is larger than dz_min dont swap -->
 		<param name="swap/dz_min" value="10"/>
