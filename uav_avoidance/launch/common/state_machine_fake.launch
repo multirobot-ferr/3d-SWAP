@@ -58,7 +58,7 @@ La idea es buscar como programar un if y dependiendo de la identidad del robot c
     <arg name="waypoints" default="$(find uav_avoidance)/logs/goals1.txt"/>
 
 	<arg name="yaw_on" default="false"/>
-	<arg name="max_speed" default="2.0"/>
+	<arg name="max_speed" default="1.5"/>
 
     <group ns="/uav_$(arg robot_number)">
         <node pkg="uav_avoidance" type="state_machine" name="state_machine" output="screen">
@@ -75,14 +75,14 @@ La idea es buscar como programar un if y dependiendo de la identidad del robot c
                 <!-- xPID -->
                 <param name="xv_pid/k_p" value="1.0"/> 
                 <param name="xv_pid/k_i" value="0.02"/>   
-                <param name="xv_pid/k_d" value="0.02"/> 
+                <param name="xv_pid/k_d" value="0.2"/> 
                 <param name="xv_pid/integral_limit" value="0.1"/>   
                 <param name="xv_pid/pid_output_limit" value="$(arg max_speed)"/> 
   
                 <!-- yPID -->
                 <param name="yv_pid/k_p" value="1.0"/> 
                 <param name="yv_pid/k_i" value="0.02"/>   
-                <param name="yv_pid/k_d" value="0.02"/> 
+                <param name="yv_pid/k_d" value="0.2"/> 
                 <param name="yv_pid/integral_limit" value="0.1"/>   
                 <param name="yv_pid/pid_output_limit" value="$(arg max_speed)"/> 
                 
