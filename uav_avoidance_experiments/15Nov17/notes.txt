@@ -1,4 +1,0 @@
-On the 15th we only executed one single experiment of experiment 1 (localization)
-and experiment 02 (one uav on the ground, second avoiding)
-
-There is a video of the second experiment in my mobilephone
