@@ -1,0 +1,14 @@
+<!--
+Launches the swap node in robot 1
+-->
+
+<launch>
+    <arg name="uav_id" default="1"/>
+
+    <!-- Swap algorithm -->
+    <include file="$(find uav_avoidance)/launch/robot0$(arg uav_id)/swap_r$(arg uav_id).launch">
+        <arg name="path2goal" default="$(find uav_avoidance)/launch/experiment05/mission5_uav$(arg uav_id).txt"/>
+
+        <arg name="nameofbag" default="$(find uav_avoidance)/logs/experiment05/"/>
+    </include>
+</launch>

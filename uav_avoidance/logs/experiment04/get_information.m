@@ -5,7 +5,7 @@ function get_information()
 password = input('Introduce mabzircs machines password:','s');
 
 for robot = 2:3
-    system(['sshpass -p ' password ' scp grvc@mbzirc_' num2str(robot) ':/home/grvc/catkin_ws/src/mbzirc/uav_avoidance/logs/experiment02/uav* ' cd])
+    system(['sshpass -p ' password ' scp grvc@mbzirc_' num2str(robot) ':/home/grvc/catkin_ws/src/mbzirc/uav_avoidance/logs/experiment04/uav* ' cd])
 end
 
 end
