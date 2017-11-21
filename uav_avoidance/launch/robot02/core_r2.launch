@@ -4,7 +4,7 @@
     <arg name="uav_id" value="2"/>
 
     <!-- Load frame transforms for map and UAVs -->
-    <rosparam file="$(find uav_avoidance)/config/simulator/simulator_params_carting.yaml" command="load" />
+    <rosparam file="$(find uav_avoidance)/config/simulator/simulator_params.yaml" command="load" />
 
     <!-- Launch robot id=$(arg uav_id) -->
     <include file="$(find px4_bringup)/launch/spawn_robot.launch">
