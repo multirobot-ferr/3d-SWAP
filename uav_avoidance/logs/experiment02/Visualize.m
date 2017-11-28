@@ -17,7 +17,7 @@ window = 10;
 step = window/dt_;
 
 reference_z = [3.5 6.0];
-reference_x = [0.0 5.0];
+reference_x = [0.0 -20.0];
 
 close all
 for t = (step+1 + 3000):200:length(x)    
