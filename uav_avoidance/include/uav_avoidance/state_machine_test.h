@@ -143,8 +143,8 @@ class StateMachine
         grvc::utils::PidROS xv_pid_{"xv_pid"};
         grvc::utils::PidROS yv_pid_{"yv_pid"};
         grvc::utils::PidROS zv_pid_{"zv_pid"};
+        grvc::utils::PidROS yawv_pid_{"yaw_pid"};
 
-        grvc::utils::PidController* pid_yaw_;
 
 
         // System variables

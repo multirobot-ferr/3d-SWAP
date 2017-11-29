@@ -356,6 +356,7 @@ void StateMachine::PublishPosErr()
     {
         xv_pid_.resetI();
         yv_pid_.resetI();
+        yawv_pid_.resetI();
         last_confl_warning = confl_warning_;
     }
 
@@ -366,54 +367,35 @@ void StateMachine::PublishPosErr()
         ye = 0.8*v_ref_*avoid_mov_direction_uav_.y;
     }
 
+    double yaw_desired=atan2(ye, xe);
+    double yawe=ScaleAngle(yaw_desired)-ScaleAngle(uav_yaw_);
+
+
     double x_actuation = xv_pid_.control_signal(xe);
     double y_actuation = yv_pid_.control_signal(ye);
     double z_actuation = zv_pid_.control_signal(ze);
+    double yaw_actuation= yawv_pid_.control_signal(yawe);
 
-    PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation);
 
 
-/*    double x_actuation = xv_pid_.control_signal(xe);
-    double y_actuation = yv_pid_.control_signal(ye);
-    double z_actuation = zv_pid_.control_signal(ze);*/
-
-    /*std::cout << "ex: " << std::setprecision(2) << xe << " ax: " << std::setprecision(2) << x_actuation << 
-              "\t ey: " << std::setprecision(2) << ye << " ay: " << std::setprecision(2) << y_actuation << 
-              "\t ez: " << std::setprecision(2) << ze << " az: " << std::setprecision(2) << z_actuation << std::endl;
-    */
-    
-    // Information for the UAV
-/*    if (!confl_warning_)
+    if(yaw_on_)
     {
-        // if mov_cam is activated yaw move first
-        if(yaw_on_){
-            ROS_ERROR("yaw_on active, system not available");
-            double dt= 0.01;
-            double ori_xy =  atan2(ye, xe);
-            double ori_yz =  atan2(ze, ye);
-            double yaw_desired=atan2((way_points_(wp_idx_, 1)), (way_points_(wp_idx_, 0)));
-            double yawe=ScaleAngle(yaw_desired)-ScaleAngle(uav_yaw_);
-            double signal=pid_yaw_->control_signal(yawe, dt);
-            
-            PublishGRVCCmdVel(v_ref_*cos(ori_xy), v_ref_*sin(ori_xy), v_ref_*sin(ori_yz), signal);
-        }
-        else
-        {
-            // Move is safe
-            PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation);
-        }
+    
+        ROS_ERROR("yaw_on active, system not available");
+
+        // orientation is controlled
+        PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation, yaw_actuation);
+
     }
     else
     {
 
-        ros::Duration d = t - ros::Time::now();
-        std::cout << "avoidance!" << d.toSec() << std::endl;
+        PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation);
 
-        // Move is not safe
-        PublishGRVCCmdVel(  0.8*v_ref_*avoid_mov_direction_uav_.x,  // 1 before
-                            0.8*v_ref_*avoid_mov_direction_uav_.y,  // 1 before
-                            z_actuation);
-    }*/
+    }
+
+
+
 }
 // ###########  #######################  ########### //
 
