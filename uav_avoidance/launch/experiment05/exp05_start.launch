@@ -14,7 +14,7 @@ Launches the swap node in robot 1
     <include file="$(find uav_avoidance)/launch/common/recordbag.launch">
             <arg name="topics2salve" default="  /uav_3/ual/pose 
                                                 /uav_2/ual/pose
-						/ual_1/ual/pose 
+						/uav_1/ual/pose 
                                                 /uav_3/avoid_movement_direction 
                                                 /uav_2/avoid_movement_direction
 						/uav_1/avoid_movement_direction  
