@@ -113,12 +113,24 @@ StateMachine::StateMachine() {
         initialization_error = true;
         ROS_FATAL("State Machine: v_max is not set. Closing the state machine system");
     }
+    if (!pnh_.getParam("game_frame", game_frame_))
+    {
+        initialization_error = true;
+        ROS_FATAL("State Machine: game frame is not set. Closing the state machine system");
+    }
 
     std::string goals_path;
     if (pnh_.getParam("goals_path", goals_path))
     {
         ROS_INFO("State Machine: Goal set:");
         way_points_.load(goals_path);
+        
+        
+        if(game_frame_)
+        {
+            way_points_=gameToMap(way_points_, 2.1984);
+        }
+
         for (int row = 0; row < way_points_.n_rows; ++row)
         {
             ROS_INFO("Goal id=%d (%.2f, %.2f, %.2f)", row,
@@ -573,4 +585,23 @@ double StateMachine::ScaleAngle(double angle)
         angle -= 2.0*M_PI;
     }
     return angle;
+}
+
+/**
+ * Utility function. If game_frame_ is true it returns waypoints in /map
+ */
+
+arma::mat StateMachine::gameToMap(arma::mat wp_game, double yaw_rot)
+{
+
+    arma::mat wp_map=wp_game;
+        for (int row = 0; row < way_points_.n_rows; ++row)
+            {
+            wp_map(row,0)=wp_game(row,0)*cos(yaw_rot)-wp_game(row,1)*sin(yaw_rot);
+            wp_map(row,1)=wp_game(row,0)*sin(yaw_rot)+wp_game(row,1)*cos(yaw_rot);
+            
+            }
+            
+    return wp_map;
+
 }

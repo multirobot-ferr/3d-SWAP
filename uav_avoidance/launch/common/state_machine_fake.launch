@@ -55,10 +55,11 @@ La idea es buscar como programar un if y dependiendo de la identidad del robot c
 <launch>
 	<!-- Configurable parameters -->
 	<arg name="robot_number" default="1"/>
-    <arg name="waypoints" default="$(find uav_avoidance)/logs/goals1.txt"/>
+    	<arg name="waypoints" default="$(find uav_avoidance)/logs/goals1.txt"/>
 
 	<arg name="yaw_on" default="false"/>
 	<arg name="max_speed" default="1.5"/>
+	<arg name="game_frame" default="false"/>
 
     <group ns="/uav_$(arg robot_number)">
         <node pkg="uav_avoidance" type="state_machine" name="state_machine" output="screen">
@@ -68,7 +69,7 @@ La idea es buscar como programar un if y dependiendo de la identidad del robot c
             <param name="d_goal" value="3.0"/>      <!-- Distance to consider that a uav is on a goal -->
 	        <param name="yaw_on" value= "$(arg yaw_on)" />  
 	        <param name="v_max"  value="$(arg max_speed)"/>
-
+		<param name="game_frame"value="$(arg game_frame)"/>
             <param name="goals_path" value="$(arg waypoints)"/> <!-- File containing a set of goals -->
             
             <!-- PID parameters-->
