@@ -1,1 +1,0 @@
-bag files are saving a collision wOrning instead of a collision warning

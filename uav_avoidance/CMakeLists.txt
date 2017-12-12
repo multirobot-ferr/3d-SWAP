@@ -78,11 +78,6 @@ target_link_libraries(swap_2_5d_library ${ARMADILLO_LIBRARIES})
 target_link_libraries(swap_2_5d_library ${ARMADILLO_LIBRARIES})
 target_link_libraries(swap_2_5d_library ${PCL_LIBRARIES})
 
-#Creating the ROS node for test
-
-add_executable(measures src/measures.cpp)
-add_dependencies(measures swap_2_5d_library ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(measures swap_2_5d_library ${catkin_LIBRARIES})
 
 # Creating the ROS node for SWAP
 add_executable(swap_2_5d src/swap_2_5d.cpp)

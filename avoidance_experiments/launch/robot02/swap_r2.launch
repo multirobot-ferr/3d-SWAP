@@ -1,0 +1,31 @@
+<!--
+
+Launches the swap node in robot 1
+
+-->
+
+<launch>
+
+    <arg name="uav_id" default="2"/>
+    <arg name="yaw_on" default="false"/>
+    <arg name="path2goal" default="$(find avoidance_experiments)/logs/mission2_uav$(arg uav_id).txt"/>
+    <arg name="nameofbag" default="simple_bag"/>
+
+	<!-- Waking up all state machines systems -->
+    <node name="auv_state_machine_$(arg uav_id)" pkg="uav_avoidance" type="delayed.sh"
+		args="1 roslaunch uav_avoidance state_machine_fake.launch 
+                waypoints:=$(arg path2goal) 
+                robot_number:=$(arg uav_id) 
+                yaw_on:=$(arg yaw_on)
+                " output="screen">
+	</node>
+
+    <!-- Swap algorithm -->
+    <node name="auv_avoidance_$(arg uav_id)" pkg="uav_avoidance" type="delayed.sh"
+		args="2 roslaunch uav_avoidance avoidance.launch 
+                robot_number:=$(arg uav_id) 
+                yaw_on:=$(arg yaw_on) 
+                file_path:=$(arg nameofbag)" output="screen">
+    </node>
+	
+</launch>

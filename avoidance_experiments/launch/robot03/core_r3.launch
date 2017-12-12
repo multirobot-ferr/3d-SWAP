@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="uav_id" value="3"/>
+
+    <!-- Load frame transforms for map and UAVs -->
+    <rosparam file="$(find avoidance_experiments)/config/simulator/simulator_params.yaml" command="load" />
+
+    <!-- Launch robot id=$(arg uav_id) -->
+    <include file="$(find px4_bringup)/launch/spawn_robot.launch">
+        <arg name="id" value="$(arg uav_id)"/>
+	    <arg name="mode" value="serial"/>
+    	<arg name="material" value="ZincYellow"/>
+    </include>
+
+    <!-- Launch UAL server for uav id=$(arg uav_id) -->
+    <node pkg="uav_abstraction_layer" type="server" name="server_$(arg uav_id)" output="screen" args="-uav_id=$(arg uav_id) -pose_frame_id=map -ns_prefix=uav_"/>
+
+</launch>

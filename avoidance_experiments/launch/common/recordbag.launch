@@ -1,0 +1,13 @@
+<!-- Launches a rosbag prepared to save datas-->
+<launch>
+
+    <!-- This are the topics that are going to be saved -->
+    <!-- E.g: <arg name="topics2salve" default="base_scan odom robot_pose_ekf/odom tf"/> -->
+    <arg name="topics2salve" default="/uav_1/ual/pose /uav_2/ual/pose /uav_3/ual/pose /uav_1/avoid_movement_direction /uav_2/avoid_movement_direction /uav_3/avoid_movement_direction /uav_1/wished_movement_direction /uav_2/wished_movement_direction /uav_3/wished_movement_direction /uav_1/collision_warning /uav_2/collision_warning /uav_3/collision_warning"/>
+
+    <arg name="nameofbag" default="Bag"/>
+
+    <!-- Saving the requested information in a rosbag -->
+    <node pkg="rosbag" type="record" name="rosbag" args="-O  $(find avoidance_experiments)/bags/$(arg nameofbag) tf tf_static $(arg topics2salve)" output="screen"/>   
+
+</launch>

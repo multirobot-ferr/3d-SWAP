@@ -1,0 +1,37 @@
+<!--
+
+Launches the swap node in robot 1
+
+-->
+
+<launch>
+
+    <!-- Representation node -->
+    <!-- <node name="visualization_system" pkg="uav_avoidance" type="delayed.sh"
+		args="3 roslaunch avoidance_visualization avoidance_visualization.launch" output="screen"/> -->
+
+    <!-- Prepare the bag -->
+    <include file="$(find avoidance_experiments)/launch/common/recordbag.launch">
+            <arg name="topics2salve" default="  /uav_3/ual/pose 
+                                                /uav_2/ual/pose 
+                                                /uav_3/avoid_movement_direction 
+                                                /uav_2/avoid_movement_direction  
+                                                /uav_3/wished_movement_direction 
+                                                /uav_2/wished_movement_direction 
+                                                /uav_3/collision_warning 
+                                                /uav_2/collision_warning
+                                                /uav_2/xv_pid_actuation
+                                                /uav_2/xv_pid_error"/>
+
+            <arg name="nameofbag" default="experiment02/experiment02_01_x"/>
+    </include>
+
+    <!-- Green light -->
+    <node name="ready2go" pkg="uav_avoidance" type="ready2go.sh" args="uav_2" output="screen"/>
+
+    <node name="reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+
+    <node name="plot" pkg="rqt_plot" type="rqt_plot" args="uav_2/xv_pid_error uav_2/xv_pid_actuation" output="screen"/>
+
+	
+</launch>

@@ -3,15 +3,12 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/Bool.h>
-#include <tf2/utils.h>
 #include <string>
 #include <sstream>
 #include <vector>
 #include <map>
 #include <fstream>
 #include <iostream>
-#include <math.h>
-#include <ros/ros.h>
 #include <iomanip> // setprecision
 
 using namespace std;
@@ -322,17 +319,7 @@ void Visualizer::publishMarkers()
             id_marker.scale.z = 1;
             id_marker.mesh_use_embedded_materials = true;
 
-            /*
-            marker.ns = "uavs_state";
-            marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-            marker.text = std::to_string(uav_id) + " ";
-            marker.pose.position.z += 2.0;
-            
-            marker.scale.x = 1;
-            marker.scale.y = 1;
-            marker.scale.z = 1;
-            
-            */
+          
             // Publish uav cylinder
 
             visualization_msgs::Marker goal_marker;
@@ -467,6 +454,9 @@ void Visualizer::publishMarkers()
                     }
                 break;
             }
+
+
+
 
             cylinder.action = visualization_msgs::Marker::ADD;
 
