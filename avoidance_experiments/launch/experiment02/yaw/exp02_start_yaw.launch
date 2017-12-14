@@ -20,10 +20,10 @@ Launches the swap node in robot 1
                                                 /uav_2/wished_movement_direction 
                                                 /uav_3/collision_warning 
                                                 /uav_2/collision_warning
-                                                /uav_2/zv_pid_actuation
-                                                /uav_2/zv_pid_error"/>
+                                                /uav_2/yaw_pid_actuation
+                                                /uav_2/yaw_pid_error"/>
 
-            <arg name="nameofbag" default="experiment02/experiment02_01_z"/>
+            <arg name="nameofbag" default="experiment02/experiment02_01_yaw"/>
     </include>
 
     <!-- Green light -->
@@ -31,7 +31,7 @@ Launches the swap node in robot 1
 
     <node name="reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
 
-    <node name="plot" pkg="rqt_plot" type="rqt_plot" args="uav_2/zv_pid_error uav_2/zv_pid_actuation" output="screen"/>
+    <node name="plot" pkg="rqt_plot" type="rqt_plot" args="uav_2/yaw_pid_error uav_2/yaw_pid_actuation" output="screen"/>
 
 
 	

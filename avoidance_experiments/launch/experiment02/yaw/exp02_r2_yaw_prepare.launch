@@ -7,8 +7,8 @@ Launches the swap node in robot 2
 
     <!-- Swap algorithm -->
     <include file="$(find avoidance_experiments)/launch/robot0$(arg uav_id)/swap_r$(arg uav_id).launch">
-        <arg name="path2goal" default="$(find avoidance_experiments)/launch/experiment02/z/mission2_uav$(arg uav_id)_z.txt"/>
-
+        <arg name="path2goal" default="$(find avoidance_experiments)/launch/experiment02/yaw/mission2_uav$(arg uav_id)_yaw.txt"/>
+        <arg name="yaw_on" default="true"/>
         <arg name="nameofbag" default="$(find avoidance_experiments)/logs/experiment02/"/>
     </include>
 </launch>
