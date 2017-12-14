@@ -3,7 +3,7 @@ Launches the swap node in robot 1
 -->
 
 <launch>
-    <arg name="uav_id" default="1"/>
+    <arg name="uav_id" default="4"/>
 
     <!-- Swap algorithm -->
     <include file="$(find avoidance_experiments)/launch/robot0$(arg uav_id)/swap_r$(arg uav_id).launch">

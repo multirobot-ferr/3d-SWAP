@@ -260,7 +260,7 @@ void Visualizer::publishMarkers()
 
             switch(uav_id)
             {
-                case 1:
+                case 4:
                 // orange
                 marker_robot.color.r = 1.0;
                 marker_robot.color.g = 0.647;
@@ -295,7 +295,7 @@ void Visualizer::publishMarkers()
             id_marker.color.a=1;
              switch(uav_id)
             {
-                case 1:
+                case 4:
                 // orange
                 id_marker.color.r = 1.0;
                 id_marker.color.g = 0.647;
@@ -335,7 +335,7 @@ void Visualizer::publishMarkers()
             goal_marker.color.a=1;
              switch(uav_id)
             {
-                case 1:
+                case 4:
                 // orange
                 goal_marker.color.r = 1.0;
                 goal_marker.color.g = 0.647;
@@ -348,10 +348,10 @@ void Visualizer::publishMarkers()
                 goal_marker.color.b = 0.510; 
                 break;
                 case 3:
-                // zinc yellow
-                goal_marker.color.r = 0.945;
-                goal_marker.color.g = 0.812;
-                goal_marker.color.b = 0.267;
+                // blue
+                goal_marker.color.r = 0.0;
+                goal_marker.color.g = 0.0;
+                goal_marker.color.b = 1.0;
                 break;
             }
             goal_marker.scale.x = 1;
@@ -371,10 +371,10 @@ void Visualizer::publishMarkers()
 
             switch(uav_id)
             {
-                case 1:
+                case 4:
                 
-                uav_cylinder.color.r = 0.7;
-                uav_cylinder.color.g = 0;
+                uav_cylinder.color.r = 0;
+                uav_cylinder.color.g = 0.7;
                 uav_cylinder.color.b = 0;
                 break;
                 case 2:
@@ -412,7 +412,7 @@ void Visualizer::publishMarkers()
 
             switch(uav_id)
             {
-                case 1:
+                case 4:
                     if(uav_direction_received_==false){
                     cylinder.color.r = 0;
                     cylinder.color.g = 1;
@@ -481,7 +481,7 @@ void Visualizer::publishMarkers()
                 arrow_goal.color.a = 1;   
                 switch(uav_id)
                 {
-                    case 1:
+                    case 4:
                     // orange
                     arrow_goal.color.r = 0.0;
                     arrow_goal.color.g = 0.0;
@@ -536,7 +536,7 @@ void Visualizer::publishMarkers()
                 arrow.color.a = 1;   
                 switch(uav_id)
                 {
-                    case 1:
+                    case 4:
                     // orange
                     arrow.color.r = 0.5;
                     arrow.color.g = 0;
@@ -614,11 +614,13 @@ int main(int argc, char** argv)
 
         robot.push_back(Visualizer(i));
     }*/
-    Visualizer vis_uav1(1);
+    
 
     Visualizer vis_uav2(2);
 
     Visualizer vis_uav3(3);
+
+    Visualizer vis_uav4(4);
     
     while(ros::ok())
     {
@@ -631,7 +633,7 @@ int main(int argc, char** argv)
           
     } */
 
-        vis_uav1.publishMarkers();
+        vis_uav4.publishMarkers();
 
         vis_uav2.publishMarkers();
 

@@ -11,7 +11,7 @@ Launches the swap node in robot 1
 		args="3 roslaunch avoidance_visualization avoidance_visualization.launch" output="screen"/> -->
 
     <!-- Prepare the bag -->
-    <include file="$(find avoidance_experiments/launch/common/recordbag.launch">
+    <include file="$(find avoidance_experiments)/launch/common/recordbag.launch">
             <arg name="topics2salve" default="  /uav_3/ual/pose 
                                                 /uav_2/ual/pose 
                                                 /uav_3/avoid_movement_direction 

@@ -18,8 +18,8 @@ Launches the swap node in robot 1
                                                 /uav_2/avoid_movement_direction  
                                                 /uav_3/wished_movement_direction 
                                                 /uav_2/wished_movement_direction 
-                                                /uav_3/collision_worning 
-                                                /uav_2/collision_worning"/>
+                                                /uav_3/collision_warning 
+                                                /uav_2/collision_warning"/>
 
             <arg name="nameofbag" default="experiment02/experiment02_01"/>
     </include>
