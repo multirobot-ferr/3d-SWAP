@@ -44,7 +44,7 @@
 
 	<!-- Configurable parameters -->
 	<arg name="robot_number" default="1"/>
-    <arg name="file_path"    default="$(find uav_avoidance)/logs/"/>
+    <arg name="file_path"    default="$(find avoidance_experiments)/logs/"/>
 	
 	<group ns="uav_$(arg robot_number)">
 
@@ -87,10 +87,10 @@
                 <param name="swap/gamma_offset" value="1.5"/>
 		
 		<!--if distance between uavs is larger than dz_min dont swap -->
-		<param name="swap/dz_min" value="4"/>
+		<param name="swap/dz_min" value="10"/>
 
 		<!--if distance between uavs is larger than dz_min dont swap -->
-		<param name="swap/dz_range" value="10"/>
+		<param name="swap/dz_range" value="2"/>
 
                 <!--  #######  Carefully tunning ########### -->
                 <!-- This parameter will help to the robots to keep the 
