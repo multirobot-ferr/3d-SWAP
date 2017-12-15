@@ -615,7 +615,7 @@ arma::mat StateMachine::gameToMap(arma::mat wp_game, double yaw_rot)
             geometry_msgs::TransformStamped transformToMap;
             tf2_ros::Buffer tfBuffer;
             tf2_ros::TransformListener tfListener(tfBuffer);
-            transformToMap = tfBuffer.lookupTransform("game","map", ros::Time(0), ros::Duration(1.0));
+            transformToMap = tfBuffer.lookupTransform("map","game", ros::Time(0), ros::Duration(1.0));
 
             tf2::doTransform(aux,out,transformToMap);
 
