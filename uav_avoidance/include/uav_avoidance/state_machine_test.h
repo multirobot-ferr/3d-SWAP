@@ -54,7 +54,10 @@
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_srvs/SetBool.h>
-#include <uav_avoidance/pid_controller.h>         
+#include <uav_avoidance/pid_controller.h>  
+#include <tf2_ros/transform_listener.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2/LinearMath/Quaternion.h>       
 
 // Uncomment this define if all the robots starts in (0,0)
 //#define UAV_NOT_IN_ZERO_ZERO 1
