@@ -35,7 +35,7 @@
     <node pkg="rviz" name="rviz" type="rviz" args="-d $(find avoidance_visualization)/rviz/visualization.rviz"/>   
   </group>
 
-  <arg name="map" default="nes3_amcl"/> <!-- nes1, nes3-->
+  <arg name="map" default="karting_map"/> 
 
 	<!-- Waking up the specific map -->
 		<node name="map_server" pkg="map_server" type="map_server" 
