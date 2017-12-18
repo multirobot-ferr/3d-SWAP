@@ -180,7 +180,7 @@ Swap_2_5d::Swap_2_5d()
     bool  rotation_ctrl_p_no_approach;
     if (pnh_->getParam("swap/rotation_ctrl_p_no_approach", rotation_ctrl_p_no_approach))
     {
-        ROS_ERROR("VOY POR AQUI");
+        SetRotCtrlP(rotation_ctrl_p, rotation_ctrl_p_no_approach);
     }
 
     // Specific namespace for UAL    
