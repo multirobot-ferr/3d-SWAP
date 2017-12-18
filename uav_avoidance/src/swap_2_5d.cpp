@@ -177,6 +177,12 @@ Swap_2_5d::Swap_2_5d()
         SetRotCtrlP(rotation_ctrl_p);
     }
 
+    bool  rotation_ctrl_p_no_approach;
+    if (pnh_->getParam("swap/rotation_ctrl_p_no_approach", rotation_ctrl_p_no_approach))
+    {
+        ROS_ERROR("VOY POR AQUI");
+    }
+
     // Specific namespace for UAL    
     std::string ual_ns;
     if (!pnh_->getParam("ual_namespace", ual_ns))
