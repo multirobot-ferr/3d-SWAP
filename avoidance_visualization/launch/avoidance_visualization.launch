@@ -32,6 +32,15 @@
   </node>    
 
   <node pkg="rviz" name="rviz" type="rviz" args="-d $(find avoidance_visualization)/rviz/visualization.rviz"/>   
+  
 
+  <arg name="map" default="nes3_amcl"/> <!-- nes1, nes3-->
+
+	<!-- Waking up the specific map -->
+		<node name="map_server" pkg="map_server" type="map_server" 
+			args="$(find avoidance_visualization)/launch/$(arg map).yaml" respawn="true">	
+				<!-- General map parameters-->
+				<param name="frame_id" value="game" />	
+		</node>
 
 </launch>
