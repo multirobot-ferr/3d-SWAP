@@ -31,13 +31,9 @@
 
   </node>    
 
-<<<<<<< HEAD
   <group ns="$(env LOGNAME)">
     <node pkg="rviz" name="rviz" type="rviz" args="-d $(find avoidance_visualization)/rviz/visualization.rviz"/>   
   </group>
-=======
-  <node pkg="rviz" name="rviz" type="rviz" args="-d $(find avoidance_visualization)/rviz/visualization.rviz"/>   
-  
 
   <arg name="map" default="nes3_amcl"/> <!-- nes1, nes3-->
 
@@ -47,6 +43,5 @@
 				<!-- General map parameters-->
 				<param name="frame_id" value="game" />	
 		</node>
->>>>>>> ac8dd2ca8a8ca81a15f116872421bbb717813826
 
 </launch>
