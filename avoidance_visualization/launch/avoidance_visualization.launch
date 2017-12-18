@@ -31,7 +31,8 @@
 
   </node>    
 
-  <node pkg="rviz" name="rviz" type="rviz" args="-d $(find avoidance_visualization)/rviz/visualization.rviz"/>   
-
+  <group ns="$(env LOGNAME)">
+    <node pkg="rviz" name="rviz" type="rviz" args="-d $(find avoidance_visualization)/rviz/visualization.rviz"/>   
+  </group>
 
 </launch>
