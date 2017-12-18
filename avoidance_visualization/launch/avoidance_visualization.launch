@@ -38,7 +38,7 @@
 
 	<!-- Waking up the specific map -->
 		<node name="map_server" pkg="map_server" type="map_server" 
-			args="$(find avoidance_visualization)/launch/$(arg map).yaml" respawn="true">	
+			args="$(find avoidance_visualization)/maps/$(arg map).yaml" respawn="true">	
 				<!-- General map parameters-->
 				<param name="frame_id" value="game" />	
 		</node>

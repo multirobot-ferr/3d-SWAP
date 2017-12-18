@@ -1,6 +1,6 @@
-image: karting_map.png
+image: karting_map2.png
 resolution: 0.135
-origin: [22, 43, 3.1400]
+origin: [-18, -6.5, 0]
 negate: 0
 occupied_thresh: 0.65
 free_thresh: 0.196
