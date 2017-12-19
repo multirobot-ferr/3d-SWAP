@@ -10,6 +10,7 @@ Launches the swap node in robot 1
     <arg name="yaw_on" default="false"/>
     <arg name="path2goal" default="$(find avoidance_experiments)/logs/mission2_uav$(arg uav_id).txt"/>
     <arg name="nameofbag" default="simple_bag"/>
+    <arg name="game_frame" default="true"/>
 
 	<!-- Waking up all state machines systems -->
     <node name="auv_state_machine_$(arg uav_id)" pkg="uav_avoidance" type="delayed.sh"
@@ -17,6 +18,7 @@ Launches the swap node in robot 1
                 waypoints:=$(arg path2goal) 
                 robot_number:=$(arg uav_id) 
                 yaw_on:=$(arg yaw_on)
+                game_frame:=$(arg game_frame)
                 " output="screen">
 	</node>
 
