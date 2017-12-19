@@ -154,10 +154,13 @@ namespace avoid
               * This value is used to make the robots remain at certain distance of
               * the obstacles arround while avoiding. This means that can drive away
               * if they are too close, but also drive to the obstacle if is too far.
-              * Acts like the P of a PID
-              * @brief rotation control proportional value
+              * Acts like the P of a PID.
+              * If no_ctrl_approach is set to true, the P controller only makes the 
+              * robot separate from other obstacles
+              * @param rotation control proportional value
+              * @param 
               */
-             void SetRotCtrlP( double rot_ctrl_P);
+             void SetRotCtrlP( double rot_ctrl_P, bool no_ctrl_approach = false);
 
              /* ****************************************************************************
               * GETTER                                                                     *
@@ -230,6 +233,7 @@ namespace avoid
             // Conflict dealing
             double goal_lateral_vision_ = 360*M_PI/180;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
             double rot_ctrl_P_ = 0.0;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
+            bool   no_ctrl_approach_ = false;       //!< Only allows separations while using rot_ctrl_P_
             double yaw_max_err_ = 45*M_PI/180.0;    //!< Maximal error allowed in RENCONTRE state
             double lin_v_rendezvous_ = 1.0;         //!< Maximal speed in the rendezvous state
             rot_behaviour rot_behaviour_ = COUNTERCLOCKWISE;           //!< +1: Always rotate counter-clockwise, 0: not defined; -1: Always rotate clockwise

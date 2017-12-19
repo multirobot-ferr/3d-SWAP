@@ -101,7 +101,11 @@
                 If active, will force the robot to go away because the distance
                 to the object starts to be too risky
                  -->
-                <param name="swap/rotation_ctrl_p" value="0.0"/>
+                <param name="swap/rotation_ctrl_p" value="1.0"/>
+                
+                <!-- This parameter makes the rotation_ctrl_p only work
+                in a repultive way-->
+                <param name="swap/rotation_ctrl_p_no_approach" value="true"/>
 
                 <!-- When avoidance sends speed commands, it will send a vector
                 with a modulus equal to uav_vector_speed -->

@@ -202,9 +202,10 @@ namespace avoid
     /**
      * Configures the value of the rotation control proportional
      */
-    void Swap::SetRotCtrlP( double rot_ctrl_P)
+    void Swap::SetRotCtrlP( double rot_ctrl_P, bool no_ctrl_approach)
     {
         rot_ctrl_P_ = rot_ctrl_P;
+        no_ctrl_approach_ = no_ctrl_approach;
     }
 
      /**
@@ -459,10 +460,14 @@ namespace avoid
          // The system tries to keep a certain rotation distance.
          double yaw_dist_keeper = rot_ctrl_P_ * GetYawAvoidanceDistanceError( conflict2avoid_phi );
 
-
          // We have to saturate the output
          yaw_dist_keeper = std::min(yaw_dist_keeper, +M_PI_2);    //+MI_PI_2
          yaw_dist_keeper = std::max(-M_PI_2, yaw_dist_keeper );   //-MI_PI_2
+
+         if (no_ctrl_approach_)
+         {
+             std::cout << "Change!" << std::endl;
+         }
 
          yaw_avoidance_ += yaw_dist_keeper;
 
