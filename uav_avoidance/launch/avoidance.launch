@@ -87,7 +87,7 @@
                 <param name="swap/gamma_offset" value="1.5"/>
 		
 		<!--if distance between uavs is larger than dz_min dont swap -->
-		<param name="swap/dz_min" value="10"/>
+		<param name="swap/dz_min" value="3.5"/>
 
 		<!--if distance between uavs is larger than dz_min dont swap -->
 		<param name="swap/dz_range" value="2"/>
