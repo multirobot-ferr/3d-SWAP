@@ -1,0 +1,27 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/matlab01/ros/mbzirc/devel/include",
+        "/home/matlab01/ros/ready/devel/include",
+        "/home/matlab01/ros/lecture/devel/include",
+        "/home/matlab01/ros/experimental/devel/include",
+        "/opt/ros/kinetic/include",
+        "/home/matlab01/ros/mbzirc/src/grvc-utils/argument_parser/include",
+        "/home/matlab01/ros/mbzirc/src/grvc-utils/gazebo_animator/include",
+        "/home/matlab01/ros/mbzirc/src/mbzirc/gcs_state_machine/include",
+        "/home/matlab01/ros/mbzirc/src/grvc-utils/handy_tools/include",
+        "/home/matlab01/ros/mbzirc/src/mbzirc/mbzirc_scheduler/include",
+        "/home/matlab01/ros/mbzirc/src/grvc-ual/uav_abstraction_layer/include",
+        "/home/matlab01/ros/mbzirc/src/mbzirc/uav_avoidance/include",
+        "/home/matlab01/ros/mbzirc/src/mbzirc/uav_state_machine/include",
+        "/usr/include"
+      ],
+      "name": "Linux"
+    }
+  ]
+}

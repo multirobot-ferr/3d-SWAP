@@ -1,0 +1,9 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/matlab01/ros/mbzirc/devel/lib/python2.7/dist-packages",
+        "/home/matlab01/ros/ready/devel/lib/python2.7/dist-packages",
+        "/home/matlab01/ros/lecture/devel/lib/python2.7/dist-packages",
+        "/home/matlab01/ros/experimental/devel/lib/python2.7/dist-packages",
+        "/opt/ros/kinetic/lib/python2.7/dist-packages"
+    ]
+}

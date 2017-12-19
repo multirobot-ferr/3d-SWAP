@@ -11,6 +11,7 @@ Launches the swap node in robot 1
     <arg name="path2goal" default="$(find avoidance_experiments)/logs/mission2_uav$(arg uav_id).txt"/>
     <arg name="nameofbag" default="simple_bag"/>
     <arg name="game_frame" default="true"/>
+    <arg name="dz_min" default="10.0"/>
 
 	<!-- Waking up all state machines systems -->
     <node name="auv_state_machine_$(arg uav_id)" pkg="uav_avoidance" type="delayed.sh"
@@ -27,7 +28,8 @@ Launches the swap node in robot 1
 		args="2 roslaunch uav_avoidance avoidance.launch 
                 robot_number:=$(arg uav_id) 
                 yaw_on:=$(arg yaw_on) 
-                file_path:=$(arg nameofbag)" output="screen">
+                file_path:=$(arg nameofbag)
+                dz_min:=$(arg dz_min)" output="screen">
     </node>
 	
 </launch>
