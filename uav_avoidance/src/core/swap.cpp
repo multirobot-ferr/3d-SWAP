@@ -466,7 +466,7 @@ namespace avoid
 
          if (no_ctrl_approach_)
          {
-             std::cout << "Change!" << std::endl;
+             
          }
 
          yaw_avoidance_ += yaw_dist_keeper;
