@@ -21,7 +21,7 @@ game_frame:
   parent_frame: "map"
   units: "m"
   translation: [0.0, 0.0, 0.0]
-  rotation: [0.0, 0.0, 5.4] # RPY
+  rotation: [0.0, 0.0, 5.38] # RPY
 
 #--------------------------------------------------------------------------------------------#
 # uav initial positions
@@ -40,7 +40,7 @@ uav_2_home:
   home_frame_id: "uav_2_home"
   parent_frame: "map"
   units: "m"
-  translation: [0.0, 10.0, 0.0]
+  translation: [-1.27, 1.55, 0.0]   # game [24.0, 36.5, 0.0]
   gz_initial_yaw: 0.0
 
 # uav_3_home
@@ -48,7 +48,7 @@ uav_3_home:
   home_frame_id: "uav_3_home"
   parent_frame: "map"
   units: "m"
-  translation: [0.0, 20.0, 0.0]
+  translation: [15.03, 15.67, 0.0]  # game [34, 36.5, 0.0]
   gz_initial_yaw: 0.0
 
   # uav_4_home
@@ -56,5 +56,5 @@ uav_4_home:
   home_frame_id: "uav_4_home"
   parent_frame: "map"
   units: "m"
-  translation: [10.0, 30.0, 0.0]
+  translation: [29.92, 28.68, 0.0]  # game [44, 36.5, 0.0]
   gz_initial_yaw: 0.0
