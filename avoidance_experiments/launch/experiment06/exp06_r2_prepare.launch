@@ -10,5 +10,6 @@ Launches the swap node in robot 6
         <arg name="path2goal" default="$(find avoidance_experiments)/launch/experiment06/mission6_uav$(arg uav_id).txt"/>
 
         <arg name="nameofbag" default="$(find avoidance_experiments)/logs/experiment06/"/>
+        <arg name="dz_min"    default="3.5"/>
     </include>
 </launch>
