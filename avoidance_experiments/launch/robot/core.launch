@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-    <arg name="uav_id" value="$(env ROBOT_ID)"/>
+    <arg name="uav_id" default="$(env ROBOT_ID)"/>
 
     <!-- Load frame transforms for map and UAVs -->
     <!-- <rosparam file="$(find avoidance_experiments)/config/simulator/simulator_params.yaml" command="load" /> -->
