@@ -6,18 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Marker9
-        - /Marker25
-        - /Marker26
-        - /Marker27
-        - /Marker28
-        - /Marker29
-        - /Marker30
-        - /Marker31
-        - /Marker32
-        - /Map1
-        - /Axes1
-        - /Axes2
+        - /Game1
       Splitter Ratio: 0.5
     Tree Height: 775
   - Class: rviz/Selection
@@ -129,7 +118,7 @@ Visualization Manager:
       Marker Topic: /uav_2/arrow
       Name: Marker
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -137,7 +126,7 @@ Visualization Manager:
       Marker Topic: /uav_2/arrow
       Name: Marker
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -145,7 +134,7 @@ Visualization Manager:
       Marker Topic: /uav_2/arrow_goal
       Name: Marker
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -201,7 +190,7 @@ Visualization Manager:
       Marker Topic: /uav_3/arrow
       Name: Marker
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -209,7 +198,7 @@ Visualization Manager:
       Marker Topic: /uav_3/arrow_goal
       Name: Marker
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -289,7 +278,7 @@ Visualization Manager:
       Marker Topic: /uav_4/bracking_cylinder
       Name: Marker
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -297,7 +286,7 @@ Visualization Manager:
       Marker Topic: /uav_4/goal
       Name: Marker
       Namespaces:
-        {}
+        uavs_state: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -305,7 +294,7 @@ Visualization Manager:
       Marker Topic: /uav_4/height
       Name: Marker
       Namespaces:
-        {}
+        uavs_state: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -313,7 +302,7 @@ Visualization Manager:
       Marker Topic: /uav_4/id
       Name: Marker
       Namespaces:
-        {}
+        uavs_state: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -321,7 +310,7 @@ Visualization Manager:
       Marker Topic: /uav_4/safety_cylinder
       Name: Marker
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -329,7 +318,7 @@ Visualization Manager:
       Marker Topic: /uav_4/uavs
       Name: Marker
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Alpha: 0.300000012
@@ -344,16 +333,16 @@ Visualization Manager:
       Value: true
     - Class: rviz/Axes
       Enabled: true
-      Length: 3
-      Name: Axes
-      Radius: 0.100000001
+      Length: 10
+      Name: Game
+      Radius: 0.200000003
       Reference Frame: game
       Value: true
     - Class: rviz/Axes
       Enabled: true
-      Length: 1
-      Name: Axes
-      Radius: 0.100000001
+      Length: 3
+      Name: Map
+      Radius: 0.200000003
       Reference Frame: map
       Value: true
   Enabled: true
@@ -389,7 +378,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Scale: 12.7072477
+      Scale: 13.0458879
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: 32.3255386

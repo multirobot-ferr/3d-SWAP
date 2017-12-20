@@ -13,13 +13,48 @@
 sim_origin: [37.558542, -5.931074, 7.89]
 
 #--------------------------------------------------------------------------------------------#
+# game frame
+#--------------------------------------------------------------------------------------------#
+
+game_frame:
+  frame_id: "game"
+  parent_frame: "map"
+  units: "m"
+  translation: [0.0, 0.0, 0.0]
+  rotation: [0.0, 0.0, 5.38] # RPY
+
+#--------------------------------------------------------------------------------------------#
 # uav initial positions
 #--------------------------------------------------------------------------------------------#
+
+# uav_1_home
+uav_1_home:
+  home_frame_id: "uav_1_home"
+  parent_frame: "map"
+  units: "m"
+  translation: [20.0, 0.0, 0.0]
+  gz_initial_yaw: 0.0
 
 # uav_2_home
 uav_2_home:
   home_frame_id: "uav_2_home"
   parent_frame: "map"
   units: "m"
-  translation: [0.0, 0.0, 0.0]
+  translation: [-14.86, -5.73, 0.0]    # game [-2.0, 0.0, 0.0]
+  gz_initial_yaw: 0.0
+
+# uav_3_home
+uav_3_home:
+  home_frame_id: "uav_3_home"
+  parent_frame: "map"
+  units: "m"
+  translation: [-2.91, 3.69, 0.0]  #  game [-2.0, 21.5, 0.0]
+  gz_initial_yaw: 0.0
+
+  # uav_4_home
+uav_4_home:
+  home_frame_id: "uav_4_home"
+  parent_frame: "map"
+  units: "m"
+  translation: [13.11, 16.32, 0.0] # game [-2.0, 41, 0.0]
   gz_initial_yaw: 0.0

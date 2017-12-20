@@ -12,13 +12,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <arg name="multi" default="false"/>
     <arg name="ns_prefix" default="uav_"/>
-    <arg name="simulator_params" default="simulator_params"/>
+    
+    <!-- Visualization system -->
+    <!-- Loads the frame transforms and the tf_publisher-->
+    <include file="$(find avoidance_experiments)/launch/visualization.launch"/>
 
     <!-- Load frame transforms for map and UAVs -->
-    <rosparam file="$(find avoidance_experiments)/config/simulator/$(arg simulator_params).yaml" command="load" />
+    <!--rosparam file="$(find avoidance_experiments)/config/simulator/$(arg simulator_params).yaml" command="load" /-->
 
     <!-- Launch static_tf_publisher for map to world transform (if defined) -->
-    <node pkg="static_tf_publisher" type="static_tf_publisher_node" name="static_tf_publisher"/>
+    <!-- <node pkg="static_tf_publisher" type="static_tf_publisher_node" name="static_tf_publisher"/> -->
 
     <!-- Launch Gazebo simulation TODO: world location? -->
     <node pkg="px4_bringup" type="launch_gzworld.py" name="gazebo_world" output="screen"
@@ -62,9 +65,5 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     <!-- Launch UAL server for uav id=3 -->
     <node pkg="uav_abstraction_layer" type="server" name="server_3" output="screen" args="-uav_id=3 -pose_frame_id=map -ns_prefix=$(arg ns_prefix)"/>
-
-    <!-- Visualization system -->
-    <node name="visualization_system" pkg="uav_avoidance" type="delayed.sh"
-		args="10 roslaunch avoidance_experiments visualization.launch" output="screen"/>
 		
 </launch>

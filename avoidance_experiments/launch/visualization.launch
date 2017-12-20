@@ -1,7 +1,15 @@
 <!--		
 -->
 <launch>
+    <arg name="simulator_params" default="simulator_params"/>
+
 	<!-- Representation node -->
     <node name="visualization_system" pkg="uav_avoidance" type="delayed.sh"
 		args="3 roslaunch avoidance_visualization avoidance_visualization.launch" output="screen"/>
+		
+	<!-- Load frame transforms for map and UAVs -->
+    <rosparam file="$(find avoidance_experiments)/config/params.yaml" command="load" />
+
+    <!-- Launch static_tf_publisher for map to world transform (if defined) -->
+    <node pkg="static_tf_publisher" type="static_tf_publisher_node" name="static_tf_publisher"/>
 </launch>
