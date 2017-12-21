@@ -138,16 +138,6 @@ StateMachine::StateMachine() {
         }
     }
 
-    #ifdef UAV_NOT_IN_ZERO_ZERO
-    for (auto row = 0; row < way_points_.n_rows; ++row)
-    {
-        for (auto col = 0; col < way_points_.n_cols; ++col)
-        {
-            way_points_(row, col) -= UAV_ZZ(uav_id_ - 1, col);
-        }
-    }
-    #endif
-
     // Specific namespace for UAL
     std::string ual_ns;
     if (!pnh_.getParam("ual_namespace", ual_ns))

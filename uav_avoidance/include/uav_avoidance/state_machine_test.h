@@ -59,17 +59,6 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/LinearMath/Quaternion.h>       
 
-// Uncomment this define if all the robots starts in (0,0)
-//#define UAV_NOT_IN_ZERO_ZERO 1
-
-#ifdef UAV_NOT_IN_ZERO_ZERO
-// values extracted from the simulator:
-                        //   x      y   yaw
-/*const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
-                           {-20.0, 30.0, 0.0 },
-                           {-28.0, 26.0, 0.0 } }; */
-#endif
-
 // Constant values
 const std::string pose_uav_topic = "/pose";
 const std::string takeoff_service= "/take_off";
