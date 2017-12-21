@@ -1,14 +1,14 @@
 <!--
+Launches swap and a simple state machine node in the robot with ROBOT_ID
 
-Launches the swap node in robot 1
-
+If you want to change your ROBOT_ID just run "export ROBOT_ID=2"
 -->
 
 <launch>
 
     <arg name="uav_id" default="$(env ROBOT_ID)"/>
     <arg name="yaw_on" default="false"/>
-    <arg name="path2goal" default="$(find avoidance_experiments)/logs/mission2_uav$(arg uav_id).txt"/>
+    <arg name="path2goal" default="$(find avoidance_experiments)/logs/uav$(arg uav_id).txt"/>
     <arg name="nameofbag" default="simple_bag"/>
     <arg name="game_frame" default="true"/>
     <arg name="dz_min" default="10.0"/>

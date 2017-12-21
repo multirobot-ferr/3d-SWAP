@@ -3,7 +3,7 @@
 
     <arg name="uav_id" default="$(env ROBOT_ID)"/>
 
-    <!-- Load frame transforms for map and UAVs -->
+    <!-- Frame transforms for map and UAVs required (assumed to be executed by the visualization system) -->
     <!-- <rosparam file="$(find avoidance_experiments)/config/simulator/simulator_params.yaml" command="load" /> -->
 
     <!-- Launch robot id=$(arg uav_id) -->
