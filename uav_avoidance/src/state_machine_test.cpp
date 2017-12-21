@@ -125,10 +125,15 @@ StateMachine::StateMachine() {
         ROS_INFO("State Machine: Goal set:");
         way_points_.load(goals_path);
         
-        
         if(game_frame_)
         {
             way_points_=gameToMap(way_points_, 2.1984);
+        }
+
+        if (way_points_.n_rows == 0)
+        {
+            ROS_ERROR("State Machine: there are no goals to read in \n%s", goals_path.c_str());
+            initialization_error = true;
         }
 
         for (int row = 0; row < way_points_.n_rows; ++row)
@@ -176,13 +181,11 @@ StateMachine::StateMachine() {
     avoid_mov_dir_sub_  = nh_.subscribe("avoid_movement_direction", 1, &StateMachine::AvoidMovementCallback, this);
     // ###########  #######################  ########### //
 
-    TakeOff();
-
     if (!initialization_error)
     {
         ROS_INFO("State Machine: Init complete");
+        TakeOff();
     }
-
 
 }
 
@@ -200,6 +203,13 @@ StateMachine::~StateMachine()
  */
 void StateMachine::Loop()
 {
+    if (initialization_error)
+    {
+        // Stopping the system
+        experiment_done = true;
+        return;
+    }
+
     // Moves to the necessary position
     PublishPosErr();
 
