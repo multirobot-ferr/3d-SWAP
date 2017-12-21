@@ -143,9 +143,11 @@ class Swap_2_5d:  public avoid::Swap
         ros::Publisher confl_warning_pub_;              //!< Publisher to determine if there is a possible collision or not
         ros::Publisher  avoid_mov_dir_pub_;             //!< Publish the direction where the uav has to go to avoid a conflict
         ros::Publisher xyz_pub_;
+        ros::Publisher marker_pub;
         // System variables
         bool initialization_error_ = false;             //!< Flags to track possible errors in initialization
-        double spin_sleep_ = 0.1;                       //!< Time that the system will sleep between iterations of the main loop
+        double spin_sleep_ = 0.1;
+        bool hard_debug_=false;                       //!< Time that the system will sleep between iterations of the main loop
         int uav_id_ = -1;                               //!< Identification number of the current uav
         int n_uavs_;                                    //!< Number of UAV involved
         std::vector<int> uav_ids_;                      //!< IDs of UAV involved
@@ -231,6 +233,12 @@ class Swap_2_5d:  public avoid::Swap
          * @param vector of values that will be saved
          */
         void Log2Matlab( std::vector<double>& values);
+
+        /**
+         * @brief Publish a market to visualizer
+         * @param 
+         */
+        void PolarObstacleMarker();
 
 }; // class SwapRos
 

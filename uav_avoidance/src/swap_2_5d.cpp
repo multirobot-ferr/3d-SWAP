@@ -52,6 +52,7 @@
 #include <std_msgs/Bool.h>
 #include <tf2/utils.h>
 #include <functional>
+#include <visualization_msgs/Marker.h>
 
 
 
@@ -99,6 +100,13 @@ Swap_2_5d::Swap_2_5d()
     }
     else
         n_uavs_ = uav_ids_.size();
+
+    // debug param
+    if (!pnh_->getParam("hard_debug", hard_debug_)) {
+        initialization_error_ = true;
+        ROS_FATAL("SWAP: uav_id is not set. Closing the avoidance system");
+    }
+
 
     // Getting the uav_id
     if (!pnh_->getParam("uav_id", uav_id_)) {
@@ -201,6 +209,7 @@ Swap_2_5d::Swap_2_5d()
     laser_sub_ = nh_.subscribe<sensor_msgs::LaserScan>("/mbzirc_1/front_laser/scan",10,&Swap_2_5d::LaserCallback,this);
     pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_1/velodyne", 10, &Swap_2_5d::CloudCallback, this);
     xyz_pub_ = nh_.advertise<pcl::PointCloud<pcl::PointXYZ>>("/velodyne/xyztopic",1,true);
+    marker_pub = nh_.advertise<visualization_msgs::Marker>("/polar_visualization_marker", 10);
     // Meant to debug the system
     std::string file_path;
     if (pnh_->getParam("debug/file_path", file_path))
@@ -484,6 +493,8 @@ void Swap_2_5d::FillLogFile()
         }
 
         */
+        PolarObstacleMarker();
+
         Log2Matlab(values2log_);
     }
 
@@ -528,6 +539,44 @@ void Swap_2_5d::Log2MatlabInit( const std::string file_path)
         log_pos_map_[uav_ids_[id]] = id;
     }
 }
+
+/**
+ * Publish markets
+ */
+void Swap_2_5d::PolarObstacleMarker()
+{
+
+        measurements info;
+        visualization_msgs::Marker points;
+        points.header.frame_id = "/map";
+        points.header.stamp = ros::Time();
+        points.action = visualization_msgs::Marker::ADD;
+        points.scale.x=1;
+        points.scale.y=1;
+        points.color.r = 1.0;
+        points.color.a = 1.0;
+        points.type = visualization_msgs::Marker::POINTS;
+
+
+
+ // Saving the measurements around the robot
+        for (unsigned id_phi = 0; id_phi < id_phi_max_; ++id_phi)
+        {
+            info = GetMeasurement( id_phi );
+
+            double x_m = info.dist * cos( info.angle );
+            double y_m = info.dist * sin( info.angle );
+
+            geometry_msgs::Point p;
+            p.x=x_m;
+            p.y=y_m;
+
+            points.points.push_back(p);
+        }
+
+        marker_pub.publish(points);
+}
+
 
 /**
  * Creates a log file that can be read in matlab

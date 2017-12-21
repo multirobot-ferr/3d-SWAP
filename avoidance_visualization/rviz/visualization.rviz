@@ -132,7 +132,7 @@ Visualization Manager:
       Marker Topic: /uav_3/bracking_cylinder
       Name: uav3/br_distance
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -140,7 +140,7 @@ Visualization Manager:
       Marker Topic: /uav_3/goal
       Name: uav3/goal
       Namespaces:
-        uavs_state: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -148,7 +148,7 @@ Visualization Manager:
       Marker Topic: /uav_3/height
       Name: uav3/heigth
       Namespaces:
-        uavs_state: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -156,7 +156,7 @@ Visualization Manager:
       Marker Topic: /uav_3/id
       Name: uav3/id
       Namespaces:
-        uavs_state: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -164,7 +164,7 @@ Visualization Manager:
       Marker Topic: /uav_3/safety_cylinder
       Name: uav3/safety_cylinder
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -172,7 +172,7 @@ Visualization Manager:
       Marker Topic: /uav_3/uavs
       Name: uav3/uav
       Namespaces:
-        uavs: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
