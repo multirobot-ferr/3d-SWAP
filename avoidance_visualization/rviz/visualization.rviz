@@ -293,13 +293,14 @@ Visualization Manager:
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
+      Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
       Scale: 10.9915361
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 36.9042473
-      Y: 13.8725948
+      X: 42.9922333
+      Y: 21.5209408
     Saved: ~
 Window Geometry:
   Displays:

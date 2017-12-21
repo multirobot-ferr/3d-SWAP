@@ -127,7 +127,7 @@ StateMachine::StateMachine() {
         
         if(game_frame_)
         {
-            way_points_=gameToMap(way_points_, 2.1984);
+            way_points_=gameToMap(way_points_, "game", "map");
         }
 
         if (way_points_.n_rows == 0)
@@ -592,7 +592,7 @@ double StateMachine::ScaleAngle(double angle)
  * Utility function. If game_frame_ is true it returns waypoints in /map
  */
 
-arma::mat StateMachine::gameToMap(arma::mat wp_game, double yaw_rot)
+arma::mat StateMachine::gameToMap(arma::mat wp_game, const std::string from, const std::string to)
 {
 
     geometry_msgs::PoseStamped out;
@@ -600,29 +600,24 @@ arma::mat StateMachine::gameToMap(arma::mat wp_game, double yaw_rot)
     arma::mat wp_map=wp_game;
         for (int row = 0; row < way_points_.n_rows; ++row)
             {
-            
-            /*wp_map(row,0)=wp_game(row,0)*cos(yaw_rot)-wp_game(row,1)*sin(yaw_rot);
-            wp_map(row,1)=wp_game(row,0)*sin(yaw_rot)+wp_game(row,1)*cos(yaw_rot);
-            */
 
-            out.pose.position.x = wp_game(row,0);
-            out.pose.position.y = wp_game(row,1);
-            out.pose.position.z = wp_game(row,2);
-            
-            geometry_msgs::PoseStamped aux=out;
-            
+                out.pose.position.x = wp_game(row,0);
+                out.pose.position.y = wp_game(row,1);
+                out.pose.position.z = wp_game(row,2);
+                
+                geometry_msgs::PoseStamped aux=out;
+                
 
-            geometry_msgs::TransformStamped transformToMap;
-            tf2_ros::Buffer tfBuffer;
-            tf2_ros::TransformListener tfListener(tfBuffer);
-            transformToMap = tfBuffer.lookupTransform("map","game", ros::Time(0), ros::Duration(1.0));
+                geometry_msgs::TransformStamped transformToMap;
+                tf2_ros::Buffer tfBuffer;
+                tf2_ros::TransformListener tfListener(tfBuffer);
+                transformToMap = tfBuffer.lookupTransform(to.c_str(), from.c_str(), ros::Time(0), ros::Duration(1.0));
 
-            tf2::doTransform(aux,out,transformToMap);
+                tf2::doTransform(aux,out,transformToMap);
 
-            wp_map(row,0)=out.pose.position.x;
-            wp_map(row,1)=out.pose.position.y;
-            wp_map(row,2)=out.pose.position.z;
-
+                wp_map(row,0)=out.pose.position.x;
+                wp_map(row,1)=out.pose.position.y;
+                wp_map(row,2)=out.pose.position.z;
 
             }
             

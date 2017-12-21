@@ -271,8 +271,7 @@ class StateMachine
         /**
          * utility function to transform waypoints
          */
-        
-        arma::mat gameToMap(arma::mat wp_game, double yaw_rot);
+        arma::mat gameToMap(arma::mat wp_game, const std::string from = "game", const std::string to = "map");
         
 
 }; // class StateMachine
