@@ -10,8 +10,8 @@ Plays the current saved rosbag
 
     <!-- Prepare the bag -->
     <include file="$(find avoidance_experiments)/launch/common/rosbag_play.launch">
-            <arg name="bags_path" value="$(find avoidance_experiments)/bags/experiment04"/>
-            <arg name="bag_name"  value="experiment04_01.bag"/>
+            <arg name="bags_path" value="$(find avoidance_experiments)/bags/experiment$(arg exp_num)"/>
+            <arg name="bag_name"  value="experiment$(arg exp_num)_01.bag"/>
     </include>
 
 </launch>
