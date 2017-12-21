@@ -1,14 +1,10 @@
 <!--
-
-Launches the swap node in robot 1
-
+Saves a rosbag in path experiment0?/experiment?_01
+Starts all robots
 -->
 
 <launch>
-
-    <!-- Representation node -->
-    <!-- <node name="visualization_system" pkg="uav_avoidance" type="delayed.sh"
-		args="3 roslaunch avoidance_visualization avoidance_visualization.launch" output="screen"/> -->
+    <arg name="exp_num" value="03"/>
 
     <!-- Prepare the bag -->
     <include file="$(find avoidance_experiments)/launch/common/recordbag.launch">
@@ -21,10 +17,12 @@ Launches the swap node in robot 1
                                                 /uav_3/collision_warning 
                                                 /uav_2/collision_warning"/>
 
-            <arg name="nameofbag" default="experiment03/experiment03_01"/>
+            <arg name="nameofbag" default="experiment$(arg exp_num)/experiment$(arg exp_num)_01"/>
     </include>
 
     <!-- Green light -->
-    <node name="ready2go" pkg="uav_avoidance" type="ready2go.sh" args="uav_2" output="screen"/>
+    <node name="ready2go_uav2" pkg="uav_avoidance" type="ready2go.sh" args="uav_2" output="screen"/>
+    <node name="ready2go_uav3" pkg="uav_avoidance" type="ready2go.sh" args="uav_3" output="screen"/>
+    <node name="ready2go_uav4" pkg="uav_avoidance" type="ready2go.sh" args="uav_4" output="screen"/>
 	
 </launch>
