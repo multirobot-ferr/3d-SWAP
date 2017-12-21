@@ -9,6 +9,7 @@ Launches the swap node in robot 1
     <!-- Representation node -->
     <!-- <node name="visualization_system" pkg="uav_avoidance" type="delayed.sh"
 		args="3 roslaunch avoidance_visualization avoidance_visualization.launch" output="screen"/> -->
+    <arg name="exp_num" value="05"/>
 
     <!-- Prepare the bag -->
     <include file="$(find avoidance_experiments)/launch/common/recordbag.launch">
@@ -25,7 +26,7 @@ Launches the swap node in robot 1
                                                 /uav_2/collision_warning
 						/uav_4/collision_warning "/>
 
-            <arg name="nameofbag" default="experiment05/experiment05_01"/>
+            <arg name="nameofbag" default="experiment$(arg exp_num)/experiment$(arg exp_num)_01"/>
     </include>
 
     <!-- Green light -->
