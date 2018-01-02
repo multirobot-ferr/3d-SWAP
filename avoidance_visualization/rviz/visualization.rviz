@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /uav2/polar_diagram1
       Splitter Ratio: 0.727777779
     Tree Height: 773
   - Class: rviz/Selection
@@ -52,7 +53,7 @@ Visualization Manager:
       Marker Topic: /uav_2/arrow
       Name: uav2/avoidance_dir
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -60,7 +61,7 @@ Visualization Manager:
       Marker Topic: /uav_2/arrow_goal
       Name: uav2/goal_dir
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -116,7 +117,7 @@ Visualization Manager:
       Marker Topic: /uav_3/arrow
       Name: uav3/avoidance_dir
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -124,7 +125,7 @@ Visualization Manager:
       Marker Topic: /uav_3/arrow_goal
       Name: uav3/goal_dir
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -132,7 +133,7 @@ Visualization Manager:
       Marker Topic: /uav_3/bracking_cylinder
       Name: uav3/br_distance
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -140,7 +141,7 @@ Visualization Manager:
       Marker Topic: /uav_3/goal
       Name: uav3/goal
       Namespaces:
-        {}
+        uavs_state: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -148,7 +149,7 @@ Visualization Manager:
       Marker Topic: /uav_3/height
       Name: uav3/heigth
       Namespaces:
-        {}
+        uavs_state: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -156,7 +157,7 @@ Visualization Manager:
       Marker Topic: /uav_3/id
       Name: uav3/id
       Namespaces:
-        {}
+        uavs_state: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -164,7 +165,7 @@ Visualization Manager:
       Marker Topic: /uav_3/safety_cylinder
       Name: uav3/safety_cylinder
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -172,7 +173,7 @@ Visualization Manager:
       Marker Topic: /uav_3/uavs
       Name: uav3/uav
       Namespaces:
-        {}
+        uavs: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -251,17 +252,33 @@ Visualization Manager:
       Value: true
     - Class: rviz/Axes
       Enabled: true
+      Length: 3
+      Name: Map
+      Radius: 0.200000003
+      Reference Frame: map
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /uav_2/polar_visualization_marker
+      Name: uav2/polar_diagram
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Axes
+      Enabled: true
       Length: 10
       Name: Game
       Radius: 0.200000003
       Reference Frame: game
       Value: true
-    - Class: rviz/Axes
+    - Class: rviz/Marker
       Enabled: true
-      Length: 3
-      Name: Map
-      Radius: 0.200000003
-      Reference Frame: map
+      Marker Topic: /uav_3/polar_visualization_marker
+      Name: uav3/polar_diagram
+      Namespaces:
+        "": true
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -295,7 +312,7 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Scale: 10.9915361
+      Scale: 10.6195707
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: 36.9042473

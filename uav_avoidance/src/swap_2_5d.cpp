@@ -209,7 +209,7 @@ Swap_2_5d::Swap_2_5d()
     laser_sub_ = nh_.subscribe<sensor_msgs::LaserScan>("/mbzirc_1/front_laser/scan",10,&Swap_2_5d::LaserCallback,this);
     pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_1/velodyne", 10, &Swap_2_5d::CloudCallback, this);
     xyz_pub_ = nh_.advertise<pcl::PointCloud<pcl::PointXYZ>>("/velodyne/xyztopic",1,true);
-    marker_pub = nh_.advertise<visualization_msgs::Marker>("/polar_visualization_marker", 10);
+    marker_pub = nh_.advertise<visualization_msgs::Marker>("polar_visualization_marker", 10);
     // Meant to debug the system
     std::string file_path;
     if (pnh_->getParam("debug/file_path", file_path))
@@ -548,12 +548,28 @@ void Swap_2_5d::PolarObstacleMarker()
 
         measurements info;
         visualization_msgs::Marker points;
-        points.header.frame_id = "/map";
+        std::string log_id = "uav_" + std::to_string(uav_id_);
+        points.header.frame_id = log_id;
         points.header.stamp = ros::Time();
         points.action = visualization_msgs::Marker::ADD;
+        
         points.scale.x=1;
         points.scale.y=1;
+        if(uav_id_==2)
+        {
         points.color.r = 1.0;
+
+        }
+        if(uav_id_==3)
+        {
+        points.color.b = 1.0;
+
+        }
+        if(uav_id_==4)
+        {
+        points.color.g = 1.0;
+
+        }
         points.color.a = 1.0;
         points.type = visualization_msgs::Marker::POINTS;
 
@@ -571,7 +587,11 @@ void Swap_2_5d::PolarObstacleMarker()
             p.x=x_m;
             p.y=y_m;
 
-            points.points.push_back(p);
+            if((p.x<500 && p.x>-500))  // not publishing infinite points
+            {   
+                points.points.push_back(p);
+
+            }
         }
 
         marker_pub.publish(points);
