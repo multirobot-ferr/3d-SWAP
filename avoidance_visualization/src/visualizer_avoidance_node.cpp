@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip> // setprecision
+#include <tf/transform_datatypes.h>
 
 using namespace std;
 
@@ -56,6 +57,7 @@ protected:
         ros::Publisher uavs_pub_;              // Publisher for uav pose
         ros::Publisher arrow_pub_;             // Publisher for avoidance direction marker
         ros::Publisher goal_arrow_pub_;        // Publisher for goal direction marker
+        ros::Publisher yaw_arrow_pub_;
         ros::Publisher uav_cylinder_pub_;       // Publisher for safety cylinder
         ros::Publisher height_marker_pub_;
         ros::Publisher id_marker_pub_; 
@@ -172,6 +174,8 @@ Visualizer::Visualizer(int id)
         cylinder_pub_= nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/bracking_cylinder",0);
         arrow_pub_= nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/arrow",0);
         goal_arrow_pub_ = nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/arrow_goal",0);
+        yaw_arrow_pub_ = nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/arrow_yaw",0);
+
         uav_cylinder_pub_ = nh_.advertise<visualization_msgs::Marker>("uav_" + std::to_string(id) + "/safety_cylinder", 0);
 }
 /** \brief Destructor
@@ -467,6 +471,65 @@ void Visualizer::publishMarkers()
             cylinder.scale.z = dz_min_;   // height
             cylinder.mesh_use_embedded_materials = true;
 
+            // publish arrow for yaw
+
+            visualization_msgs::Marker arrow_yaw;
+                arrow_yaw.header.frame_id = "/map";
+                arrow_yaw.header.stamp = ros::Time();
+                arrow_yaw.id = uav_id;
+                arrow_yaw.ns = "uavs";
+                arrow_yaw.type = visualization_msgs::Marker::ARROW;
+                arrow_yaw.color.a = 1;   
+                switch(uav_id)
+                {
+                    case 4:
+                    // orange
+                    arrow_yaw.color.r = 0.0;
+                    arrow_yaw.color.g = 1;
+                    arrow_yaw.color.b = 0;
+                    break;
+                    case 2:
+                    // ingigo
+                    arrow_yaw.color.r = 0;
+                    arrow_yaw.color.g = 1;
+                    arrow_yaw.color.b = 0; 
+                    break;
+                    case 3:
+                    // zinc yellow
+                    arrow_yaw.color.r = 0.0;
+                    arrow_yaw.color.g = 1;
+                    arrow_yaw.color.b = 0;
+                    break;
+                }
+
+
+
+                double quatx= uavs_poses_.pose.orientation.x;
+                double quaty= uavs_poses_.pose.orientation.y;
+                double quatz= uavs_poses_.pose.orientation.z;
+                double quatw= uavs_poses_.pose.orientation.w;
+
+                tf::Quaternion q(quatx, quaty, quatz, quatw);
+                tf::Matrix3x3 m(q);
+                double roll, pitch, yaw;
+                m.getRPY(roll, pitch, yaw);
+
+                arrow_yaw.action = visualization_msgs::Marker::ADD;
+                arrow_yaw.points.resize(2);
+                arrow_yaw.points[0].x=uavs_poses_.pose.position.x;
+                arrow_yaw.points[0].y=uavs_poses_.pose.position.y;
+                arrow_yaw.points[0].z=uavs_poses_.pose.position.z;
+                arrow_yaw.points[1].x=uavs_poses_.pose.position.x + cos(yaw);
+                arrow_yaw.points[1].y=uavs_poses_.pose.position.y + sin(yaw);
+                arrow_yaw.points[1].z= uavs_poses_.pose.position.z;
+
+            
+                arrow_yaw.scale.x=0.1;
+                arrow_yaw.scale.y = 0.2;
+            
+               // arrow_goal.mesh_use_embedded_materials = true;
+
+
 
             //publish arrow for goal direction
 
@@ -591,7 +654,7 @@ void Visualizer::publishMarkers()
         id_marker_pub_.publish(id_marker);                // publish number of UAV
         goal_arrow_pub_.publish(arrow_goal);              // publish goal direction
         goal_marker_pub_.publish(goal_marker);            // publish goal
-
+        yaw_arrow_pub_.publish(arrow_yaw);               // publish yaw
         uav_pose_received_= false;
   
     }

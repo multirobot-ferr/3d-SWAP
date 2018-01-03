@@ -46,6 +46,7 @@
 	<arg name="robot_number" default="1"/>
     <arg name="file_path"    default="$(find avoidance_experiments)/logs/"/>
     <arg name="dz_min"       default="10.0"/>
+    <arg name="hard_debug" default="true"/>
 	
 	<group ns="uav_$(arg robot_number)">
 
@@ -117,6 +118,7 @@
                 
             <!-- Specific configuration parameters [do not change them if not necessary]-->
             <param name="uav_id" value="$(arg robot_number)"/>
+            <param name="hard_debug" value="$(arg hard_debug)"/>
             <rosparam param="uav_ids">[1, 2, 3, 4]</rosparam>
             <param name="swap/granularity" value="360"/>    <!-- One measurement set per degree -->
             <param name="swap/num_measurements" value="3"/>    <!-- 3 measurements per measurement set (fights against noise) -->

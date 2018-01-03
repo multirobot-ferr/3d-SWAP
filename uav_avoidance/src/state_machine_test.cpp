@@ -353,9 +353,8 @@ void StateMachine::PublishPosErr()
     double xe = way_points_(wp_idx_, 0) - uav_x_;
     double ye = way_points_(wp_idx_, 1) - uav_y_;
     double ze = way_points_(wp_idx_, 2) - uav_z_;
-    double dirx=xe/(sqrt(powf(xe, 2.0) + powf(ye, 2.0) + powf(ze, 2.0)));
-    double diry=ye/(sqrt(powf(xe, 2.0) + powf(ye, 2.0) + powf(ze, 2.0)));
-    double dirz=ze/(sqrt(powf(xe, 2.0) + powf(ye, 2.0) + powf(ze, 2.0)));
+    double dirx=xe/(sqrt(powf(xe, 2.0) + powf(ye, 2.0)));
+    double diry=ye/(sqrt(powf(xe, 2.0) + powf(ye, 2.0)));
     
     // Information for SWAP (where the uav wants to go)
     wished_direction_uav_.x = xe;
@@ -380,8 +379,8 @@ void StateMachine::PublishPosErr()
         ze = 0;
     }
 
-    double yaw_desired=atan2(ye, xe);
-    double yawe=ScaleAngle(yaw_desired)-ScaleAngle(uav_yaw_);
+    double yaw_desired=atan2(diry, dirx);
+    double yawe=ScaleAngle((yaw_desired)-(uav_yaw_));
 
 
     double x_actuation = xv_pid_.control_signal(xe);
@@ -563,6 +562,7 @@ void StateMachine::UpdateWayPoints()
                 xv_pid_.reset();
                 yv_pid_.reset();
                 zv_pid_.reset();
+                yawv_pid_.reset();
             }
         }
     }
