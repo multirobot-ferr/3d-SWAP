@@ -46,7 +46,7 @@
 	<arg name="robot_number" default="1"/>
     <arg name="file_path"    default="$(find avoidance_experiments)/logs/"/>
     <arg name="dz_min"       default="10.0"/>
-    <arg name="hard_debug" default="true"/>
+    <arg name="hard_debug" default="false"/>
 	
 	<group ns="uav_$(arg robot_number)">
 

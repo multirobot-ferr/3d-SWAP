@@ -104,7 +104,7 @@ Swap_2_5d::Swap_2_5d()
     // debug param
     if (!pnh_->getParam("hard_debug", hard_debug_)) {
         initialization_error_ = true;
-        ROS_FATAL("SWAP: uav_id is not set. Closing the avoidance system");
+        ROS_FATAL("SWAP: hard_debug_ is not set. Closing the avoidance system");
     }
 
 
@@ -493,7 +493,11 @@ void Swap_2_5d::FillLogFile()
         }
 
         */
+        if(hard_debug_)
+        {
         PolarObstacleMarker();
+
+        }
 
         Log2Matlab(values2log_);
     }
