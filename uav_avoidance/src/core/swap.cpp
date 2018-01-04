@@ -117,7 +117,7 @@ namespace avoid
     /**
      * Set the position of the goal with respect to the robot (in polars)
      */
-     void Swap::SetGoal(double distance, double angle)
+     void Swap::SetGoal(double distance, double angle, double uav_yaw)
      {
          if (distance < 0)
          {
@@ -126,7 +126,14 @@ namespace avoid
          }
 
          goal_dist_ = distance;
+         if(yaw_on_)
+         {
+         goal_angle_=ScaleAngle(angle+uav_yaw);
+         }
+         else
+         {
          goal_angle_= ScaleAngle(angle);
+         }
      }
 
      /**
@@ -336,6 +343,7 @@ namespace avoid
 
              conflict_left_phi  = conflictive_angles_[0];
              conflict_right_phi = conflictive_angles_[0];
+
              return true;
          }
 
@@ -381,49 +389,62 @@ namespace avoid
          double left_angle = conflict_left_id_phi;
          double right_angle= conflict_right_id_phi;
          
-         /*if ( fabs( AngleDiff(0.0, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
-              fabs( AngleDiff(0.0, right_angle)) < M_PI/3   ) */
-
-         if ( fabs( AngleDiff(goal_angle, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
-              fabs( AngleDiff(goal_angle, right_angle)) < M_PI/3   )
-         {   // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
-
-            previous_goaldist_=goal_dist_;
-             return false;
-
-         }
-
-        // if (fabs(goal_angle) <= goal_lateral_vision_)
-
-        /* la idea para que el obstáculo funcione en situaciones de mínimos locales es que cuando se esté alejando del obstáculo
-        no salga del movimiento de evitación, o sea, cuando la distancia al ángulo sea mayor que la anterior, sigue evitando el obstáculo hasta que
-        se acerque */
-
-        if( previous_goaldist_> goal_dist_)
-         {
-            // The goal is visible from the robot's perspective
-            if (fabs( AngleDiff(goal_angle, left_angle) ) < M_PI_2 ||
-                fabs( AngleDiff(goal_angle, right_angle)) < M_PI_2)
-            {
-
-                // The goal belongs to the not navigable area
-                previous_goaldist_=goal_dist_;
-
-                return false;
-            }
-         }
-         else
-         {
-
-             // The goal is not visible from the robot's perspective
-             previous_goaldist_=goal_dist_;
-
-             return false;
-         }
         
-        previous_goaldist_=goal_dist_;
+        
+       if(yaw_on_)
+        {
+                if ( fabs( AngleDiff(0.0, left_angle) ) < M_PI/2  ||         // PI/3 is working better than PI/2
+                    fabs( AngleDiff(0.0, right_angle)) < M_PI/2   )
+                    {
+                        // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
+                        return false;
+                    }
+        }
+        else
+        {
+                if ( fabs( AngleDiff(goal_angle, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
+                    fabs( AngleDiff(goal_angle, right_angle)) < M_PI/3   )
+                {   // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
 
-         return true;
+                    previous_goaldist_=goal_dist_;
+                    return false;
+
+                }
+        }
+                        
+                        // if (fabs(goal_angle) <= goal_lateral_vision_)
+
+                        /* la idea para que el obstáculo funcione en situaciones de mínimos locales es que cuando se esté alejando del obstáculo
+                        no salga del movimiento de evitación, o sea, cuando la distancia al ángulo sea mayor que la anterior, sigue evitando el obstáculo hasta que
+                        se acerque */
+
+                        if( previous_goaldist_> goal_dist_)
+                        {
+                            // The goal is visible from the robot's perspective
+                            if (fabs( AngleDiff(goal_angle, left_angle) ) < M_PI_2 ||
+                                fabs( AngleDiff(goal_angle, right_angle)) < M_PI_2)
+                            {
+
+                                // The goal belongs to the not navigable area
+                                previous_goaldist_=goal_dist_;
+
+                                return false;
+                            }
+                        }
+                        else
+                        {
+
+                            // The goal is not visible from the robot's perspective
+                            previous_goaldist_=goal_dist_;
+
+                            return false;
+                        }
+                        
+                        previous_goaldist_=goal_dist_;
+
+                        return true;
+        
+         
      }
 
 

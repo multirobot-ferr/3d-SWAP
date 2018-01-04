@@ -413,7 +413,7 @@ void Swap_2_5d::WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPt
     // The goal is far away to avoid swap to think that is close .
     // If that happens, swap will command to the system to brake
     double distance=sqrt(powf(wished_movement_direction_uav->x, 2.0) + powf(wished_movement_direction_uav->y, 2.0));
-    SetGoal( distance, uav_wished_yaw_map_);
+    SetGoal( distance, uav_wished_yaw_map_, uav_yaw_);
 }
 
 /**
@@ -427,8 +427,10 @@ void Swap_2_5d::RequestControlPub(bool request_control)
 
     if (request_control)
     {
-        avoid_mov_direction_.x = v_ref_*cos(yaw_ref_);
-        avoid_mov_direction_.y = v_ref_*sin(yaw_ref_);
+        std::cout<<"yaw_ref es: "<<yaw_ref_<<std::endl;
+        std::cout<<"yaw del robot es: "<<uav_yaw_<<std::endl;
+        avoid_mov_direction_.x = v_ref_*cos(yaw_ref_+uav_yaw_);
+        avoid_mov_direction_.y = v_ref_*sin(yaw_ref_+uav_yaw_);
         avoid_mov_direction_.z = 0.0;   // The state machine should ignore this value.
         avoid_mov_dir_pub_.publish(avoid_mov_direction_);
 

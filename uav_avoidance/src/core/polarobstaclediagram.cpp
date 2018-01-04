@@ -432,15 +432,20 @@ namespace avoid
         if (in_confl_region)
         {
             // Conflict on the -PI/2 +PI/2 discontinuity
+
            conflictive.push_back(std::make_pair(angle_[id_phi_max_-1],zdist_[id_phi_max_-1]));
            // conflictive_angles.push_back(angle_[id_phi_max_-1]);
 
         }
 
+
         // Sorting the conflictive angles
         std::sort(conflictive.begin(), conflictive.end());
 
+
+
         for(unsigned id=0; id<conflictive.size();++id){
+        
         conflictive_angles.push_back(conflictive[id].first);
         conflictive_heights.push_back(conflictive[id].second);
         }

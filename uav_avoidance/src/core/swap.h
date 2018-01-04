@@ -107,7 +107,7 @@ namespace avoid
              * @param distance The distance to the goal
              * @param angle    Angle with respect to the front of the robot to the goal (in radians).
              */
-             void SetGoal( double distance, double angle );
+             void SetGoal( double distance, double angle, double uav_yaw );
 
              /**
               * @brief Calculates a direction and a speed for collision avoidance.
@@ -217,7 +217,7 @@ namespace avoid
         private:
             // Variables to track if the system is ready
             bool is_ready_ = false;                 //!< Tracks if all values of Swap are initialized.
-            bool yaw_on_= false;                    //!< Tracks if all yaw is controlled
+            bool yaw_on_= true;                    //!< Tracks if all yaw is controlled
 
             // Goal storage
             double goal_dist_ = 0.0;                //!< Distance to the goal
@@ -231,7 +231,7 @@ namespace avoid
             double v_avoidance_   = 0.0;            //!< Speed to follow on the RENDEZVOUS case
 	    
             // Conflict dealing
-            double goal_lateral_vision_ = 360*M_PI/180;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
+            double goal_lateral_vision_ = 45*M_PI/180;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
             double rot_ctrl_P_ = 0.0;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
             bool   no_ctrl_approach_ = false;       //!< Only allows separations while using rot_ctrl_P_
             double yaw_max_err_ = 45*M_PI/180.0;    //!< Maximal error allowed in RENCONTRE state

@@ -393,7 +393,6 @@ void StateMachine::PublishPosErr()
     if(yaw_on_)
     {
     
-        ROS_ERROR("yaw_on active, system not available");
 
         // orientation is controlled
         PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation, yaw_actuation);
