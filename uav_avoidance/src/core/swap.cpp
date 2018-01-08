@@ -128,6 +128,7 @@ namespace avoid
          goal_dist_ = distance;
          if(yaw_on_)
          {
+
          goal_angle_=ScaleAngle(angle+uav_yaw);
          }
          else
@@ -207,6 +208,13 @@ namespace avoid
      }
 
     /**
+     * 
+     */
+    void Swap::SetYawOn(bool yaw_on)
+    {
+        yaw_on_ = yaw_on;
+    }
+    /**
      * Configures the value of the rotation control proportional
      */
     void Swap::SetRotCtrlP( double rot_ctrl_P, bool no_ctrl_approach)
@@ -274,7 +282,7 @@ namespace avoid
             // Depending if the turning procedure is CLOCKWISE or COUNTERCLOCKWISE we use one of the following readings
             double conflict_left_phi  = 0.0;
             double conflict_right_phi = 0.0;
-
+            
             // checking if Z_RANGE state is available
             bool conflict_range=false;
 

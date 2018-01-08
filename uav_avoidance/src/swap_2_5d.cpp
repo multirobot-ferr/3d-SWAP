@@ -179,6 +179,12 @@ Swap_2_5d::Swap_2_5d()
     SetSmoothFactor(0); // The system has no laser ranger. It makes no sense to smooth the measurements
     SetHolonomicRobot(true);
 
+    bool yaw_on;
+    if (pnh_->getParam("swap/yaw_on", yaw_on))
+    {
+        SetYawOn(yaw_on);
+    }
+    
     double rotation_ctrl_p;
     if (pnh_->getParam("swap/rotation_ctrl_p", rotation_ctrl_p))
     {
@@ -427,8 +433,7 @@ void Swap_2_5d::RequestControlPub(bool request_control)
 
     if (request_control)
     {
-        std::cout<<"yaw_ref es: "<<yaw_ref_<<std::endl;
-        std::cout<<"yaw del robot es: "<<uav_yaw_<<std::endl;
+        
         avoid_mov_direction_.x = v_ref_*cos(yaw_ref_+uav_yaw_);
         avoid_mov_direction_.y = v_ref_*sin(yaw_ref_+uav_yaw_);
         avoid_mov_direction_.z = 0.0;   // The state machine should ignore this value.

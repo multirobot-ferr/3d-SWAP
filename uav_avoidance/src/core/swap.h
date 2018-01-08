@@ -148,6 +148,13 @@ namespace avoid
               */
              void SetHolonomicRobot( bool holonomic_robot);
 
+
+            /**
+             * 
+             *
+             */
+
+             void SetYawOn(bool yaw_on);
              /**
               * @brief Configures the value of the rotation control proportional
               *
@@ -217,7 +224,7 @@ namespace avoid
         private:
             // Variables to track if the system is ready
             bool is_ready_ = false;                 //!< Tracks if all values of Swap are initialized.
-            bool yaw_on_= true;                    //!< Tracks if all yaw is controlled
+            bool yaw_on_= false;                    //!< Tracks if all yaw is controlled
 
             // Goal storage
             double goal_dist_ = 0.0;                //!< Distance to the goal
