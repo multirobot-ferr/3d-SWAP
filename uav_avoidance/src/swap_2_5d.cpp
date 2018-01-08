@@ -560,21 +560,26 @@ void Swap_2_5d::PolarObstacleMarker()
         points.header.stamp = ros::Time();
         points.action = visualization_msgs::Marker::ADD;
         
-        points.scale.x=1;
-        points.scale.y=1;
-        if(uav_id_==2)
+        points.scale.x=0.5;
+        points.scale.y=0.5;
+        if(uav_id_==4)
         {
         points.color.r = 1.0;
+        points.color.g = 0.647;
+        points.color.b = 0.0;
 
+        }
+        if(uav_id_==2)
+        {
+        points.color.r = 0.294;
+        points.color.g = 0.0;
+        points.color.b = 0.510;
         }
         if(uav_id_==3)
         {
+        points.color.r = 0.0;
+        points.color.g = 0.0;
         points.color.b = 1.0;
-
-        }
-        if(uav_id_==4)
-        {
-        points.color.g = 1.0;
 
         }
         points.color.a = 1.0;
