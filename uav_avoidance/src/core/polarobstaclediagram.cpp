@@ -920,7 +920,7 @@ namespace avoid
         double pond = 1.0;
         if (dynamism)
         {
-            pond = 1.0;
+            pond = 2.0;
         }
         measurement -= pond*bracking_distance_;
         measurement -= pond*local_measurement_error_;      // Includes even more safety
