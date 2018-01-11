@@ -433,9 +433,18 @@ void Swap_2_5d::RequestControlPub(bool request_control)
 
     if (request_control)
     {
-        
+        if(yaw_on_){
         avoid_mov_direction_.x = v_ref_*cos(yaw_ref_+uav_yaw_);
         avoid_mov_direction_.y = v_ref_*sin(yaw_ref_+uav_yaw_);
+        }
+        else
+        {
+        avoid_mov_direction_.x = v_ref_*cos(yaw_ref_);
+        avoid_mov_direction_.y = v_ref_*sin(yaw_ref_); 
+        }
+       
+        
+
         avoid_mov_direction_.z = 0.0;   // The state machine should ignore this value.
         avoid_mov_dir_pub_.publish(avoid_mov_direction_);
 

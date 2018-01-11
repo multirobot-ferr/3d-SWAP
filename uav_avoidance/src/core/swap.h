@@ -219,12 +219,13 @@ namespace avoid
                                 CLOCKWISE = -1,
                                 NOTDEFINED = 0};
 
-        
+            
+            bool yaw_on_= false;                    //!< Tracks if all yaw is controlled
+
 
         private:
             // Variables to track if the system is ready
             bool is_ready_ = false;                 //!< Tracks if all values of Swap are initialized.
-            bool yaw_on_= false;                    //!< Tracks if all yaw is controlled
 
             // Goal storage
             double goal_dist_ = 0.0;                //!< Distance to the goal
