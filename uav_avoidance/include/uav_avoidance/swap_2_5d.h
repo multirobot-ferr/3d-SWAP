@@ -141,9 +141,9 @@ class Swap_2_5d:  public avoid::Swap
 
         // Publishers
         ros::Publisher confl_warning_pub_;              //!< Publisher to determine if there is a possible collision or not
-        ros::Publisher  avoid_mov_dir_pub_;             //!< Publish the direction where the uav has to go to avoid a conflict
-        ros::Publisher xyz_pub_;
-        ros::Publisher marker_pub;
+        ros::Publisher avoid_mov_dir_pub_;             //!< Publish the direction where the uav has to go to avoid a conflict
+        ros::Publisher xyz_pub_;                       //!< Publish the xyz position from the lidar
+        ros::Publisher marker_pub;                     //!< Publish a marker to visualizate robot orientation
         // System variables
         bool initialization_error_ = false;             //!< Flags to track possible errors in initialization
         double spin_sleep_ = 0.1;
@@ -235,8 +235,7 @@ class Swap_2_5d:  public avoid::Swap
         void Log2Matlab( std::vector<double>& values);
 
         /**
-         * @brief Publish a market to visualizer
-         * @param 
+         * @brief Publish a market to visalizate robot orientation 
          */
         void PolarObstacleMarker();
 
