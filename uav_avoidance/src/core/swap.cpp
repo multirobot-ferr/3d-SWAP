@@ -126,15 +126,11 @@ namespace avoid
          }
 
          goal_dist_ = distance;
-         if(yaw_on_)
-         {
+ 
 
-         goal_angle_=ScaleAngle(angle+uav_yaw);
-         }
-         else
-         {
-         goal_angle_= ScaleAngle(angle);
-         }
+         goal_angle_=ScaleAngle(angle-uav_yaw);
+         
+      
      }
 
      /**
@@ -177,7 +173,7 @@ namespace avoid
              case BLOCKED:
                  // The robot should keep position and orientation until the situation changes.
                  v_ref   = 0.0;
-                 yaw_ref = 0.0;
+                 yaw_ref = goal_angle_;
                  break;
              case Z_BLOCKED:
                  // The robot should navigate toward goal in xy plane
@@ -399,17 +395,8 @@ namespace avoid
          
         
         
-       if(yaw_on_)
-        {
-                if ( fabs( AngleDiff(0.0, left_angle) ) < M_PI/2  ||         // PI/3 is working better than PI/2
-                    fabs( AngleDiff(0.0, right_angle)) < M_PI/2   )
-                    {
-                        // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
-                        return false;
-                    }
-        }
-        else
-        {
+      
+        
                 if ( fabs( AngleDiff(goal_angle, left_angle) ) < M_PI/3  ||         // PI/3 is working better than PI/2
                     fabs( AngleDiff(goal_angle, right_angle)) < M_PI/3   )
                 {   // The robot is facing the non-navigable area, it will crash when continuing motion into the currenct direction.
@@ -418,22 +405,17 @@ namespace avoid
                     return false;
 
                 }
-        }
+        
                         
-                        // if (fabs(goal_angle) <= goal_lateral_vision_)
-
-                        /* la idea para que el obstáculo funcione en situaciones de mínimos locales es que cuando se esté alejando del obstáculo
-                        no salga del movimiento de evitación, o sea, cuando la distancia al ángulo sea mayor que la anterior, sigue evitando el obstáculo hasta que
-                        se acerque */
+                       /* if robot is moving away from his next waypoint it keeps swaping. It works with local minimum */
 
                         if( previous_goaldist_> goal_dist_)
                         {
-                            // The goal is visible from the robot's perspective
+                            
                             if (fabs( AngleDiff(goal_angle, left_angle) ) < M_PI_2 ||
                                 fabs( AngleDiff(goal_angle, right_angle)) < M_PI_2)
                             {
-
-                                // The goal belongs to the not navigable area
+                                // The goal is visible from the robot's perspective
                                 previous_goaldist_=goal_dist_;
 
                                 return false;
@@ -442,7 +424,6 @@ namespace avoid
                         else
                         {
 
-                            // The goal is not visible from the robot's perspective
                             previous_goaldist_=goal_dist_;
 
                             return false;

@@ -433,18 +433,10 @@ void Swap_2_5d::RequestControlPub(bool request_control)
 
     if (request_control)
     {
-        if(yaw_on_){
-        avoid_mov_direction_.x = v_ref_*cos(yaw_ref_+uav_yaw_);
-        avoid_mov_direction_.y = v_ref_*sin(yaw_ref_+uav_yaw_);
-        }
-        else
-        {
-        avoid_mov_direction_.x = v_ref_*cos(yaw_ref_);
-        avoid_mov_direction_.y = v_ref_*sin(yaw_ref_); 
-        }
-       
-        
 
+
+        avoid_mov_direction_.x = v_ref_*cos(yaw_ref_+uav_yaw_);  // yaw_ref__ + uav_yaw_ to public global orientation
+        avoid_mov_direction_.y = v_ref_*sin(yaw_ref_+uav_yaw_);
         avoid_mov_direction_.z = 0.0;   // The state machine should ignore this value.
         avoid_mov_dir_pub_.publish(avoid_mov_direction_);
 
@@ -473,42 +465,7 @@ void Swap_2_5d::FillLogFile()
 
         values2log_.push_back(ros::Time::now().toSec());
 
-       /* // Showing the orientation of movement of the robot
-        for (double d : {0.0,1.0})
-        {
-            double x_dir = d*cos( uav_wished_yaw_map_ );
-            double y_dir = d*sin( uav_wished_yaw_map_ );
-
-            values2log_.push_back (x_dir);
-            values2log_.push_back (y_dir);
-        }
-
-        // Showing the orientation requested from the system
-        for (double d : {0.0,1.0})
-        {
-            double x_dir = d*cos( yaw_ref_ );
-            double y_dir = d*sin( yaw_ref_ );
-
-            values2log_.push_back (x_dir);
-            values2log_.push_back (y_dir);
-        }
-
-        measurements info;
-        // Saving the safety_region around the robot it is not necessary anymore
-
-        // Saving the measurements around the robot
-        for (unsigned id_phi = 0; id_phi < id_phi_max_; ++id_phi)
-        {
-            info = GetMeasurement( id_phi );
-
-            double x_m = info.dist * cos( info.angle );
-            double y_m = info.dist * sin( info.angle );
-
-            values2log_.push_back (x_m);
-            values2log_.push_back (y_m);
-        }
-
-        */
+      
         PolarObstacleMarker();
 
         Log2Matlab(values2log_);

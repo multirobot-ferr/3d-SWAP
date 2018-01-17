@@ -220,7 +220,6 @@ namespace avoid
                                 NOTDEFINED = 0};
 
             
-            bool yaw_on_= false;                    //!< Tracks if all yaw is controlled
 
 
         private:
@@ -237,7 +236,8 @@ namespace avoid
             state_orientation statusOri_ = FREE;    //!< Current state for the orientation state machine.
             double yaw_avoidance_ = 0.0;            //!< Orientation to follow on the RENDEZVOUS or RENCONTRE cases
             double v_avoidance_   = 0.0;            //!< Speed to follow on the RENDEZVOUS case
-	    
+	        bool yaw_on_= false;                    //!< Tracks if all yaw is controlled
+
             // Conflict dealing
             double goal_lateral_vision_ = 45*M_PI/180;      //!< Instead of looking for the goal in the entire navigable area, in order to define an obstacle as ignorable or not, looks only in an area defined by this parameter in radians. Allows to deal with convex-walls conflicts.
             double rot_ctrl_P_ = 0.0;               //!< Acts as a P controller trying to keep the distance while surround other obstacles.
