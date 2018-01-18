@@ -213,7 +213,7 @@ Swap_2_5d::Swap_2_5d()
     wished_mov_dir_sub_ = nh_.subscribe( "wished_movement_direction",1 , &Swap_2_5d::WishedMovDirectionCallback, this);
     avoid_mov_dir_pub_  = nh_.advertise<geometry_msgs::Vector3>("avoid_movement_direction", 1, true);
     laser_sub_ = nh_.subscribe<sensor_msgs::LaserScan>("/mbzirc_1/front_laser/scan",10,&Swap_2_5d::LaserCallback,this);
-    pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_1/velodyne", 10, &Swap_2_5d::CloudCallback, this);
+    pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_2/velodyne", 10, &Swap_2_5d::CloudCallback, this);
     xyz_pub_ = nh_.advertise<pcl::PointCloud<pcl::PointXYZ>>("/velodyne/xyztopic",1,true);
     marker_pub = nh_.advertise<visualization_msgs::Marker>("polar_visualization_marker", 10);
     // Meant to debug the system
@@ -333,7 +333,7 @@ void Swap_2_5d::CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg
        {
 
                 SetNewGlobalMeasurement(uav_x_, uav_y_, uav_z_, uav_yaw_ ,  // The 0.0 makes it always look to the nord (even if not)
-                                        cloud_xyz_.points[id_point].x,  cloud_xyz_.points[id_point].y,  cloud_xyz_.points[id_point].z,
+                                        cloud_xyz_.points[id_point].x+uav_x_,  cloud_xyz_.points[id_point].y+uav_y_,  cloud_xyz_.points[id_point].z+uav_z_,
                                         uav_safety_radius_, true);       }
 
 }
