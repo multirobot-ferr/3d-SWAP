@@ -147,7 +147,7 @@ class Swap_2_5d:  public avoid::Swap
         // System variables
         bool initialization_error_ = false;             //!< Flags to track possible errors in initialization
         double spin_sleep_ = 0.1;
-        bool hard_debug_=false;                       //!< Time that the system will sleep between iterations of the main loop
+        bool hard_debug_=false;                         //!< Time that the system will sleep between iterations of the main loop
         int uav_id_ = -1;                               //!< Identification number of the current uav
         int n_uavs_;                                    //!< Number of UAV involved
         std::vector<int> uav_ids_;                      //!< IDs of UAV involved
@@ -155,13 +155,13 @@ class Swap_2_5d:  public avoid::Swap
         double uav_safety_radius_ = -1.0;               //!< Safety radius of each uav
 	    double dz_min_;	    		   		            //!< max z-distance to swap. It is a parameter
         double dz_range_;
-        pcl::PointCloud<pcl::PointXYZ> cloud_xyz_;
+        pcl::PointCloud<pcl::PointXYZ> cloud_xyz_;      //!< Lidar information to publish
 
 
         // Position of the UAV
         bool   pose_received_ = false;                  //!< Tracks if the uav knows its position
         double uav_x_, uav_y_, uav_z_, uav_yaw_;        //!< Position of the current uav
-        bool z_swap_=true;			    		//!< Flag to swap depends on z-distance between uavs
+        bool z_swap_=true;			    		        //!< Flag to swap depends on z-distance between uavs
 
         // START ----- IMPORTANT ----- START
         // uav_yaw_ is the direction where the robot wants to go
@@ -194,12 +194,16 @@ class Swap_2_5d:  public avoid::Swap
         void PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id);
 
         /**
-         * @brief Callback for lidar date
+         * @brief Callback for Lidar date
+         * 
+         * @param cloud_msg Point cloud message from Lidar
          */
         void CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
 
         /**
-         * @brief Callback for laser date
+         * @brief Callback for laser 2D date
+         * 
+         * @param scan Laser 2D message from Hokuyo
          */
         void LaserCallback(const sensor_msgs::LaserScan::ConstPtr& scan);
 
@@ -235,7 +239,9 @@ class Swap_2_5d:  public avoid::Swap
         void Log2Matlab( std::vector<double>& values);
 
         /**
-         * @brief Publish a market to visalizate robot orientation 
+         * @brief Utility function. 
+         * 
+         * Utility function. Publish a market to visualizate robot orientation 
          */
         void PolarObstacleMarker();
 

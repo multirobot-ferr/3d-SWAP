@@ -93,7 +93,6 @@ StateMachine::StateMachine() {
     double sleep_time = 1.0 + (rand() % 10 + 1)/10.0;
     ROS_INFO("Waiting %f seconds before start", sleep_time);
 
-    //pid_yaw_ = new grvc::utils::PidController("yaw", 0.4, 0.02, 0.0);
 
     ros::Duration( sleep_time).sleep();
 
@@ -118,6 +117,9 @@ StateMachine::StateMachine() {
         initialization_error = true;
         ROS_FATAL("State Machine: game frame is not set. Closing the state machine system");
     }
+
+
+    // Reading waypoints and transforming it to /map
 
     std::string goals_path;
     if (pnh_.getParam("goals_path", goals_path))
@@ -572,7 +574,7 @@ void StateMachine::UpdateWayPoints()
 }
 
 /**
- * Utility function. Returns an angle between (-pi and pi)
+ * Utility function. Returns an angle between (-2*pi and 2*pi)
  */
 double StateMachine::ScaleAngle(double angle)
 {

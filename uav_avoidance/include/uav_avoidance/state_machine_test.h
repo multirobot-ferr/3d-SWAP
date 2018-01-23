@@ -119,16 +119,16 @@ class StateMachine
 
         // Services
         ros::ServiceServer wait_for_start_;           //!< Service that makes the UAV wait on the Goal point 1
-        bool keep_moving_ = false;              //!< Allows the UAV to move on from the Goal point 1
+        bool keep_moving_ = false;                    //!< Allows the UAV to move on from the Goal point 1
         bool landed_ = false;                     
 
     // ###########  Communication with SWAP  ########### //
-        ros::Subscriber  confl_warning_sub_;    //!< Receives warnings from SWAP
-        bool confl_warning_ = false;            //!< Flag to know if there is a conflict to avoid
-        ros::Publisher   wished_mov_dir_pub_;   //!< Sends the direction of movement that the uav wants to take (respect to the map)
-        ros::Subscriber  avoid_mov_dir_sub_;    //!< Requested direction to avoid a conflict
-        geometry_msgs::Vector3 wished_direction_uav_; //!< Movement direction with respect to the map (where the uav wants to go)
-        geometry_msgs::Vector3 avoid_mov_direction_uav_; //!< Movement direction requested from swap
+        ros::Subscriber  confl_warning_sub_;                //!< Receives warnings from SWAP
+        bool confl_warning_ = false;                        //!< Flag to know if there is a conflict to avoid
+        ros::Publisher   wished_mov_dir_pub_;               //!< Sends the direction of movement that the uav wants to take (respect to the map)
+        ros::Subscriber  avoid_mov_dir_sub_;                //!< Requested direction to avoid a conflict
+        geometry_msgs::Vector3 wished_direction_uav_;       //!< Movement direction with respect to the map (where the uav wants to go)
+        geometry_msgs::Vector3 avoid_mov_direction_uav_;    //!< Movement direction requested from swap
     // ###########  #######################  ########### //
 
         //pid variables
@@ -143,7 +143,7 @@ class StateMachine
         bool experiment_done = false;           
         bool initialization_error = false;      //!< Tracks possible initialization errors
         int uav_id_ = -1;                       //!< Identification number of the current uav
-        bool yaw_on_;                   //!< movement depend on laser 3D is activated
+        bool yaw_on_;                           //!< Flag to know if yaw is controlled
         bool game_frame_;
         // Position of the UAV
         bool   pose_received_ = false;          //!< Tracks if the pose is already known
@@ -257,19 +257,21 @@ class StateMachine
          */
         void UpdateWayPoints();
 
-        /**
-         *  Pid implementation
-         */
-
-        double pid(double error, double dt);
 
         /**
-         *
+         * @brief Utility function. Returns an angle between -2*pi and 2*pi
+         * @param Angle to scale
+         * @return Angle between -2pi adn 2pi
          */
         double ScaleAngle(double angle);
 
         /**
-         * utility function to transform waypoints
+         * @brief Utility function to transform waypoints
+         * @param wp_game waypoints to transform
+         * @param "game"  frame input
+         * @param "map"   frame output
+         * @return /map waypoints
+         * 
          */
         arma::mat gameToMap(arma::mat wp_game, const std::string from = "game", const std::string to = "map");
         
