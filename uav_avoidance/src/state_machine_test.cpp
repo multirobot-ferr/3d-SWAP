@@ -574,7 +574,7 @@ void StateMachine::UpdateWayPoints()
 }
 
 /**
- * Utility function. Returns an angle between (-2*pi and 2*pi)
+ * Utility function. Returns an angle between (pi and pi)
  */
 double StateMachine::ScaleAngle(double angle)
 {

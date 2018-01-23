@@ -261,7 +261,7 @@ class StateMachine
         /**
          * @brief Utility function. Returns an angle between -2*pi and 2*pi
          * @param Angle to scale
-         * @return Angle between -2pi adn 2pi
+         * @return Angle between pi and pi
          */
         double ScaleAngle(double angle);
 
