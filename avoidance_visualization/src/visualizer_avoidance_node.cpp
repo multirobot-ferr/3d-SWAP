@@ -1,16 +1,12 @@
 #include <ros/ros.h>
-#include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/Bool.h>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <map>
-#include <fstream>
-#include <iostream>
+#include <string>  //to string
+#include <sstream>  //stringstream
+#include <vector>   //vector3
 #include <iomanip> // setprecision
-#include <tf/transform_datatypes.h>
+#include <tf/transform_datatypes.h> //to get yaw
 
 using namespace std;
 
@@ -98,7 +94,6 @@ Visualizer::Visualizer(int id)
     
     // getting swap parameters
 
-    cout<<"el id es: "<<id<<endl;
 
     //getting visualization parameters
 

@@ -51,7 +51,6 @@
 #include <uav_avoidance/swap_2_5d.h>
 #include <std_msgs/Bool.h>
 #include <tf2/utils.h>
-#include <functional>
 #include <visualization_msgs/Marker.h>
 
 

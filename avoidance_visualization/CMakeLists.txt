@@ -10,8 +10,10 @@ add_definitions(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   gazebo_ros
   geometry_msgs
+  std_msgs
   roscpp
   visualization_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions

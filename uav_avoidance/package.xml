@@ -41,6 +41,8 @@
   <build_depend>geometry_msgs</build_depend>
   <build_depend>tf2</build_depend>
   <build_depend>armadillo</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_depend>libpcl-all</build_depend>
 
 
   
@@ -51,6 +53,8 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>tf2</run_depend>
   <run_depend>armadillo</run_depend>
+  <run_depend>visualization_msgs</run_depend>
+  <run_depend>libpcl-all</run_depend>
 
   
 </package>
