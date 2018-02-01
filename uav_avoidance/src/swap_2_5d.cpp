@@ -334,7 +334,7 @@ void Swap_2_5d::CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg
                 {
                 SetNewGlobalMeasurement(uav_x_, uav_y_, uav_z_, uav_yaw_ ,  // The 0.0 makes it always look to the nord (even if not)
                                         cloud_xyz_.points[id_point].x+uav_x_,  cloud_xyz_.points[id_point].y+uav_y_,  cloud_xyz_.points[id_point].z+uav_z_,
-                                        uav_safety_radius_, true);      
+                                        uav_safety_radius_, false);      
                  }
        }
 }
