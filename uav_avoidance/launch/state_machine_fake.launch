@@ -1,0 +1,109 @@
+<!--
+/*
+ * Copyright (c) 2017, University of Duisburg-Essen, swap-ferr
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of swap-ferr nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+ @author Eduardo Ferrera
+ @version 0.1
+ @date    7/3/17 
+ 
+ @short: Launches a fake state machine to play with SWAP
+ 
+ The following state machine is meant to take off the quadcopter and make it move 
+ to different locations. It receives all necessary commands from SWAP to avoid
+ conflicts.
+ 
+ This is just an implementation example of how the state machine of the full
+ system should interact with SWAP, but can be used to test with the real 
+ uav
+ 
+ Note: For some reason, the command of land() is not working. Take that into
+ account for the real experiments.
+
+Para mañana voy a intentar hacer aquí un script para que vaya a los waypoints que yo quiero diferentes para cada uav
+La idea es buscar como programar un if y dependiendo de la identidad del robot cargar un archivo de texto goal.txt u otro
+
+ -->
+
+
+<launch>
+	<!-- Configurable parameters -->
+	<arg name="robot_number" default="1"/>
+    	<arg name="waypoints" default="$(find uav_avoidance)/logs/goals1.txt"/>
+
+	<arg name="yaw_on" default="false"/>
+	<arg name="max_speed" default="1.5"/>
+	<arg name="game_frame" default="false"/>
+
+    <group ns="/uav_$(arg robot_number)">
+        <node pkg="uav_avoidance" type="state_machine" name="state_machine" output="screen">
+            <param name="uav_id" value="$(arg robot_number)"/>
+            <param name="ual_namespace" value=""/>    
+            <param name="z_distance" value="3.0"/>  <!-- Distance between the uav's in the z axis -->
+            <param name="d_goal" value="3.0"/>      <!-- Distance to consider that a uav is on a goal -->
+	        <param name="yaw_on" value= "$(arg yaw_on)" />  
+	        <param name="v_max"  value="$(arg max_speed)"/>
+		    <param name="game_frame" value="$(arg game_frame)"/>
+            <param name="goals_path" value="$(arg waypoints)"/> <!-- File containing a set of goals -->
+            
+            <!-- PID parameters-->
+                <!-- xPID -->
+                <param name="xv_pid/k_p" value="1.0"/> 
+                <param name="xv_pid/k_i" value="0.02"/>   
+                <param name="xv_pid/k_d" value="0.2"/> 
+                <param name="xv_pid/integral_limit" value="0.1"/>   
+                <param name="xv_pid/pid_output_limit" value="$(arg max_speed)"/> 
+  
+                <!-- yPID -->
+                <param name="yv_pid/k_p" value="1.0"/> 
+                <param name="yv_pid/k_i" value="0.02"/>   
+                <param name="yv_pid/k_d" value="0.2"/> 
+                <param name="yv_pid/integral_limit" value="0.1"/>   
+                <param name="yv_pid/pid_output_limit" value="$(arg max_speed)"/> 
+                
+                <!-- zPID -->
+                <param name="zv_pid/k_p" value="1.5"/> <!-- Sim: 3.0-->
+                <param name="zv_pid/k_i" value="0.0"/>   
+                <param name="zv_pid/k_d" value="0.0"/> 
+                <param name="zv_pid/integral_limit" value="5.0"/>   
+                <param name="zv_pid/pid_output_limit" value="$(arg max_speed)"/> 
+
+                <!-- yawPID -->
+                <param name="yaw_pid/k_p" value="0.4"/> <!-- Sim: 3.0-->
+                <param name="yaw_pid/k_i" value="0.02"/>   
+                <param name="yaw_pid/k_d" value="0.0"/> 
+                <param name="yaw_pid/integral_limit" value="5.0"/>   
+                <param name="yaw_pid/pid_output_limit" value="$(arg max_speed)"/> 
+
+
+
+
+        </node>
+    </group>
+</launch>

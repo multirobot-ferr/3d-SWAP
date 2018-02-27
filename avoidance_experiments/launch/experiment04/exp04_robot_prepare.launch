@@ -1,0 +1,17 @@
+<!--
+Launches swap and a simple state machine node in the robot with ROBOT_ID
+
+If you want to change your ROBOT_ID just run "export ROBOT_ID=2"
+-->
+
+<launch>
+    <arg name="exp_num" value="04"/>
+    <arg name="uav_id" default="$(env ROBOT_ID)"/>
+
+    <!-- Swap algorithm -->
+    <include file="$(find avoidance_experiments)/launch/robot/swap.launch">
+        <arg name="path2goal" default="$(find avoidance_experiments)/launch/experiment$(arg exp_num)/mission$(arg exp_num)_uav$(arg uav_id).txt"/>
+
+        <arg name="nameofbag" default="$(find avoidance_experiments)/logs/experiment$(arg exp_num)/"/>
+    </include>
+</launch>

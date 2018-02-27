@@ -1,0 +1,17 @@
+<!--
+
+Plays the current saved rosbag
+
+-->
+
+<launch>
+
+    <param name="exp_num" value="02"/>
+
+    <!-- Prepare the bag -->
+    <include file="$(find avoidance_experiments)/launch/common/rosbag_play.launch">
+            <arg name="bags_path" value="$(find avoidance_experiments)/bags/experiment$(arg exp_num)"/>
+            <arg name="bag_name"  value="experiment$(arg exp_num)_01.bag"/>
+    </include>
+
+</launch>

@@ -1,0 +1,13 @@
+*~
+*/.vscode
+*/*/.vscode
+/CMakeLists.txt
+
+# Bag files
+avoidance_experiments/bags/experiment*/*.bag
+
+# Log files
+avoidance_experiments/logs/experiment*/*.txt
+
+# Where the experiments are saved (large files)
+uav_avoidance_experiments/  

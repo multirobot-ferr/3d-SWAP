@@ -1,0 +1,15 @@
+<!--
+
+Launches the swap node in robot 1
+
+-->
+
+<launch>
+
+    <!-- Prepare the bag -->
+    <include file="$(find avoidance_experiments)/launch/common/rosbag_play.launch">
+            <arg name="bags_path" value="$(find avoidance_experiments)/bags/experiment01"/>
+            <arg name="bag_name"  value="experiment01_01.bag"/>
+    </include>
+	
+</launch>
