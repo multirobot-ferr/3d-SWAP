@@ -1,5 +1,0 @@
-int16 uav_id
----
-int16 target_id
-geometry_msgs/Vector3 global_position
-int32 color

@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-
-    <node name="uav_state_machine_1" pkg="uav_state_machine" type="uav_state_machine" respawn="false" output="screen"
-      args="-uav_id=1 -flying_level=3.0"/>
-    
-</launch>

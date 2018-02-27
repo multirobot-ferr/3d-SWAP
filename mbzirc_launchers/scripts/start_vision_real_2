@@ -1,5 +1,0 @@
-#!/bin/bash
-# This scripts launches vision nodes 
-
-./vision_node ../cfg/vision/realData_2.xml
-
