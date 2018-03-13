@@ -787,7 +787,7 @@ namespace avoid
         double pond = 2.0;  // For static obstacles we only take one time the bracking distance
         if (GetDynMeasurement(id_phi))
         {
-            pond = 1.0;     // For dynamic obstacles we take two times the bracking distance
+            pond = 2.0;     // For dynamic obstacles we take two times the bracking distance
         }
         double desired_dist =  pond * (bracking_distance_ + gamma_offset_ + local_measurement_error_);  // 0.5 *
 

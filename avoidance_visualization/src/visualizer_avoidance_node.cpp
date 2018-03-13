@@ -104,7 +104,6 @@ Visualizer::Visualizer(int id)
     pnh_->getParam("positioning_error", positioning_error_);
     pnh_->getParam("gamma_offset", gamma_offset_);
 
-
     pnh_->getParam("/uav_1/avoidance_swap/swap/safety_radius", uav_safety_radius_swap_);
     pnh_->getParam("/uav_1/avoidance_swap/swap/braking_distance", bracking_distance_swap_);
     pnh_->getParam("/uav_1/avoidance_swap/swap/dz_min", dz_min_swap_);
@@ -259,6 +258,13 @@ void Visualizer::publishMarkers()
 
             switch(uav_id)
             {
+                
+                 case 1:
+                // orange
+                marker_robot.color.r = 1.0;
+                marker_robot.color.g = 0.647;
+                marker_robot.color.b = 0.0;
+                break;
                 case 4:
                 // orange
                 marker_robot.color.r = 1.0;
@@ -294,6 +300,12 @@ void Visualizer::publishMarkers()
             id_marker.color.a=1;
              switch(uav_id)
             {
+                case 1:
+                // orange
+                id_marker.color.r = 1.0;
+                id_marker.color.g = 0.647;
+                id_marker.color.b = 0.0;
+                break;
                 case 4:
                 // orange
                 id_marker.color.r = 1.0;
@@ -334,6 +346,13 @@ void Visualizer::publishMarkers()
             goal_marker.color.a=1;
              switch(uav_id)
             {
+                
+                 case 1:
+                // orange
+                goal_marker.color.r = 1.0;
+                goal_marker.color.g = 0.647;
+                goal_marker.color.b = 0.0;
+                break;
                 case 4:
                 // orange
                 goal_marker.color.r = 1.0;
@@ -366,25 +385,32 @@ void Visualizer::publishMarkers()
             uav_cylinder.id = uav_id;
             uav_cylinder.ns = "uavs";
             uav_cylinder.type = visualization_msgs::Marker::CYLINDER;
-            uav_cylinder.color.a = 0.1;   
+            uav_cylinder.color.a = 0.5;   
 
             switch(uav_id)
             {
-                case 4:
+                case 1:
                 
                 uav_cylinder.color.r = 0;
                 uav_cylinder.color.g = 0.7;
                 uav_cylinder.color.b = 0;
                 break;
+                
+                case 4:
+                
+                uav_cylinder.color.r = 0.95;
+                uav_cylinder.color.g = 0;
+                uav_cylinder.color.b = 0.95;
+                break;
                 case 2:
 
                 uav_cylinder.color.r = 0;
-                uav_cylinder.color.g = 0.7;
-                uav_cylinder.color.b = 0; 
+                uav_cylinder.color.g = 0;
+                uav_cylinder.color.b = 0.85;
                 break;
                 case 3:
-                uav_cylinder.color.r = 0.7;
-                uav_cylinder.color.g = 0.7;
+                uav_cylinder.color.r = 0.75;
+                uav_cylinder.color.g = 0;
                 uav_cylinder.color.b = 0;
                 break;
             
@@ -407,11 +433,12 @@ void Visualizer::publishMarkers()
             cylinder.id = uav_id;
             cylinder.ns = "uavs";
             cylinder.type = visualization_msgs::Marker::CYLINDER;
-            cylinder.color.a = 0.1;   
+            cylinder.color.a = 0.5;   
 
             switch(uav_id)
             {
-                case 4:
+                
+                case 1:
                     if(uav_direction_received_==false){
                     cylinder.color.r = 0;
                     cylinder.color.g = 1;
@@ -425,30 +452,45 @@ void Visualizer::publishMarkers()
                     }
 
                 break;
+                
+                case 4:
+                    if(uav_direction_received_==false){
+                    cylinder.color.r = 0.95;
+                    cylinder.color.g = 0;
+                    cylinder.color.b = 0.95;
+                    }
+                    else
+                    {
+                    cylinder.color.r = 0.95;
+                    cylinder.color.g = 0;
+                    cylinder.color.b = 0.95;
+                    }
+
+                break;
                 case 2:
 
                 if(uav_direction_received_==false){
                     cylinder.color.r = 0;
-                    cylinder.color.g = 1;
-                    cylinder.color.b = 0;
+                    cylinder.color.g = 0;
+                    cylinder.color.b = 0.85;
                     }
                     else
                     {
-                    cylinder.color.r = 1;
-                    cylinder.color.g = 1;
-                    cylinder.color.b = 0;
+                    cylinder.color.r = 0;
+                    cylinder.color.g = 0;
+                    cylinder.color.b = 0.85;
                     }
                 break;
                 case 3:
                 if(uav_direction_received_==false){
-                    cylinder.color.r = 0;
-                    cylinder.color.g = 1;
+                    cylinder.color.r = 0.75;
+                    cylinder.color.g = 0;
                     cylinder.color.b = 0;
                     }
                     else
                     {
-                    cylinder.color.r = 1;
-                    cylinder.color.g = 1;
+                    cylinder.color.r = 0.75;
+                    cylinder.color.g = 0;
                     cylinder.color.b = 0;
                     }
                 break;
@@ -477,6 +519,12 @@ void Visualizer::publishMarkers()
                 arrow_yaw.color.a = 1;   
                 switch(uav_id)
                 {
+                    case 1:
+                    // orange
+                    arrow_yaw.color.r = 0.0;
+                    arrow_yaw.color.g = 1;
+                    arrow_yaw.color.b = 0;
+                    break;
                     case 4:
                     // orange
                     arrow_yaw.color.r = 0.0;
@@ -539,6 +587,13 @@ void Visualizer::publishMarkers()
                 arrow_goal.color.a = 1;   
                 switch(uav_id)
                 {
+                    
+                    case 1:
+                    // orange
+                    arrow_goal.color.r = 0.0;
+                    arrow_goal.color.g = 0.0;
+                    arrow_goal.color.b = 0.5;
+                    break;
                     case 4:
                     // orange
                     arrow_goal.color.r = 0.0;
@@ -594,6 +649,12 @@ void Visualizer::publishMarkers()
                 arrow.color.a = 1;   
                 switch(uav_id)
                 {
+                     case 1:
+                    // orange
+                    arrow.color.r = 0.5;
+                    arrow.color.g = 0;
+                    arrow.color.b = 0.0;
+                    break;
                     case 4:
                     // orange
                     arrow.color.r = 0.5;
@@ -679,7 +740,11 @@ int main(int argc, char** argv)
     Visualizer vis_uav3(3);
 
     Visualizer vis_uav4(4);
+
+    Visualizer vis_uav1(1);
     
+    Visualizer vis_uav5(5);
+
     while(ros::ok())
     {
         ros::spinOnce();
@@ -696,6 +761,10 @@ int main(int argc, char** argv)
         vis_uav2.publishMarkers();
 
         vis_uav3.publishMarkers();
+
+        vis_uav1.publishMarkers();
+
+        vis_uav5.publishMarkers();
         
         ros::Duration(0.1).sleep();
     }

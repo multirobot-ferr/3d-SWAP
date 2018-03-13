@@ -96,7 +96,6 @@ StateMachine::StateMachine() {
 
     ros::Duration( sleep_time).sleep();
 
-
     if (!pnh_.getParam("uav_id", uav_id_))
     {
         initialization_error = true;
@@ -378,7 +377,6 @@ void StateMachine::PublishPosErr()
         // Movement is not safe. Changing the reference
         xe = 0.8*v_ref_*avoid_mov_direction_uav_.x;
         ye = 0.8*v_ref_*avoid_mov_direction_uav_.y;
-        ze = 0;
     }
 
     double yaw_desired=atan2(diry, dirx);
