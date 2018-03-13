@@ -144,6 +144,10 @@ class Swap_2_5d:  public avoid::Swap
         pcl::PointCloud<pcl::PointXYZ> cloud_xyz_;      //!< Lidar information to publish
 
 
+        //Noise
+        std::default_random_engine generator_;
+        std::normal_distribution<double> distribution_;
+
         // Position of the UAV
         bool   pose_received_ = false;                  //!< Tracks if the uav knows its position
         double uav_x_, uav_y_, uav_z_, uav_yaw_;        //!< Position of the current uav

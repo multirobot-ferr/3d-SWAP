@@ -80,6 +80,7 @@ int main(int argc, char **argv) {
  * Default constructor of the class
  */
 Swap_2_5d::Swap_2_5d()
+    : generator_(std::chrono::system_clock::now().time_since_epoch().count()), distribution_(0.0, 1.5)
 {
     // Preparing private acquisition of parameters
     pnh_ = new ros::NodeHandle("~");
@@ -112,14 +113,6 @@ Swap_2_5d::Swap_2_5d()
         initialization_error_ = true;
         ROS_FATAL("SWAP: uav_id is not set. Closing the avoidance system");
     }
-
-   /* if (!pnh_->getParam("yaw_on", yaw_on_))
-    {
-        initialization_error = true;
-        ROS_FATAL("State Machine: yaw_on is not set");
-    }
-    // yaw_on es una miembro privado
-    */
 
 
     // Getting the sleeping time of the loop
@@ -374,6 +367,12 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
         offset[coordinate] = UAV_ZZ( uav_id-1, coordinate );
     }
     #endif
+
+    double rx= distribution_(generator_);  // x noise
+    double ry= distribution_(generator_);  // y noise
+    double rz= distribution_(generator_);   // z noise
+
+
     double x   = offset[0] + uav_pose->pose.position.x;
     double y   = offset[1] + uav_pose->pose.position.y;
     double z   = offset[2] + uav_pose->pose.position.z;
@@ -383,9 +382,9 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
     {
         // We are reading the position of the robot that owns the avoidance system
         pose_received_ = true;
-        uav_x_   = x;
-        uav_y_   = y;
-        uav_z_   = z;
+        uav_x_   = x + rx;
+        uav_y_   = y + ry;
+        uav_z_   = z + rz;
         uav_yaw_ = yaw;
 
         //ROS_INFO("Pose of uav %d %.2f, %.2f, %.2f, ||  %.2f", uav_id, x, y, z, yaw);
@@ -393,8 +392,8 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
     else if (pose_received_)
     {
         // The robot knows where it is and where an other robot is located.
-        SetNewGlobalMeasurement(uav_x_, uav_y_, uav_z_, uav_yaw_,  // The 0.0 makes it always look to the nord (even if not)
-                                x, y, z, uav_safety_radius_, true);
+        SetNewGlobalMeasurement(uav_x_, uav_y_ , uav_z_ , uav_yaw_,  // The 0.0 makes it always look to the nord (even if not)
+                                x+ rx, y+ ry, z+ rz, uav_safety_radius_, true);
 
 
     }
