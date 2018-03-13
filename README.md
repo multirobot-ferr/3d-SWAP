@@ -27,3 +27,5 @@ There are some examples that you can run for testing the 3D-SWAP. How to run the
     `$ roslaunch avoidance_experiments cube_prepare.launch`
 
  * expcube_start.launch: UAVs start the experiment.
+
+     `$ roslaunch avoidance_experiments expcube_start.launch`
