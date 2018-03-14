@@ -7,6 +7,7 @@ This repository contains all the code for running 3D-SWAP and the experiments us
  * [grvc-ual](https://github.com/grvcTeam/grvc-ual)
  * [grvc-utils](https://github.com/grvcTeam/grvc-utils)
  * [PX4 Firmware](https://github.com/PX4/Firmware) at tag [v1.6.3](https://github.com/PX4/Firmware/tree/v1.6.3)
+ * [Armadillo](http://arma.sourceforge.net/download.html)
 
 ## How do I get set up?
 
