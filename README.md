@@ -16,11 +16,11 @@ You can find the instructions for the UAL installation [here](https://github.com
 
 Once dependencies have been installed, 3D-SWAP can be set up. The 3D-SWAP repository contains a folder with a set of packages. These packages need to reside in the src folder of your catkin workspace. To clone the repositorie into the right place:
        
-    `$ cd ~/catkin_ws/src`
-    `$ git clone https://github.com/multirobot-ferr/3d-SWAP.git`
-    `$ cd ~/catkin_ws/`
-    `$ catkin_make`
-    `$ source ~/.bashrc`
+    $ cd ~/catkin_ws/src
+    $ git clone https://github.com/multirobot-ferr/3d-SWAP.git
+    $ cd ~/catkin_ws/
+    $ catkin_make
+    $ source ~/.bashrc
 
 
 ## How to use 3D-SWAP ##
