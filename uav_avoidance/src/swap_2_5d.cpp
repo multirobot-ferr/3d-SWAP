@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
  * Default constructor of the class
  */
 Swap_2_5d::Swap_2_5d()
-    : generator_(std::chrono::system_clock::now().time_since_epoch().count()), distribution_(0.0, 1.5)
+    : generator_(std::chrono::system_clock::now().time_since_epoch().count()), distribution_(0.0, 0.0)
 {
     // Preparing private acquisition of parameters
     pnh_ = new ros::NodeHandle("~");
@@ -208,6 +208,8 @@ Swap_2_5d::Swap_2_5d()
     pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_2/velodyne", 10, &Swap_2_5d::CloudCallback, this);
     xyz_pub_ = nh_.advertise<pcl::PointCloud<pcl::PointXYZ>>("/velodyne/xyztopic",1,true);
     marker_pub = nh_.advertise<visualization_msgs::Marker>("polar_visualization_marker", 10);
+    wait_for_start_ = nh_.advertiseService("Start1", &Swap_2_5d::StartServiceCb, this);
+
     // Meant to debug the system
     std::string file_path;
     if (pnh_->getParam("debug/file_path", file_path))
@@ -236,6 +238,26 @@ Swap_2_5d::~Swap_2_5d()
 
     // Releasing the memory
     delete pnh_;
+}
+
+
+bool Swap_2_5d::StartServiceCb(std_srvs::SetBool::Request& allowed2move, std_srvs::SetBool::Response& ok)
+{
+    start_experiment_ = allowed2move.data;
+
+    if (start_experiment_)
+    {
+        std::string msg = "SWAP: Starting logging" + std::to_string(uav_id_) + "!";
+        ROS_INFO("%s", msg.c_str());
+        ok.message = msg;
+    }
+    else
+    {
+        ROS_INFO("finish logging");
+    }
+
+    ok.success = true;
+    return true;
 }
 
 /**
@@ -304,8 +326,11 @@ void Swap_2_5d::SpinOnce()
         ROS_INFO("Swap: %s", state.c_str());
     }
 
+    if(start_experiment_){
     // If active, save in a log all information
     FillLogFile();
+    }
+   
 }
 
 /**
@@ -397,16 +422,17 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
 
 
     }
+    
+        // If necessary, save the positions on the log
+        if (pos_all)
+        {
+            int pos = log_pos_map_[uav_id];
 
-    // If necessary, save the positions on the log
-    if (pos_all)
-    {
-        int pos = log_pos_map_[uav_id];
-
-        pos_all[pos*3 + 0] = x;
-        pos_all[pos*3 + 1] = y;
-        pos_all[pos*3 + 2] = z;
-    }
+            pos_all[pos*3 + 0] = x;
+            pos_all[pos*3 + 1] = y;
+            pos_all[pos*3 + 2] = z;
+        }
+    
 }
 
 /**

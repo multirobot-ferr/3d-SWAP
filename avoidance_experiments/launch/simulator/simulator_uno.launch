@@ -1,0 +1,41 @@
+<launch>
+
+    <arg name="multi" default="false"/>
+    <arg name="ns_prefix" default="uav_"/>
+    
+    <!-- Visualization system -->
+    <!-- Loads the frame transforms and the tf_publisher-->
+    <include file="$(find avoidance_experiments)/launch/visualization.launch"/>
+
+    <!-- Load frame transforms for map and UAVs -->
+    <!--rosparam file="$(find avoidance_experiments)/config/simulator/$(arg simulator_params).yaml" command="load" /-->
+
+    <!-- Launch static_tf_publisher for map to world transform (if defined) -->
+    <!-- <node pkg="static_tf_publisher" type="static_tf_publisher_node" name="static_tf_publisher"/> -->
+
+    <!-- Launch Gazebo simulation TODO: world location? -->
+    <node pkg="px4_bringup" type="launch_gzworld.py" name="gazebo_world" output="screen"
+    args="-physics=ode -world=$(find px4_bringup)/config/empty_light.world"/>
+
+    <!-- Launch robots. Argument mode can be:
+        - sitl: for software in the loop simulation
+        - serial: for serial connection to px4
+        - udp: for udp connection to px4
+    -->
+	 <!-- Launch robot id=1 -->
+    <include file="$(find px4_bringup)/launch/spawn_robot.launch">
+        <arg name="id" value="1"/>
+        <arg name="material" value="Orange"/>
+        <arg name="mode" value="sitl"/>
+        <arg name="ns_prefix" value="$(arg ns_prefix)"/>
+    </include>
+
+    <!-- Launch UAL server for drone id=1 -->
+    <node pkg="uav_abstraction_layer" type="server" name="server_1" output="screen">
+        <param name="uav_id" value="1"/>
+        <param name="ns_prefix" value="$(arg ns_prefix)"/>
+        <param name="pose_frame_id" value="map"/>
+    </node>
+
+    </launch>
+

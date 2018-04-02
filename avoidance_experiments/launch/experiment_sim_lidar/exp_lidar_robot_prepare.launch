@@ -5,7 +5,7 @@ If you want to change your ROBOT_ID just run "export ROBOT_ID=2"
 -->
 
 <launch>
-    <arg name="uav_id" default="$(env ROBOT_ID)"/>
+    <arg name="uav_id" default="2"/>
 
 
     <!-- Swap algorithm -->

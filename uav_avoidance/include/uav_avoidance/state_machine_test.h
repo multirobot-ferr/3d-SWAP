@@ -60,7 +60,7 @@
 #include <tf2/LinearMath/Quaternion.h>       
 
 // Constant values
-const std::string pose_uav_topic = "/pose";
+const std::string pose_uav_topic_ = "/pose";
 const std::string takeoff_service= "/take_off";
 const std::string speed_service  = "/set_velocity";
 const std::string way_point_service  = "/go_to_waypoint";
@@ -162,6 +162,7 @@ class StateMachine
         ros::ServiceClient speed_srv_;
         ros::ServiceClient pos_err_srv_;
         ros::ServiceClient land_srv_;
+        ros::ServiceClient start_client_;
         double dist_between_uav_z_ = 0.0;
 
         //Waypoints to debug the system

@@ -45,12 +45,14 @@
 #include <uav_avoidance/state_machine_test.h>
 #include <tf2/utils.h>     // to convert quaternion to roll-pitch-yaw
 #include <math.h>  // to use atan2
+#include <uav_avoidance/swap_2_5d.h>
 
 #include <uav_abstraction_layer/TakeOff.h>
 #include <uav_abstraction_layer/SetVelocity.h>
 #include <uav_abstraction_layer/SetPositionError.h>
 #include <uav_abstraction_layer/GoToWaypoint.h>
 #include <uav_abstraction_layer/Land.h>
+
 
 /**
  * Main code of the state machine
@@ -150,7 +152,7 @@ StateMachine::StateMachine() {
         ual_ns = "";
 
     // Subscribing to the position of the UAV
-    std::string uav_topic_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual"+ pose_uav_topic.c_str();
+    std::string uav_topic_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual"+ pose_uav_topic_.c_str();
     pos_uav_sub_ = nh_.subscribe(  uav_topic_name.c_str() , 1, &StateMachine::PoseReceived, this);
     // Preparing the necessary services
 
@@ -169,6 +171,9 @@ StateMachine::StateMachine() {
 
     uav_service_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual" + land_service;
     land_srv_ = nh_.serviceClient<uav_abstraction_layer::Land>(uav_service_name);
+
+    start_client_ = nh_.serviceClient<std_srvs::SetBool>("Start1");
+
 
 
     pnh_.param<double>("z_distance", dist_between_uav_z_, 2.0);
@@ -287,8 +292,12 @@ bool StateMachine::StartServiceCb(std_srvs::SetBool::Request& allowed2move, std_
 {
     keep_moving_ = allowed2move.data;
 
+
     if (keep_moving_)
-    {
+    {   
+        std_srvs::SetBool start;
+        start.request.data = true;
+        start_client_.call(start);
         std::string msg = "Starting the experiment with uav" + std::to_string(uav_id_) + "!";
         ROS_INFO("%s", msg.c_str());
         ok.message = msg;
@@ -388,12 +397,8 @@ void StateMachine::PublishPosErr()
     double z_actuation = zv_pid_.control_signal(ze);
     double yaw_actuation= yawv_pid_.control_signal(yawe);
 
-
-
     if(yaw_on_)
     {
-    
-
         // orientation is controlled
         PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation, yaw_actuation);
 
@@ -404,8 +409,6 @@ void StateMachine::PublishPosErr()
         PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation);
 
     }
-
-
 
 }
 // ###########  #######################  ########### //
@@ -529,8 +532,12 @@ void StateMachine::UpdateWayPoints()
 
         if (wp_idx_ == way_points_.n_rows - 1)
         {
+            std_srvs::SetBool start;
+            start.request.data = false;
+            start_client_.call(start);
             experiment_done = true;
             Land();
+           
         }
 
         if (keep_moving_ && !experiment_done)

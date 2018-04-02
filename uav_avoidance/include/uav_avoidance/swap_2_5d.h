@@ -61,6 +61,8 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <sensor_msgs/LaserScan.h>
 #include <pcl_ros/point_cloud.h>
+#include <std_srvs/SetBool.h>
+
 
 
 
@@ -82,7 +84,8 @@ const std::string pose_uav_topic = "/pose";
 class Swap_2_5d:  public avoid::Swap
 {
     public:
-
+        
+        bool experiment_started_ = false; 
         /**
          * @brief Default constructor of the class
          *
@@ -118,11 +121,13 @@ class Swap_2_5d:  public avoid::Swap
         ros::NodeHandle nh_;            //!< ROS Node handler
         ros::NodeHandle* pnh_;          //!< Private node handler
 
+
         // Subscribers
         std::vector<ros::Subscriber> pos_all_uav_sub_;  //!< Receives the positions of all UAVs
         ros::Subscriber wished_mov_dir_sub_;            //!< Receives the direction where the uav whants to go
         ros::Subscriber laser_sub_;                     //!< Receives laser data
         ros::Subscriber pointcloud_sub_;                //!< Receives lidar data
+        ros::ServiceServer wait_for_start_;           //!< Service that makes the UAV wait on the Goal point 1
 
 
         // Publishers
@@ -165,7 +170,7 @@ class Swap_2_5d:  public avoid::Swap
         double yaw_ref_;    //!< Orientation with respect to the nord that the uav should take to avoid a conflict
         geometry_msgs::Vector3 avoid_mov_direction_;    //!< Message where the avoidance direction will be published
 	
-
+        bool start_experiment_ = false;
         // Debuging parameters
         std::ofstream log2mat_;
         std::vector<double> values2log_;    // Defined here to avoid multiple allocations of memory
@@ -234,6 +239,8 @@ class Swap_2_5d:  public avoid::Swap
          * Utility function. Publish a market to visualizate robot orientation 
          */
         void PolarObstacleMarker();
+
+        bool StartServiceCb(std_srvs::SetBool::Request& allowed2move, std_srvs::SetBool::Response& ok);
 
 }; // class SwapRos
 
