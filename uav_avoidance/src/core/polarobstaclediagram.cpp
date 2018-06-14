@@ -784,7 +784,7 @@ namespace avoid
          *             <----------->
          *          This is the distance to keep
          */
-        double pond = 2.0;  // For static obstacles we only take one time the bracking distance
+        double pond = 1.0;  // For static obstacles we only take one time the bracking distance
         if (GetDynMeasurement(id_phi))
         {
             pond = 2.0;     // For dynamic obstacles we take two times the bracking distance

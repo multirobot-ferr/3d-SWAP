@@ -178,7 +178,7 @@ class Swap_2_5d:  public avoid::Swap
         double *pos_all;
         std::map<int,int> log_pos_map_;
 
-
+        bool conflict_warning_ = true;
         /* Callbacks for ROS */
         /**
          * @brief Callback for own pose estimatimation

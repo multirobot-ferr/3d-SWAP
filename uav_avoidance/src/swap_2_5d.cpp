@@ -196,7 +196,7 @@ Swap_2_5d::Swap_2_5d()
 
     // Subscribing to the position of all UAVs
     for (int n_uav = 0; n_uav < n_uavs_; n_uav++) {
-        std::string uav_topic_name = "/" + ual_ns + "uav_" + std::to_string(uav_ids_[n_uav]) + "/ual" + pose_uav_topic.c_str();
+        std::string uav_topic_name = "/" + ual_ns + "drone_" + std::to_string(uav_ids_[n_uav]) + "/ual" + pose_uav_topic.c_str();
         pos_all_uav_sub_.push_back(nh_.subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Swap_2_5d::PoseReceived, this, std::placeholders::_1, uav_ids_[n_uav]) ));
     }
 
@@ -457,14 +457,20 @@ void Swap_2_5d::RequestControlPub(bool request_control)
     request_ctrl.data = request_control;
     confl_warning_pub_.publish(request_ctrl);
 
+
     if (request_control)
     {
+        conflict_warning_ = true;
 
 
         avoid_mov_direction_.x = v_ref_*cos(yaw_ref_+uav_yaw_);  // yaw_ref__ + uav_yaw_ to public global orientation
         avoid_mov_direction_.y = v_ref_*sin(yaw_ref_+uav_yaw_);
         avoid_mov_direction_.z = 0.0;   // The state machine should ignore this value.
         avoid_mov_dir_pub_.publish(avoid_mov_direction_);
+
+    }
+    else{
+        conflict_warning_ = false;
 
     }
 }
@@ -490,6 +496,8 @@ void Swap_2_5d::FillLogFile()
         }
 
         values2log_.push_back(ros::Time::now().toSec());
+
+        values2log_.push_back(conflict_warning_);
 
        
         if(hard_debug_)
