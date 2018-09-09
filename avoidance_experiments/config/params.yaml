@@ -58,3 +58,36 @@ uav_4_home:
   units: "m"
   translation: [13.11, 16.32, 0.0] # game [-2.0, 41, 0.0]
   gz_initial_yaw: 0.0
+
+     # uav_5_home
+uav_5_home:
+  home_frame_id: "uav_5_home"
+  parent_frame: "map"
+  units: "m"
+  translation: [10.0, 35.0, 0.0]
+  gz_initial_yaw: 0.0
+
+   # uav_6_home
+uav_6_home:
+  home_frame_id: "uav_6_home"
+  parent_frame: "map"
+  units: "m"
+  translation: [32.0, 15.0, 0.0]
+  gz_initial_yaw: 0.0
+
+   # uav_6_home
+uav_7_home:
+  home_frame_id: "uav_7_home"
+  parent_frame: "map"
+  units: "m"
+  translation: [5.0, 15.0, 0.0]
+  gz_initial_yaw: 0.0
+
+   # uav_6_home
+uav_8_home:
+  home_frame_id: "uav_8_home"
+  parent_frame: "map"
+  units: "m"
+  translation: [2.0, 15.0, 0.0]
+  gz_initial_yaw: 0.0
+

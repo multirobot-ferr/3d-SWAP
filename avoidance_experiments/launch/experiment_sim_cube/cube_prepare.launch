@@ -31,4 +31,27 @@ If you want to change your ROBOT_ID just run "export ROBOT_ID=2"
         <arg name="uav_id" value="4"/>
         <arg name="nameofbag" default="$(find avoidance_experiments)/logs/experiment_cube/"/>
     </include>
+
+    <include file="$(find avoidance_experiments)/launch/robot/swap.launch">
+        <arg name="path2goal" default="$(find avoidance_experiments)/launch/experiment_sim_cube/mission_cube_uav5.txt"/>
+        <arg name="uav_id" value="5"/>
+        <arg name="nameofbag" default="$(find avoidance_experiments)/logs/experiment_cube/"/>
+    </include>
+
+     <include file="$(find avoidance_experiments)/launch/robot/swap.launch">
+        <arg name="path2goal" default="$(find avoidance_experiments)/launch/experiment_sim_cube/mission_cube_uav6.txt"/>
+        <arg name="uav_id" value="6"/>
+        <arg name="nameofbag" default="$(find avoidance_experiments)/logs/experiment_cube/"/>
+    </include>
+    <include file="$(find avoidance_experiments)/launch/robot/swap.launch">
+        <arg name="path2goal" default="$(find avoidance_experiments)/launch/experiment_sim_cube/mission_cube_uav7.txt"/>
+        <arg name="uav_id" value="7"/>
+        <arg name="nameofbag" default="$(find avoidance_experiments)/logs/experiment_cube/"/>
+    </include>
+
+    <include file="$(find avoidance_experiments)/launch/robot/swap.launch">
+        <arg name="path2goal" default="$(find avoidance_experiments)/launch/experiment_sim_cube/mission_cube_uav8.txt"/>
+        <arg name="uav_id" value="8"/>
+        <arg name="nameofbag" default="$(find avoidance_experiments)/logs/experiment_cube/"/>
+    </include>
 </launch>

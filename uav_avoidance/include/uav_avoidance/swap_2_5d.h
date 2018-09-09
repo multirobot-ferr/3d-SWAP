@@ -148,7 +148,9 @@ class Swap_2_5d:  public avoid::Swap
         double dz_range_;
         pcl::PointCloud<pcl::PointXYZ> cloud_xyz_;      //!< Lidar information to publish
 
+        std::chrono::time_point<std::chrono::high_resolution_clock> ini_;
 
+        double init_time_;
         //Noise
         std::default_random_engine generator_;
         std::normal_distribution<double> distribution_;

@@ -32,23 +32,41 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         - serial: for serial connection to px4
         - udp: for udp connection to px4
     -->
-   
+	 <!-- Launch robot id=1 -->
+    <include file="$(find px4_bringup)/launch/spawn_robot.launch">
+        <arg name="id" value="1"/>
+        <arg name="material" value="Orange"/>
+        <arg name="mode" value="sitl"/>
+        <arg name="ns_prefix" value="$(arg ns_prefix)"/>
+    </include>
+
+    
+
         <!-- Launch robot id=2 -->
         <include file="$(find px4_bringup)/launch/spawn_robot.launch">
             <arg name="id" value="2"/>
             <arg name="material" value="Indigo"/>
             <arg name="mode" value="sitl"/>
             <arg name="ns_prefix" value="$(arg ns_prefix)"/>
-            <arg name="velodyne" value="false"/>
-
         </include>
 
+       
 
+ 	 <!-- Launch UAL server for drone id=1 -->
+    <node pkg="uav_abstraction_layer" type="server" name="server_1" output="screen">
+        <param name="uav_id" value="1"/>
+        <param name="ns_prefix" value="$(arg ns_prefix)"/>
+        <param name="pose_frame_id" value="map"/>
+    </node>
+
+    <!-- Launch UAL server for drone id=2 -->
+    <node pkg="uav_abstraction_layer" type="server" name="server_2" output="screen">
+        <param name="uav_id" value="2"/>
+        <param name="ns_prefix" value="$(arg ns_prefix)"/>
+        <param name="pose_frame_id" value="map"/>
+    </node>
     
-
-
-    <!-- Launch UAL server for uav id=2 -->
-    <node pkg="uav_abstraction_layer" type="server" name="server_2" output="screen" args="-uav_id=2 -pose_frame_id=map -ns_prefix=$(arg ns_prefix)"/>
+    
 
 		
 </launch>

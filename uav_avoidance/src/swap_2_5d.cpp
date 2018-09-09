@@ -196,7 +196,7 @@ Swap_2_5d::Swap_2_5d()
 
     // Subscribing to the position of all UAVs
     for (int n_uav = 0; n_uav < n_uavs_; n_uav++) {
-        std::string uav_topic_name = "/" + ual_ns + "drone_" + std::to_string(uav_ids_[n_uav]) + "/ual" + pose_uav_topic.c_str();
+        std::string uav_topic_name = "/" + ual_ns + "uav_" + std::to_string(uav_ids_[n_uav]) + "/ual" + pose_uav_topic.c_str();
         pos_all_uav_sub_.push_back(nh_.subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Swap_2_5d::PoseReceived, this, std::placeholders::_1, uav_ids_[n_uav]) ));
     }
 
@@ -205,7 +205,7 @@ Swap_2_5d::Swap_2_5d()
     wished_mov_dir_sub_ = nh_.subscribe( "wished_movement_direction",1 , &Swap_2_5d::WishedMovDirectionCallback, this);
     avoid_mov_dir_pub_  = nh_.advertise<geometry_msgs::Vector3>("avoid_movement_direction", 1, true);
     laser_sub_ = nh_.subscribe<sensor_msgs::LaserScan>("/mbzirc_1/front_laser/scan",10,&Swap_2_5d::LaserCallback,this);
-    pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_2/velodyne", 10, &Swap_2_5d::CloudCallback, this);
+    pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_1/velodyne", 10, &Swap_2_5d::CloudCallback, this);
     xyz_pub_ = nh_.advertise<pcl::PointCloud<pcl::PointXYZ>>("/velodyne/xyztopic",1,true);
     marker_pub = nh_.advertise<visualization_msgs::Marker>("polar_visualization_marker", 10);
     wait_for_start_ = nh_.advertiseService("Start1", &Swap_2_5d::StartServiceCb, this);
@@ -284,7 +284,11 @@ void Swap_2_5d::Spin()
 {
     while (ros::ok())
     {
+        ini_ = std::chrono::high_resolution_clock::now();
+
         SpinOnce();
+       
+        
 
         // Sleeping to save time
         ros::Duration(spin_sleep_).sleep();
@@ -296,6 +300,7 @@ void Swap_2_5d::Spin()
  */
 void Swap_2_5d::SpinOnce()
 {
+
     // Forgetting old information
     //TODO Create a watchdog here to see if the information is comming or not
     NewMeasurementSetReceived();    //This forgets old information (slowly)
@@ -326,10 +331,9 @@ void Swap_2_5d::SpinOnce()
         ROS_INFO("Swap: %s", state.c_str());
     }
 
-    if(start_experiment_){
     // If active, save in a log all information
     FillLogFile();
-    }
+    
    
 }
 
@@ -345,15 +349,14 @@ void Swap_2_5d::CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg
 
      xyz_pub_.publish(cloud_xyz_);
 
-
+    std::cout<<"Npoints: "<<cloud_xyz_.size()<<std::endl;
      for (unsigned id_point = 0; id_point < cloud_xyz_.size(); ++id_point)
        {
-                if(cloud_xyz_.points[id_point].z>1)
-                {
+                
                 SetNewGlobalMeasurement(uav_x_, uav_y_, uav_z_, uav_yaw_ ,  // The 0.0 makes it always look to the nord (even if not)
                                         cloud_xyz_.points[id_point].x+uav_x_,  cloud_xyz_.points[id_point].y+uav_y_,  cloud_xyz_.points[id_point].z+uav_z_,
                                         uav_safety_radius_, false);      
-                 }
+                
        }
 }
 
@@ -498,6 +501,18 @@ void Swap_2_5d::FillLogFile()
         values2log_.push_back(ros::Time::now().toSec());
 
         values2log_.push_back(conflict_warning_);
+
+       
+        auto finish = std::chrono::high_resolution_clock::now();
+
+        std::chrono::duration<double> diff= finish-ini_;
+        
+
+
+
+         values2log_.push_back(diff.count());
+
+        std::cout<<diff.count()<<std::endl;
 
        
         if(hard_debug_)

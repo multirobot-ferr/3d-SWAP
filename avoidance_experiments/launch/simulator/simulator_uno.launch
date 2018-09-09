@@ -28,6 +28,8 @@
         <arg name="material" value="Orange"/>
         <arg name="mode" value="sitl"/>
         <arg name="ns_prefix" value="$(arg ns_prefix)"/>
+         <arg name="velodyne" value="true"/>
+
     </include>
 
     <!-- Launch UAL server for drone id=1 -->
