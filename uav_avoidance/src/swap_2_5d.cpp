@@ -284,7 +284,6 @@ void Swap_2_5d::Spin()
 {
     while (ros::ok())
     {
-        ini_ = std::chrono::high_resolution_clock::now();
 
         SpinOnce();
        
@@ -300,6 +299,7 @@ void Swap_2_5d::Spin()
  */
 void Swap_2_5d::SpinOnce()
 {
+    ini_cod_ = std::chrono::high_resolution_clock::now();
 
     // Forgetting old information
     //TODO Create a watchdog here to see if the information is comming or not
@@ -307,6 +307,9 @@ void Swap_2_5d::SpinOnce()
 
     // Getting fresh information (updating positions and so on)
     ros::spinOnce();
+
+
+    ini_swap_ = std::chrono::high_resolution_clock::now();
 
     // Checking for conflicts and finding solutions
     CollisionAvoidance(v_ref_, yaw_ref_, uav_vector_speed_);
@@ -505,14 +508,20 @@ void Swap_2_5d::FillLogFile()
        
         auto finish = std::chrono::high_resolution_clock::now();
 
-        std::chrono::duration<double> diff= finish-ini_;
+        std::chrono::duration<double> diff_cod= ini_swap_-ini_cod_;
         
 
 
 
-         values2log_.push_back(diff.count());
+         values2log_.push_back(diff_cod.count());
 
-        std::cout<<diff.count()<<std::endl;
+        std::cout<<"tiempo cod: "<<diff_cod.count()<<std::endl;
+
+        std::chrono::duration<double> diff_swap = std::chrono::high_resolution_clock::now() - ini_swap_;
+
+        std::cout<<"tiempo swap: "<<diff_swap.count()<<std::endl;
+
+        values2log_.push_back(diff_swap.count());
 
        
         if(hard_debug_)
