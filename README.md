@@ -1,4 +1,4 @@
-# 3d-SWAP
+# 3D-SWAP
 
 This repository contains all the code for running 3D-SWAP and the experiments used to test the algorithm
 
