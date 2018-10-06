@@ -2,9 +2,9 @@
 
 This repository contains all the code for running 3D-SWAP and the experiments used to test the algorithm
 
-## Installing 3D-SWAP
+# Installing 3D-SWAP
 
-# Installing dependencies
+## Installing dependencies
 
 Before you can actually set up the 3D-SWAP, you need to install the following dependencies.
 
