@@ -6,7 +6,7 @@ This repository contains all the code for running 3D-SWAP and the experiments us
 
  * [ros Kinetic Kame](http://wiki.ros.org/kinetic)
  * [grvc-ual v2.0](https://github.com/grvcTeam/grvc-ual)
- * [Armadillo](http://arma.sourceforge.net/download.html)
+ * [Armadillo C++ library](http://arma.sourceforge.net/download.html)
 
 
 ## How to install
