@@ -16,6 +16,15 @@ Before you can actually set up the 3D-SWAP, you need to install the following de
 ```
     $ sudo apt-get install libarmadillo-dev
 ```
+
+## Creating your workspace
+
+In order to use 3D-SWAP you need a catkin workspace. You should have one alredy, but if not, follow the instructions in [create a ROS Workspace](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment).
+
+We will assume you created your workspace in the **~/catkin_ws** folder.
+
+## Donwloading the source
+
 Once dependencies have been installed, 3D-SWAP can be set up. The 3D-SWAP repository contains a folder with a set of packages. These packages need to reside in the src folder of your catkin workspace. To clone the repositorie into the right place:
        
     $ cd ~/catkin_ws/src
