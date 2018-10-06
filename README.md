@@ -6,16 +6,16 @@ This repository contains all the code for running 3D-SWAP and the experiments us
 
 ## Installing dependencies
 
-Before you can actually set up the 3D-SWAP, you need to install the following dependencies.
+Before you can actually set up the 3D-SWAP, you need to install the following dependencies:
 
  * The algorithm works over [ros Kinetic Kame](http://wiki.ros.org/kinetic), you can finde the instructions to install it [here](http://wiki.ros.org/kinetic/Installation)
 
  * In order to intereact with UAVs, the system also uses the [grvc-ual v2.0](https://github.com/grvcTeam/grvc-ual) interface, you can also find installation instructions [here](https://github.com/grvcTeam/grvc-ual/wiki/How-to-build-and-install-grvc-ual)
 
  * Finally 3D-SWAP uses the [Armadillo C++ library](http://arma.sourceforge.net/download.html), to install it type:
-
+```
     $ sudo apt-get install libarmadillo-dev
-
+```
 Once dependencies have been installed, 3D-SWAP can be set up. The 3D-SWAP repository contains a folder with a set of packages. These packages need to reside in the src folder of your catkin workspace. To clone the repositorie into the right place:
        
     $ cd ~/catkin_ws/src
