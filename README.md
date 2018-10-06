@@ -2,22 +2,22 @@
 
 This repository contains all the code for running 3D-SWAP and the experiments used to test the algorithm
 
-## Dependencies
+## Installing 3D-SWAP
 
  * [ros Kinetic Kame](http://wiki.ros.org/kinetic)
  * [grvc-ual v2.0](https://github.com/grvcTeam/grvc-ual)
- * [Armadillo C++ library](http://arma.sourceforge.net/download.html)
+ * 
 
 
-## How to install
+# Installing dependencies
 
-Before you can actually set up the 3D-SWAP, you need to install the dependencies.
+Before you can actually set up the 3D-SWAP, you need to install the following dependencies.
 
-You can find the instructions to install ROS Kinetic Kame [here](http://wiki.ros.org/kinetic/Installation)
+ * The algorithm works over [ros Kinetic Kame](http://wiki.ros.org/kinetic), you can finde the instructions to install it [here](http://wiki.ros.org/kinetic/Installation)
 
-You can also find the instructions for the UAL installation [here](https://github.com/grvcTeam/grvc-ual/wiki/How-to-build-and-install-grvc-ual)
+ * In order to intereact with UAVs, the system also uses the [grvc-ual v2.0](https://github.com/grvcTeam/grvc-ual) interface, you can install it [here](https://github.com/grvcTeam/grvc-ual/wiki/How-to-build-and-install-grvc-ual)
 
-Finally 3D-SWAP uses the Armadillo C++ library, to install it type:
+ * Finally 3D-SWAP uses the [Armadillo C++ library](http://arma.sourceforge.net/download.html), to install it type:
 
     $ sudo apt-get install libarmadillo-dev
 
