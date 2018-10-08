@@ -48,7 +48,6 @@
 
 #include <uav_abstraction_layer/TakeOff.h>
 #include <uav_abstraction_layer/SetVelocity.h>
-#include <uav_abstraction_layer/SetPositionError.h>
 #include <uav_abstraction_layer/GoToWaypoint.h>
 #include <uav_abstraction_layer/Land.h>
 
@@ -161,9 +160,6 @@ StateMachine::StateMachine() {
     uav_service_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual" + speed_service;
     speed_srv_ = nh_.serviceClient<uav_abstraction_layer::SetVelocity>(uav_service_name);
 
-    uav_service_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual" + pos_err_service;
-    pos_err_srv_ = nh_.serviceClient<uav_abstraction_layer::SetPositionError>(uav_service_name);
-
     uav_service_name = "/" + ual_ns + "uav_" + std::to_string(uav_id_) + "/ual" + way_point_service;
     way_point_srv_ = nh_.serviceClient<uav_abstraction_layer::GoToWaypoint>(uav_service_name);
 
@@ -254,7 +250,7 @@ void StateMachine::ForcedLand()
     std::cout << "Forcing a landing out of the node" << std::endl;
     std::string command = "rosservice call /uav_" + std::to_string(uav_id_) + "/ual/land \"blocking: false\"";
     std::cout << command.c_str() << std::endl;
-    system(command.c_str());
+    int result = system(command.c_str());
 }
 
 /**
@@ -392,39 +388,15 @@ void StateMachine::PublishPosErr()
 
     if(yaw_on_)
     {
-    
-
         // orientation is controlled
         PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation, yaw_actuation);
-
     }
     else
     {
-
         PublishGRVCCmdVel(x_actuation, y_actuation, z_actuation);
-
     }
-
-
-
 }
 // ###########  #######################  ########### //
-
-/**
- * Publish a position error on the controller of the uav
- */
-void StateMachine::PublishGRVCPosErr(const double xe, const double ye, const double ze)
-{
-    uav_abstraction_layer::SetPositionError srv;
-    srv.request.position_error.vector.x = xe;
-    srv.request.position_error.vector.y = ye;
-    srv.request.position_error.vector.z = ze;
-
-    if (!pos_err_srv_.call(srv))
-    {
-        ROS_ERROR("Failed to call service SetPositionError");
-    }
-}
 
 /**
  * Publishes a speed on the grvc controler

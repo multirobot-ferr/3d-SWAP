@@ -64,7 +64,6 @@ const std::string pose_uav_topic = "/pose";
 const std::string takeoff_service= "/take_off";
 const std::string speed_service  = "/set_velocity";
 const std::string way_point_service  = "/go_to_waypoint";
-const std::string pos_err_service = "/set_position_error";
 const std::string land_service   = "/land";
 
 /**
@@ -220,14 +219,6 @@ class StateMachine
          */
         void PublishPosErr();
     // ###########  #######################  ########### //
-
-        /**
-         * @brief Publish a position error on the controller of the uav
-         * @param xe error in x
-         * @param ye error in y
-         * @param ze error in z
-         */
-        void PublishGRVCPosErr(const double xe, const double ye, const double ze);
 
         /**
          * @brief Publishes a speed on the grvc controler
