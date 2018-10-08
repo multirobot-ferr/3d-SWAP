@@ -11,5 +11,6 @@
     <rosparam file="$(find avoidance_experiments)/config/params.yaml" command="load" />
 
     <!-- Launch static_tf_publisher for map to world transform (if defined) -->
-    <node pkg="static_tf_publisher" type="static_tf_publisher_node" name="static_tf_publisher"/>
+    <node pkg="tf" type="static_transform_publisher" name="game_to_map_tf" args="14.42 13.50 0.0 0.0 0.0 0.0 game map 5" />
+
 </launch>

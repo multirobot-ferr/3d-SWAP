@@ -63,20 +63,6 @@
 #include <sensor_msgs/LaserScan.h>
 #include <pcl_ros/point_cloud.h>
 
-
-
-// Fixing some problems
-// If the simulator makes all uavs start in (0,0), this define should be uncommented
-//#define UAV_NOT_IN_ZERO_ZERO 1
-
-#ifdef UAV_NOT_IN_ZERO_ZERO
-// values extracted from the simulator:
-                        //   x      y   yaw
-const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
-                           {-20.0, 30.0, 0.0 },
-                           {-28.0, 26.0, 0.0 } };
-#endif
-
 // Constant values
 const std::string pose_uav_topic = "/pose";
 

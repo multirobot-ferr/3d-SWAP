@@ -364,16 +364,9 @@ void Swap_3d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose,
                        uav_pose->pose.orientation.w);
     q3.normalize();     //Avoids a warning
 
-    std::vector<double> offset(3,0.0);
-    #ifdef UAV_NOT_IN_ZERO_ZERO
-    for (int coordinate = 0; coordinate < 3; ++coordinate)
-    {
-        offset[coordinate] = UAV_ZZ( uav_id-1, coordinate );
-    }
-    #endif
-    double x   = offset[0] + uav_pose->pose.position.x;
-    double y   = offset[1] + uav_pose->pose.position.y;
-    double z   = offset[2] + uav_pose->pose.position.z;
+    double x   = uav_pose->pose.position.x;
+    double y   = uav_pose->pose.position.y;
+    double z   = uav_pose->pose.position.z;
     double yaw = tf2::getYaw(q3);
 
     if (uav_id == uav_id_)
