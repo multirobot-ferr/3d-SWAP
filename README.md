@@ -17,6 +17,11 @@ Before you can actually set up the 3D-SWAP, you need to install the following de
     $ sudo apt-get install libarmadillo-dev
 ```
 
+There are some ROS related packages that our system uses to show prettier representations. They are optional and probably you have them already installed, but if not, you can install them with the following command:
+```
+    $ sudo apt-get install ros-kinetic-static-tf ros-kinetic-map-server 
+```
+
 ## Creating your workspace
 
 In order to use 3D-SWAP you need a catkin workspace. You should have one alredy, but if not, follow the instructions in [create a ROS Workspace](http://wiki.ros.org/ROS/Tutorials/InstallingandConfiguringROSEnvironment).
