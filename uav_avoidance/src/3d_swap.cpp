@@ -205,6 +205,7 @@ Swap_3d::Swap_3d()
     }
 
     // Information for the state machine
+    PublishAnnouncement();
     confl_warning_pub_  = nh_.advertise<std_msgs::Bool>("collision_warning", 1, true);
     wished_mov_dir_sub_ = nh_.subscribe( "wished_movement_direction",1 , &Swap_3d::WishedMovDirectionCallback, this);
     avoid_mov_dir_pub_  = nh_.advertise<geometry_msgs::Vector3>("avoid_movement_direction", 1, true);
@@ -411,6 +412,19 @@ void Swap_3d::WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPtr&
     // If that happens, swap will command to the system to brake
     double distance=sqrt(powf(wished_movement_direction_uav->x, 2.0) + powf(wished_movement_direction_uav->y, 2.0));
     SetGoal( distance, uav_wished_yaw_map_, uav_yaw_);
+}
+
+/**
+ * brief Publishes the existence of such UAV and its characteristics to the world
+ */
+void Swap_3d::PublishAnnouncement()
+{
+    announcement_pub_   = nh_.advertise<uav_avoidance::Announcement>("/3d_swap/uavs_announcements", 1, true);
+    uav_avoidance::Announcement msg;
+    msg.uav_id = uav_id_;
+    msg.uav_name_position_topic = "still not implemented!";
+
+    announcement_pub_.publish(msg);
 }
 
 /**

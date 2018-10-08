@@ -113,10 +113,11 @@ class Swap_3d:  public avoid::Swap
 
 
         // Publishers
+        ros::Publisher announcement_pub_;               //!< Publisher to inform to other UAVs of my presence.
         ros::Publisher confl_warning_pub_;              //!< Publisher to determine if there is a possible collision or not
-        ros::Publisher avoid_mov_dir_pub_;             //!< Publish the direction where the uav has to go to avoid a conflict
-        ros::Publisher xyz_pub_;                       //!< Publish the xyz position from the lidar
-        ros::Publisher marker_pub;                     //!< Publish a marker to visualizate robot orientation
+        ros::Publisher avoid_mov_dir_pub_;              //!< Publish the direction where the uav has to go to avoid a conflict
+        ros::Publisher xyz_pub_;                        //!< Publish the xyz position from the lidar
+        ros::Publisher marker_pub;                      //!< Publish a marker to visualizate robot orientation
         // System variables
         bool initialization_error_ = false;             //!< Flags to track possible errors in initialization
         double spin_sleep_ = 0.1;
@@ -188,6 +189,11 @@ class Swap_3d:  public avoid::Swap
         void WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPtr& movement_direction_uav);
 
         /* Internal publishers */
+        /**
+         * @brief Publishes the existence of such UAV and its characteristics to the world
+         */
+        void PublishAnnouncement();
+
         /**
          * @brief Publishes if there is a possible collision to avoid and the direction to take
          */
