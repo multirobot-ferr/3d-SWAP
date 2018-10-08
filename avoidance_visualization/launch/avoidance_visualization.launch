@@ -2,34 +2,38 @@
 -->
 <launch>
 
-  <node pkg="avoidance_visualization" name="visualizer_avoidance_node" type="visualizer_avoidance_node"
-		output="screen" >
+    <node pkg="avoidance_visualization" name="swap_visualization" type="swap_visualization.py" output="screen"/>
+
+  <!-- OLD CODE, DELETE!!! -->
+  <!-- <node pkg="avoidance_visualization" name="visualizer_avoidance_node" type="visualizer_avoidance_node"
+		output="screen" > -->
 
         <!-- The UAVs are 1.2x1.2m. Meaning that from the center to the
         corner there are sqrt((1.2/2)^2 + (1.2/2)^2) = 1.2*sqrt(2)/2 = 0.8486
         Set it to the real value -->
-        <param name="safety_radius" value="1.5983"/>
+        <!-- <param name="safety_radius" value="1.5983"/> -->
 
         <!-- I am assuming that the uav is able to stop in 2m -->
-        <param name="braking_distance" value="4.5983"/>
+        <!-- <param name="braking_distance" value="4.5983"/> -->
 
         <!-- I am assuming that the largest error in the positioning
         system is 1m. -->
-        <param name="positioning_error" value="0.0"/> 
+        <!-- <param name="positioning_error" value="0.0"/>  -->
 
         <!-- Start playing with this parameter if you want to increase
         the safety of your system -->
-        <param name="gamma_offset" value="0.0"/>
+        <!-- <param name="gamma_offset" value="0.0"/> -->
 
         <!-- Start playing with this parameter if you want to increase
         the safety of your system -->
-        <param name="dz_min" value="10.0"/>
+        <!-- <param name="dz_min" value="10.0"/> -->
 
         <!-- Start playing with this parameter if you want to increase
         the safety of your system -->
-        <param name="dz_range" value="10.0"/>
+        <!-- <param name="dz_range" value="10.0"/> -->
 
-  </node>    
+  <!-- </node>   -->
+
 
   <group ns="$(env LOGNAME)">
     <node pkg="rviz" name="rviz" type="rviz" args="-d $(find avoidance_visualization)/rviz/visualization.rviz"/>   
@@ -45,3 +49,4 @@
 		</node>
 
 </launch>
+
