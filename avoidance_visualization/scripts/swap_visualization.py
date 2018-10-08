@@ -40,42 +40,74 @@
 # This node is designed to connect to all available UAVs, print all their cilyinders and related information.
 
 import rospy 
+from visualization_msgs.msg import Marker
+from visualization_msgs.msg import MarkerArray
+from uav_avoidance.msg      import Announcement
 
 class RepresentRobot:
 
     def __init__(self):
-        rospy.loginfo("Hello world")
+        rospy.loginfo("Representing robot")
+
+        # Publication
+        self._markerPub = rospy.Publisher('z/uav_model', Marker, queue_size=10, latch=True)
+        
+        self._publish()
+
+        # Definitions
+        self._body = MarkerArray()
+        self._prepare_body()
+        return
+
+    def _publish(self):
+        # Publishes all visualization parts of the UAV
+        self._publish_shape()
+
+    def _publish_shape(self):
+        # Publishes the shape of a UAV
         pass
+        
+    def _prepare_body(self):
+        # Prepares the body of a UAV
+        marker = Marker()
+        marker.header.frame_id = "map"
+        marker.header.stamp = rospy.Time.now()
+        marker.ns = "uav_body_main"
+        marker.id = 0
+
+        marker.type = Marker.MESH_RESOURCE
+        marker.color.r = 0.0
+        marker.color.g = 1.0
+        marker.color.b = 0.0 
+        marker.color.a = 1.0
+        marker.pose.position.x  =  0
+        marker.pose.position.y  =  0
+        marker.pose.position.z  =  0
+        # marker.pose.orientation =  [0,0,0]
+        # Normalizing the .stl
+        marker.scale.x = 0.01
+        marker.scale.y = 0.01
+        marker.scale.z = 0.01
+        marker.mesh_resource = "package://avoidance_visualization/rviz/drone_model.stl"
+        
+        self._markerPub.publish(marker)
+
+
+
+
+class RepresentationsManager:
+    # Manages the representation of the robots
+
+    def __init__(self):
+        # Subscriptions
+        rospy.Subscriber("/3d_swap/uavs_announcements", Announcement, self._announcement_cb)
+        return
+
+    def _announcement_cb(self, announcement_msg):
+        rospy.loginfo(announcement_msg.uav_id)
+        robot = RepresentRobot()
 
 if __name__ == '__main__':
     rospy.init_node('swap_visualization', anonymous=True)
-    robot_representation = RepresentRobot()
+    rep_manager = RepresentationsManager()
     rospy.spin()
-
-
-""" Old code from someone else:
-
-import tf
-from object_recognition_msgs.msg import RecognizedObjectArray
-import object_recognition_clusters.cluster_bounding_box_finder as cluster_bounding_box_finder
-#import object_recognition_clusters.cluster_bounding_box_finder_3d as cluster_bounding_box_finder_3d
-
-class ClusterToPose:
-
-    def __init__(self):
-        self.tf_listener = tf.TransformListener()
-        self.tf_broadcaster = tf.TransformBroadcaster()
-        self.cbbf = cluster_bounding_box_finder.ClusterBoundingBoxFinder(self.tf_listener, self.tf_broadcaster)
-#        self.cbbf3d = cluster_bounding_box_finder_3d.ClusterBoundingBoxFinder3D(self.tf_listener)
-
-        rospy.Subscriber("/recognized_object_array", RecognizedObjectArray, self.callback)
-
-    def callback(self, data):
-        rospy.loginfo(rospy.get_name() + ": This message contains %d objects." % len(data.objects))
-        # for myobject in data.objects:
-            #print object.point_clouds[0]
-        myobject = data.objects[0]
-        self.cbbf.find_object_frame_and_bounding_box(myobject.point_clouds[0])
-
-
-"""
