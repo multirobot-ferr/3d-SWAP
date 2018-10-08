@@ -19,7 +19,7 @@ Before you can actually set up the 3D-SWAP, you need to install the following de
 
 There are some ROS related packages that our system uses to show prettier representations. They are optional and probably you have them already installed, but if not, you can install them with the following command:
 ```
-    $ sudo apt-get install ros-kinetic-static-tf ros-kinetic-map-server 
+    $ sudo apt-get install ros-kinetic-map-server 
 ```
 
 ## Creating your workspace
