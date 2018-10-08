@@ -51,7 +51,7 @@
 	
 	<group ns="uav_$(arg robot_number)">
 
-    	<node pkg="uav_avoidance" type="swap_2_5d" name="avoidance_swap" output="screen">
+    	<node pkg="uav_avoidance" type="3d_swap" name="avoidance_swap" output="screen">
 
             <param name="ual_namespace" value=""/>
             

@@ -9,16 +9,16 @@ add_definitions(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin 
     REQUIRED 
-    dynamic_reconfigure
+        dynamic_reconfigure
     COMPONENTS
-    roscpp
-    std_msgs
-    geometry_msgs
-    tf2
-    uav_abstraction_layer
-    visualization_msgs
-    pcl_ros
-    sensor_msgs
+        roscpp
+        std_msgs
+        geometry_msgs
+        tf2
+        uav_abstraction_layer
+        visualization_msgs
+        pcl_ros
+        sensor_msgs
 )
 
 find_package(Armadillo REQUIRED)
@@ -40,7 +40,7 @@ generate_dynamic_reconfigure_options(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include src/core
-  LIBRARIES swap_2_5d_library
+  LIBRARIES swap_3d_library
   CATKIN_DEPENDS
         roscpp
         std_msgs
@@ -65,7 +65,7 @@ include_directories(
 
 
 # Declaring the C++ swap library
-add_library(swap_2_5d_library
+add_library(swap_3d_library
     src/core/swap.cpp
     src/core/polarobstaclediagram.cpp
 )
@@ -73,18 +73,18 @@ add_library(swap_2_5d_library
 
 
 
-target_link_libraries(swap_2_5d_library ${ARMADILLO_LIBRARIES})
+target_link_libraries(swap_3d_library ${ARMADILLO_LIBRARIES})
 
 
 
 # Creating the ROS node for SWAP
-add_executable(swap_2_5d src/swap_2_5d.cpp)
-add_dependencies(swap_2_5d swap_2_5d_library ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(swap_2_5d swap_2_5d_library ${catkin_LIBRARIES})
+add_executable(3d_swap src/3d_swap.cpp)
+add_dependencies(3d_swap swap_3d_library ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(3d_swap swap_3d_library ${catkin_LIBRARIES})
 
 # Creating a node to test the system
 add_executable(state_machine src/state_machine_test.cpp)
 add_dependencies(state_machine ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
-target_link_libraries(state_machine swap_2_5d_library ${catkin_LIBRARIES})
+target_link_libraries(state_machine swap_3d_library ${catkin_LIBRARIES})
 
 

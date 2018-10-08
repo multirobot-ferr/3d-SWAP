@@ -31,25 +31,25 @@
  */
 
 /**
- * @file swap_2_5.h
+ * @file 3d_swap.h
  * @author Eduardo Ferrera
- * @version 0.4
+ * @version 0.7
  * @date    12/3/17
  *
  * @short: Adapts the avoidace code "SWAP" to the GRVC enviroment for the mbzirc challenge.
  *
  * This node is designed to work in parallel with a state_machine. It communicates with the state machine throw the
  * "collision_warning", the "wished_movement_direction" and the "avoid_movement_direction" topics.
- * Swap_2_5d will connect to all the robots of the system and warns through "collision_warning" to the state machine
- * when two or more uavs are too close and can collide. When that happens, Swap_2_5d will publish over
+ * 3d_swap will connect to all the robots of the system and warns through "collision_warning" to the state machine
+ * when two or more uavs are too close and can collide. When that happens, 3d_swap will publish over
  * "avoid_movement_direction" an avoidance direction for the uav.
  * It also receives from the state machine "wished_movement_direction", a vector that indicates where does the uav wants
  * to go (e.g: where is placed the next goal, or in wich direction does it wants to move).
  *
  */
 
-#ifndef SWAP_2_5D_H
-#define SWAP_2_5D_H
+#ifndef SWAP_3D_H
+#define SWAP_3D_H
 
 #include <swap.h>                    // base class
 #include <vector>
@@ -79,7 +79,7 @@ const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
 // Constant values
 const std::string pose_uav_topic = "/pose";
 
-class Swap_2_5d:  public avoid::Swap
+class Swap_3d:  public avoid::Swap
 {
     public:
 
@@ -89,12 +89,12 @@ class Swap_2_5d:  public avoid::Swap
          * Request to ROS the necessary variables from the parameters and connects
          * the necessary publishers and subscribers.
          */
-        Swap_2_5d();
+        Swap_3d();
 
         /**
          * @brief Destructor to release the memory
          */
-        virtual ~Swap_2_5d();
+        virtual ~Swap_3d();
 
         /**
          * @brief Controls if all parameters are well initialized
@@ -234,4 +234,4 @@ class Swap_2_5d:  public avoid::Swap
 }; // class SwapRos
 
 
-#endif // SWAP_2_5D_H
+#endif // SWAP_3D_H
