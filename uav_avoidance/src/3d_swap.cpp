@@ -53,9 +53,6 @@
 #include <tf2/utils.h>
 #include <visualization_msgs/Marker.h>
 
-
-
-
 int main(int argc, char **argv) {
     // name remapping
     ros::init(argc, argv, "3d_swap");

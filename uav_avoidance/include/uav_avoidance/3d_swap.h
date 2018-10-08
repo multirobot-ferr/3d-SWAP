@@ -59,6 +59,7 @@
 // message need
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <uav_avoidance/Announcement.h>
 #include <sensor_msgs/LaserScan.h>
 #include <pcl_ros/point_cloud.h>
 

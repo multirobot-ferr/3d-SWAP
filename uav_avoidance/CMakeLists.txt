@@ -13,6 +13,7 @@ find_package(catkin
     COMPONENTS
         roscpp
         std_msgs
+        message_generation
         geometry_msgs
         tf2
         uav_abstraction_layer
@@ -27,7 +28,15 @@ generate_dynamic_reconfigure_options(
     config/pid.cfg
 )
 
+##############
+## Messages ##
+##############
+add_message_files(
+    FILES 
+    Announcement.msg 
+)
 
+generate_messages(DEPENDENCIES std_msgs)
 
 ###################################
 ## catkin specific configuration ##
@@ -44,6 +53,7 @@ catkin_package(
   CATKIN_DEPENDS
         roscpp
         std_msgs
+        message_generation
         geometry_msgs
         tf2
         uav_abstraction_layer
