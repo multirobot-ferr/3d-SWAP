@@ -36,16 +36,20 @@ Once dependencies have been installed, 3D-SWAP can be set up. The 3D-SWAP reposi
 
 ## How to use 3D-SWAP ##
 
-There are some examples that you can run for testing the 3D-SWAP. How to run the cube simulation is explained here.
+### Simple performance demo
 
- * simulator_cube.launch: launches up to 4 UAVs in SITL simulation. UAVs are controlled through the ROS services provided by the UAV abstraction Layer.
+If you just want to try 3D-SWAP, you can directly run our cube simulation demo. In it, basically you have 4 UAVs that places themselves in a cube of 20x20x20m centered at (0,0,13) (UAVs are always at least 3m away from the floor). Those UAVs exchange their positions creating a pretty conflictive situation in the center of the cube.
 
-    `$ roslaunch avoidance_experiments simulator_cube.launch`   
+To test it, you have to first launch the 4 UAVs in SITL simulation. The UAVs are controlled through the ROS services provided by the UAV abstraction Layer.
 
- * cube_prepare.launch: UAVs are placed in the four squares of a cube waiting for the starting launch to exchange their positions. 
+    $ roslaunch avoidance_experiments simulator_cube.launch 
+    
+You should have rightnow a gazebo simulation with 4 UAVs, and an RVIZ representation of the system.
 
-    `$ roslaunch avoidance_experiments cube_prepare.launch`
+To make the UAVs take-off and place themselves in their respective starting positions, execute the folling command:
 
- * expcube_start.launch: UAVs start the experiment.
+    $ roslaunch avoidance_experiments cube_prepare.launch
 
-     `$ roslaunch avoidance_experiments expcube_start.launch`
+Finally, once they are in their stating positions, just give them the green light to move:
+
+    $ roslaunch avoidance_experiments expcube_start.launch
