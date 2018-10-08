@@ -5,9 +5,11 @@
 
 # Bag files
 avoidance_experiments/bags/experiment*/*.bag
+avoidance_visualization/rosbag*/*.bag
 
 # Log files
 avoidance_experiments/logs/experiment*/*.txt
+avoidance_experiments/logs/uav*.txt
 
 # Where the experiments are saved (large files)
 uav_avoidance_experiments/  
