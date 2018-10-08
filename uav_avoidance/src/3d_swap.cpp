@@ -31,36 +31,33 @@
  */
 
 /**
- * @file swap_2_5.cpp
+ * @file 3d_swap.cpp
  * @author Eduardo Ferrera
- * @version 0.4
+ * @version 0.7
  * @date    12/3/17
  *
  * @short: Adapts the avoidace code "SWAP" to the GRVC enviroment for the mbzirc challenge.
  *
  * This node is designed to work in parallel with a state_machine. It communicates with the state machine throw the
  * "collision_warning", the "wished_movement_direction" and the "avoid_movement_direction" topics.
- * Swap_2_5d will connect to all the robots of the system and warns through "collision_warning" to the state machine
- * when two or more uavs are too close and can collide. When that happens, Swap_2_5d will publish over
+ * 3d_swap will connect to all the robots of the system and warns through "collision_warning" to the state machine
+ * when two or more uavs are too close and can collide. When that happens, 3d_swap will publish over
  * "avoid_movement_direction" an avoidance direction for the uav.
  * It also receives from the state machine "wished_movement_direction", a vector that indicates where does the uav wants
  * to go (e.g: where is placed the next goal, or in wich direction does it wants to move).
  *
  */
 
-#include <uav_avoidance/swap_2_5d.h>
+#include <uav_avoidance/3d_swap.h>
 #include <std_msgs/Bool.h>
 #include <tf2/utils.h>
 #include <visualization_msgs/Marker.h>
 
-
-
-
 int main(int argc, char **argv) {
     // name remapping
-    ros::init(argc, argv, "swap_2_d");
+    ros::init(argc, argv, "3d_swap");
 
-    Swap_2_5d swap;
+    Swap_3d swap;
 
     std::string why;
     if (!swap.IsReady(why))
@@ -79,7 +76,7 @@ int main(int argc, char **argv) {
 /**
  * Default constructor of the class
  */
-Swap_2_5d::Swap_2_5d()
+Swap_3d::Swap_3d()
 {
     // Preparing private acquisition of parameters
     pnh_ = new ros::NodeHandle("~");
@@ -204,15 +201,16 @@ Swap_2_5d::Swap_2_5d()
     // Subscribing to the position of all UAVs
     for (int n_uav = 0; n_uav < n_uavs_; n_uav++) {
         std::string uav_topic_name = "/" + ual_ns + "uav_" + std::to_string(uav_ids_[n_uav]) + "/ual" + pose_uav_topic.c_str();
-        pos_all_uav_sub_.push_back(nh_.subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Swap_2_5d::PoseReceived, this, std::placeholders::_1, uav_ids_[n_uav]) ));
+        pos_all_uav_sub_.push_back(nh_.subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Swap_3d::PoseReceived, this, std::placeholders::_1, uav_ids_[n_uav]) ));
     }
 
     // Information for the state machine
+    PublishAnnouncement();
     confl_warning_pub_  = nh_.advertise<std_msgs::Bool>("collision_warning", 1, true);
-    wished_mov_dir_sub_ = nh_.subscribe( "wished_movement_direction",1 , &Swap_2_5d::WishedMovDirectionCallback, this);
+    wished_mov_dir_sub_ = nh_.subscribe( "wished_movement_direction",1 , &Swap_3d::WishedMovDirectionCallback, this);
     avoid_mov_dir_pub_  = nh_.advertise<geometry_msgs::Vector3>("avoid_movement_direction", 1, true);
-    laser_sub_ = nh_.subscribe<sensor_msgs::LaserScan>("/mbzirc_1/front_laser/scan",10,&Swap_2_5d::LaserCallback,this);
-    pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_2/velodyne", 10, &Swap_2_5d::CloudCallback, this);
+    laser_sub_ = nh_.subscribe<sensor_msgs::LaserScan>("/mbzirc_1/front_laser/scan",10,&Swap_3d::LaserCallback,this);
+    pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>("/mbzirc_2/velodyne", 10, &Swap_3d::CloudCallback, this);
     xyz_pub_ = nh_.advertise<pcl::PointCloud<pcl::PointXYZ>>("/velodyne/xyztopic",1,true);
     marker_pub = nh_.advertise<visualization_msgs::Marker>("polar_visualization_marker", 10);
     // Meant to debug the system
@@ -232,7 +230,7 @@ Swap_2_5d::Swap_2_5d()
 /**
  * Destructor to release the memory
  */
-Swap_2_5d::~Swap_2_5d()
+Swap_3d::~Swap_3d()
 {
     // Closing debug log
     if (log2mat_)
@@ -248,7 +246,7 @@ Swap_2_5d::~Swap_2_5d()
 /**
  * Controls if all parameters are well initialized
  */
-bool Swap_2_5d::IsReady(  std::string& why_not)
+bool Swap_3d::IsReady(  std::string& why_not)
 {
     if (!Swap::IsReady(why_not))
     {
@@ -265,7 +263,7 @@ bool Swap_2_5d::IsReady(  std::string& why_not)
 /**
  * Executes the main loop of swap
  */
-void Swap_2_5d::Spin()
+void Swap_3d::Spin()
 {
     while (ros::ok())
     {
@@ -279,7 +277,7 @@ void Swap_2_5d::Spin()
 /**
  * Executes the main loop of swap once
  */
-void Swap_2_5d::SpinOnce()
+void Swap_3d::SpinOnce()
 {
     // Forgetting old information
     //TODO Create a watchdog here to see if the information is comming or not
@@ -319,7 +317,7 @@ void Swap_2_5d::SpinOnce()
   * Callback for velodyne
   */
 
-void Swap_2_5d::CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
+void Swap_3d::CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
 
      pcl::PCLPointCloud2 pcl_pc2;
      pcl_conversions::toPCL(*cloud_msg,pcl_pc2);
@@ -343,7 +341,7 @@ void Swap_2_5d::CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg
   * Callback for laser
   */
 
-void Swap_2_5d::LaserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
+void Swap_3d::LaserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
 
 
@@ -358,7 +356,7 @@ void Swap_2_5d::LaserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
 /**
  * Callback for own pose estimatimation
  */
-void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id)
+void Swap_3d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pose, const int uav_id)
 {
     
     tf2::Quaternion q3(uav_pose->pose.orientation.x,
@@ -367,16 +365,9 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
                        uav_pose->pose.orientation.w);
     q3.normalize();     //Avoids a warning
 
-    std::vector<double> offset(3,0.0);
-    #ifdef UAV_NOT_IN_ZERO_ZERO
-    for (int coordinate = 0; coordinate < 3; ++coordinate)
-    {
-        offset[coordinate] = UAV_ZZ( uav_id-1, coordinate );
-    }
-    #endif
-    double x   = offset[0] + uav_pose->pose.position.x;
-    double y   = offset[1] + uav_pose->pose.position.y;
-    double z   = offset[2] + uav_pose->pose.position.z;
+    double x   = uav_pose->pose.position.x;
+    double y   = uav_pose->pose.position.y;
+    double z   = uav_pose->pose.position.z;
     double yaw = tf2::getYaw(q3);
 
     if (uav_id == uav_id_)
@@ -413,7 +404,7 @@ void Swap_2_5d::PoseReceived(const geometry_msgs::PoseStamped::ConstPtr& uav_pos
 /**
  * Callback for the direction of movement of the uav
  */
-void Swap_2_5d::WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPtr& wished_movement_direction_uav)
+void Swap_3d::WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPtr& wished_movement_direction_uav)
 {
     uav_wished_yaw_map_ = atan2(wished_movement_direction_uav->y,
                                 wished_movement_direction_uav->x);
@@ -424,9 +415,22 @@ void Swap_2_5d::WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPt
 }
 
 /**
+ * brief Publishes the existence of such UAV and its characteristics to the world
+ */
+void Swap_3d::PublishAnnouncement()
+{
+    announcement_pub_   = nh_.advertise<uav_avoidance::Announcement>("/3d_swap/uavs_announcements", 1, true);
+    uav_avoidance::Announcement msg;
+    msg.uav_id = uav_id_;
+    msg.uav_name_position_topic = "still not implemented!";
+
+    announcement_pub_.publish(msg);
+}
+
+/**
  * Publishes if there is a possible collision to avoid and the direction to take
  */
-void Swap_2_5d::RequestControlPub(bool request_control)
+void Swap_3d::RequestControlPub(bool request_control)
 {
     std_msgs::Bool request_ctrl;
     request_ctrl.data = request_control;
@@ -447,7 +451,7 @@ void Swap_2_5d::RequestControlPub(bool request_control)
 /**
  * Saves a single line of a log file from the simulation that can be read in matlab
  */
-void Swap_2_5d::FillLogFile()
+void Swap_3d::FillLogFile()
 {
     if (log2mat_)
     {
@@ -481,7 +485,7 @@ void Swap_2_5d::FillLogFile()
 /**
  * Prepares a logger for matlab
  */
-void Swap_2_5d::Log2MatlabInit( const std::string file_path)
+void Swap_3d::Log2MatlabInit( const std::string file_path)
 {
     // Loging first the parameters of the uav
     std::string log_var = file_path + "uav" + std::to_string(uav_id_) + "vars.txt";
@@ -521,7 +525,7 @@ void Swap_2_5d::Log2MatlabInit( const std::string file_path)
 /**
  * Publish markets
  */
-void Swap_2_5d::PolarObstacleMarker()
+void Swap_3d::PolarObstacleMarker()
 {
 
         measurements info;
@@ -584,7 +588,7 @@ void Swap_2_5d::PolarObstacleMarker()
 /**
  * Creates a log file that can be read in matlab
  */
-void Swap_2_5d::Log2Matlab( std::vector<double>& values )
+void Swap_3d::Log2Matlab( std::vector<double>& values )
 {
     if (log2mat_)
     {

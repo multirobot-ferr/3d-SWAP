@@ -31,25 +31,25 @@
  */
 
 /**
- * @file swap_2_5.h
+ * @file 3d_swap.h
  * @author Eduardo Ferrera
- * @version 0.4
+ * @version 0.7
  * @date    12/3/17
  *
  * @short: Adapts the avoidace code "SWAP" to the GRVC enviroment for the mbzirc challenge.
  *
  * This node is designed to work in parallel with a state_machine. It communicates with the state machine throw the
  * "collision_warning", the "wished_movement_direction" and the "avoid_movement_direction" topics.
- * Swap_2_5d will connect to all the robots of the system and warns through "collision_warning" to the state machine
- * when two or more uavs are too close and can collide. When that happens, Swap_2_5d will publish over
+ * 3d_swap will connect to all the robots of the system and warns through "collision_warning" to the state machine
+ * when two or more uavs are too close and can collide. When that happens, 3d_swap will publish over
  * "avoid_movement_direction" an avoidance direction for the uav.
  * It also receives from the state machine "wished_movement_direction", a vector that indicates where does the uav wants
  * to go (e.g: where is placed the next goal, or in wich direction does it wants to move).
  *
  */
 
-#ifndef SWAP_2_5D_H
-#define SWAP_2_5D_H
+#ifndef SWAP_3D_H
+#define SWAP_3D_H
 
 #include <swap.h>                    // base class
 #include <vector>
@@ -59,27 +59,14 @@
 // message need
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <uav_avoidance/Announcement.h>
 #include <sensor_msgs/LaserScan.h>
 #include <pcl_ros/point_cloud.h>
-
-
-
-// Fixing some problems
-// If the simulator makes all uavs start in (0,0), this define should be uncommented
-//#define UAV_NOT_IN_ZERO_ZERO 1
-
-#ifdef UAV_NOT_IN_ZERO_ZERO
-// values extracted from the simulator:
-                        //   x      y   yaw
-const arma::mat UAV_ZZ = { {-28.0, 34.0, 0.0 },
-                           {-20.0, 30.0, 0.0 },
-                           {-28.0, 26.0, 0.0 } };
-#endif
 
 // Constant values
 const std::string pose_uav_topic = "/pose";
 
-class Swap_2_5d:  public avoid::Swap
+class Swap_3d:  public avoid::Swap
 {
     public:
 
@@ -89,12 +76,12 @@ class Swap_2_5d:  public avoid::Swap
          * Request to ROS the necessary variables from the parameters and connects
          * the necessary publishers and subscribers.
          */
-        Swap_2_5d();
+        Swap_3d();
 
         /**
          * @brief Destructor to release the memory
          */
-        virtual ~Swap_2_5d();
+        virtual ~Swap_3d();
 
         /**
          * @brief Controls if all parameters are well initialized
@@ -126,10 +113,11 @@ class Swap_2_5d:  public avoid::Swap
 
 
         // Publishers
+        ros::Publisher announcement_pub_;               //!< Publisher to inform to other UAVs of my presence.
         ros::Publisher confl_warning_pub_;              //!< Publisher to determine if there is a possible collision or not
-        ros::Publisher avoid_mov_dir_pub_;             //!< Publish the direction where the uav has to go to avoid a conflict
-        ros::Publisher xyz_pub_;                       //!< Publish the xyz position from the lidar
-        ros::Publisher marker_pub;                     //!< Publish a marker to visualizate robot orientation
+        ros::Publisher avoid_mov_dir_pub_;              //!< Publish the direction where the uav has to go to avoid a conflict
+        ros::Publisher xyz_pub_;                        //!< Publish the xyz position from the lidar
+        ros::Publisher marker_pub;                      //!< Publish a marker to visualizate robot orientation
         // System variables
         bool initialization_error_ = false;             //!< Flags to track possible errors in initialization
         double spin_sleep_ = 0.1;
@@ -202,6 +190,11 @@ class Swap_2_5d:  public avoid::Swap
 
         /* Internal publishers */
         /**
+         * @brief Publishes the existence of such UAV and its characteristics to the world
+         */
+        void PublishAnnouncement();
+
+        /**
          * @brief Publishes if there is a possible collision to avoid and the direction to take
          */
         void RequestControlPub(bool request_control);
@@ -234,4 +227,4 @@ class Swap_2_5d:  public avoid::Swap
 }; // class SwapRos
 
 
-#endif // SWAP_2_5D_H
+#endif // SWAP_3D_H
