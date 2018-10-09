@@ -199,7 +199,8 @@ Swap_3d::Swap_3d()
         ual_ns = "";
 
     // Subscribing to the position of all UAVs
-    for (int n_uav = 0; n_uav < n_uavs_; n_uav++) {
+    for (int n_uav = 0; n_uav < n_uavs_; n_uav++) 
+    {
         std::string uav_topic_name = "/" + ual_ns + "uav_" + std::to_string(uav_ids_[n_uav]) + "/ual" + pose_uav_topic.c_str();
         pos_all_uav_sub_.push_back(nh_.subscribe<geometry_msgs::PoseStamped>(uav_topic_name.c_str(), 1, std::bind(&Swap_3d::PoseReceived, this, std::placeholders::_1, uav_ids_[n_uav]) ));
     }
@@ -303,7 +304,6 @@ void Swap_3d::SpinOnce()
     }
 
     // Showing to the user what is happening
-  //  ROS_INFO("Swap: %s", state.c_str());
     if (GetMachineStateChanges(state))
     {
         ROS_INFO("Swap: %s", state.c_str());
@@ -340,7 +340,6 @@ void Swap_3d::CloudCallback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
 /**
   * Callback for laser
   */
-
 void Swap_3d::LaserCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
 
@@ -419,10 +418,18 @@ void Swap_3d::WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPtr&
  */
 void Swap_3d::PublishAnnouncement()
 {
+        // Specific namespace for UAL    
+    std::string pose_topic;
+    if (!pnh_->getParam("pose_topic", pose_topic)){
+        initialization_error_ = true;
+        ROS_FATAL("SWAP: pose_topic is not set. Closing the avoidance system");
+    }
+
     announcement_pub_   = nh_.advertise<uav_avoidance::Announcement>("/3d_swap/uavs_announcements", 1, true);
     uav_avoidance::Announcement msg;
-    msg.uav_id = uav_id_;
-    msg.uav_name_position_topic = "still not implemented!";
+    msg.uav_id              = uav_id_;
+    msg.uav_name_pose_topic = pose_topic;
+    msg.uav_safety_radius   = uav_safety_radius_;
 
     announcement_pub_.publish(msg);
 }

@@ -135,7 +135,7 @@ class Swap_3d:  public avoid::Swap
         // Position of the UAV
         bool   pose_received_ = false;                  //!< Tracks if the uav knows its position
         double uav_x_, uav_y_, uav_z_, uav_yaw_;        //!< Position of the current uav
-        bool z_swap_=true;			    		        //!< Flag to swap depends on z-distance between uavs
+        bool z_swap_ = true;			   		        //!< Flag to swap depends on z-distance between uavs
 
         // START ----- IMPORTANT ----- START
         // uav_yaw_ is the direction where the robot wants to go

@@ -4,4 +4,7 @@
 int64 uav_id
 
 # String containing the name where the UAV is going to publish its position.
-string uav_name_position_topic
+string uav_name_pose_topic
+
+# Safety radius of the UAV
+float64 uav_safety_radius

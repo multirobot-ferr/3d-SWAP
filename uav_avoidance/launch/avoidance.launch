@@ -52,10 +52,11 @@
 	<group ns="uav_$(arg robot_number)">
 
     	<node pkg="uav_avoidance" type="3d_swap" name="avoidance_swap" output="screen">
-
+            
             <param name="ual_namespace" value=""/>
             
 	        <!-- Parameters for SWAP -->
+            <param name="pose_topic"    value="/uav_$(arg robot_number)/ual/pose"/>
 	
 	        <!-- Debugging parameters -->
 	            <!-- Comment out this parameter for long experiments. Log files can take too much space.-->
