@@ -65,7 +65,7 @@
             <!-- General configuration parameters -->
             
             <!-- Time that the algorithm remains sleeping in a loop -->
-                <param name="spin_sleep" value="0.1"/>
+                <param name="swap/spin_sleep" value="0.1"/>
 
                 <!-- The UAVs are 1.2x1.2m. Meaning that from the center to the
                       corner there are sqrt((1.2/2)^2 + (1.2/2)^2) = 1.2*sqrt(2)/2 = 0.8486
@@ -115,7 +115,7 @@
 
                 <!-- When avoidance sends speed commands, it will send a vector
                 with a modulus equal to uav_vector_speed -->
-                <param name="uav_vector_speed" value="1"/>
+                <param name="swap/uav_vector_speed" value="1"/>
                 <!--  #################################### -->
 
                 
@@ -139,6 +139,7 @@
                             0.95      * 3.0 +   0.05  * 30.0 = 4.35
             -->
             <param name="swap/multi_input_pond" value="0.0"/>
+            <param name="swap/cylinder_descriptor_announcment_freq" value="0.1"/>
         
         </node>
     </group>

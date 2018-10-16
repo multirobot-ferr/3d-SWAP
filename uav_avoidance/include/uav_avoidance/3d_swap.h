@@ -111,7 +111,6 @@ class Swap_3d:  public avoid::Swap
         ros::Subscriber laser_sub_;                     //!< Receives laser data
         ros::Subscriber pointcloud_sub_;                //!< Receives lidar data
 
-
         // Publishers
         ros::Publisher announcement_pub_;               //!< Publisher to inform to other UAVs of my presence.
         ros::Publisher confl_warning_pub_;              //!< Publisher to determine if there is a possible collision or not
@@ -192,7 +191,8 @@ class Swap_3d:  public avoid::Swap
         /**
          * @brief Publishes the existence of such UAV and its characteristics to the world
          */
-        void PublishAnnouncement();
+        ros::Timer publish_announcement_timmer_;
+        void PublishAnnouncement(const ros::TimerEvent&);
 
         /**
          * @brief Publishes if there is a possible collision to avoid and the direction to take

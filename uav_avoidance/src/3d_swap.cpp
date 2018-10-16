@@ -120,10 +120,10 @@ Swap_3d::Swap_3d()
 
 
     // Getting the sleeping time of the loop
-    pnh_->param<double>("spin_sleep", spin_sleep_, 0.2);
+    pnh_->param<double>("swap/spin_sleep", spin_sleep_, 0.2);
 
     // Getting the normal speed of an uav
-    pnh_->param<double>("uav_vector_speed", uav_vector_speed_, 1.0);
+    pnh_->param<double>("swap/uav_vector_speed", uav_vector_speed_, 1.0);
 
     // Getting swap parameters
     int granularity;
@@ -198,6 +198,12 @@ Swap_3d::Swap_3d()
     if (!pnh_->getParam("ual_namespace", ual_ns))
         ual_ns = "";
 
+    // Getting announcement frequency
+    double freq;
+    pnh_->param<double>("swap/cylinder_descriptor_announcment_freq", freq, 0.2);
+    ros::Duration diff_time = ros::Duration(1.0/freq);
+    publish_announcement_timmer_ = nh_.createTimer(ros::Duration(1.0/freq), &Swap_3d::PublishAnnouncement, this);
+        
     // Subscribing to the position of all UAVs
     for (int n_uav = 0; n_uav < n_uavs_; n_uav++) 
     {
@@ -206,7 +212,6 @@ Swap_3d::Swap_3d()
     }
 
     // Information for the state machine
-    PublishAnnouncement();
     confl_warning_pub_  = nh_.advertise<std_msgs::Bool>("collision_warning", 1, true);
     wished_mov_dir_sub_ = nh_.subscribe( "wished_movement_direction",1 , &Swap_3d::WishedMovDirectionCallback, this);
     avoid_mov_dir_pub_  = nh_.advertise<geometry_msgs::Vector3>("avoid_movement_direction", 1, true);
@@ -416,16 +421,23 @@ void Swap_3d::WishedMovDirectionCallback(const geometry_msgs::Vector3::ConstPtr&
 /**
  * brief Publishes the existence of such UAV and its characteristics to the world
  */
-void Swap_3d::PublishAnnouncement()
+void Swap_3d::PublishAnnouncement(const ros::TimerEvent&)
 {
-        // Specific namespace for UAL    
-    std::string pose_topic;
-    if (!pnh_->getParam("pose_topic", pose_topic)){
-        initialization_error_ = true;
-        ROS_FATAL("SWAP: pose_topic is not set. Closing the avoidance system");
-    }
+    static bool initialized = false;
+    static std::string pose_topic;
 
-    announcement_pub_   = nh_.advertise<uav_avoidance::Announcement>("/3d_swap/uavs_announcements", 1, true);
+    if (!initialized)
+    {
+        if (!pnh_->getParam("pose_topic", pose_topic)){
+            initialization_error_ = true;
+            ROS_FATAL("SWAP: pose_topic is not set. Closing the avoidance system");
+        }
+
+        announcement_pub_   = nh_.advertise<uav_avoidance::Announcement>("/3d_swap/uavs_announcements", 1, true);
+
+        initialized = true;
+    }// Function initialized
+    
     uav_avoidance::Announcement msg;
     msg.uav_id              = uav_id_;
     msg.uav_name_pose_topic = pose_topic;
